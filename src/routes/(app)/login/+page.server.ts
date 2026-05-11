@@ -1,0 +1,49 @@
+import type { Actions, PageServerLoad } from './$types.js';
+import { fail, redirect } from '@sveltejs/kit';
+import { getUserByIdentifier } from '$lib/server/auth/user.js';
+import { verifyPassword } from '$lib/server/auth/password.js';
+import { createSession } from '$lib/server/auth/session.js';
+
+export const load: PageServerLoad = async ({ locals }) => {
+	if (locals.user) {
+		redirect(302, '/profile');
+	}
+};
+
+export const actions: Actions = {
+	default: async ({ request, cookies }) => {
+		const formData = await request.formData();
+		const identifier = formData.get('identifier')?.toString().trim() ?? '';
+		const password = formData.get('password')?.toString() ?? '';
+
+		if (!identifier || !password) {
+			return fail(400, { error: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน' });
+		}
+
+		const user = await getUserByIdentifier(identifier);
+		if (!user) {
+			return fail(400, { error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
+		}
+
+		if (!user.isActive) {
+			return fail(400, { error: 'บัญชีนี้ถูกปิดใช้งาน' });
+		}
+
+		const valid = await verifyPassword(password, user.passwordHash);
+		if (!valid) {
+			return fail(400, { error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
+		}
+
+		const { token, expiresAt } = await createSession(user.id);
+
+		cookies.set('session', token, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: 'lax',
+			path: '/',
+			expires: expiresAt
+		});
+
+		redirect(302, '/profile');
+	}
+};
