@@ -38,6 +38,12 @@
   --space-fluid-2xl: clamp(3rem, 2rem + 5vw, 6rem);
 }
 
+@keyframes loading-slide {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(200%); }
+  100% { transform: translateX(-100%); }
+}
+
 @keyframes aurora {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -172,6 +178,10 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  overflow: visible;
 }
 
 .text-gradient-coral {
@@ -179,6 +189,10 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  overflow: visible;
 }
 
 .bg-gradient-mesh {
@@ -225,6 +239,11 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(196, 181, 253, 0.6);
+}
+
+/* Global heading line-height for Thai tone marks */
+h1, h2, h3 {
+  line-height: 1.5;
 }
 
 /* Reduce motion for accessibility */

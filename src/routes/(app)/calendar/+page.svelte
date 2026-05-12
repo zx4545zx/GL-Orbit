@@ -28,9 +28,44 @@
 		'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
 	];
 
-	const events = $derived(data.events);
-	const allSeries = $derived(data.allSeries);
-	const scheduleByDay = $derived(data.scheduleByDay);
+	let events = $state<Record<string, Array<{
+		time: string;
+		series: string;
+		seriesId: string;
+		episode: string;
+		platform: string;
+		isUncut: boolean;
+	}>>>({});
+	let allSeries = $state<string[]>([]);
+	let platforms = $state<string[]>([]);
+	let scheduleByDay = $state<Array<{
+		day: string;
+		items: Array<{
+			time: string;
+			series: string;
+			seriesId: string;
+			episode: string;
+			platform: string;
+			isUncut: boolean;
+		}>;
+	}>>([]);
+	let loading = $state(true);
+
+	$effect(() => {
+		loading = true;
+		Promise.all([
+			Promise.resolve(data.events),
+			Promise.resolve(data.allSeries),
+			Promise.resolve(data.platforms),
+			Promise.resolve(data.scheduleByDay)
+		]).then(([e, a, p, s]) => {
+			events = e;
+			allSeries = a;
+			platforms = p;
+			scheduleByDay = s;
+			loading = false;
+		});
+	});
 
 	const platformColorClasses = [
 		'bg-red-50 text-red-600 border-red-200',
@@ -45,7 +80,7 @@
 
 	const platformColors = $derived((() => {
 		const map: Record<string, string> = {};
-		data.platforms.forEach((p, i) => {
+		platforms.forEach((p, i) => {
 			map[p] = platformColorClasses[i % platformColorClasses.length];
 		});
 		return map;
@@ -163,18 +198,18 @@
 
 <!-- Floating Sticky View Toggle -->
 <div
-	class="fixed top-0 md:top-20 left-0 right-0 z-30 px-4 sm:px-6 py-3 glass-card border-t-0 border-x-0 shadow-[0_8px_32px_rgba(196,181,253,0.15)] transition-all duration-300 {showSticky ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}"
+	class="fixed top-0 left-0 right-0 z-30 px-4 sm:px-6 py-3 glass-card border-t-0 border-x-0 shadow-[0_8px_32px_rgba(196,181,253,0.15)] transition-all duration-300 md:hidden {showSticky ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}"
 >
 	<div class="max-w-6xl mx-auto">
 		{@render viewToggle()}
 	</div>
 </div>
 
-<div class="py-6 sm:py-8">
+<div class="py-6 sm:py-8 max-w-6xl mx-auto">
 	<!-- Title -->
 	<div bind:this={titleRef} class="text-center mb-6 sm:mb-8">
 		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
-			ตารางฉาย<span class="text-gradient">ประจำเดือน</span>
+			ตารางฉาย<span class="text-coral">ประจำเดือน</span>
 		</h1>
 		<p class="text-sm sm:text-base text-plum-light">อัปเดตตารางฉายซีรีส์ GL ล่าสุด</p>
 	</div>
@@ -302,8 +337,42 @@
 		{/if}
 
 	{:else if viewMode === 'calendar'}
-		<!-- Calendar View -->
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+		{#if loading}
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+				<div class="lg:col-span-2">
+					<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
+						<div class="flex items-center justify-between mb-4 sm:mb-6">
+							<div class="h-8 w-8 sm:h-10 sm:w-10 bg-lavender/10 rounded-xl animate-pulse"></div>
+							<div class="h-6 w-40 bg-lavender/10 rounded animate-pulse"></div>
+							<div class="h-8 w-8 sm:h-10 sm:w-10 bg-lavender/10 rounded-xl animate-pulse"></div>
+						</div>
+						<div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
+							{#each Array(7) as _}
+								<div class="h-8 bg-lavender/10 rounded animate-pulse"></div>
+							{/each}
+						</div>
+						<div class="grid grid-cols-7 gap-0.5 sm:gap-1">
+							{#each Array(42) as _}
+								<div class="aspect-square bg-lavender/10 rounded animate-pulse"></div>
+							{/each}
+						</div>
+					</div>
+				</div>
+				<div class="lg:col-span-1">
+					<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 space-y-3">
+						<div class="h-6 w-1/2 bg-lavender/10 rounded animate-pulse"></div>
+						<div class="h-4 w-1/3 bg-lavender/10 rounded animate-pulse"></div>
+						<div class="space-y-2 pt-2">
+							{#each Array(2) as _}
+								<div class="h-20 bg-lavender/10 rounded animate-pulse"></div>
+							{/each}
+						</div>
+					</div>
+				</div>
+			</div>
+		{:else}
+			<!-- Calendar View -->
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 			<div class="lg:col-span-2">
 				<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
 					<div class="flex items-center justify-between mb-4 sm:mb-6">
@@ -427,6 +496,7 @@
 			</div>
 		</div>
 
+		{/if}
 	{:else}
 		<!-- List View -->
 		{#if scheduleByDay.length === 0}

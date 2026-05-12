@@ -1,12 +1,23 @@
+import { json } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db/index.js';
 import { series, studios, episodes, episodeSchedules, platforms } from '$lib/server/db/schema.js';
 import { eq, and, isNull, gte, asc } from 'drizzle-orm';
-import type { PageServerLoad } from './$types.js';
+import { getCached, setCached } from '$lib/server/cache.js';
+import type { RequestHandler } from './$types.js';
 
-export const load: PageServerLoad = async () => {
+const CACHE_KEY = 'api:home';
+const CACHE_TTL = 30_000;
+
+export const GET: RequestHandler = async () => {
+	const cached = getCached(CACHE_KEY, CACHE_TTL);
+	if (cached) {
+		return json(cached);
+	}
+
 	const db = await getDb();
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
 
-	// Featured series — ONGOING or UPCOMING, limit 6
 	const featuredSeries = await db
 		.select({
 			id: series.id,
@@ -18,16 +29,9 @@ export const load: PageServerLoad = async () => {
 		})
 		.from(series)
 		.leftJoin(studios, eq(series.studioId, studios.id))
-		.where(and(
-			isNull(series.deletedAt),
-			// Only ONGOING or UPCOMING for featured
-		))
+		.where(and(isNull(series.deletedAt)))
 		.orderBy(asc(series.titleEn))
 		.limit(6);
-
-	// Upcoming schedule — from today onwards, limit 5
-	const today = new Date();
-	today.setHours(0, 0, 0, 0);
 
 	const upcomingSchedules = await db
 		.select({
@@ -55,23 +59,7 @@ export const load: PageServerLoad = async () => {
 
 	const dayShortNames = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 
-	const upcomingSchedule = upcomingSchedules.map((s) => {
-		const d = s.airDate;
-		const dayName = dayShortNames[d.getDay()];
-		const timeStr = d.toISOString().split('T')[1].slice(0, 5);
-
-		return {
-			day: dayName + '.',
-			time: timeStr,
-			series: s.seriesTitleEn,
-			seriesId: s.seriesId,
-			episode: s.episodeTitle ?? `EP.${s.episodeNumber}`,
-			platform: s.platformName,
-			isUncut: s.isUncut
-		};
-	});
-
-	return {
+	const result = {
 		featuredSeries: featuredSeries.map((s) => ({
 			id: s.id,
 			title: s.titleEn,
@@ -80,6 +68,22 @@ export const load: PageServerLoad = async () => {
 			status: s.status,
 			studio: s.studioName ?? 'ไม่ระบุสตูดิโอ'
 		})),
-		upcomingSchedule
+		upcomingSchedule: upcomingSchedules.map((s) => {
+			const d = s.airDate;
+			const dayName = dayShortNames[d.getDay()];
+			const timeStr = d.toISOString().split('T')[1].slice(0, 5);
+			return {
+				day: dayName + '.',
+				time: timeStr,
+				series: s.seriesTitleEn,
+				seriesId: s.seriesId,
+				episode: s.episodeTitle ?? `EP.${s.episodeNumber}`,
+				platform: s.platformName,
+				isUncut: s.isUncut
+			};
+		})
 	};
+
+	setCached(CACHE_KEY, result, CACHE_TTL);
+	return json(result);
 };

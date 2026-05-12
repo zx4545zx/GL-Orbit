@@ -3,8 +3,38 @@
 
 	let { data }: { data: PageData } = $props();
 
-	const featuredSeries = $derived(data.featuredSeries);
-	const upcomingSchedule = $derived(data.upcomingSchedule);
+	let featuredSeries = $state<Awaited<PageData['featuredSeries']>>([]);
+	let upcomingSchedule = $state<Awaited<PageData['upcomingSchedule']>>([]);
+	let loadingFeatured = $state(true);
+	let loadingSchedule = $state(true);
+
+	$effect(() => {
+		const value = data.featuredSeries;
+		if (Array.isArray(value)) {
+			featuredSeries = value;
+			loadingFeatured = false;
+		} else {
+			loadingFeatured = true;
+			Promise.resolve(value).then((s) => {
+				featuredSeries = s;
+				loadingFeatured = false;
+			});
+		}
+	});
+
+	$effect(() => {
+		const value = data.upcomingSchedule;
+		if (Array.isArray(value)) {
+			upcomingSchedule = value;
+			loadingSchedule = false;
+		} else {
+			loadingSchedule = true;
+			Promise.resolve(value).then((s) => {
+				upcomingSchedule = s;
+				loadingSchedule = false;
+			});
+		}
+	});
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
@@ -14,7 +44,7 @@
 </script>
 
 <!-- Hero Section -->
-<section class="relative min-h-[70vh] sm:min-h-[80vh] flex items-center justify-center overflow-hidden -mx-4 px-4">
+<section class="relative min-h-[70vh] sm:min-h-[80vh] flex items-center justify-center overflow-hidden -mx-4 px-4 md:-mt-24">
 	<!-- Background decorations -->
 	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
 	<div class="absolute top-16 sm:top-20 left-4 sm:left-10 w-48 h-48 sm:w-72 sm:h-72 bg-coral/20 rounded-full blur-3xl animate-float"></div>
@@ -28,7 +58,7 @@
 		<div class="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 bg-mint rounded-full animate-orbit opacity-50" style="animation-delay: -13s; animation-duration: 25s;"></div>
 	</div>
 
-	<div class="relative z-10 text-center max-w-3xl mx-auto px-4">
+	<div class="relative z-10 text-center max-w-3xl mx-auto px-4 md:pt-24">
 		<div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/60 backdrop-blur-sm border border-lavender/20 mb-6 sm:mb-8 animate-slide-up">
 			<span class="w-2 h-2 bg-coral rounded-full animate-pulse"></span>
 			<span class="text-xs sm:text-sm font-medium text-plum-light">ยินดีต้อนรับสู่จักรวาล GL</span>
@@ -69,7 +99,7 @@
 		<div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-10 gap-4">
 			<div>
 				<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum mb-2">
-					ซีรีส์<span class="text-gradient-coral">แนะนำ</span>
+					ซีรีส์<span class="text-coral">แนะนำ</span>
 				</h2>
 				<p class="text-sm sm:text-base text-plum-light">ซีรีส์ GL ที่น่าติดตามในตอนนี้</p>
 			</div>
@@ -79,7 +109,22 @@
 			</a>
 		</div>
 
-		{#if featuredSeries.length === 0}
+		{#if loadingFeatured}
+			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+				{#each Array(4) as _, i}
+					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+						<div class="relative aspect-[3/4] overflow-hidden">
+							<div class="absolute inset-0 bg-lavender/10 animate-pulse"></div>
+							<div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5 space-y-2">
+								<div class="h-3 w-1/2 bg-white/20 rounded animate-pulse"></div>
+								<div class="h-5 w-3/4 bg-white/30 rounded animate-pulse"></div>
+								<div class="h-3 w-2/3 bg-white/20 rounded animate-pulse"></div>
+							</div>
+						</div>
+					</div>
+				{/each}
+			</div>
+		{:else if featuredSeries.length === 0}
 			<div class="text-center py-16">
 				<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
 					<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,12 +173,24 @@
 	<div class="relative max-w-6xl mx-auto">
 		<div class="text-center mb-8 sm:mb-12">
 			<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum mb-3">
-				ตารางฉาย<span class="text-gradient">เร็วๆ นี้</span>
+				ตารางฉาย<span class="text-coral">เร็วๆ นี้</span>
 			</h2>
 			<p class="text-sm sm:text-base text-plum-light">ไม่พลาดทุกตอนสำคัญ</p>
 		</div>
 
-		{#if upcomingSchedule.length === 0}
+		{#if loadingSchedule}
+			<div class="max-w-2xl mx-auto space-y-3 sm:space-y-4">
+				{#each Array(3) as _, i}
+					<div class="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex items-center gap-3 sm:gap-5">
+						<div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-lavender/10 animate-pulse"></div>
+						<div class="flex-1 min-w-0 space-y-2">
+							<div class="h-4 w-3/4 bg-lavender/10 rounded animate-pulse"></div>
+							<div class="h-3 w-1/2 bg-lavender/10 rounded animate-pulse"></div>
+						</div>
+					</div>
+				{/each}
+			</div>
+		{:else if upcomingSchedule.length === 0}
 			<div class="text-center py-16">
 				<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
 					<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,21 +240,3 @@
 	</div>
 </section>
 
-<!-- Stats / Features Section -->
-<section class="py-12 sm:py-20 -mx-4 px-4">
-	<div class="max-w-6xl mx-auto">
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-			{#each [
-				{ icon: '📺', title: 'ครบทุกซีรีส์', desc: 'รวบรวมซีรีส์ GL จากทุกสตูดิโอทั่วโลก' },
-				{ icon: '⏰', title: 'ตารางฉายแม่นยำ', desc: 'รองรับ Timezone ของคุณ พร้อมระบุ Uncut version' },
-				{ icon: '🔗', title: 'ลิงก์รับชมครบ', desc: 'รวบรวมลิงก์สตรีมมิ่งจากทุกแพลตฟอร์ม' }
-			] as feature}
-				<div class="glass-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-center hover:shadow-xl hover:shadow-lavender/10 transition-all duration-300 hover:-translate-y-1">
-					<div class="text-3xl sm:text-4xl mb-4">{feature.icon}</div>
-					<h3 class="font-[family-name:var(--font-display)] font-bold text-plum text-base sm:text-lg mb-2">{feature.title}</h3>
-					<p class="text-plum-light text-xs sm:text-sm leading-relaxed">{feature.desc}</p>
-				</div>
-			{/each}
-		</div>
-	</div>
-</section>

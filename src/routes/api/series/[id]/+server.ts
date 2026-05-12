@@ -1,11 +1,19 @@
+import { json, error } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db/index.js';
 import { series, studios, artists, seriesArtists, episodes, episodeSchedules, platforms } from '$lib/server/db/schema.js';
 import { eq, and, isNull, asc, inArray } from 'drizzle-orm';
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types.js';
+import { getCached, setCached } from '$lib/server/cache.js';
+import type { RequestHandler } from './$types.js';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const GET: RequestHandler = async ({ params }) => {
+	const cacheKey = `api:series:${params.id}`;
+	const cached = getCached(cacheKey, 30_000);
+	if (cached) {
+		return json(cached);
+	}
+
 	const db = await getDb();
+
 	const [seriesResult] = await db
 		.select({
 			id: series.id,
@@ -97,7 +105,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		? new Date(scheduleResult[0].airDate).getFullYear()
 		: undefined;
 
-	return {
+	const result = {
 		series: {
 			id: seriesResult.id,
 			titleEn: seriesResult.titleEn,
@@ -118,4 +126,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			schedule
 		}
 	};
+
+	setCached(cacheKey, result, 30_000);
+	return json(result);
 };

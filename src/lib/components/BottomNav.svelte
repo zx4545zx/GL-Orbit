@@ -75,6 +75,7 @@
 				{@const active = isActive(item.href)}
 				<a
 					href={item.href}
+					data-sveltekit-preload-data="tap"
 					class="group flex flex-col items-center justify-center gap-1 py-2 px-3 min-w-[64px] touch-target transition-all duration-300"
 				>
 					<div class="relative flex items-center justify-center">

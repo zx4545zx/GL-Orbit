@@ -1,9 +1,19 @@
+import { json } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db/index.js';
 import { series, episodes, episodeSchedules, platforms } from '$lib/server/db/schema.js';
 import { eq, and, isNull, asc } from 'drizzle-orm';
-import type { PageServerLoad } from './$types.js';
+import { getCached, setCached } from '$lib/server/cache.js';
+import type { RequestHandler } from './$types.js';
 
-export const load: PageServerLoad = async () => {
+const CACHE_KEY = 'api:calendar';
+const CACHE_TTL = 30_000;
+
+export const GET: RequestHandler = async () => {
+	const cached = getCached(CACHE_KEY, CACHE_TTL);
+	if (cached) {
+		return json(cached);
+	}
+
 	const db = await getDb();
 
 	const schedules = await db
@@ -30,7 +40,6 @@ export const load: PageServerLoad = async () => {
 		))
 		.orderBy(asc(episodeSchedules.airDate));
 
-	// Group events by date string (YYYY-MM-DD)
 	const eventsByDate: Record<string, Array<{
 		time: string;
 		series: string;
@@ -64,7 +73,6 @@ export const load: PageServerLoad = async () => {
 		platformSet.add(s.platformName);
 	}
 
-	// Build schedule by day of week for list view
 	const dayOfWeekNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
 	const scheduleByDayMap = new Map<string, typeof schedules>();
 
@@ -88,14 +96,16 @@ export const load: PageServerLoad = async () => {
 		}))
 	}));
 
-	// Sort days by day of week order
 	const dayOrder = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
 	scheduleByDay.sort((a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day));
 
-	return {
+	const result = {
 		events: eventsByDate,
 		allSeries: Array.from(allSeriesSet),
 		platforms: Array.from(platformSet),
 		scheduleByDay
 	};
+
+	setCached(CACHE_KEY, result, CACHE_TTL);
+	return json(result);
 };
