@@ -1,6 +1,7 @@
 <script lang="ts">
 	let viewMode = $state<'grid' | 'calendar' | 'list'>('grid');
 	let currentMonth = $state(new Date());
+	let currentWeek = $state(new Date());
 	let selectedDate = $state<string | null>(null);
 
 	let showSticky = $state(false);
@@ -31,6 +32,87 @@
 		const day = String(date.getDate()).padStart(2, '0');
 		return `${year}-${month}-${day}`;
 	}
+
+	// Get start of week (Monday)
+	function getStartOfWeek(date: Date): Date {
+		const d = new Date(date);
+		const day = d.getDay();
+		const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+		return new Date(d.setDate(diff));
+	}
+
+	// Get end of week (Sunday)
+	function getEndOfWeek(date: Date): Date {
+		const start = getStartOfWeek(date);
+		return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7);
+	}
+
+	let events = $state<Record<string, Array<{
+		time: string;
+		series: string;
+		seriesId: string;
+		episode: string;
+		platform: string;
+		isUncut: boolean;
+	}>>({});
+	let allSeries = $state<string[]>([]);
+	let platforms = $state<string[]>([]);
+	let scheduleByDay = $state<Array<{
+		day: string;
+		items: Array<{
+			time: string;
+			series: string;
+			seriesId: string;
+			episode: string;
+			platform: string;
+			isUncut: boolean;
+		}>;
+	}>>([]);
+	let loading = $state(true);
+	let weekLoading = $state(false);
+
+	// Fetch calendar data when currentMonth changes (for grid/calendar views)
+	$effect(() => {
+		const year = currentMonth.getFullYear();
+		const month = currentMonth.getMonth() + 1;
+		
+		loading = true;
+		fetch(`/api/calendar?year=${year}&month=${month}`)
+			.then((r) => r.json())
+			.then((data) => {
+				events = data.events;
+				allSeries = data.allSeries;
+				platforms = data.platforms;
+				scheduleByDay = data.scheduleByDay;
+				loading = false;
+			})
+			.catch((err) => {
+				console.error('Failed to fetch calendar data:', err);
+				loading = false;
+			});
+	});
+
+	// Fetch weekly data when currentWeek changes (for list view)
+	$effect(() => {
+		if (viewMode !== 'list') return;
+
+		const startDate = getStartOfWeek(currentWeek);
+		const endDate = getEndOfWeek(currentWeek);
+		const startDateStr = formatDateLocal(startDate);
+		const endDateStr = formatDateLocal(endDate);
+		
+		weekLoading = true;
+		fetch(`/api/calendar?startDate=${startDateStr}&endDate=${endDateStr}`)
+			.then((r) => r.json())
+			.then((data) => {
+				scheduleByDay = data.scheduleByDay;
+				weekLoading = false;
+			})
+			.catch((err) => {
+				console.error('Failed to fetch weekly data:', err);
+			weekLoading = false;
+		});
+	});
 
 	let events = $state<Record<string, Array<{
 		time: string;
@@ -138,6 +220,35 @@
 
 	function goToToday() {
 		currentMonth = new Date();
+	}
+
+	function prevWeek() {
+		currentWeek = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate() - 7);
+	}
+
+	function nextWeek() {
+		currentWeek = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate() + 7);
+	}
+
+	function goToThisWeek() {
+		currentWeek = new Date();
+	}
+
+	// Get week range text (e.g., "26 พ.ค. - 1 มิ.ย. 2569")
+	function getWeekRangeText(): string {
+		const start = getStartOfWeek(currentWeek);
+		const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+		const startDay = start.getDate();
+		const endDay = end.getDate();
+		const startMonth = thaiMonths[start.getMonth()];
+		const endMonth = thaiMonths[end.getMonth()];
+		const year = start.getFullYear() + 543;
+
+		if (start.getMonth() === end.getMonth()) {
+			return `${startDay} - ${endDay} ${startMonth} ${year}`;
+		} else {
+			return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${year}`;
+		}
 	}
 
 	function isToday(fullDate: string) {
@@ -500,7 +611,38 @@
 		{/if}
 	{:else}
 		<!-- List View -->
-		{#if loading}
+		<!-- Week Navigation -->
+		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6">
+			<div class="flex items-center justify-between">
+				<button
+					aria-label="สัปดาห์ก่อนหน้า"
+					onclick={prevWeek}
+					class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+				>
+					<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+				</button>
+				<div class="flex items-center gap-2 sm:gap-3">
+					<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
+						{getWeekRangeText()}
+					</h2>
+					<button
+						onclick={goToThisWeek}
+						class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
+					>
+						สัปดาห์นี้
+					</button>
+				</div>
+				<button
+					aria-label="สัปดาห์ถัดไป"
+					onclick={nextWeek}
+					class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+				>
+					<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+				</button>
+			</div>
+		</div>
+
+		{#if weekLoading}
 			<div class="space-y-4">
 				{#each Array(3) as _}
 					<div class="glass-card rounded-2xl p-6">

@@ -41,11 +41,18 @@ export const GET: RequestHandler = async ({ url }) => {
 	// Parse query parameters for filtering
 	const yearParam = url.searchParams.get('year');
 	const monthParam = url.searchParams.get('month');
+	const startDateParam = url.searchParams.get('startDate');
+	const endDateParam = url.searchParams.get('endDate');
 	
 	// Build cache key based on filters
-	const cacheKey = yearParam && monthParam 
-		? `api:calendar:${yearParam}:${monthParam}`
-		: 'api:calendar:all';
+	let cacheKey: string;
+	if (startDateParam && endDateParam) {
+		cacheKey = `api:calendar:week:${startDateParam}:${endDateParam}`;
+	} else if (yearParam && monthParam) {
+		cacheKey = `api:calendar:${yearParam}:${monthParam}`;
+	} else {
+		cacheKey = 'api:calendar:all';
+	}
 	
 	const cached = getCached(cacheKey, CACHE_TTL);
 	if (cached) {
@@ -61,19 +68,31 @@ export const GET: RequestHandler = async ({ url }) => {
 		isNull(series.deletedAt)
 	];
 
-	// Add date range filter if year and month are provided
-	if (yearParam && monthParam) {
+	// Add date range filter
+	if (startDateParam && endDateParam) {
+		// Week-based filtering (for list view)
+		const startDate = new Date(startDateParam);
+		const endDate = new Date(endDateParam);
+		
+		// Convert Thailand time to UTC for database query
+		const thailandOffsetMs = 7 * 60 * 60 * 1000;
+		const startUtc = new Date(startDate.getTime() - thailandOffsetMs);
+		const endUtc = new Date(endDate.getTime() - thailandOffsetMs);
+		
+		whereConditions.push(
+			gte(episodeSchedules.airDate, startUtc),
+			lt(episodeSchedules.airDate, endUtc)
+		);
+	} else if (yearParam && monthParam) {
+		// Month-based filtering (for grid/calendar views)
 		const year = parseInt(yearParam);
 		const month = parseInt(monthParam);
 		
 		// Create date range for the month (Thailand time)
-		// Start of month in Thailand time
 		const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
-		// End of month in Thailand time (start of next month)
 		const endDate = new Date(Date.UTC(year, month, 1, 0, 0, 0));
 		
 		// Convert Thailand time to UTC for database query
-		// Thailand is UTC+7, so we subtract 7 hours
 		const thailandOffsetMs = 7 * 60 * 60 * 1000;
 		const startUtc = new Date(startDate.getTime() - thailandOffsetMs);
 		const endUtc = new Date(endDate.getTime() - thailandOffsetMs);
