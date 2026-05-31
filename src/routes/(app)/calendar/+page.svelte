@@ -373,7 +373,6 @@
 														<div class="rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platforms[0]] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target" title="{event.platforms.join(', ')}">
 															<div class="font-bold">{event.time}</div>
 															<div class="mt-0.5">{event.episode}</div>
-															<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-plum-light truncate">{event.platforms.join(', ')}</div>
 															{#if event.isUncut}
 																<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
 															{/if}
