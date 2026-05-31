@@ -128,27 +128,27 @@ export const GET: RequestHandler = async ({ url }) => {
 		series: string;
 		seriesId: string;
 		episode: string;
-		platform: string;
+		platforms: string[];
 		isUncut: boolean;
 	}>> = {};
 
 	const allSeriesSet = new Set<string>();
 	const platformSet = new Set<string>();
 
-	// Group events by date + series + time to merge multiple episodes
+	// Group events by date + series + time to merge multiple episodes/platforms
 	const eventsMap = new Map<string, {
 		time: string;
 		series: string;
 		seriesId: string;
 		episodes: string[];
-		platform: string;
+		platforms: string[];
 		isUncut: boolean;
 	}>();
 
 	for (const s of schedules) {
 		const dateStr = formatThailandDate(s.airDate);
 		const timeStr = formatThailandTime(s.airDate);
-		const key = `${dateStr}:${s.seriesTitleEn}:${timeStr}:${s.platformName}`;
+		const key = `${dateStr}:${s.seriesTitleEn}:${timeStr}`;
 
 		if (!eventsMap.has(key)) {
 			eventsMap.set(key, {
@@ -156,14 +156,19 @@ export const GET: RequestHandler = async ({ url }) => {
 				series: s.seriesTitleEn,
 				seriesId: s.seriesId,
 				episodes: [],
-				platform: s.platformName,
+				platforms: [],
 				isUncut: s.isUncut
 			});
 		}
 
+		const event = eventsMap.get(key)!;
 		const episodeLabel = s.episodeTitle ?? `EP.${s.episodeNumber}`;
-		if (!eventsMap.get(key)!.episodes.includes(episodeLabel)) {
-			eventsMap.get(key)!.episodes.push(episodeLabel);
+		
+		if (!event.episodes.includes(episodeLabel)) {
+			event.episodes.push(episodeLabel);
+		}
+		if (!event.platforms.includes(s.platformName)) {
+			event.platforms.push(s.platformName);
 		}
 
 		allSeriesSet.add(s.seriesTitleEn);
@@ -188,7 +193,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			series: event.series,
 			seriesId: event.seriesId,
 			episode: episodeText,
-			platform: event.platform,
+			platforms: event.platforms,
 			isUncut: event.isUncut
 		});
 	}
@@ -199,14 +204,14 @@ export const GET: RequestHandler = async ({ url }) => {
 		series: string;
 		seriesId: string;
 		episodes: string[];
-		platform: string;
+		platforms: string[];
 		isUncut: boolean;
 	}>>();
 
 	for (const s of schedules) {
 		const dayName = dayOfWeekNames[getThailandDayOfWeek(s.airDate)];
 		const timeStr = formatThailandTime(s.airDate);
-		const key = `${s.seriesTitleEn}:${timeStr}:${s.platformName}`;
+		const key = `${s.seriesTitleEn}:${timeStr}`;
 
 		if (!scheduleByDayMap.has(dayName)) {
 			scheduleByDayMap.set(dayName, new Map());
@@ -219,14 +224,19 @@ export const GET: RequestHandler = async ({ url }) => {
 				series: s.seriesTitleEn,
 				seriesId: s.seriesId,
 				episodes: [],
-				platform: s.platformName,
+				platforms: [],
 				isUncut: s.isUncut
 			});
 		}
 
+		const item = dayMap.get(key)!;
 		const episodeLabel = s.episodeTitle ?? `EP.${s.episodeNumber}`;
-		if (!dayMap.get(key)!.episodes.includes(episodeLabel)) {
-			dayMap.get(key)!.episodes.push(episodeLabel);
+		
+		if (!item.episodes.includes(episodeLabel)) {
+			item.episodes.push(episodeLabel);
+		}
+		if (!item.platforms.includes(s.platformName)) {
+			item.platforms.push(s.platformName);
 		}
 	}
 
@@ -237,7 +247,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			series: item.series,
 			seriesId: item.seriesId,
 			episode: item.episodes.length > 1 ? item.episodes.join(', ') : item.episodes[0],
-			platform: item.platform,
+			platforms: item.platforms,
 			isUncut: item.isUncut
 		}))
 	}));
