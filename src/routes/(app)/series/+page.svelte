@@ -27,6 +27,7 @@
 	};
 
 	type FilterKey = 'ALL' | 'ONGOING' | 'UPCOMING' | 'ENDED';
+	type SeriesItem = PageData['series']['items'][number];
 
 	const filterOptions: { key: FilterKey; label: string }[] = [
 		{ key: 'ALL', label: 'ทั้งหมด' },
@@ -37,11 +38,12 @@
 
 	let filterStatus = $state<FilterKey>('ALL');
 	let searchQuery = $state('');
-	let allSeries = $state<any[]>([]);
+	let allSeries = $state<SeriesItem[]>([]);
 	let total = $state(0);
 	let currentPage = $state(1);
 	let loading = $state(true);
 	let loadMoreLoading = $state(false);
+	let loadMoreError = $state('');
 
 	// Sync local state from server data (after navigation or initial load)
 	$effect(() => {
@@ -50,6 +52,7 @@
 		currentPage = data.series.page;
 		filterStatus = data.filters.status;
 		searchQuery = data.filters.search;
+		loadMoreError = '';
 		loading = false;
 	});
 
@@ -70,29 +73,42 @@
 
 	let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
-	function scheduleSearchUpdate() {
+	function clearSearchTimer() {
 		clearTimeout(searchTimer);
+		searchTimer = undefined;
+	}
+
+	// Cleanup timer on component teardown
+	$effect(() => {
+		return () => clearSearchTimer();
+	});
+
+	function scheduleSearchUpdate() {
+		clearSearchTimer();
+		loading = true;
 		searchTimer = setTimeout(() => {
+			searchTimer = undefined;
 			updateUrl(searchQuery, filterStatus);
 		}, 300);
 	}
 
 	function updateStatus(status: FilterKey) {
+		clearSearchTimer();
 		updateUrl(searchQuery, status);
 	}
 
 	function clearSearch() {
+		clearSearchTimer();
 		searchQuery = '';
 		updateUrl('', filterStatus);
 	}
 
 	async function loadMore() {
-		if (loadMoreLoading) return;
+		if (loadMoreLoading || loading) return;
 		loadMoreLoading = true;
+		loadMoreError = '';
 		try {
-			const params = new URLSearchParams();
-			if (searchQuery.trim()) params.set('search', searchQuery.trim());
-			if (filterStatus !== 'ALL') params.set('status', filterStatus.toLowerCase());
+			const params = new URLSearchParams(page.url.searchParams);
 			params.set('page', String(currentPage + 1));
 			const res = await fetch(`/api/series?${params.toString()}`);
 			if (!res.ok) throw new Error('Load failed');
@@ -103,7 +119,7 @@
 				total = result.total;
 			}
 		} catch {
-			alert('เกิดข้อผิดพลาดในการโหลดข้อมูลเพิ่มเติม กรุณาลองใหม่อีกครั้ง');
+			loadMoreError = 'โหลดไม่สำเร็จ กรุณาลองใหม่';
 		} finally {
 			loadMoreLoading = false;
 		}
@@ -160,6 +176,7 @@
 				{#each filterOptions as filter}
 					<button
 						onclick={() => updateStatus(filter.key)}
+						aria-pressed={filterStatus === filter.key}
 						class="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 flex items-center gap-1.5 touch-target whitespace-nowrap {filterStatus === filter.key ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/60'}"
 					>
 						{filter.label}
@@ -256,6 +273,9 @@
 				{/if}
 			</button>
 
+			{#if loadMoreError}
+				<p class="mt-3 text-sm text-coral-dark">{loadMoreError}</p>
+			{/if}
 		</div>
 	{/if}
 
