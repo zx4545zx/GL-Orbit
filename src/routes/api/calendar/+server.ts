@@ -148,7 +148,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	for (const s of schedules) {
 		const dateStr = formatThailandDate(s.airDate);
 		const timeStr = formatThailandTime(s.airDate);
-		const key = `${dateStr}:${s.seriesTitleEn}:${timeStr}`;
+		const key = `${dateStr}:${s.seriesTitleEn}:${timeStr}:${s.platformName}`;
 
 		if (!eventsMap.has(key)) {
 			eventsMap.set(key, {
@@ -162,7 +162,9 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		const episodeLabel = s.episodeTitle ?? `EP.${s.episodeNumber}`;
-		eventsMap.get(key)!.episodes.push(episodeLabel);
+		if (!eventsMap.get(key)!.episodes.includes(episodeLabel)) {
+			eventsMap.get(key)!.episodes.push(episodeLabel);
+		}
 
 		allSeriesSet.add(s.seriesTitleEn);
 		platformSet.add(s.platformName);
@@ -204,7 +206,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	for (const s of schedules) {
 		const dayName = dayOfWeekNames[getThailandDayOfWeek(s.airDate)];
 		const timeStr = formatThailandTime(s.airDate);
-		const key = `${s.seriesTitleEn}:${timeStr}`;
+		const key = `${s.seriesTitleEn}:${timeStr}:${s.platformName}`;
 
 		if (!scheduleByDayMap.has(dayName)) {
 			scheduleByDayMap.set(dayName, new Map());
@@ -223,7 +225,9 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		const episodeLabel = s.episodeTitle ?? `EP.${s.episodeNumber}`;
-		dayMap.get(key)!.episodes.push(episodeLabel);
+		if (!dayMap.get(key)!.episodes.includes(episodeLabel)) {
+			dayMap.get(key)!.episodes.push(episodeLabel);
+		}
 	}
 
 	const scheduleByDay = Array.from(scheduleByDayMap.entries()).map(([day, itemsMap]) => ({
