@@ -208,6 +208,32 @@ src/
 
 ---
 
+## Pending Shells (Navigation Loading States)
+
+เมื่อผู้ใช้คลิก link เพื่อไปยังหน้าอื่น แอปจะแสดง **Pending Shell** (skeleton UI) ทันทีระหว่างรอโหลดหน้าใหม่ เพื่อลด perceived latency
+
+### Architecture
+- **Base Shells:** `PublicBaseShell.svelte` และ `AdminBaseShell.svelte` — layout + animation + accessibility
+- **Page Shells:** แต่ละหน้ามี shell ของตัวเอง (เช่น `CalendarPendingShell.svelte`, `AdminSeriesPendingShell.svelte`)
+- **Composition:** Page shells ใช้ `{#snippet content()}` เพื่อ inject skeleton เข้าไปใน base shell
+
+### Navigation Detection
+- ใช้ `$derived` กับ `$app/state` (NOT `$app/stores`) เพื่อ detect navigation
+- ตรวจว่า `navigating.to?.url.pathname` ต่างจาก `page.url.pathname` (navigate FROM หน้าอื่น TO หน้าเป้าหมาย)
+- Shell จะแสดงเฉพาะเมื่อ navigate TO หน้าเท่านั้น ไม่แสดงเมื่ออยู่หน้าเดิม
+
+### Components
+- **Public:** `SeriesPendingShell`, `SeriesDetailPendingShell`, `CalendarPendingShell`, `ProfilePendingShell`
+- **Admin:** `AdminSeriesPendingShell`, `AdminArtistsPendingShell`, `AdminStudiosPendingShell`, `AdminPlatformsPendingShell`, `AdminEpisodesPendingShell`, `AdminSchedulesPendingShell`, `AdminArtistSocialsPendingShell`, `AdminSeriesArtistsPendingShell`, `AdminEpisodeSchedulesPendingShell`
+
+### Key Principles
+- **SSR-safe:** Shells ไม่ render บน server (client-side only)
+- **Accessibility:** `aria-busy="true"`, `aria-live="polite"`, เคารพ `prefers-reduced-motion`
+- **Thai UI:** ข้อความใน shell เป็นภาษาไทย
+- **Design:** ใช้ glassmorphism + สี project (coral, lavender, mint, plum)
+
+---
+
 ## Code Style Guidelines
 
 ### Svelte / TypeScript
