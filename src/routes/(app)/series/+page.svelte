@@ -44,15 +44,29 @@
 	let loading = $state(true);
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
+	let pendingUrl: string | null = $state(null);
+	let loadMoreController: AbortController | null = $state(null);
+
+	/** Returns the current URL path + search for this page (used in same-URL guard). */
+	function getCurrentSeriesUrl(): string {
+		return page.url.pathname + page.url.search;
+	}
 
 	// Sync local state from server data (after navigation or initial load)
 	$effect(() => {
+		const serverUrl = buildUrl(data.filters.search, data.filters.status);
+		// If there is a pending navigation and the server data does not match,
+		// the response is stale — ignore it so newer user input is not overwritten.
+		if (pendingUrl !== null && serverUrl !== pendingUrl) {
+			return;
+		}
 		allSeries = data.series.items;
 		total = data.series.total;
 		currentPage = data.series.page;
 		filterStatus = data.filters.status;
 		searchQuery = data.filters.search;
 		loadMoreError = '';
+		pendingUrl = null;
 		loading = false;
 	});
 
@@ -67,8 +81,30 @@
 	}
 
 	async function updateUrl(search: string, status: string) {
+		// Abort any in-flight Load More to prevent racing
+		if (loadMoreController) {
+			loadMoreController.abort();
+			loadMoreController = null;
+			loadMoreLoading = false;
+		}
+
+		const target = buildUrl(search, status);
+		const current = getCurrentSeriesUrl();
+
+		// Same-URL guard: if target matches current, no navigation needed
+		if (target === current) {
+			loading = false;
+			return;
+		}
+
 		loading = true;
-		await goto(buildUrl(search, status), { replaceState: true, noScroll: true, keepFocus: true });
+		pendingUrl = target;
+		try {
+			await goto(target, { replaceState: true, noScroll: true, keepFocus: true });
+		} catch {
+			loading = false;
+			pendingUrl = null;
+		}
 	}
 
 	let searchTimer: ReturnType<typeof setTimeout> | undefined;
@@ -94,6 +130,7 @@
 
 	function updateStatus(status: FilterKey) {
 		clearSearchTimer();
+		filterStatus = status; // Optimistic update before navigation
 		updateUrl(searchQuery, status);
 	}
 
@@ -105,23 +142,41 @@
 
 	async function loadMore() {
 		if (loadMoreLoading || loading) return;
+		const controller = new AbortController();
+		loadMoreController = controller;
 		loadMoreLoading = true;
 		loadMoreError = '';
+
+		// Capture current filter query string so we can detect if filters changed mid-flight
+		const currentFilterQuery = page.url.searchParams.toString();
+
 		try {
 			const params = new URLSearchParams(page.url.searchParams);
 			params.set('page', String(currentPage + 1));
-			const res = await fetch(`/api/series?${params.toString()}`);
+			const res = await fetch(`/api/series?${params.toString()}`, {
+				signal: controller.signal
+			});
 			if (!res.ok) throw new Error('Load failed');
 			const result = await res.json();
+
+			// Only apply results if not aborted and filters still match
+			if (controller.signal.aborted) return;
+			if (page.url.searchParams.toString() !== currentFilterQuery) return;
+
 			if (result && Array.isArray(result.items)) {
 				allSeries = [...allSeries, ...result.items];
 				currentPage = result.page;
 				total = result.total;
 			}
-		} catch {
+		} catch (err) {
+			if (err instanceof Error && err.name === 'AbortError') return;
 			loadMoreError = 'โหลดไม่สำเร็จ กรุณาลองใหม่';
 		} finally {
-			loadMoreLoading = false;
+			// Only clear loading for the current controller
+			if (loadMoreController === controller) {
+				loadMoreLoading = false;
+				loadMoreController = null;
+			}
 		}
 	}
 </script>
@@ -154,6 +209,7 @@
 					bind:value={searchQuery}
 					oninput={scheduleSearchUpdate}
 					placeholder="ค้นหาซีรีส์, สตูดิโอ..."
+					aria-label="ค้นหาซีรีส์หรือสตูดิโอ"
 					class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base"
 				/>
 				{#if searchQuery}
@@ -187,16 +243,19 @@
 	</div>
 {/snippet}
 
-<!-- Floating Sticky Search (appears on scroll) -->
-<div
-	class="fixed top-0 left-0 right-0 z-30 px-4 sm:px-6 py-3 glass-card border-t-0 border-x-0 shadow-[0_8px_32px_rgba(196,181,253,0.15)] transition-all duration-300 md:hidden {showSticky ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}"
->
-	<div class="max-w-6xl mx-auto">
-		{@render searchFilter()}
+<!-- Floating Sticky Search (appears on scroll, hidden from assistive tech when not visible) -->
+{#if showSticky}
+	<div
+		class="fixed top-0 left-0 right-0 z-30 px-4 sm:px-6 py-3 glass-card border-t-0 border-x-0 shadow-[0_8px_32px_rgba(196,181,253,0.15)] transition-all duration-300 md:hidden"
+		aria-hidden={false}
+	>
+		<div class="max-w-6xl mx-auto">
+			{@render searchFilter()}
+		</div>
 	</div>
-</div>
+{/if}
 
-<div class="py-6 sm:py-8 max-w-6xl mx-auto">
+<div class="py-6 sm:py-8 max-w-6xl mx-auto" aria-busy={loading}>
 	<!-- Title -->
 	<div bind:this={titleRef} class="text-center mb-6 sm:mb-8">
 		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
@@ -274,7 +333,7 @@
 			</button>
 
 			{#if loadMoreError}
-				<p class="mt-3 text-sm text-coral-dark">{loadMoreError}</p>
+				<p class="mt-3 text-sm text-coral-dark" role="alert">{loadMoreError}</p>
 			{/if}
 		</div>
 	{/if}
