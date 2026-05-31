@@ -147,7 +147,7 @@ export async function getSeriesList(filters: SeriesFilters, page: number = 1): P
 		.leftJoin(episodeSchedules, and(eq(episodes.id, episodeSchedules.episodeId), isNull(episodeSchedules.deletedAt)))
 		.where(where)
 		.groupBy(series.id, studios.name)
-		.orderBy(desc(sql`MIN(${episodeSchedules.airDate})`), asc(series.titleEn))
+		.orderBy(sql`MIN(${episodeSchedules.airDate}) DESC NULLS FIRST`, asc(series.titleEn))
 		.limit(SERIES_PAGE_LIMIT)
 		.offset(offset);
 
