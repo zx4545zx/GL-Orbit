@@ -1,6 +1,6 @@
-import { and, asc, eq, isNull, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, or, sql } from 'drizzle-orm';
 import { getDb } from '$lib/server/db/index.js';
-import { series, studios } from '$lib/server/db/schema.js';
+import { episodes, episodeSchedules, series, studios } from '$lib/server/db/schema.js';
 
 export const SERIES_PAGE_LIMIT = 20;
 
@@ -138,12 +138,16 @@ export async function getSeriesList(filters: SeriesFilters, page: number = 1): P
 			titleTh: series.titleTh,
 			posterUrl: series.posterUrl,
 			status: series.status,
-			studioName: studios.name
+			studioName: studios.name,
+			firstAirDate: sql<Date | null>`MIN(${episodeSchedules.airDate})`
 		})
 		.from(series)
 		.leftJoin(studios, and(eq(series.studioId, studios.id), isNull(studios.deletedAt)))
+		.leftJoin(episodes, and(eq(series.id, episodes.seriesId), isNull(episodes.deletedAt)))
+		.leftJoin(episodeSchedules, and(eq(episodes.id, episodeSchedules.episodeId), isNull(episodeSchedules.deletedAt)))
 		.where(where)
-		.orderBy(asc(series.titleEn))
+		.groupBy(series.id, studios.name)
+		.orderBy(desc(sql`MIN(${episodeSchedules.airDate})`), asc(series.titleEn))
 		.limit(SERIES_PAGE_LIMIT)
 		.offset(offset);
 
