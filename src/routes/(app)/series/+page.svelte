@@ -36,16 +36,27 @@
 		{ key: 'ENDED', label: 'จบแล้ว' }
 	];
 
-	let filterStatus = $state<FilterKey>('ALL');
-	let searchQuery = $state('');
-	let allSeries = $state<SeriesItem[]>([]);
-	let total = $state(0);
-	let currentPage = $state(1);
-	let loading = $state(true);
+	// Intentional: capture SSR initial values for first render.
+	// The reactive $effect below syncs state after client-side navigations.
+	// svelte-ignore state_referenced_locally
+	let filterStatus = $state<FilterKey>(data.filters.status);
+	// svelte-ignore state_referenced_locally
+	let searchQuery = $state(data.filters.search);
+	// svelte-ignore state_referenced_locally
+	let allSeries = $state<SeriesItem[]>(data.series.items);
+	// svelte-ignore state_referenced_locally
+	let total = $state(data.series.total);
+	// svelte-ignore state_referenced_locally
+	let currentPage = $state(data.series.page);
+	let loading = $state(false);
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
 	let pendingUrl: string | null = $state(null);
 	let loadMoreController: AbortController | null = $state(null);
+
+	// Navigation version tracking to guard stale in-flight navigations
+	let navVersion = $state(0);
+	let latestDesiredUrl: string | null = $state(null);
 
 	/** Returns the current URL path + search for this page (used in same-URL guard). */
 	function getCurrentSeriesUrl(): string {
@@ -91,19 +102,37 @@
 		const target = buildUrl(search, status);
 		const current = getCurrentSeriesUrl();
 
-		// Same-URL guard: if target matches current, no navigation needed
+		// Increment navigation version and set tracking state on every call,
+		// even for same-URL no-ops, to invalidate any stale in-flight navigation.
+		navVersion++;
+		const myVersion = navVersion;
+		latestDesiredUrl = target;
+		pendingUrl = target;
+
+		// Same-URL/no-op: invalidate older navigations and return
 		if (target === current) {
 			loading = false;
 			return;
 		}
 
 		loading = true;
-		pendingUrl = target;
 		try {
 			await goto(target, { replaceState: true, noScroll: true, keepFocus: true });
+			// If this call is stale, repair by navigating to the latest desired URL
+			if (navVersion !== myVersion) {
+				const currentAfterGoto = getCurrentSeriesUrl();
+				if (latestDesiredUrl !== null && currentAfterGoto !== latestDesiredUrl) {
+					goto(latestDesiredUrl, { replaceState: true, noScroll: true, keepFocus: true });
+				}
+				return;
+			}
+			// Latest version: pendingUrl cleared by sync effect on data arrival
 		} catch {
-			loading = false;
-			pendingUrl = null;
+			// Only clear loading / pending state if this call is still the latest version
+			if (navVersion === myVersion) {
+				loading = false;
+				pendingUrl = null;
+			}
 		}
 	}
 
