@@ -115,7 +115,7 @@ export async function getSeriesList(filters: SeriesFilters, page: number = 1): P
 	const [countResult] = await db
 		.select({ count: sql<number>`count(*)::int` })
 		.from(series)
-		.leftJoin(studios, eq(series.studioId, studios.id))
+		.leftJoin(studios, and(eq(series.studioId, studios.id), isNull(studios.deletedAt)))
 		.where(where);
 
 	const rows = await db
@@ -128,7 +128,7 @@ export async function getSeriesList(filters: SeriesFilters, page: number = 1): P
 			studioName: studios.name
 		})
 		.from(series)
-		.leftJoin(studios, eq(series.studioId, studios.id))
+		.leftJoin(studios, and(eq(series.studioId, studios.id), isNull(studios.deletedAt)))
 		.where(where)
 		.orderBy(asc(series.titleEn))
 		.limit(SERIES_PAGE_LIMIT)
