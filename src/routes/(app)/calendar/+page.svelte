@@ -370,12 +370,17 @@
 											{#if dayEvents.length > 0}
 												<div class="space-y-0.5">
 													{#each dayEvents as event}
-														<div class="rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platforms[0]] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target" title="{event.platforms.join(', ')}">
+														<div class="relative group rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platforms[0]] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
 															<div class="font-bold">{event.time}</div>
 															<div class="mt-0.5">{event.episode}</div>
 															{#if event.isUncut}
 																<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
 															{/if}
+															<!-- Custom tooltip -->
+															<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-plum text-white text-[8px] sm:text-[9px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+																{event.platforms.join(', ')}
+																<div class="absolute top-full left-1/2 -translate-x-1/2 border-2 border-transparent border-t-plum"></div>
+															</div>
 														</div>
 													{/each}
 												</div>
