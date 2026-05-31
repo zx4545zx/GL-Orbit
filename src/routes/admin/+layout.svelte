@@ -1,9 +1,40 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { navigating } from '$app/state';
 	import { slide } from 'svelte/transition';
+	import AdminSeriesPendingShell from '$lib/components/AdminSeriesPendingShell.svelte';
+	import AdminArtistsPendingShell from '$lib/components/AdminArtistsPendingShell.svelte';
+	import AdminStudiosPendingShell from '$lib/components/AdminStudiosPendingShell.svelte';
+	import AdminPlatformsPendingShell from '$lib/components/AdminPlatformsPendingShell.svelte';
+	import AdminEpisodesPendingShell from '$lib/components/AdminEpisodesPendingShell.svelte';
+	import AdminSchedulesPendingShell from '$lib/components/AdminSchedulesPendingShell.svelte';
+	import AdminArtistSocialsPendingShell from '$lib/components/AdminArtistSocialsPendingShell.svelte';
+	import AdminSeriesArtistsPendingShell from '$lib/components/AdminSeriesArtistsPendingShell.svelte';
+	import AdminEpisodeSchedulesPendingShell from '$lib/components/AdminEpisodeSchedulesPendingShell.svelte';
 
 	let { children } = $props();
 	let mobileOpen = $state(false);
+
+	const shellMap: Record<string, string> = {
+		'/admin/series': 'series',
+		'/admin/artists': 'artists',
+		'/admin/studios': 'studios',
+		'/admin/platforms': 'platforms',
+		'/admin/episodes': 'episodes',
+		'/admin/schedules': 'schedules',
+		'/admin/artist-socials': 'artist-socials',
+		'/admin/series-artists': 'series-artists',
+		'/admin/episode-schedules': 'episode-schedules'
+	};
+
+	const pendingAdminShell = $derived.by(() => {
+		const to = navigating.to?.url.pathname;
+		const from = $page.url.pathname;
+		
+		if (!to || !to.startsWith('/admin/') || to === from) return null;
+		
+		return shellMap[to] || null;
+	});
 
 	const navItems = [
 		{ href: '/admin/series', label: 'ซีรีส์', icon: 'M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z' },
@@ -111,7 +142,27 @@
 	<!-- Main Content -->
 	<main class="flex-1 lg:ml-64 pt-14 lg:pt-0 min-h-screen">
 		<div class="max-w-6xl mx-auto px-4 py-6">
-			{@render children()}
+			{#if pendingAdminShell === 'series'}
+				<AdminSeriesPendingShell />
+			{:else if pendingAdminShell === 'artists'}
+				<AdminArtistsPendingShell />
+			{:else if pendingAdminShell === 'studios'}
+				<AdminStudiosPendingShell />
+			{:else if pendingAdminShell === 'platforms'}
+				<AdminPlatformsPendingShell />
+			{:else if pendingAdminShell === 'episodes'}
+				<AdminEpisodesPendingShell />
+			{:else if pendingAdminShell === 'schedules'}
+				<AdminSchedulesPendingShell />
+			{:else if pendingAdminShell === 'artist-socials'}
+				<AdminArtistSocialsPendingShell />
+			{:else if pendingAdminShell === 'series-artists'}
+				<AdminSeriesArtistsPendingShell />
+			{:else if pendingAdminShell === 'episode-schedules'}
+				<AdminEpisodeSchedulesPendingShell />
+			{:else}
+				{@render children()}
+			{/if}
 		</div>
 	</main>
 </div>
