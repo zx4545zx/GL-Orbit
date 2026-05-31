@@ -33,8 +33,25 @@ pnpm-debug.log*
 .agents/
 skills-lock.json
 
+# AI Tools configs
+.claude/
+.cline/
+.clinerules
+.codemap/
+.continue/
+.cursor/
+.github/
+.mindmodel/
+.windsurf/
+graphify-out/
+seo.plugin
+thoughts/
+
 # Testing
 coverage/
 
 # Local worktrees
 .worktrees/
+
+# Misc
+1
