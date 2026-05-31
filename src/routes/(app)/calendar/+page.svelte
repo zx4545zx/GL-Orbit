@@ -1,8 +1,4 @@
 <script lang="ts">
-	import type { PageData } from './$types.js';
-
-	let { data }: { data: PageData } = $props();
-
 	let viewMode = $state<'grid' | 'calendar' | 'list'>('grid');
 	let currentMonth = $state(new Date());
 	let selectedDate = $state<string | null>(null);
@@ -59,20 +55,25 @@
 	}>>([]);
 	let loading = $state(true);
 
+	// Fetch calendar data when currentMonth changes
 	$effect(() => {
+		const year = currentMonth.getFullYear();
+		const month = currentMonth.getMonth() + 1;
+		
 		loading = true;
-		Promise.all([
-			Promise.resolve(data.events),
-			Promise.resolve(data.allSeries),
-			Promise.resolve(data.platforms),
-			Promise.resolve(data.scheduleByDay)
-		]).then(([e, a, p, s]) => {
-			events = e;
-			allSeries = a;
-			platforms = p;
-			scheduleByDay = s;
-			loading = false;
-		});
+		fetch(`/api/calendar?year=${year}&month=${month}`)
+			.then((r) => r.json())
+			.then((data) => {
+				events = data.events;
+				allSeries = data.allSeries;
+				platforms = data.platforms;
+				scheduleByDay = data.scheduleByDay;
+				loading = false;
+			})
+			.catch((err) => {
+				console.error('Failed to fetch calendar data:', err);
+				loading = false;
+			});
 	});
 
 	const platformColorClasses = [

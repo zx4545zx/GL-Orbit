@@ -1,11 +1,10 @@
 import { json } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db/index.js';
 import { series, episodes, episodeSchedules, platforms } from '$lib/server/db/schema.js';
-import { eq, and, isNull, asc } from 'drizzle-orm';
+import { eq, and, isNull, asc, gte, lt } from 'drizzle-orm';
 import { getCached, setCached } from '$lib/server/cache.js';
 import type { RequestHandler } from './$types.js';
 
-const CACHE_KEY = 'api:calendar';
 const CACHE_TTL = 30_000;
 
 // Helper function to convert UTC date to Thailand time (UTC+7)
@@ -38,13 +37,52 @@ function getThailandDayOfWeek(date: Date): number {
 	return thailandDate.getUTCDay();
 }
 
-export const GET: RequestHandler = async () => {
-	const cached = getCached(CACHE_KEY, CACHE_TTL);
+export const GET: RequestHandler = async ({ url }) => {
+	// Parse query parameters for filtering
+	const yearParam = url.searchParams.get('year');
+	const monthParam = url.searchParams.get('month');
+	
+	// Build cache key based on filters
+	const cacheKey = yearParam && monthParam 
+		? `api:calendar:${yearParam}:${monthParam}`
+		: 'api:calendar:all';
+	
+	const cached = getCached(cacheKey, CACHE_TTL);
 	if (cached) {
 		return json(cached);
 	}
 
 	const db = await getDb();
+
+	// Build where conditions
+	const whereConditions = [
+		isNull(episodeSchedules.deletedAt),
+		isNull(episodes.deletedAt),
+		isNull(series.deletedAt)
+	];
+
+	// Add date range filter if year and month are provided
+	if (yearParam && monthParam) {
+		const year = parseInt(yearParam);
+		const month = parseInt(monthParam);
+		
+		// Create date range for the month (Thailand time)
+		// Start of month in Thailand time
+		const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
+		// End of month in Thailand time (start of next month)
+		const endDate = new Date(Date.UTC(year, month, 1, 0, 0, 0));
+		
+		// Convert Thailand time to UTC for database query
+		// Thailand is UTC+7, so we subtract 7 hours
+		const thailandOffsetMs = 7 * 60 * 60 * 1000;
+		const startUtc = new Date(startDate.getTime() - thailandOffsetMs);
+		const endUtc = new Date(endDate.getTime() - thailandOffsetMs);
+		
+		whereConditions.push(
+			gte(episodeSchedules.airDate, startUtc),
+			lt(episodeSchedules.airDate, endUtc)
+		);
+	}
 
 	const schedules = await db
 		.select({
@@ -63,11 +101,7 @@ export const GET: RequestHandler = async () => {
 		.innerJoin(episodes, eq(episodeSchedules.episodeId, episodes.id))
 		.innerJoin(series, eq(episodes.seriesId, series.id))
 		.innerJoin(platforms, eq(episodeSchedules.platformId, platforms.id))
-		.where(and(
-			isNull(episodeSchedules.deletedAt),
-			isNull(episodes.deletedAt),
-			isNull(series.deletedAt)
-		))
+		.where(and(...whereConditions))
 		.orderBy(asc(episodeSchedules.airDate));
 
 	const eventsByDate: Record<string, Array<{
@@ -136,6 +170,6 @@ export const GET: RequestHandler = async () => {
 		scheduleByDay
 	};
 
-	setCached(CACHE_KEY, result, CACHE_TTL);
+	setCached(cacheKey, result, CACHE_TTL);
 	return json(result);
 };
