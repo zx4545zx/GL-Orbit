@@ -28,6 +28,14 @@
 		'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
 	];
 
+	// Helper function to format date using local time (not UTC)
+	function formatDateLocal(date: Date): string {
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const day = String(date.getDate()).padStart(2, '0');
+		return `${year}-${month}-${day}`;
+	}
+
 	let events = $state<Record<string, Array<{
 		time: string;
 		series: string;
@@ -102,18 +110,18 @@
 		const prevMonthDays = new Date(date.getFullYear(), date.getMonth(), 0).getDate();
 		for (let i = firstDay - 1; i >= 0; i--) {
 			const d = new Date(date.getFullYear(), date.getMonth() - 1, prevMonthDays - i);
-			days.push({ date: prevMonthDays - i, month: 'prev', fullDate: d.toISOString().split('T')[0] });
+			days.push({ date: prevMonthDays - i, month: 'prev', fullDate: formatDateLocal(d) });
 		}
 
 		for (let i = 1; i <= daysInMonth; i++) {
 			const d = new Date(date.getFullYear(), date.getMonth(), i);
-			days.push({ date: i, month: 'current', fullDate: d.toISOString().split('T')[0] });
+			days.push({ date: i, month: 'current', fullDate: formatDateLocal(d) });
 		}
 
 		const remaining = 42 - days.length;
 		for (let i = 1; i <= remaining; i++) {
 			const d = new Date(date.getFullYear(), date.getMonth() + 1, i);
-			days.push({ date: i, month: 'next', fullDate: d.toISOString().split('T')[0] });
+			days.push({ date: i, month: 'next', fullDate: formatDateLocal(d) });
 		}
 
 		return days;
@@ -132,7 +140,7 @@
 	}
 
 	function isToday(fullDate: string) {
-		const today = new Date().toISOString().split('T')[0];
+		const today = formatDateLocal(new Date());
 		return fullDate === today;
 	}
 
@@ -157,7 +165,7 @@
 	const monthDays = $derived(Array.from({ length: daysInMonthCurrent }, (_, i) => i + 1));
 
 	function getEventForSeriesAndDay(seriesName: string, day: number) {
-		const dateStr = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day).toISOString().split('T')[0];
+		const dateStr = formatDateLocal(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day));
 		return events[dateStr]?.find(e => e.series === seriesName) || null;
 	}
 
@@ -273,7 +281,7 @@
 								<!-- Day columns -->
 								{#each monthDays as day}
 									{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
-									{@const isToday = dateObj.toISOString().split('T')[0] === new Date().toISOString().split('T')[0]}
+									{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
 									{@const dayOfWeek = dateObj.getDay()}
 									<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[36px] sm:min-w-[48px] {isToday ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
 										<div class="font-bold">{day}</div>
@@ -302,7 +310,7 @@
 									{#each monthDays as day}
 										{@const event = getEventForSeriesAndDay(seriesName, day)}
 										{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
-										{@const isToday = dateObj.toISOString().split('T')[0] === new Date().toISOString().split('T')[0]}
+										{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
 										<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isToday ? 'bg-coral/5' : ''}">
 											{#if event}
 												<div class="rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platform] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
