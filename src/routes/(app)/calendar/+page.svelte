@@ -7,17 +7,27 @@
 	let showSticky = $state(false);
 	let titleRef: HTMLDivElement;
 
-	$effect(() => {
-		if (!titleRef) return;
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				showSticky = !entry.isIntersecting;
-			},
-			{ threshold: 0, rootMargin: '0px 0px -1px 0px' }
-		);
-		observer.observe(titleRef);
-		return () => observer.disconnect();
-	});
+	// State variables for calendar data
+	type CalendarEvent = {
+		time: string;
+		series: string;
+		seriesId: string;
+		episode: string;
+		platform: string;
+		isUncut: boolean;
+	};
+
+	type ScheduleDay = {
+		day: string;
+		items: CalendarEvent[];
+	};
+
+	let events: Record<string, CalendarEvent[]> = $state({});
+	let allSeries: string[] = $state([]);
+	let platforms: string[] = $state([]);
+	let scheduleByDay: ScheduleDay[] = $state([]);
+	let loading = $state(true);
+	let weekLoading = $state(false);
 
 	const weekDays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 	const thaiMonths = [
@@ -47,29 +57,17 @@
 		return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7);
 	}
 
-	let events = $state<Record<string, Array<{
-		time: string;
-		series: string;
-		seriesId: string;
-		episode: string;
-		platform: string;
-		isUncut: boolean;
-	}>>({});
-	let allSeries = $state<string[]>([]);
-	let platforms = $state<string[]>([]);
-	let scheduleByDay = $state<Array<{
-		day: string;
-		items: Array<{
-			time: string;
-			series: string;
-			seriesId: string;
-			episode: string;
-			platform: string;
-			isUncut: boolean;
-		}>;
-	}>>([]);
-	let loading = $state(true);
-	let weekLoading = $state(false);
+	$effect(() => {
+		if (!titleRef) return;
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				showSticky = !entry.isIntersecting;
+			},
+			{ threshold: 0, rootMargin: '0px 0px -1px 0px' }
+		);
+		observer.observe(titleRef);
+		return () => observer.disconnect();
+	});
 
 	// Fetch calendar data when currentMonth changes (for grid/calendar views)
 	$effect(() => {
@@ -110,51 +108,7 @@
 			})
 			.catch((err) => {
 				console.error('Failed to fetch weekly data:', err);
-			weekLoading = false;
-		});
-	});
-
-	let events = $state<Record<string, Array<{
-		time: string;
-		series: string;
-		seriesId: string;
-		episode: string;
-		platform: string;
-		isUncut: boolean;
-	}>>>({});
-	let allSeries = $state<string[]>([]);
-	let platforms = $state<string[]>([]);
-	let scheduleByDay = $state<Array<{
-		day: string;
-		items: Array<{
-			time: string;
-			series: string;
-			seriesId: string;
-			episode: string;
-			platform: string;
-			isUncut: boolean;
-		}>;
-	}>>([]);
-	let loading = $state(true);
-
-	// Fetch calendar data when currentMonth changes
-	$effect(() => {
-		const year = currentMonth.getFullYear();
-		const month = currentMonth.getMonth() + 1;
-		
-		loading = true;
-		fetch(`/api/calendar?year=${year}&month=${month}`)
-			.then((r) => r.json())
-			.then((data) => {
-				events = data.events;
-				allSeries = data.allSeries;
-				platforms = data.platforms;
-				scheduleByDay = data.scheduleByDay;
-				loading = false;
-			})
-			.catch((err) => {
-				console.error('Failed to fetch calendar data:', err);
-				loading = false;
+				weekLoading = false;
 			});
 	});
 
