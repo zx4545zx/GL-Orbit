@@ -8,6 +8,36 @@ import type { RequestHandler } from './$types.js';
 const CACHE_KEY = 'api:calendar';
 const CACHE_TTL = 30_000;
 
+// Helper function to convert UTC date to Thailand time (UTC+7)
+function toThailandTime(date: Date): Date {
+	const utcMs = date.getTime();
+	const thailandOffsetMs = 7 * 60 * 60 * 1000; // 7 hours in milliseconds
+	return new Date(utcMs + thailandOffsetMs);
+}
+
+// Format date as YYYY-MM-DD using Thailand time
+function formatThailandDate(date: Date): string {
+	const thailandDate = toThailandTime(date);
+	const year = thailandDate.getUTCFullYear();
+	const month = String(thailandDate.getUTCMonth() + 1).padStart(2, '0');
+	const day = String(thailandDate.getUTCDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
+}
+
+// Format time as HH:MM using Thailand time
+function formatThailandTime(date: Date): string {
+	const thailandDate = toThailandTime(date);
+	const hours = String(thailandDate.getUTCHours()).padStart(2, '0');
+	const minutes = String(thailandDate.getUTCMinutes()).padStart(2, '0');
+	return `${hours}:${minutes}`;
+}
+
+// Get day of week using Thailand time
+function getThailandDayOfWeek(date: Date): number {
+	const thailandDate = toThailandTime(date);
+	return thailandDate.getUTCDay();
+}
+
 export const GET: RequestHandler = async () => {
 	const cached = getCached(CACHE_KEY, CACHE_TTL);
 	if (cached) {
@@ -53,8 +83,8 @@ export const GET: RequestHandler = async () => {
 	const platformSet = new Set<string>();
 
 	for (const s of schedules) {
-		const dateStr = s.airDate.toISOString().split('T')[0];
-		const timeStr = s.airDate.toISOString().split('T')[1].slice(0, 5);
+		const dateStr = formatThailandDate(s.airDate);
+		const timeStr = formatThailandTime(s.airDate);
 
 		if (!eventsByDate[dateStr]) {
 			eventsByDate[dateStr] = [];
@@ -77,7 +107,7 @@ export const GET: RequestHandler = async () => {
 	const scheduleByDayMap = new Map<string, typeof schedules>();
 
 	for (const s of schedules) {
-		const dayName = dayOfWeekNames[s.airDate.getDay()];
+		const dayName = dayOfWeekNames[getThailandDayOfWeek(s.airDate)];
 		if (!scheduleByDayMap.has(dayName)) {
 			scheduleByDayMap.set(dayName, []);
 		}
@@ -87,7 +117,7 @@ export const GET: RequestHandler = async () => {
 	const scheduleByDay = Array.from(scheduleByDayMap.entries()).map(([day, items]) => ({
 		day,
 		items: items.map((item) => ({
-			time: item.airDate.toISOString().split('T')[1].slice(0, 5),
+			time: formatThailandTime(item.airDate),
 			series: item.seriesTitleEn,
 			seriesId: item.seriesId,
 			episode: item.episodeTitle ?? `EP.${item.episodeNumber}`,
