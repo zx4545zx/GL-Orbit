@@ -165,9 +165,9 @@
 	const daysInMonthCurrent = $derived(getDaysInMonth(currentMonth));
 	const monthDays = $derived(Array.from({ length: daysInMonthCurrent }, (_, i) => i + 1));
 
-	function getEventForSeriesAndDay(seriesName: string, day: number) {
+	function getEventsForSeriesAndDay(seriesName: string, day: number) {
 		const dateStr = formatDateLocal(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day));
-		return events[dateStr]?.find(e => e.series === seriesName) || null;
+		return events[dateStr]?.filter(e => e.series === seriesName) || [];
 	}
 
 	const dayColors: Record<string, string> = {
@@ -298,17 +298,21 @@
 									</td>
 									<!-- Day cells -->
 									{#each monthDays as day}
-										{@const event = getEventForSeriesAndDay(seriesName, day)}
+										{@const dayEvents = getEventsForSeriesAndDay(seriesName, day)}
 										{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
 										{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
 										<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isToday ? 'bg-coral/5' : ''}">
-											{#if event}
-												<div class="rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platform] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
-													<div class="font-bold">{event.time}</div>
-													<div class="mt-0.5">{event.episode}</div>
-													{#if event.isUncut}
-														<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
-													{/if}
+											{#if dayEvents.length > 0}
+												<div class="space-y-0.5">
+													{#each dayEvents as event}
+														<div class="rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platform] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
+															<div class="font-bold">{event.time}</div>
+															<div class="mt-0.5">{event.episode}</div>
+															{#if event.isUncut}
+																<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
+															{/if}
+														</div>
+													{/each}
 												</div>
 											{:else}
 												<div class="w-full h-6 sm:h-8"></div>

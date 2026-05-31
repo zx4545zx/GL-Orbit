@@ -116,46 +116,105 @@ export const GET: RequestHandler = async ({ url }) => {
 	const allSeriesSet = new Set<string>();
 	const platformSet = new Set<string>();
 
+	// Group events by date + series + time to merge multiple episodes
+	const eventsMap = new Map<string, {
+		time: string;
+		series: string;
+		seriesId: string;
+		episodes: string[];
+		platform: string;
+		isUncut: boolean;
+	}>();
+
 	for (const s of schedules) {
 		const dateStr = formatThailandDate(s.airDate);
 		const timeStr = formatThailandTime(s.airDate);
+		const key = `${dateStr}:${s.seriesTitleEn}:${timeStr}`;
 
-		if (!eventsByDate[dateStr]) {
-			eventsByDate[dateStr] = [];
+		if (!eventsMap.has(key)) {
+			eventsMap.set(key, {
+				time: timeStr,
+				series: s.seriesTitleEn,
+				seriesId: s.seriesId,
+				episodes: [],
+				platform: s.platformName,
+				isUncut: s.isUncut
+			});
 		}
 
-		eventsByDate[dateStr].push({
-			time: timeStr,
-			series: s.seriesTitleEn,
-			seriesId: s.seriesId,
-			episode: s.episodeTitle ?? `EP.${s.episodeNumber}`,
-			platform: s.platformName,
-			isUncut: s.isUncut
-		});
+		const episodeLabel = s.episodeTitle ?? `EP.${s.episodeNumber}`;
+		eventsMap.get(key)!.episodes.push(episodeLabel);
 
 		allSeriesSet.add(s.seriesTitleEn);
 		platformSet.add(s.platformName);
 	}
 
+	// Convert map back to eventsByDate structure
+	for (const [key, event] of eventsMap.entries()) {
+		const dateStr = key.split(':')[0];
+		
+		if (!eventsByDate[dateStr]) {
+			eventsByDate[dateStr] = [];
+		}
+
+		// Join episodes with comma or show single episode
+		const episodeText = event.episodes.length > 1 
+			? event.episodes.join(', ')
+			: event.episodes[0];
+
+		eventsByDate[dateStr].push({
+			time: event.time,
+			series: event.series,
+			seriesId: event.seriesId,
+			episode: episodeText,
+			platform: event.platform,
+			isUncut: event.isUncut
+		});
+	}
+
 	const dayOfWeekNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
-	const scheduleByDayMap = new Map<string, typeof schedules>();
+	const scheduleByDayMap = new Map<string, Map<string, {
+		time: string;
+		series: string;
+		seriesId: string;
+		episodes: string[];
+		platform: string;
+		isUncut: boolean;
+	}>>();
 
 	for (const s of schedules) {
 		const dayName = dayOfWeekNames[getThailandDayOfWeek(s.airDate)];
+		const timeStr = formatThailandTime(s.airDate);
+		const key = `${s.seriesTitleEn}:${timeStr}`;
+
 		if (!scheduleByDayMap.has(dayName)) {
-			scheduleByDayMap.set(dayName, []);
+			scheduleByDayMap.set(dayName, new Map());
 		}
-		scheduleByDayMap.get(dayName)!.push(s);
+
+		const dayMap = scheduleByDayMap.get(dayName)!;
+		if (!dayMap.has(key)) {
+			dayMap.set(key, {
+				time: timeStr,
+				series: s.seriesTitleEn,
+				seriesId: s.seriesId,
+				episodes: [],
+				platform: s.platformName,
+				isUncut: s.isUncut
+			});
+		}
+
+		const episodeLabel = s.episodeTitle ?? `EP.${s.episodeNumber}`;
+		dayMap.get(key)!.episodes.push(episodeLabel);
 	}
 
-	const scheduleByDay = Array.from(scheduleByDayMap.entries()).map(([day, items]) => ({
+	const scheduleByDay = Array.from(scheduleByDayMap.entries()).map(([day, itemsMap]) => ({
 		day,
-		items: items.map((item) => ({
-			time: formatThailandTime(item.airDate),
-			series: item.seriesTitleEn,
+		items: Array.from(itemsMap.values()).map((item) => ({
+			time: item.time,
+			series: item.series,
 			seriesId: item.seriesId,
-			episode: item.episodeTitle ?? `EP.${item.episodeNumber}`,
-			platform: item.platformName,
+			episode: item.episodes.length > 1 ? item.episodes.join(', ') : item.episodes[0],
+			platform: item.platform,
 			isUncut: item.isUncut
 		}))
 	}));
