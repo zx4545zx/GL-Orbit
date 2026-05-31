@@ -1,4 +1,4 @@
-import { and, asc, eq, ilike, isNull, or, sql } from 'drizzle-orm';
+import { and, asc, eq, isNull, or, sql } from 'drizzle-orm';
 import { getDb } from '$lib/server/db/index.js';
 import { series, studios } from '$lib/server/db/schema.js';
 
@@ -61,6 +61,15 @@ const STATUS_LABEL: Record<SeriesStatusFilter, string> = {
 	ENDED: 'จบแล้ว'
 };
 
+function safeJsonLd(data: unknown): string {
+	return JSON.stringify(data)
+		.replace(/</g, '\\u003c')
+		.replace(/>/g, '\\u003e')
+		.replace(/&/g, '\\u0026')
+		.replace(/\u2028/g, '\\u2028')
+		.replace(/\u2029/g, '\\u2029');
+}
+
 function normalizeSearch(value: string | null): string {
 	return (value ?? '').trim().slice(0, 100);
 }
@@ -86,6 +95,10 @@ export function buildSeriesSearchParams(filters: SeriesFilters): URLSearchParams
 	return params;
 }
 
+function escapeLikePattern(input: string): string {
+	return input.replace(/[\\%_]/g, '\\$&');
+}
+
 function buildSeriesConditions(filters: SeriesFilters) {
 	const conditions = [isNull(series.deletedAt)];
 
@@ -94,12 +107,12 @@ function buildSeriesConditions(filters: SeriesFilters) {
 	}
 
 	if (filters.search) {
-		const pattern = `%${filters.search}%`;
+		const pattern = `%${escapeLikePattern(filters.search)}%`;
 		conditions.push(
 			or(
-				ilike(series.titleEn, pattern),
-				ilike(series.titleTh, pattern),
-				ilike(studios.name, pattern)
+				sql`${series.titleEn} ILIKE ${pattern} ESCAPE '\\'`,
+				sql`${series.titleTh} ILIKE ${pattern} ESCAPE '\\'`,
+				sql`${studios.name} ILIKE ${pattern} ESCAPE '\\'`
 			)!
 		);
 	}
@@ -153,8 +166,9 @@ export function buildSeriesCacheKey(filters: SeriesFilters, page: number): strin
 	return `api:series:search:${filters.search}:status:${filters.status}:page:${page}`;
 }
 
-export function buildSeriesSeoMeta(filters: SeriesFilters, items: SeriesListItem[], url: URL): SeriesSeoMeta {
+export function buildSeriesSeoMeta(filters: SeriesFilters, items: SeriesListItem[], url: URL, page: number = 1): SeriesSeoMeta {
 	const params = buildSeriesSearchParams(filters);
+	if (page > 1) params.set('page', String(page));
 	const query = params.toString();
 	const canonicalPath = query ? `/series?${query}` : '/series';
 
@@ -208,6 +222,6 @@ export function buildSeriesSeoMeta(filters: SeriesFilters, items: SeriesListItem
 		canonicalPath,
 		ogTitle: title,
 		ogDescription: description,
-		jsonLd: JSON.stringify(schemas)
+		jsonLd: safeJsonLd(schemas)
 	};
 }
