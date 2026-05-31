@@ -226,9 +226,7 @@
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={data.meta.canonicalPath} />
 	<meta name="twitter:card" content="summary_large_image" />
-	<script type="application/ld+json">
-		{@html data.meta.jsonLd}
-	</script>
+	{@html `<script type="application/ld+json">${data.meta.jsonLd}</script>`}
 </svelte:head>
 
 {#snippet searchFilter()}
