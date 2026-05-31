@@ -230,15 +230,18 @@
 
 	{#if viewMode === 'grid'}
 		<!-- Grid / Timeline View — Series rows × Date columns -->
-		{#if allSeries.length === 0}
-			<div class="text-center py-16">
-				<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
-					<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-					</svg>
+		{#if loading}
+			<div class="glass-card rounded-2xl sm:rounded-3xl p-6">
+				<div class="flex items-center justify-between mb-4">
+					<div class="h-8 w-8 bg-lavender/10 rounded-xl animate-pulse"></div>
+					<div class="h-6 w-40 bg-lavender/10 rounded animate-pulse"></div>
+					<div class="h-8 w-8 bg-lavender/10 rounded-xl animate-pulse"></div>
 				</div>
-				<h3 class="font-semibold text-plum mb-1">ไม่มีตารางฉาย</h3>
-				<p class="text-sm text-plum-light">ยังไม่มีซีรีส์ที่มีกำหนดฉายในระบบ</p>
+				<div class="space-y-2">
+					{#each Array(5) as _}
+						<div class="h-12 bg-lavender/10 rounded animate-pulse"></div>
+					{/each}
+				</div>
 			</div>
 		{:else}
 			<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
@@ -301,33 +304,52 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each allSeries as seriesName, seriesIndex}
-								<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
-									<!-- Series name cell -->
-									<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
-										<div class="font-semibold text-plum text-xs sm:text-sm truncate">{seriesName}</div>
+							{#if allSeries.length === 0}
+								<!-- Empty state -->
+								<tr>
+									<td colspan={monthDays.length + 1} class="px-4 py-12 text-center">
+										<div class="flex flex-col items-center gap-3">
+											<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center">
+												<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+												</svg>
+											</div>
+											<div>
+												<h3 class="font-semibold text-plum mb-1">ไม่มีตารางฉายในเดือนนี้</h3>
+												<p class="text-sm text-plum-light">ยังไม่มีซีรีส์ที่มีกำหนดฉายในเดือน {thaiMonths[currentMonth.getMonth()]}</p>
+											</div>
+										</div>
 									</td>
-									<!-- Day cells -->
-									{#each monthDays as day}
-										{@const event = getEventForSeriesAndDay(seriesName, day)}
-										{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
-										{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
-										<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isToday ? 'bg-coral/5' : ''}">
-											{#if event}
-												<div class="rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platform] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
-													<div class="font-bold">{event.time}</div>
-													<div class="mt-0.5">{event.episode}</div>
-													{#if event.isUncut}
-														<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
-													{/if}
-												</div>
-											{:else}
-												<div class="w-full h-6 sm:h-8"></div>
-											{/if}
-										</td>
-									{/each}
 								</tr>
-							{/each}
+							{:else}
+								{#each allSeries as seriesName, seriesIndex}
+									<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
+										<!-- Series name cell -->
+										<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
+											<div class="font-semibold text-plum text-xs sm:text-sm truncate">{seriesName}</div>
+										</td>
+										<!-- Day cells -->
+										{#each monthDays as day}
+											{@const event = getEventForSeriesAndDay(seriesName, day)}
+											{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
+											{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
+											<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isToday ? 'bg-coral/5' : ''}">
+												{#if event}
+													<div class="rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platform] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
+														<div class="font-bold">{event.time}</div>
+														<div class="mt-0.5">{event.episode}</div>
+														{#if event.isUncut}
+															<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
+														{/if}
+													</div>
+												{:else}
+													<div class="w-full h-6 sm:h-8"></div>
+												{/if}
+											</td>
+										{/each}
+									</tr>
+								{/each}
+							{/if}
 						</tbody>
 					</table>
 				</div>
@@ -508,15 +530,28 @@
 		{/if}
 	{:else}
 		<!-- List View -->
-		{#if scheduleByDay.length === 0}
+		{#if loading}
+			<div class="space-y-4">
+				{#each Array(3) as _}
+					<div class="glass-card rounded-2xl p-6">
+						<div class="h-8 w-32 bg-lavender/10 rounded animate-pulse mb-4"></div>
+						<div class="space-y-3">
+							{#each Array(2) as _}
+								<div class="h-16 bg-lavender/10 rounded animate-pulse"></div>
+							{/each}
+						</div>
+					</div>
+				{/each}
+			</div>
+		{:else if scheduleByDay.length === 0}
 			<div class="text-center py-16">
 				<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
 					<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 					</svg>
 				</div>
-				<h3 class="font-semibold text-plum mb-1">ไม่มีตารางฉาย</h3>
-				<p class="text-sm text-plum-light">ยังไม่มีซีรีส์ที่มีกำหนดฉายในระบบ</p>
+				<h3 class="font-semibold text-plum mb-1">ไม่มีตารางฉายในเดือนนี้</h3>
+				<p class="text-sm text-plum-light">ยังไม่มีซีรีส์ที่มีกำหนดฉายในเดือน {thaiMonths[currentMonth.getMonth()]}</p>
 			</div>
 		{:else}
 			<div class="space-y-4 sm:space-y-6">
