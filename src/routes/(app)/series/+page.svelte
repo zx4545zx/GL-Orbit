@@ -122,16 +122,20 @@
 			if (navVersion !== myVersion) {
 				const currentAfterGoto = getCurrentSeriesUrl();
 				if (latestDesiredUrl !== null && currentAfterGoto !== latestDesiredUrl) {
-					goto(latestDesiredUrl, { replaceState: true, noScroll: true, keepFocus: true });
+					await goto(latestDesiredUrl, { replaceState: true, noScroll: true, keepFocus: true });
 				}
 				return;
 			}
 			// Latest version: pendingUrl cleared by sync effect on data arrival
 		} catch {
-			// Only clear loading / pending state if this call is still the latest version
+			// Only clear loading / pending state if this call is still the latest version.
+			// Resync optimistic UI controls to URL-backed server state.
 			if (navVersion === myVersion) {
 				loading = false;
 				pendingUrl = null;
+				latestDesiredUrl = null;
+				searchQuery = data.filters.search;
+				filterStatus = data.filters.status;
 			}
 		}
 	}
@@ -276,7 +280,8 @@
 {#if showSticky}
 	<div
 		class="fixed top-0 left-0 right-0 z-30 px-4 sm:px-6 py-3 glass-card border-t-0 border-x-0 shadow-[0_8px_32px_rgba(196,181,253,0.15)] transition-all duration-300 md:hidden"
-		aria-hidden={false}
+		role="search"
+		aria-label="ค้นหาและกรองซีรีส์แบบติดด้านบน"
 	>
 		<div class="max-w-6xl mx-auto">
 			{@render searchFilter()}
