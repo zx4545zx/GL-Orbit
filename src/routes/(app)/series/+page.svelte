@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
@@ -20,93 +22,108 @@
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
-		UPCOMING: { text: ' upcoming', class: 'bg-lavender/20 text-lavender-dark' },
+		UPCOMING: { text: 'เร็วๆ นี้', class: 'bg-lavender/20 text-lavender-dark' },
 		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
 	};
 
-	let filterStatus = $state<'ALL' | 'ONGOING' | 'UPCOMING' | 'ENDED'>('ALL');
-	let searchQuery = $state('');
+	type FilterKey = 'ALL' | 'ONGOING' | 'UPCOMING' | 'ENDED';
 
+	const filterOptions: { key: FilterKey; label: string }[] = [
+		{ key: 'ALL', label: 'ทั้งหมด' },
+		{ key: 'ONGOING', label: 'กำลังฉาย' },
+		{ key: 'UPCOMING', label: 'เร็วๆ นี้' },
+		{ key: 'ENDED', label: 'จบแล้ว' }
+	];
+
+	let filterStatus = $state<FilterKey>('ALL');
+	let searchQuery = $state('');
 	let allSeries = $state<any[]>([]);
 	let total = $state(0);
 	let currentPage = $state(1);
 	let loading = $state(true);
 	let loadMoreLoading = $state(false);
 
-	function isPaginated(v: unknown): v is { items: any[]; total: number; page: number } {
-		return typeof v === 'object' && v !== null && 'items' in v;
-	}
-
+	// Sync local state from server data (after navigation or initial load)
 	$effect(() => {
-		const value = data.series;
-		if (isPaginated(value)) {
-			allSeries = value.items ?? [];
-			total = value.total ?? 0;
-			currentPage = value.page ?? 1;
-			loading = false;
-		} else if (Array.isArray(value)) {
-			allSeries = value;
-			total = value.length;
-			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				if (isPaginated(s)) {
-					allSeries = s.items ?? [];
-					total = s.total ?? 0;
-					currentPage = s.page ?? 1;
-				} else if (Array.isArray(s)) {
-					allSeries = s;
-					total = s.length;
-				}
-				loading = false;
-			});
-		}
-	});
-
-	const filteredSeries = $derived(() => {
-		let result = allSeries;
-
-		if (filterStatus !== 'ALL') {
-			result = result.filter((s: typeof allSeries[0]) => s.status === filterStatus);
-		}
-
-		const q = searchQuery.trim().toLowerCase();
-		if (q) {
-			result = result.filter(
-				(s: typeof allSeries[0]) =>
-					s.title.toLowerCase().includes(q) ||
-					s.subtitle.toLowerCase().includes(q) ||
-					s.studio.toLowerCase().includes(q)
-			);
-		}
-
-		return result;
+		allSeries = data.series.items;
+		total = data.series.total;
+		currentPage = data.series.page;
+		filterStatus = data.filters.status;
+		searchQuery = data.filters.search;
+		loading = false;
 	});
 
 	const hasMore = $derived(allSeries.length < total);
-	const isFiltering = $derived(filterStatus !== 'ALL' || searchQuery.trim().length > 0);
+
+	function buildUrl(search: string, status: string): string {
+		const params = new URLSearchParams();
+		if (search.trim()) params.set('search', search.trim());
+		if (status !== 'ALL') params.set('status', status.toLowerCase());
+		const query = params.toString();
+		return query ? `/series?${query}` : '/series';
+	}
+
+	async function updateUrl(search: string, status: string) {
+		loading = true;
+		await goto(buildUrl(search, status), { replaceState: true, noScroll: true, keepFocus: true });
+	}
+
+	let searchTimer: ReturnType<typeof setTimeout> | undefined;
+
+	function scheduleSearchUpdate() {
+		clearTimeout(searchTimer);
+		searchTimer = setTimeout(() => {
+			updateUrl(searchQuery, filterStatus);
+		}, 300);
+	}
+
+	function updateStatus(status: FilterKey) {
+		updateUrl(searchQuery, status);
+	}
 
 	function clearSearch() {
 		searchQuery = '';
+		updateUrl('', filterStatus);
 	}
 
 	async function loadMore() {
 		if (loadMoreLoading) return;
 		loadMoreLoading = true;
 		try {
-			const res = await fetch(`/api/series?page=${currentPage + 1}`);
+			const params = new URLSearchParams();
+			if (searchQuery.trim()) params.set('search', searchQuery.trim());
+			if (filterStatus !== 'ALL') params.set('status', filterStatus.toLowerCase());
+			params.set('page', String(currentPage + 1));
+			const res = await fetch(`/api/series?${params.toString()}`);
+			if (!res.ok) throw new Error('Load failed');
 			const result = await res.json();
 			if (result && Array.isArray(result.items)) {
 				allSeries = [...allSeries, ...result.items];
 				currentPage = result.page;
 				total = result.total;
 			}
+		} catch {
+			alert('เกิดข้อผิดพลาดในการโหลดข้อมูลเพิ่มเติม กรุณาลองใหม่อีกครั้ง');
 		} finally {
 			loadMoreLoading = false;
 		}
 	}
 </script>
+
+<svelte:head>
+	<title>{data.meta.title}</title>
+	<meta name="description" content={data.meta.description} />
+	<meta name="robots" content={data.meta.robots} />
+	<link rel="canonical" href={data.meta.canonicalPath} />
+	<link rel="alternate" hreflang="th" href="/series" />
+	<link rel="alternate" hreflang="x-default" href="/series" />
+	<meta property="og:title" content={data.meta.ogTitle} />
+	<meta property="og:description" content={data.meta.ogDescription} />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content={data.meta.canonicalPath} />
+	<meta name="twitter:card" content="summary_large_image" />
+	<script type="application/ld+json">{@html data.meta.jsonLd}</script>
+</svelte:head>
 
 {#snippet searchFilter()}
 	<div class="flex flex-col gap-3 max-w-xl mx-auto">
@@ -119,6 +136,7 @@
 				<input
 					type="text"
 					bind:value={searchQuery}
+					oninput={scheduleSearchUpdate}
 					placeholder="ค้นหาซีรีส์, สตูดิโอ..."
 					class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base"
 				/>
@@ -139,9 +157,9 @@
 		<!-- Status Filter -->
 		<div class="flex justify-center">
 			<div class="glass-card rounded-2xl p-1.5 flex gap-1 overflow-x-auto">
-				{#each [{ key: 'ALL', label: 'ทั้งหมด' }, { key: 'ONGOING', label: 'กำลังฉาย' }, { key: 'UPCOMING', label: ' upcoming' }, { key: 'ENDED', label: 'จบแล้ว' }] as filter}
+				{#each filterOptions as filter}
 					<button
-						onclick={() => filterStatus = filter.key as typeof filterStatus}
+						onclick={() => updateStatus(filter.key)}
 						class="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 flex items-center gap-1.5 touch-target whitespace-nowrap {filterStatus === filter.key ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/60'}"
 					>
 						{filter.label}
@@ -191,7 +209,7 @@
 				</div>
 			{/each}
 		{:else}
-			{#each filteredSeries() as s (s.id)}
+			{#each allSeries as s (s.id)}
 				<a href="/series/{s.id}" class="group">
 					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/20 transition-all duration-500 hover:-translate-y-2">
 						<div class="relative aspect-[3/4] overflow-hidden">
@@ -242,7 +260,7 @@
 	{/if}
 
 	<!-- Empty State -->
-	{#if !loading && filteredSeries().length === 0}
+	{#if !loading && allSeries.length === 0}
 		<div class="text-center py-16">
 			<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
 				<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
