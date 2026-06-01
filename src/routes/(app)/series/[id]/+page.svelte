@@ -228,9 +228,9 @@
 											<div class="flex items-center justify-between gap-3 py-2 px-3 sm:px-4 rounded-xl bg-white/50">
 												<div class="flex items-center gap-2 sm:gap-3 min-w-0">
 													{#if sch.platformLogo}
-														<img src={sch.platformLogo} alt={sch.platform} class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover flex-shrink-0" />
+														<img src={sch.platformLogo} alt={sch.platform} class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover flex-shrink-0 border border-lavender/30" />
 													{:else}
-														<div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-lavender/20 flex items-center justify-center flex-shrink-0">
+														<div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-lavender/20 flex items-center justify-center flex-shrink-0 border border-lavender/30">
 															<span class="text-[10px] font-bold text-lavender-dark">{sch.platform.charAt(0)}</span>
 														</div>
 													{/if}
