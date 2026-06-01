@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Pagination from '$lib/components/Pagination.svelte';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import type { PageData, ActionData } from './$types.js';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -12,6 +13,9 @@
 	let editingId = $state<string | null>(null);
 	let formLoading = $state(false);
 	let formError = $state('');
+	let deleteTarget = $state<{ id: string; name: string } | null>(null);
+	let showConfirm = $state(false);
+	let formEl = $state<HTMLDivElement | null>(null);
 
 	$effect(() => {
 		const value = data.platforms;
@@ -33,16 +37,22 @@
 		}
 	});
 
+	function scrollToForm() {
+		setTimeout(() => formEl?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+	}
+
 	function openCreate() {
 		editingId = null;
 		formError = '';
 		showForm = true;
+		scrollToForm();
 	}
 
 	function openEdit(platform: typeof allPlatforms[0]) {
 		editingId = platform.id;
 		formError = '';
 		showForm = true;
+		scrollToForm();
 	}
 
 	function closeForm() {
@@ -63,6 +73,26 @@
 		};
 	}
 
+	function confirmDelete(platform: typeof allPlatforms[0]) {
+		deleteTarget = { id: platform.id, name: platform.name };
+		showConfirm = true;
+	}
+
+	async function handleDelete() {
+		if (!deleteTarget) return;
+		const target = deleteTarget;
+		const formData = new FormData();
+		formData.set('id', target.id);
+		try {
+			const res = await fetch('?/delete', { method: 'POST', body: formData });
+			if (res.ok) {
+				allPlatforms = allPlatforms.filter((p: any) => p.id !== target.id);
+				result = { ...result, data: allPlatforms, total: result.total - 1 };
+			}
+		} catch { /* ignore */ }
+		deleteTarget = null;
+	}
+
 	const editingPlatform = $derived(() => allPlatforms.find((p: any) => p.id === editingId));
 </script>
 
@@ -80,7 +110,7 @@
 	</div>
 
 	{#if showForm}
-		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
+		<div bind:this={formEl} class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไขแพลตฟอร์ม' : 'เพิ่มแพลตฟอร์ม'}</h2>
 			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
 				{#if editingId}
@@ -113,7 +143,8 @@
 		</div>
 	{/if}
 
-	<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg shadow-lavender/5">
+	<!-- Desktop Table -->
+	<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg shadow-lavender/5 hidden md:block">
 		<div class="overflow-x-auto -mx-px">
 			<table class="w-full min-w-[600px]">
 				<thead>
@@ -159,12 +190,9 @@
 										<button onclick={() => openEdit(platform)} aria-label="แก้ไข" class="p-1.5 sm:p-2 rounded-lg hover:bg-lavender/20 transition-colors text-plum-light hover:text-lavender-dark touch-target">
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
 										</button>
-										<form method="POST" action="?/delete" use:enhance={() => async ({ update }) => { await update(); }} class="inline">
-											<input type="hidden" name="id" value={platform.id} />
-											<button type="submit" aria-label="ลบ" class="p-1.5 sm:p-2 rounded-lg hover:bg-coral/10 transition-colors text-plum-light hover:text-coral-dark touch-target">
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-											</button>
-										</form>
+										<button onclick={() => confirmDelete(platform)} aria-label="ลบ" class="p-1.5 sm:p-2 rounded-lg hover:bg-coral/10 transition-colors text-plum-light hover:text-coral-dark touch-target">
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+										</button>
 									</div>
 								</td>
 							</tr>
@@ -173,6 +201,58 @@
 				</tbody>
 			</table>
 		</div>
+	</div>
+
+	<!-- Mobile Cards -->
+	<div class="block md:hidden space-y-3">
+		{#if loading}
+			{#each Array(4) as _, i}
+				<div class="glass-card rounded-2xl p-4 animate-pulse space-y-3">
+					<div class="flex items-center gap-3">
+						<div class="w-10 h-10 rounded-full bg-lavender/10 flex-shrink-0"></div>
+						<div class="flex-1 space-y-2">
+							<div class="h-4 w-3/4 bg-lavender/10 rounded"></div>
+							<div class="h-3 w-1/2 bg-lavender/10 rounded"></div>
+						</div>
+					</div>
+					<div class="flex justify-end pt-2">
+						<div class="h-8 w-24 bg-lavender/10 rounded"></div>
+					</div>
+				</div>
+			{/each}
+		{:else}
+			{#each allPlatforms as platform (platform.id)}
+				<div class="glass-card rounded-2xl p-4 transition-all">
+					<div class="flex items-center gap-3">
+						{#if platform.logoUrl}
+							<img src={platform.logoUrl} alt={platform.name} class="w-10 h-10 rounded-full object-cover border border-lavender/30 flex-shrink-0" />
+						{:else}
+							<div class="w-10 h-10 rounded-full bg-lavender/10 flex items-center justify-center border border-lavender/30 flex-shrink-0">
+								<svg class="w-5 h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+							</div>
+						{/if}
+						<div class="flex-1 min-w-0">
+							<div class="font-semibold text-plum text-sm">{platform.name}</div>
+							{#if platform.baseUrl}
+								<p class="text-xs text-plum-light truncate mt-0.5">{platform.baseUrl}</p>
+							{:else}
+								<p class="text-xs text-plum-light/50 mt-0.5">-</p>
+							{/if}
+						</div>
+					</div>
+					<div class="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-lavender/10">
+						<button onclick={() => openEdit(platform)} class="px-3 py-1.5 rounded-lg bg-lavender/10 text-lavender-dark text-xs font-medium hover:bg-lavender/20 transition-colors touch-target flex items-center gap-1">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+							แก้ไข
+						</button>
+						<button onclick={() => confirmDelete(platform)} class="px-3 py-1.5 rounded-lg bg-coral/10 text-coral-dark text-xs font-medium hover:bg-coral/20 transition-colors touch-target flex items-center gap-1">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+							ลบ
+						</button>
+					</div>
+				</div>
+			{/each}
+		{/if}
 	</div>
 
 	{#if !loading && result.totalPages > 1}
@@ -191,3 +271,10 @@
 		</div>
 	{/if}
 </div>
+
+<ConfirmDialog
+	bind:open={showConfirm}
+	title="ยืนยันการลบแพลตฟอร์ม"
+	message={deleteTarget ? `คุณแน่ใจหรือไม่ว่าต้องการลบ "${deleteTarget.name}"? การกระทำนี้ไม่สามารถย้อนกลับได้` : ''}
+	onconfirm={handleDelete}
+/>

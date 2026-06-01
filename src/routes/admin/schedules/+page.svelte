@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Pagination from '$lib/components/Pagination.svelte';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import type { PageData, ActionData } from './$types.js';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -22,6 +23,9 @@
 	let editingId = $state<string | null>(null);
 	let formLoading = $state(false);
 	let formError = $state('');
+	let formEl = $state<HTMLElement | null>(null);
+	let deleteTarget = $state<string | null>(null);
+	let showConfirm = $state(false);
 
 	$effect(() => {
 		const value = data.schedules;
@@ -43,16 +47,24 @@
 		}
 	});
 
+	function scrollToForm() {
+		setTimeout(() => {
+			formEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}, 50);
+	}
+
 	function openCreate() {
 		editingId = null;
 		formError = '';
 		showForm = true;
+		scrollToForm();
 	}
 
 	function openEdit(schedule: typeof allSchedules[0]) {
 		editingId = schedule.id;
 		formError = '';
 		showForm = true;
+		scrollToForm();
 	}
 
 	function closeForm() {
@@ -71,6 +83,21 @@
 			}
 			await update();
 		};
+	}
+
+	async function handleDelete() {
+		if (!deleteTarget) return;
+		try {
+			await fetch('?/delete', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams({ id: deleteTarget })
+			});
+		} catch {
+			// silent
+		}
+		deleteTarget = null;
+		showConfirm = false;
 	}
 
 	const editingSchedule = $derived(() => allSchedules.find((s: any) => s.id === editingId));
@@ -95,7 +122,7 @@
 	{#if showForm}
 		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไขตารางฉาย' : 'เพิ่มตารางฉาย'}</h2>
-			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
+			<form bind:this={formEl} method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
 				{#if editingId}
 					<input type="hidden" name="id" value={editingId} />
 				{/if}
@@ -186,12 +213,9 @@
 							<button onclick={() => openEdit(schedule)} aria-label="แก้ไข" class="p-1.5 rounded-lg hover:bg-lavender/20 transition-colors text-plum-light touch-target">
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
 							</button>
-							<form method="POST" action="?/delete" use:enhance={() => async ({ update }) => { await update(); }} class="inline">
-								<input type="hidden" name="id" value={schedule.id} />
-								<button type="submit" aria-label="ลบ" class="p-1.5 rounded-lg hover:bg-coral/10 transition-colors text-plum-light hover:text-coral-dark touch-target">
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-								</button>
-							</form>
+							<button onclick={() => { deleteTarget = schedule.id; showConfirm = true; }} aria-label="ลบ" class="p-1.5 rounded-lg hover:bg-coral/10 transition-colors text-plum-light hover:text-coral-dark touch-target">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+							</button>
 						</div>
 					</div>
 
@@ -236,3 +260,14 @@
 		</div>
 	{/if}
 </div>
+
+<ConfirmDialog
+	bind:open={showConfirm}
+	title="ยืนยันการลบ"
+	message="คุณแน่ใจหรือไม่ว่าต้องการลบตารางฉายนี้? การกระทำนี้ไม่สามารถย้อนกลับได้"
+	confirmLabel="ลบ"
+	cancelLabel="ยกเลิก"
+	danger={true}
+	onconfirm={handleDelete}
+	oncancel={() => { deleteTarget = null; }}
+/>

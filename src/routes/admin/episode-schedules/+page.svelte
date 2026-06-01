@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Pagination from '$lib/components/Pagination.svelte';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import type { PageData, ActionData } from './$types.js';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -12,6 +13,11 @@
 	let editingId = $state<string | null>(null);
 	let formLoading = $state(false);
 	let formError = $state('');
+
+	let formEl = $state<HTMLElement | null>(null);
+
+	let deleteTarget = $state<string | null>(null);
+	let showConfirm = $state(false);
 
 	$effect(() => {
 		const value = data.schedules;
@@ -33,22 +39,45 @@
 		}
 	});
 
+	function scrollToForm() {
+		setTimeout(() => {
+			formEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}, 50);
+	}
+
 	function openCreate() {
 		editingId = null;
 		formError = '';
 		showForm = true;
+		scrollToForm();
 	}
 
 	function openEdit(item: typeof allItems[0]) {
 		editingId = item.id;
 		formError = '';
 		showForm = true;
+		scrollToForm();
 	}
 
 	function closeForm() {
 		showForm = false;
 		editingId = null;
 		formError = '';
+	}
+
+	function confirmDelete(id: string) {
+		deleteTarget = id;
+		showConfirm = true;
+	}
+
+	async function handleDelete() {
+		if (!deleteTarget) return;
+		const fd = new FormData();
+		fd.append('id', deleteTarget);
+		await fetch('?/delete', { method: 'POST', body: fd });
+		deleteTarget = null;
+		showConfirm = false;
+		window.location.reload();
 	}
 
 	function handleEnhance() {
@@ -92,7 +121,7 @@
 	</div>
 
 	{#if showForm}
-		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
+		<div bind:this={formEl} class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไข' : 'เพิ่ม'}ตารางฉายรายตอน</h2>
 			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
 				{#if editingId}
@@ -145,68 +174,126 @@
 		</div>
 	{/if}
 
-	<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg shadow-lavender/5">
-		<div class="overflow-x-auto -mx-px">
-			<table class="w-full min-w-[700px]">
-				<thead>
-					<tr class="border-b border-lavender/20">
-						<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider">ซีรีส์</th>
-						<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider hidden md:table-cell">ตอน</th>
-						<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider hidden md:table-cell">แพลตฟอร์ม</th>
-						<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider">วันที่</th>
-						<th class="px-4 sm:px-6 py-3 sm:py-4 text-right text-xs font-semibold text-plum-light uppercase tracking-wider">จัดการ</th>
-					</tr>
-				</thead>
-				<tbody class="divide-y divide-lavender/10">
-					{#if loading}
-						{#each Array(4) as _, i}
-							<tr class="animate-pulse">
-								<td class="px-4 sm:px-6 py-3 sm:py-4"><div class="h-4 w-24 bg-lavender/10 rounded"></div></td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4 hidden md:table-cell"><div class="h-3 w-12 bg-lavender/10 rounded"></div></td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4 hidden md:table-cell"><div class="h-3 w-16 bg-lavender/10 rounded"></div></td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4"><div class="h-3 w-20 bg-lavender/10 rounded"></div></td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4 text-right"><div class="h-8 w-16 bg-lavender/10 rounded ml-auto"></div></td>
-							</tr>
-						{/each}
-					{:else}
-						{#each allItems as item (item.id)}
-							<tr class="hover:bg-white/40 transition-colors">
-								<td class="px-4 sm:px-6 py-3 sm:py-4 text-sm text-plum">{item.series?.title ?? '-'}</td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-plum-light hidden md:table-cell">
-									{#if item.episode}
-										ตอนที่ {item.episode.episodeNumber}: {item.episode.title}
-									{:else}
-										-
-									{/if}
-								</td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-plum-light hidden md:table-cell">
-									{item.platform?.name ?? '-'}
-								</td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-plum-light">
-									<div class="flex flex-col">
-										<span>{formatDate(item.airDate)}</span>
-										<span class="text-plum-light/60">{formatTime(item.airTime)}</span>
-									</div>
-								</td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4 text-right">
-									<div class="flex items-center justify-end gap-1 sm:gap-2">
-										<button onclick={() => openEdit(item)} aria-label="แก้ไข" class="p-1.5 sm:p-2 rounded-lg hover:bg-lavender/20 transition-colors text-plum-light hover:text-lavender-dark touch-target">
-											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-										</button>
-										<form method="POST" action="?/delete" use:enhance={() => async ({ update }) => { await update(); }} class="inline">
-											<input type="hidden" name="id" value={item.id} />
-											<button type="submit" aria-label="ลบ" class="p-1.5 sm:p-2 rounded-lg hover:bg-coral/10 transition-colors text-plum-light hover:text-coral-dark touch-target">
+	<!-- Desktop Table -->
+	<div class="hidden md:block">
+		<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg shadow-lavender/5">
+			<div class="overflow-x-auto -mx-px">
+				<table class="w-full min-w-[700px]">
+					<thead>
+						<tr class="border-b border-lavender/20">
+							<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider">ซีรีส์</th>
+							<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider hidden md:table-cell">ตอน</th>
+							<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider hidden md:table-cell">แพลตฟอร์ม</th>
+							<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider">วันที่</th>
+							<th class="px-4 sm:px-6 py-3 sm:py-4 text-right text-xs font-semibold text-plum-light uppercase tracking-wider">จัดการ</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-lavender/10">
+						{#if loading}
+							{#each Array(4) as _, i}
+								<tr class="animate-pulse">
+									<td class="px-4 sm:px-6 py-3 sm:py-4"><div class="h-4 w-24 bg-lavender/10 rounded"></div></td>
+									<td class="px-4 sm:px-6 py-3 sm:py-4 hidden md:table-cell"><div class="h-3 w-12 bg-lavender/10 rounded"></div></td>
+									<td class="px-4 sm:px-6 py-3 sm:py-4 hidden md:table-cell"><div class="h-3 w-16 bg-lavender/10 rounded"></div></td>
+									<td class="px-4 sm:px-6 py-3 sm:py-4"><div class="h-3 w-20 bg-lavender/10 rounded"></div></td>
+									<td class="px-4 sm:px-6 py-3 sm:py-4 text-right"><div class="h-8 w-16 bg-lavender/10 rounded ml-auto"></div></td>
+								</tr>
+							{/each}
+						{:else}
+							{#each allItems as item (item.id)}
+								<tr class="hover:bg-white/40 transition-colors">
+									<td class="px-4 sm:px-6 py-3 sm:py-4 text-sm text-plum">{item.series?.title ?? '-'}</td>
+									<td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-plum-light hidden md:table-cell">
+										{#if item.episode}
+											ตอนที่ {item.episode.episodeNumber}: {item.episode.title}
+										{:else}
+											-
+										{/if}
+									</td>
+									<td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-plum-light hidden md:table-cell">
+										{item.platform?.name ?? '-'}
+									</td>
+									<td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-plum-light">
+										<div class="flex flex-col">
+											<span>{formatDate(item.airDate)}</span>
+											<span class="text-plum-light/60">{formatTime(item.airTime)}</span>
+										</div>
+									</td>
+									<td class="px-4 sm:px-6 py-3 sm:py-4 text-right">
+										<div class="flex items-center justify-end gap-1 sm:gap-2">
+											<button onclick={() => openEdit(item)} aria-label="แก้ไข" class="p-1.5 sm:p-2 rounded-lg hover:bg-lavender/20 transition-colors text-plum-light hover:text-lavender-dark touch-target">
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+											</button>
+											<button onclick={() => confirmDelete(item.id)} aria-label="ลบ" class="p-1.5 sm:p-2 rounded-lg hover:bg-coral/10 transition-colors text-plum-light hover:text-coral-dark touch-target">
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
 											</button>
-										</form>
-									</div>
-								</td>
-							</tr>
-						{/each}
-					{/if}
-				</tbody>
-			</table>
+										</div>
+									</td>
+								</tr>
+							{/each}
+						{/if}
+					</tbody>
+				</table>
+			</div>
 		</div>
+	</div>
+
+	<!-- Mobile Cards -->
+	<div class="block md:hidden space-y-3">
+		{#if loading}
+			{#each Array(4) as _, i}
+				<div class="glass-card rounded-2xl p-4 animate-pulse">
+					<div class="h-4 w-3/4 bg-lavender/10 rounded mb-3"></div>
+					<div class="space-y-2">
+						<div class="h-3 w-full bg-lavender/10 rounded"></div>
+						<div class="h-3 w-2/3 bg-lavender/10 rounded"></div>
+					</div>
+					<div class="flex justify-end gap-2 mt-3 pt-3 border-t border-lavender/10">
+						<div class="h-8 w-16 bg-lavender/10 rounded"></div>
+					</div>
+				</div>
+			{/each}
+		{:else}
+			{#each allItems as item (item.id)}
+				<div class="glass-card rounded-2xl p-4">
+					<div class="flex items-start justify-between mb-2">
+						<h3 class="font-semibold text-plum text-sm leading-snug">{item.series?.title ?? '-'}</h3>
+						{#if item.isUncut}
+							<span class="shrink-0 ml-2 px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] font-medium">Uncut</span>
+						{/if}
+					</div>
+					<div class="space-y-1.5 mb-3">
+						<div class="flex items-center gap-2 text-xs text-plum-light">
+							<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+							{#if item.episode}
+								ตอนที่ {item.episode.episodeNumber}: {item.episode.title}
+							{:else}
+								-
+							{/if}
+						</div>
+						<div class="flex items-center gap-2 text-xs text-plum-light">
+							<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+							{item.platform?.name ?? '-'}
+						</div>
+						<div class="flex items-center gap-2 text-xs text-plum-light">
+							<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+							<span>{formatDate(item.airDate)}</span>
+							<span class="text-plum-light/60">{formatTime(item.airTime)}</span>
+						</div>
+					</div>
+					<div class="flex items-center justify-end gap-2 pt-2.5 border-t border-lavender/10">
+						<button onclick={() => openEdit(item)} aria-label="แก้ไข" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-lavender-dark hover:bg-lavender/10 transition-colors touch-target">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+							แก้ไข
+						</button>
+						<button onclick={() => confirmDelete(item.id)} aria-label="ลบ" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-coral-dark hover:bg-coral/10 transition-colors touch-target">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+							ลบ
+						</button>
+					</div>
+				</div>
+			{/each}
+		{/if}
 	</div>
 
 	{#if !loading && result.totalPages > 1}
@@ -225,3 +312,14 @@
 		</div>
 	{/if}
 </div>
+
+<ConfirmDialog
+	open={showConfirm}
+	title="ยืนยันการลบ"
+	message="คุณแน่ใจหรือไม่ว่าต้องการลบตารางฉายรายตอนนี้? การกระทำนี้ไม่สามารถย้อนกลับได้"
+	confirmLabel="ลบ"
+	cancelLabel="ยกเลิก"
+	danger={true}
+	onconfirm={handleDelete}
+	oncancel={() => { showConfirm = false; }}
+/>
