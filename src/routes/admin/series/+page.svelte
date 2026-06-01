@@ -265,7 +265,7 @@
 			{/each}
 		{:else}
 			{#each allSeries as seriesItem (seriesItem.id)}
-				<div class="glass-card rounded-2xl p-4 transition-all">
+				<div class="glass-card rounded-2xl p-4 transition-all overflow-hidden">
 					<div class="flex items-start gap-3">
 						{#if seriesItem.poster}
 							<img src={seriesItem.poster} alt={seriesItem.title} class="w-14 h-20 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
@@ -275,14 +275,14 @@
 							</div>
 						{/if}
 						<div class="flex-1 min-w-0">
-							<div class="font-semibold text-plum text-sm">{seriesItem.title}</div>
-							<div class="text-xs text-plum-light mt-0.5">{seriesItem.titleTh}</div>
+							<div class="font-semibold text-plum text-sm truncate">{seriesItem.title}</div>
+							<div class="text-xs text-plum-light mt-0.5 truncate">{seriesItem.titleTh}</div>
 							<div class="flex items-center gap-2 mt-2 flex-wrap">
 								<span class="px-2 py-0.5 rounded-full text-[10px] font-medium {statusConfig[seriesItem.status]?.class ?? 'bg-gray-100 text-gray-600'}">
 									{statusConfig[seriesItem.status]?.text ?? seriesItem.status}
 								</span>
 								{#if seriesItem.studio}
-									<span class="text-[10px] text-plum-light">{seriesItem.studio}</span>
+									<span class="text-[10px] text-plum-light truncate">{seriesItem.studio}</span>
 								{/if}
 								<span class="text-[10px] text-plum-light">{seriesItem.episodes || 0} ตอน</span>
 							</div>

@@ -256,7 +256,7 @@
 			{/each}
 		{:else}
 			{#each allItems as item (item.id)}
-				<div class="glass-card rounded-2xl p-4 shadow-lg shadow-lavender/5">
+				<div class="glass-card rounded-2xl p-4 shadow-lg shadow-lavender/5 overflow-hidden">
 					<div class="flex items-start justify-between mb-3">
 						<div class="flex-1 min-w-0">
 							<p class="text-sm font-semibold text-plum truncate">{item.series?.title ?? '-'}</p>
@@ -276,7 +276,7 @@
 							{roleLabel(item.role)}
 						</span>
 						{#if item.characterName}
-							<span class="text-xs text-plum-light">{item.characterName}</span>
+							<span class="text-xs text-plum-light truncate">{item.characterName}</span>
 						{/if}
 					</div>
 				</div>

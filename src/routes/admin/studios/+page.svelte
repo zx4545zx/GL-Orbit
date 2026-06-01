@@ -236,7 +236,7 @@
 			{/each}
 		{:else}
 			{#each allStudios as studio (studio.id)}
-				<div class="glass-card rounded-xl p-3 sm:p-4">
+				<div class="glass-card rounded-xl p-3 sm:p-4 overflow-hidden">
 					<div class="flex items-center gap-3">
 						{#if studio.logoUrl}
 							<img src={studio.logoUrl} alt={studio.name} class="w-10 h-10 rounded-lg object-cover bg-gray-100 shrink-0" />

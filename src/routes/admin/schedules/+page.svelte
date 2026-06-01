@@ -202,7 +202,7 @@
 	{:else}
 		<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
 			{#each allSchedules as schedule (schedule.id)}
-				<div class="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:shadow-lavender/10 transition-all group">
+				<div class="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:shadow-lavender/10 transition-all group overflow-hidden">
 					<div class="flex items-start justify-between mb-3 sm:mb-4">
 						<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center">
 							<svg class="w-5 h-5 sm:w-6 sm:h-6 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,7 +219,7 @@
 						</div>
 					</div>
 
-					<h3 class="font-semibold text-plum text-sm sm:text-base mb-2 sm:mb-3">{schedule.series}</h3>
+					<h3 class="font-semibold text-plum text-sm sm:text-base mb-2 sm:mb-3 truncate">{schedule.series}</h3>
 
 					<div class="space-y-1.5 sm:space-y-2">
 						<div class="flex items-center gap-2 text-xs sm:text-sm">
@@ -233,7 +233,7 @@
 							<span class="w-4 h-4 sm:w-5 sm:h-5 rounded-md bg-mint/20 flex items-center justify-center">
 								<svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-mint-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
 							</span>
-							<span class="text-plum-light">{schedule.platform}</span>
+							<span class="text-plum-light truncate">{schedule.platform}</span>
 							{#if schedule.isUncut}
 								<span class="px-1.5 sm:px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] sm:text-xs font-medium">Uncut</span>
 							{/if}

@@ -255,10 +255,10 @@
 			{/each}
 		{:else}
 			{#each allItems as item (item.id)}
-				<div class="glass-card rounded-2xl p-4 space-y-3">
-					<div class="flex items-center justify-between">
-						<span class="font-medium text-plum text-sm">{item.artist?.nickname ?? '-'}</span>
-						<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {platformColor(item.platform)}">
+				<div class="glass-card rounded-2xl p-4 space-y-3 overflow-hidden">
+					<div class="flex items-center justify-between gap-2">
+						<span class="font-medium text-plum text-sm truncate min-w-0">{item.artist?.nickname ?? '-'}</span>
+						<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold shrink-0 {platformColor(item.platform)}">
 							{platformOptions.find(p => p.value === item.platform)?.label ?? item.platform}
 						</span>
 					</div>

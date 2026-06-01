@@ -219,7 +219,7 @@
 			{/each}
 		{:else}
 			{#each allArtists as artist (artist.id)}
-				<div class="glass-card rounded-2xl p-4 transition-all">
+				<div class="glass-card rounded-2xl p-4 transition-all overflow-hidden">
 					<div class="flex items-start gap-3">
 						{#if artist.profileImageUrl}
 							<img src={artist.profileImageUrl} alt={artist.nickname} class="w-12 h-12 rounded-full object-cover bg-gray-100 flex-shrink-0" />
@@ -229,8 +229,8 @@
 							</div>
 						{/if}
 						<div class="flex-1 min-w-0">
-							<div class="font-semibold text-plum text-sm">{artist.nickname}</div>
-							<div class="text-xs text-plum-light mt-0.5">{artist.fullName ?? '-'}</div>
+							<div class="font-semibold text-plum text-sm truncate">{artist.nickname}</div>
+							<div class="text-xs text-plum-light mt-0.5 truncate">{artist.fullName ?? '-'}</div>
 						</div>
 					</div>
 					<div class="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-lavender/10">

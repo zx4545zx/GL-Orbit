@@ -225,7 +225,7 @@
 				{/each}
 			{:else}
 				{#each allEpisodes as episode (episode.id)}
-					<div class="glass-card rounded-2xl p-4">
+					<div class="glass-card rounded-2xl p-4 overflow-hidden">
 						<div class="flex items-start justify-between gap-3">
 							<div class="min-w-0 flex-1">
 								<h3 class="font-medium text-plum text-sm truncate">{episode.seriesTitle}</h3>

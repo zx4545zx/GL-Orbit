@@ -140,8 +140,8 @@
 	{/if}
 
 	<!-- Main Content -->
-	<main class="flex-1 lg:ml-64 pt-14 lg:pt-0 min-h-screen">
-		<div class="max-w-6xl mx-auto px-4 py-6">
+	<main class="flex-1 lg:ml-64 pt-14 lg:pt-0 min-h-screen overflow-x-hidden">
+		<div class="max-w-6xl mx-auto px-4 py-6 overflow-x-hidden">
 			{#if pendingAdminShell === 'series'}
 				<AdminSeriesPendingShell />
 			{:else if pendingAdminShell === 'artists'}

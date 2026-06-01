@@ -222,7 +222,7 @@
 			{/each}
 		{:else}
 			{#each allPlatforms as platform (platform.id)}
-				<div class="glass-card rounded-2xl p-4 transition-all">
+				<div class="glass-card rounded-2xl p-4 transition-all overflow-hidden">
 					<div class="flex items-center gap-3">
 						{#if platform.logoUrl}
 							<img src={platform.logoUrl} alt={platform.name} class="w-10 h-10 rounded-full object-cover border border-lavender/30 flex-shrink-0" />
@@ -232,7 +232,7 @@
 							</div>
 						{/if}
 						<div class="flex-1 min-w-0">
-							<div class="font-semibold text-plum text-sm">{platform.name}</div>
+							<div class="font-semibold text-plum text-sm truncate">{platform.name}</div>
 							{#if platform.baseUrl}
 								<p class="text-xs text-plum-light truncate mt-0.5">{platform.baseUrl}</p>
 							{:else}

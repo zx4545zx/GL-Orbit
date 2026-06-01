@@ -255,9 +255,9 @@
 			{/each}
 		{:else}
 			{#each allItems as item (item.id)}
-				<div class="glass-card rounded-2xl p-4">
+				<div class="glass-card rounded-2xl p-4 overflow-hidden">
 					<div class="flex items-start justify-between mb-2">
-						<h3 class="font-semibold text-plum text-sm leading-snug">{item.series?.title ?? '-'}</h3>
+						<h3 class="font-semibold text-plum text-sm leading-snug min-w-0 truncate">{item.series?.title ?? '-'}</h3>
 						{#if item.isUncut}
 							<span class="shrink-0 ml-2 px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] font-medium">Uncut</span>
 						{/if}
@@ -266,14 +266,14 @@
 						<div class="flex items-center gap-2 text-xs text-plum-light">
 							<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
 							{#if item.episode}
-								ตอนที่ {item.episode.episodeNumber}: {item.episode.title}
+								<span class="truncate">ตอนที่ {item.episode.episodeNumber}: {item.episode.title}</span>
 							{:else}
-								-
+								<span class="truncate">-</span>
 							{/if}
 						</div>
 						<div class="flex items-center gap-2 text-xs text-plum-light">
 							<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-							{item.platform?.name ?? '-'}
+							<span class="truncate">{item.platform?.name ?? '-'}</span>
 						</div>
 						<div class="flex items-center gap-2 text-xs text-plum-light">
 							<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
