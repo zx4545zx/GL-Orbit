@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Pagination from '$lib/components/Pagination.svelte';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import type { PageData, ActionData } from './$types.js';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -12,6 +13,16 @@
 	let editingId = $state<string | null>(null);
 	let formLoading = $state(false);
 	let formError = $state('');
+
+	let formEl = $state<HTMLElement | null>(null);
+	function scrollToForm() {
+		setTimeout(() => {
+			formEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}, 50);
+	}
+
+	let deleteTarget = $state<string | null>(null);
+	let showConfirm = $state(false);
 
 	$effect(() => {
 		const value = data.socials;
@@ -37,12 +48,14 @@
 		editingId = null;
 		formError = '';
 		showForm = true;
+		scrollToForm();
 	}
 
 	function openEdit(item: typeof allItems[0]) {
 		editingId = item.id;
 		formError = '';
 		showForm = true;
+		scrollToForm();
 	}
 
 	function closeForm() {
@@ -63,6 +76,25 @@
 		};
 	}
 
+	function confirmDelete(id: string) {
+		deleteTarget = id;
+		showConfirm = true;
+	}
+
+	async function handleDelete() {
+		if (!deleteTarget) return;
+		try {
+			await fetch('?/delete', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams({ id: deleteTarget })
+			});
+		} catch (e) {
+			console.error('Delete failed', e);
+		}
+		deleteTarget = null;
+	}
+
 	const editingItem = $derived(() => allItems.find((i: any) => i.id === editingId));
 	const artistOptions = $derived(data.artists ?? []);
 
@@ -76,6 +108,20 @@
 		{ value: 'XIAOHONGSHU', label: 'Xiaohongshu' },
 		{ value: 'OTHER', label: 'อื่น ๆ' },
 	];
+
+	const platformColor = $derived((platform: string) => {
+		const colors: Record<string, string> = {
+			INSTAGRAM: 'bg-pink-100 text-pink-700',
+			TWITTER: 'bg-sky-100 text-sky-700',
+			TIKTOK: 'bg-gray-100 text-gray-900',
+			YOUTUBE: 'bg-red-100 text-red-700',
+			FACEBOOK: 'bg-blue-100 text-blue-700',
+			WEIBO: 'bg-orange-100 text-orange-700',
+			XIAOHONGSHU: 'bg-rose-100 text-rose-700',
+			OTHER: 'bg-gray-100 text-gray-600',
+		};
+		return colors[platform] ?? 'bg-lavender/10 text-lavender-dark';
+	});
 </script>
 
 <div class="py-6 sm:py-8">
@@ -92,7 +138,7 @@
 	</div>
 
 	{#if showForm}
-		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
+		<div bind:this={formEl} class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไข' : 'เพิ่ม'}โซเชียลมีเดีย</h2>
 			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
 				{#if editingId}
@@ -135,7 +181,8 @@
 		</div>
 	{/if}
 
-	<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg shadow-lavender/5">
+	<!-- Desktop table -->
+	<div class="hidden md:block glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg shadow-lavender/5">
 		<div class="overflow-x-auto -mx-px">
 			<table class="w-full min-w-[600px]">
 				<thead>
@@ -177,12 +224,9 @@
 										<button onclick={() => openEdit(item)} aria-label="แก้ไข" class="p-1.5 sm:p-2 rounded-lg hover:bg-lavender/20 transition-colors text-plum-light hover:text-lavender-dark touch-target">
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
 										</button>
-										<form method="POST" action="?/delete" use:enhance={() => async ({ update }) => { await update(); }} class="inline">
-											<input type="hidden" name="id" value={item.id} />
-											<button type="submit" aria-label="ลบ" class="p-1.5 sm:p-2 rounded-lg hover:bg-coral/10 transition-colors text-plum-light hover:text-coral-dark touch-target">
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-											</button>
-										</form>
+										<button onclick={() => confirmDelete(item.id)} aria-label="ลบ" class="p-1.5 sm:p-2 rounded-lg hover:bg-coral/10 transition-colors text-plum-light hover:text-coral-dark touch-target">
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+										</button>
 									</div>
 								</td>
 							</tr>
@@ -191,6 +235,51 @@
 				</tbody>
 			</table>
 		</div>
+	</div>
+
+	<!-- Mobile cards -->
+	<div class="block md:hidden space-y-3">
+		{#if loading}
+			{#each Array(4) as _, i}
+				<div class="glass-card rounded-2xl p-4 animate-pulse space-y-3">
+					<div class="flex items-center justify-between">
+						<div class="h-4 w-24 bg-lavender/10 rounded"></div>
+						<div class="h-5 w-20 bg-lavender/10 rounded-full"></div>
+					</div>
+					<div class="h-3 w-full bg-lavender/10 rounded"></div>
+					<div class="flex gap-2 pt-1">
+						<div class="h-8 w-10 bg-lavender/10 rounded-lg"></div>
+						<div class="h-8 w-10 bg-lavender/10 rounded-lg"></div>
+					</div>
+				</div>
+			{/each}
+		{:else}
+			{#each allItems as item (item.id)}
+				<div class="glass-card rounded-2xl p-4 space-y-3">
+					<div class="flex items-center justify-between">
+						<span class="font-medium text-plum text-sm">{item.artist?.nickname ?? '-'}</span>
+						<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {platformColor(item.platform)}">
+							{platformOptions.find(p => p.value === item.platform)?.label ?? item.platform}
+						</span>
+					</div>
+					<div class="text-xs sm:text-sm text-plum-light truncate">
+						{#if item.url}
+							<a href={item.url} target="_blank" rel="noopener noreferrer" class="hover:text-coral-dark hover:underline">{item.url}</a>
+						{:else}
+							-
+						{/if}
+					</div>
+					<div class="flex gap-2 pt-1">
+						<button onclick={() => openEdit(item)} aria-label="แก้ไข" class="p-2 rounded-lg hover:bg-lavender/20 transition-colors text-plum-light hover:text-lavender-dark touch-target">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+						</button>
+						<button onclick={() => confirmDelete(item.id)} aria-label="ลบ" class="p-2 rounded-lg hover:bg-coral/10 transition-colors text-plum-light hover:text-coral-dark touch-target">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+						</button>
+					</div>
+				</div>
+			{/each}
+		{/if}
 	</div>
 
 	{#if !loading && result.totalPages > 1}
@@ -209,3 +298,9 @@
 		</div>
 	{/if}
 </div>
+
+<ConfirmDialog
+	bind:open={showConfirm}
+	onconfirm={handleDelete}
+	oncancel={() => { deleteTarget = null; }}
+/>
