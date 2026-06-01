@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
 
 	let { artistId, onclose }: { artistId: string; onclose: () => void } = $props();
 
@@ -98,8 +97,7 @@
 	{#if loading}
 		<div
 			class="relative w-full md:max-w-lg md:mx-auto md:my-8 rounded-t-3xl md:rounded-3xl bg-white shadow-2xl max-h-[80vh] overflow-y-auto pb-[env(safe-area-inset-bottom)]"
-			transition:fly={{ y: 200, duration: 300 }}
-		>
+			>
 			<!-- Skeleton loading state -->
 			<div class="p-6 space-y-6">
 				<div class="flex justify-center">
@@ -123,8 +121,7 @@
 	{:else if error}
 		<div
 			class="relative w-full md:max-w-lg md:mx-auto md:my-8 rounded-t-3xl md:rounded-3xl bg-white shadow-2xl max-h-[80vh] overflow-y-auto pb-[env(safe-area-inset-bottom)]"
-			transition:fly={{ y: 200, duration: 300 }}
-		>
+			>
 			<!-- Error state -->
 			<div class="p-6 text-center space-y-4">
 				<div class="w-16 h-16 mx-auto rounded-full bg-coral/10 flex items-center justify-center">
@@ -147,8 +144,7 @@
 	{:else if data}
 		<div
 			class="relative w-full md:max-w-lg md:mx-auto md:my-8 rounded-t-3xl md:rounded-3xl bg-white shadow-2xl max-h-[80vh] overflow-y-auto pb-[env(safe-area-inset-bottom)]"
-			transition:fly={{ y: 200, duration: 300 }}
-		>
+			>
 			<!-- Close button -->
 			<button
 				onclick={onclose}
