@@ -69,6 +69,7 @@
 				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl shadow-lavender/10 max-w-xs sm:max-w-none mx-auto">
 					<img src={series.poster} alt={series.titleEn} class="w-full aspect-[2/3] object-cover" loading="eager" />
 				</div>
+				<FavoriteButton seriesId={series.id} className="w-full justify-center mt-3" />
 			</div>
 
 			<div class="md:col-span-2 space-y-4 sm:space-y-6">
@@ -76,7 +77,6 @@
 					<div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
 						<span class="px-2.5 sm:px-3 py-1 rounded-full {s?.bg} {s?.class} text-xs sm:text-sm font-semibold">{s?.text}</span>
 						<span class="text-xs sm:text-sm text-plum-light">{series.studio}{#if series.year} • {series.year}{/if}</span>
-						<FavoriteButton seriesId={series.id} />
 					</div>
 					<h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum mb-1 sm:mb-2">{series.titleEn}</h1>
 					<p class="text-base sm:text-xl text-plum-light">{series.titleTh}</p>

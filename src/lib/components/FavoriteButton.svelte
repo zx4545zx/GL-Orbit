@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 
-	let { seriesId }: { seriesId: string } = $props();
+	let { seriesId, className = '' }: { seriesId: string; className?: string } = $props();
 
 	let favorited = $state(false);
 	let loading = $state(false);
@@ -66,7 +66,7 @@
 	disabled={checking || loading}
 	aria-label={favorited ? 'เลิก Favorite' : 'เพิ่ม Favorite'}
 	aria-pressed={favorited}
-	class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 touch-target {favorited ? 'bg-coral/10 text-coral-dark' : 'glass-card text-plum-light hover:text-coral-dark hover:bg-coral/5'}"
+	class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 touch-target {favorited ? 'bg-coral/10 text-coral-dark' : 'glass-card text-plum-light hover:text-coral-dark hover:bg-coral/5'} {className}"
 >
 	{#if checking}
 		<svg class="w-5 h-5 animate-pulse text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
