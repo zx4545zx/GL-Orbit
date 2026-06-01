@@ -108,10 +108,10 @@
 		items.push(authItem);
 		return items;
 	});
-	let lastScrollY = $state(0);
 	let navHidden = $state(false);
 
 	$effect(() => {
+		let lastScrollY = window.scrollY;
 		let ticking = false;
 
 		function onScroll() {
@@ -127,11 +127,15 @@
 					navHidden = false;
 				} else if (delta > 10) {
 					navHidden = true;
-				} else if (delta < -10) {
+				} else if (delta < -2) {
 					navHidden = false;
 				}
 
-				lastScrollY = currentY;
+				if (!atTop && Math.abs(delta) > 2) {
+					lastScrollY = currentY;
+				} else if (atTop) {
+					lastScrollY = 0;
+				}
 				ticking = false;
 			});
 		}
