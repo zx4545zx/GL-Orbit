@@ -267,7 +267,7 @@
 		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
 			ซีรีส์<span class="text-coral">ทั้งหมด</span>
 		</h1>
-		<p class="text-sm sm:text-base text-plum-light">รวบรวมซีรีส์ GL จากทุกสตูดิโอทั่วโลก</p>
+		<p class="text-sm sm:text-base text-plum-light">รวบรวมซีรีส์ GL จากทุกสตูดิโอ</p>
 	</div>
 
 	<!-- Normal Search & Filter -->

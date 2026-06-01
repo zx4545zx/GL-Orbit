@@ -186,7 +186,7 @@ export function buildSeriesSeoMeta(filters: SeriesFilters, items: SeriesListItem
 	const canonicalPath = query ? `/series?${query}` : '/series';
 
 	let title = 'ซีรีส์ GL ทั้งหมด | GL-Orbit';
-	let description = 'รวมซีรีส์ Girls\' Love ทั้งหมดจากทั่วโลก พร้อมตารางฉายและข้อมูลครบถ้วน';
+	let description = 'รวมซีรีส์ Girls\' Love ทั้งหมด พร้อมตารางฉายและข้อมูลครบถ้วน';
 
 	if (filters.status !== 'ALL') {
 		const label = STATUS_LABEL[filters.status];

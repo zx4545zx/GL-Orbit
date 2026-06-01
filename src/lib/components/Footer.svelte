@@ -20,7 +20,7 @@
 					<span class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">GL-Orbit</span>
 				</div>
 				<p class="text-sm text-plum-light leading-relaxed max-w-xs">
-					ศูนย์กลางข้อมูลและตารางฉายสำหรับแฟนคลับซีรีส์ GL ทั่วโลก
+					ศูนย์กลางข้อมูลและตารางฉายสำหรับแฟนคลับซีรีส์ GL
 				</p>
 				<div class="flex gap-3">
 					{#each ['twitter', 'instagram', 'github'] as social}
@@ -60,7 +60,7 @@
 				<h3 class="font-[family-name:var(--font-display)] font-semibold text-plum mb-4">เกี่ยวกับเรา</h3>
 				<ul class="space-y-3">
 					<li><span class="text-sm text-plum-light">ข้อมูลเวลาฉายแม่นยำ</span></li>
-					<li><span class="text-sm text-plum-light">รองรับ Timezone & Uncut version</span></li>
+					<li><span class="text-sm text-plum-light">รองรับ Uncut version</span></li>
 					<li><span class="text-sm text-plum-light">ออกแบบมาเพื่อติ่งโดยเฉพาะ</span></li>
 				</ul>
 			</div>
