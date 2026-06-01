@@ -31,6 +31,20 @@
 
 	// --- Collapsible schedule state ---
 	let expandedEpisodes = $state(new Set<number>());
+	let initialized = $state(false);
+
+	$effect(() => {
+		if (series && !initialized) {
+			for (const item of series.schedule) {
+				const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA');
+				if (hasSchedules) {
+					expandedEpisodes.add(item.episode);
+				}
+			}
+			expandedEpisodes = new Set(expandedEpisodes);
+			initialized = true;
+		}
+	});
 
 	function toggleEpisode(ep: number) {
 		if (expandedEpisodes.has(ep)) {
