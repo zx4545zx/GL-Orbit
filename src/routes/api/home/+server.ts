@@ -31,7 +31,7 @@ export const GET: RequestHandler = async () => {
 		.leftJoin(studios, eq(series.studioId, studios.id))
 		.where(and(eq(series.status, 'ONGOING'), isNull(series.deletedAt)))
 		.orderBy(asc(series.titleEn))
-		.limit(6);
+		.limit(8);
 
 	const upcomingSchedules = await db
 		.select({
