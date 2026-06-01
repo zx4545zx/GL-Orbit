@@ -29,7 +29,7 @@ export const GET: RequestHandler = async () => {
 		})
 		.from(series)
 		.leftJoin(studios, eq(series.studioId, studios.id))
-		.where(and(isNull(series.deletedAt)))
+		.where(and(eq(series.status, 'ONGOING'), isNull(series.deletedAt)))
 		.orderBy(asc(series.titleEn))
 		.limit(6);
 
