@@ -126,6 +126,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			year: firstAirDate,
 			platforms: [...new Map(scheduleResult.filter((s) => s.platformId).map((s) => [s.platformId, { name: s.platformName!, logo: s.platformLogo }])).values()],
 			artists: artistsResult.map((a) => ({
+				id: a.id,
 				name: a.nickname,
 				role: a.roleName ?? 'นักแสดง',
 				image: a.profileImageUrl ?? 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop'
