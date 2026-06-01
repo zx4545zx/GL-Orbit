@@ -57,14 +57,16 @@ export const GET: RequestHandler = async ({ params }) => {
 
 	const episodeIds = episodesResult.map((ep) => ep.id);
 
-	let scheduleResult: {
+	type ScheduleRow = {
 		episodeId: string;
 		airDate: Date | null;
 		platformId: string | null;
 		platformName: string | null;
 		platformLogo: string | null;
 		streamLink: string | null;
-	}[] = [];
+	};
+
+	let scheduleResult: ScheduleRow[] = [];
 
 	if (episodeIds.length > 0) {
 		scheduleResult = await db
@@ -84,20 +86,25 @@ export const GET: RequestHandler = async ({ params }) => {
 			));
 	}
 
-	const scheduleMap = new Map<string, typeof scheduleResult[0]>();
+	// --- FIXED: group-by instead of first-wins ---
+	const scheduleMap = new Map<string, ScheduleRow[]>();
 	for (const s of scheduleResult) {
-		if (!scheduleMap.has(s.episodeId)) {
-			scheduleMap.set(s.episodeId, s);
-		}
+		const arr = scheduleMap.get(s.episodeId) ?? [];
+		arr.push(s);
+		scheduleMap.set(s.episodeId, arr);
 	}
 
 	const schedule = episodesResult.map((ep) => {
-		const sch = scheduleMap.get(ep.id);
+		const rows = scheduleMap.get(ep.id) ?? [];
 		return {
 			episode: ep.episodeNumber,
 			title: ep.title ?? `ตอนที่ ${ep.episodeNumber}`,
-			airDate: sch?.airDate ? sch.airDate.toISOString().split('T')[0] : 'TBA',
-			platform: sch?.platformName ?? 'TBA'
+			schedules: rows.map((sch) => ({
+				airDate: sch.airDate ? sch.airDate.toISOString().split('T')[0] : 'TBA',
+				platform: sch.platformName ?? 'TBA',
+				platformLogo: sch.platformLogo ?? null,
+				streamLink: sch.streamLink ?? null
+			}))
 		};
 	});
 

@@ -28,6 +28,32 @@
 	};
 
 	const s = $derived(series ? statusConfig[series.status] : null);
+
+	// --- Collapsible schedule state ---
+	let expandedEpisodes = $state(new Set<number>());
+
+	function toggleEpisode(ep: number) {
+		if (expandedEpisodes.has(ep)) {
+			expandedEpisodes.delete(ep);
+		} else {
+			expandedEpisodes.add(ep);
+		}
+		// Trigger reactivity by reassigning
+		expandedEpisodes = new Set(expandedEpisodes);
+	}
+
+	function scheduleSummary(item: { schedules: { platform: string; airDate: string }[] }): string {
+		const valid = item.schedules.filter((s) => s.platform !== 'TBA');
+		if (valid.length === 0) return 'TBA';
+		if (valid.length === 1) return valid[0].platform;
+		return `${valid.length} แพลตฟอร์ม`;
+	}
+
+	function firstAirDate(item: { schedules: { airDate: string; platform: string }[] }): string {
+		if (item.schedules.length === 0) return 'TBA';
+		const first = item.schedules[0];
+		return first.airDate;
+	}
 </script>
 
 {#if loading || !series}
@@ -144,24 +170,77 @@
 			</section>
 		{/if}
 
-		<!-- Schedule -->
+		<!-- Schedule with collapsible rows -->
 		{#if series.schedule.length > 0}
 			<section>
 				<h2 class="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-bold text-plum mb-4 sm:mb-6">ตารางฉาย</h2>
 				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
 					<div class="divide-y divide-lavender/10">
 						{#each series.schedule as item}
-							<div class="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-white/40 transition-colors">
-								<div class="flex items-center gap-3 sm:gap-4">
-									<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center flex-shrink-0">
-										<span class="text-xs sm:text-sm font-bold text-coral-dark">{item.episode}</span>
+							{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA')}
+							<div class="transition-colors {hasSchedules ? 'hover:bg-white/40 cursor-pointer' : ''}"
+								role="button"
+								tabindex={hasSchedules ? 0 : undefined}
+								onclick={hasSchedules ? () => toggleEpisode(item.episode) : undefined}
+								onkeydown={hasSchedules ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleEpisode(item.episode); } } : undefined}
+								aria-expanded={hasSchedules ? expandedEpisodes.has(item.episode) : undefined}
+							>
+								<!-- Collapsed row -->
+								<div class="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+									<div class="flex items-center gap-3 sm:gap-4 min-w-0">
+										<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center flex-shrink-0">
+											<span class="text-xs sm:text-sm font-bold text-coral-dark">{item.episode}</span>
+										</div>
+										<div class="min-w-0">
+											<div class="font-semibold text-plum text-sm sm:text-base truncate">{item.title}</div>
+											<div class="text-xs sm:text-sm text-plum-light truncate">{scheduleSummary(item)}</div>
+										</div>
 									</div>
-									<div>
-										<div class="font-semibold text-plum text-sm sm:text-base">{item.title}</div>
-										<div class="text-xs sm:text-sm text-plum-light">{item.platform}</div>
+									<div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+										<span class="text-xs sm:text-sm font-medium text-coral-dark whitespace-nowrap">{firstAirDate(item)}</span>
+										{#if hasSchedules}
+											<!-- Chevron icon -->
+											<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum-light transition-transform duration-200 {expandedEpisodes.has(item.episode) ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+											</svg>
+										{/if}
 									</div>
 								</div>
-								<div class="text-xs sm:text-sm font-medium text-coral-dark whitespace-nowrap">{item.airDate}</div>
+								<!-- Expanded sub-list -->
+								{#if hasSchedules && expandedEpisodes.has(item.episode)}
+									<div class="px-4 sm:px-6 pb-3 sm:pb-4 space-y-2 animate-fade-in">
+										{#each item.schedules as sch}
+											{@const hasStreamLink = sch.streamLink && sch.streamLink.length > 0}
+											<div class="flex items-center justify-between gap-3 py-2 px-3 sm:px-4 rounded-xl bg-white/50">
+												<div class="flex items-center gap-2 sm:gap-3 min-w-0">
+													{#if sch.platformLogo}
+														<img src={sch.platformLogo} alt={sch.platform} class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover flex-shrink-0" />
+													{:else}
+														<div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-lavender/20 flex items-center justify-center flex-shrink-0">
+															<span class="text-[10px] font-bold text-lavender-dark">{sch.platform.charAt(0)}</span>
+														</div>
+													{/if}
+													<div class="min-w-0">
+														<div class="text-sm sm:text-base font-medium text-plum truncate">{sch.platform}</div>
+														<div class="text-xs text-plum-light">{sch.airDate}</div>
+													</div>
+												</div>
+												{#if hasStreamLink}
+													<a href={sch.streamLink}
+														target="_blank"
+														rel="noopener noreferrer"
+														class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-coral to-coral-dark hover:from-coral-dark hover:to-coral transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0 touch-target"
+													>
+														ดูเลย
+														<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+														</svg>
+													</a>
+												{/if}
+											</div>
+										{/each}
+									</div>
+								{/if}
 							</div>
 						{/each}
 					</div>
