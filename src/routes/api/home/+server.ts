@@ -8,6 +8,10 @@ import type { RequestHandler } from './$types.js';
 const CACHE_KEY = 'api:home';
 const CACHE_TTL = 30_000;
 
+function toThailandTime(date: Date): Date {
+	return new Date(date.getTime() + 7 * 60 * 60 * 1000);
+}
+
 export const GET: RequestHandler = async () => {
 	const cached = getCached(CACHE_KEY, CACHE_TTL);
 	if (cached) {
@@ -69,9 +73,11 @@ export const GET: RequestHandler = async () => {
 			studio: s.studioName ?? 'ไม่ระบุสตูดิโอ'
 		})),
 		upcomingSchedule: upcomingSchedules.map((s) => {
-			const d = s.airDate;
-			const dayName = dayShortNames[d.getDay()];
-			const timeStr = d.toISOString().split('T')[1].slice(0, 5);
+			const d = toThailandTime(s.airDate);
+			const dayName = dayShortNames[d.getUTCDay()];
+			const hours = String(d.getUTCHours()).padStart(2, '0');
+			const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+			const timeStr = `${hours}:${minutes}`;
 			return {
 				day: dayName + '.',
 				time: timeStr,
