@@ -86,7 +86,60 @@
 				}
 	);
 
-	const navItems = $derived([...baseItems, authItem]);
+	const notificationItem = $derived(
+		user
+			? {
+					href: '/notifications',
+					label: 'แจ้งเตือน',
+					icon: (active: boolean) => `
+						<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+						</svg>
+					`
+				}
+			: null
+	);
+
+	const navItems = $derived.by(() => {
+		const items = [...baseItems];
+		if (notificationItem) {
+			items.push(notificationItem);
+		}
+		items.push(authItem);
+		return items;
+	});
+	let lastScrollY = $state(0);
+	let navHidden = $state(false);
+
+	$effect(() => {
+		let ticking = false;
+
+		function onScroll() {
+			if (ticking) return;
+			ticking = true;
+
+			requestAnimationFrame(() => {
+				const currentY = window.scrollY;
+				const delta = currentY - lastScrollY;
+				const atTop = currentY <= 0;
+
+				if (atTop) {
+					navHidden = false;
+				} else if (delta > 10) {
+					navHidden = true;
+				} else if (delta < -10) {
+					navHidden = false;
+				}
+
+				lastScrollY = currentY;
+				ticking = false;
+			});
+		}
+
+		window.addEventListener('scroll', onScroll, { passive: true });
+		return () => window.removeEventListener('scroll', onScroll);
+	});
+
 	const activePathname = $derived(navigating.to?.url.pathname ?? page.url.pathname);
 
 	function isActive(href: string) {
@@ -98,7 +151,7 @@
 </script>
 
 <nav
-	class="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+	class="fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300 {navHidden ? 'translate-y-full' : 'translate-y-0'}"
 	style="padding-bottom: env(safe-area-inset-bottom, 0px);"
 >
 	<div class="glass-card rounded-t-2xl border-b-0 border-x-0 shadow-[0_-8px_32px_rgba(196,181,253,0.15)]">
@@ -119,7 +172,7 @@
 						{/if}
 						<div class="relative">
 							{@html item.icon(active)}
-							{#if item.href === '/profile' && user}
+							{#if item.href === '/notifications'}
 								<NotificationBadge count={unreadCount} />
 							{/if}
 						</div>

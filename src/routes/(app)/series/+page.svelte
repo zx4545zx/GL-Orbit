@@ -5,21 +5,6 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let showSticky = $state(false);
-	let titleRef: HTMLDivElement;
-
-	$effect(() => {
-		if (!titleRef) return;
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				showSticky = !entry.isIntersecting;
-			},
-			{ threshold: 0, rootMargin: '0px 0px -1px 0px' }
-		);
-		observer.observe(titleRef);
-		return () => observer.disconnect();
-	});
-
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
 		UPCOMING: { text: 'เร็วๆ นี้', class: 'bg-lavender/20 text-lavender-dark' },
@@ -276,22 +261,9 @@
 	</div>
 {/snippet}
 
-<!-- Floating Sticky Search (appears on scroll, hidden from assistive tech when not visible) -->
-{#if showSticky}
-	<div
-		class="fixed top-0 left-0 right-0 z-30 px-4 sm:px-6 py-3 glass-card border-t-0 border-x-0 shadow-[0_8px_32px_rgba(196,181,253,0.15)] transition-all duration-300 md:hidden"
-		role="search"
-		aria-label="ค้นหาและกรองซีรีส์แบบติดด้านบน"
-	>
-		<div class="max-w-6xl mx-auto">
-			{@render searchFilter()}
-		</div>
-	</div>
-{/if}
-
 <div class="py-6 sm:py-8 max-w-6xl mx-auto" aria-busy={loading}>
 	<!-- Title -->
-	<div bind:this={titleRef} class="text-center mb-6 sm:mb-8">
+	<div class="text-center mb-6 sm:mb-8">
 		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
 			ซีรีส์<span class="text-coral">ทั้งหมด</span>
 		</h1>

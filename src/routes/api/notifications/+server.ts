@@ -11,6 +11,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 	const rawLimit = parseInt(url.searchParams.get('limit') ?? '5', 10);
 	const limit = Number.isNaN(rawLimit) ? 5 : Math.min(50, Math.max(1, rawLimit));
+	const rawOffset = parseInt(url.searchParams.get('offset') ?? '0', 10);
+	const offset = Number.isNaN(rawOffset) ? 0 : Math.max(0, rawOffset);
 	const db = await getDb();
 
 	const rows = await db
@@ -28,7 +30,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		.innerJoin(series, eq(notifications.seriesId, series.id))
 		.where(eq(notifications.userId, locals.user.id))
 		.orderBy(desc(notifications.createdAt))
-		.limit(limit);
+		.limit(limit)
+		.offset(offset);
 
 	const [{ count }] = await db
 		.select({ count: sql<number>`count(*)::int` })

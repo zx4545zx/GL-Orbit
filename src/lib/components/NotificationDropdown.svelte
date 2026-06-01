@@ -177,6 +177,20 @@
 					{/each}
 				{/if}
 			</div>
+
+			<!-- Footer -->
+			<div class="border-t border-lavender/10">
+				<a
+					href="/notifications"
+					onclick={() => { isOpen = false; }}
+					class="flex items-center justify-center gap-1.5 px-4 py-3 text-sm text-plum-light hover:text-coral transition-colors touch-target"
+				>
+					ดูเพิ่มเติม
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+					</svg>
+				</a>
+			</div>
 		</div>
 	{/if}
 </div>

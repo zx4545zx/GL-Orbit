@@ -4,9 +4,6 @@
 	let currentWeek = $state(new Date());
 	let selectedDate = $state<string | null>(null);
 
-	let showSticky = $state(false);
-	let titleRef: HTMLDivElement;
-
 	// State variables for calendar data
 	type CalendarEvent = {
 		time: string;
@@ -56,18 +53,6 @@
 		const start = getStartOfWeek(date);
 		return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7);
 	}
-
-	$effect(() => {
-		if (!titleRef) return;
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				showSticky = !entry.isIntersecting;
-			},
-			{ threshold: 0, rootMargin: '0px 0px -1px 0px' }
-		);
-		observer.observe(titleRef);
-		return () => observer.disconnect();
-	});
 
 	// Fetch calendar data when currentMonth changes (for grid/calendar views)
 	$effect(() => {
@@ -270,18 +255,9 @@
 	</div>
 {/snippet}
 
-<!-- Floating Sticky View Toggle -->
-<div
-	class="fixed top-0 left-0 right-0 z-30 px-4 sm:px-6 py-3 glass-card border-t-0 border-x-0 shadow-[0_8px_32px_rgba(196,181,253,0.15)] transition-all duration-300 md:hidden {showSticky ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}"
->
-	<div class="max-w-6xl mx-auto">
-		{@render viewToggle()}
-	</div>
-</div>
-
 <div class="py-6 sm:py-8 max-w-6xl mx-auto">
 	<!-- Title -->
-	<div bind:this={titleRef} class="text-center mb-6 sm:mb-8">
+	<div class="text-center mb-6 sm:mb-8">
 		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
 			ตารางฉาย<span class="text-coral">ประจำเดือน</span>
 		</h1>
