@@ -156,7 +156,7 @@
 						{#each series.platforms as platform}
 							<span class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl glass-card text-xs sm:text-sm font-medium text-plum flex items-center gap-2">
 								{#if platform.logo}
-									<img src={platform.logo} alt={platform.name} class="w-5 h-5 rounded-full object-cover" />
+									<img src={platform.logo} alt={platform.name} class="w-5 h-5 rounded-full object-cover border border-lavender/30" />
 								{/if}
 								{platform.name}
 							</span>
