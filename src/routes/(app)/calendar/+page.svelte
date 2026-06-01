@@ -355,42 +355,54 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each allSeries as seriesName, seriesIndex}
-								<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
-									<!-- Series name cell -->
-									<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
-										<div class="font-semibold text-plum text-xs sm:text-sm truncate">{seriesName}</div>
-									</td>
-									<!-- Day cells -->
-									{#each monthDays as day}
-										{@const dayEvents = getEventsForSeriesAndDay(seriesName, day)}
-										{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
-										{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
-										<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isToday ? 'bg-coral/5' : ''}">
-											{#if dayEvents.length > 0}
-												<div class="space-y-0.5">
-													{#each dayEvents as event}
-														<div class="relative group rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platforms[0]] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
-															<div class="font-bold">{event.time}</div>
-															<div class="mt-0.5">{event.episode}</div>
-															{#if event.isUncut}
-																<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
-															{/if}
-															<!-- Custom tooltip -->
-															<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-plum text-white text-[8px] sm:text-[9px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-																{event.platforms.join(', ')}
-																<div class="absolute top-full left-1/2 -translate-x-1/2 border-2 border-transparent border-t-plum"></div>
-															</div>
-														</div>
-													{/each}
-												</div>
-											{:else}
-												<div class="w-full h-6 sm:h-8"></div>
-											{/if}
+							{#if loading}
+								{#each Array(6) as _, rowIndex}
+									<tr class="border-b border-lavender/5 {rowIndex % 2 === 0 ? 'bg-white/20' : ''}">
+										<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
+											<div class="h-4 w-24 bg-lavender/10 rounded animate-pulse"></div>
 										</td>
-									{/each}
-								</tr>
-							{/each}
+										{#each monthDays as day}
+											<td class="px-0.5 sm:px-1 py-1 sm:py-2">
+												<div class="h-6 sm:h-8 w-full bg-lavender/10 rounded animate-pulse"></div>
+											</td>
+										{/each}
+									</tr>
+								{/each}
+							{:else}
+								{#each allSeries as seriesName, seriesIndex}
+									<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
+										<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
+											<div class="font-semibold text-plum text-xs sm:text-sm truncate">{seriesName}</div>
+										</td>
+										{#each monthDays as day}
+											{@const dayEvents = getEventsForSeriesAndDay(seriesName, day)}
+											{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
+											{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
+											<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isToday ? 'bg-coral/5' : ''}">
+												{#if dayEvents.length > 0}
+													<div class="space-y-0.5">
+														{#each dayEvents as event}
+															<div class="relative group rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platforms[0]] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
+																<div class="font-bold">{event.time}</div>
+																<div class="mt-0.5">{event.episode}</div>
+																{#if event.isUncut}
+																	<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
+																{/if}
+																<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-plum text-white text-[8px] sm:text-[9px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+																	{event.platforms.join(', ')}
+																	<div class="absolute top-full left-1/2 -translate-x-1/2 border-2 border-transparent border-t-plum"></div>
+																</div>
+															</div>
+														{/each}
+													</div>
+												{:else}
+													<div class="w-full h-6 sm:h-8"></div>
+												{/if}
+											</td>
+										{/each}
+									</tr>
+								{/each}
+							{/if}
 						</tbody>
 					</table>
 				</div>
