@@ -55,7 +55,7 @@
 
 <div class="min-h-screen flex flex-col">
 	<Navigation />
-	<div class="flex-1 pt-0 md:pt-24 pb-14 md:pb-0 px-4">
+	<div class="flex-1 pt-0 md:pt-24 pb-4 md:pb-0 px-4">
 		{#if showShell === 'home'}
 			<HomePendingShell />
 		{:else if showShell === 'login'}
