@@ -73,7 +73,7 @@
 
 		<p class="text-base sm:text-lg md:text-xl text-plum-light max-w-xl mx-auto mb-6 sm:mb-10 leading-relaxed animate-slide-up stagger-2 px-2">
 			ติดตามตารางฉาย ข้อมูลซีรีส์ และลิงก์รับชม<br class="hidden md:block" />
-			ที่อัปเดตแบบเรียลไทม์ รองรับทุก Timezone
+			ที่อัปเดตแบบเรียลไทม์
 		</p>
 
 		<div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up stagger-3 px-4 sm:px-0">

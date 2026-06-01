@@ -658,7 +658,7 @@
 		<div>
 			<h3 class="font-semibold text-plum mb-1 text-sm sm:text-base">หมายเหตุ</h3>
 			<p class="text-xs sm:text-sm text-plum-light leading-relaxed">
-				เวลาฉายแสดงตาม timezone ของประเทศไทย (UTC+7) หากมีการเปลี่ยนแปลงตารางฉาย
+				เวลาฉายแสดงตามเวลาในประเทศไทย หากมีการเปลี่ยนแปลงตารางฉาย
 				ระบบจะอัปเดตให้โดยอัตโนมัติ ติ่งทุกคนสามารถตรวจสอบเวลาฉาย Uncut version ได้จากป้ายสีชมพู
 			</p>
 		</div>
