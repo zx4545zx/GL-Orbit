@@ -3,6 +3,7 @@ import { fail } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db/index.js';
 import { episodes, series } from '$lib/server/db/schema.js';
 import { eq, isNull, asc } from 'drizzle-orm';
+import { createFollowerNotifications } from '$lib/server/notifications.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user || locals.user.role !== 'ADMIN') {
@@ -44,6 +45,21 @@ export const actions: Actions = {
 			coverUrl,
 			trailerUrl
 		});
+
+		// Notify followers
+		try {
+			const [seriesInfo] = await db
+				.select({ titleEn: series.titleEn })
+				.from(series)
+				.where(eq(series.id, seriesId))
+				.limit(1);
+
+			const episodeLabel = title ? `EP.${episodeNumber} ${title}` : `EP.${episodeNumber}`;
+			const message = `มีตอนใหม่: ${episodeLabel}`;
+			await createFollowerNotifications(seriesId, 'new_episode', message, locals.user.id);
+		} catch {
+			// Notification failure should not break episode creation
+		}
 
 		return { success: true };
 	},

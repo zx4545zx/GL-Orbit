@@ -1,7 +1,38 @@
 <script lang="ts">
 	import { navigating, page } from '$app/state';
+	import NotificationBadge from './NotificationBadge.svelte';
 
 	const user = $derived(page.data.user);
+	let unreadCount = $state(0);
+
+	$effect(() => {
+		if (!user) {
+			unreadCount = 0;
+			return;
+		}
+
+		let cancelled = false;
+
+		async function poll() {
+			try {
+				const res = await fetch('/api/notifications/unread-count');
+				if (!cancelled && res.ok) {
+					const data = await res.json();
+					unreadCount = data.count ?? 0;
+				}
+			} catch {
+				if (!cancelled) unreadCount = 0;
+			}
+		}
+
+		poll();
+		const interval = setInterval(poll, 30000);
+
+		return () => {
+			cancelled = true;
+			clearInterval(interval);
+		};
+	});
 
 	const baseItems = [
 		{
@@ -88,6 +119,9 @@
 						{/if}
 						<div class="relative">
 							{@html item.icon(active)}
+							{#if item.href === '/profile' && user}
+								<NotificationBadge count={unreadCount} />
+							{/if}
 						</div>
 					</div>
 					<span

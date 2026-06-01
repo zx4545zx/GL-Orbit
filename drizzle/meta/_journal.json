@@ -15,6 +15,20 @@
       "when": 1778522697076,
       "tag": "0001_simple_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780305247302,
+      "tag": "0002_modern_skin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780306064588,
+      "tag": "0003_narrow_iceman",
+      "breakpoints": true
     }
   ]
 }
