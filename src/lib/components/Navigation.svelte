@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import NotificationDropdown from './NotificationDropdown.svelte';
 
 	const navLinks = [
 		{ href: '/', label: 'หน้าแรก' },
@@ -8,6 +9,37 @@
 	];
 
 	const user = $derived(page.data.user);
+
+	let unreadCount = $state(0);
+
+	$effect(() => {
+		if (!user) {
+			unreadCount = 0;
+			return;
+		}
+
+		let cancelled = false;
+
+		async function poll() {
+			try {
+				const res = await fetch('/api/notifications/unread-count');
+				if (!cancelled && res.ok) {
+					const data = await res.json();
+					unreadCount = data.count ?? 0;
+				}
+			} catch {
+				if (!cancelled) unreadCount = 0;
+			}
+		}
+
+		poll();
+		const interval = setInterval(poll, 30000);
+
+		return () => {
+			cancelled = true;
+			clearInterval(interval);
+		};
+	});
 </script>
 
 <nav class="fixed top-0 left-0 right-0 z-50 hidden md:block">
@@ -51,6 +83,10 @@
 							จัดการ
 						</a>
 					{/if}
+					<NotificationDropdown
+						unreadCount={unreadCount}
+						onMarkAllRead={() => { unreadCount = 0; }}
+					/>
 					<a
 						href="/profile"
 						class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-lavender/20 transition-all touch-target"

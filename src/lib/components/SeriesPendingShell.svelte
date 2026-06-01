@@ -15,7 +15,7 @@
 			<div class="h-6 rounded-xl bg-lavender/15 animate-pulse"></div>
 		</div>
 		<div class="flex justify-center">
-			<div class="glass-card rounded-2xl p-1.5 flex gap-1">
+			<div class="glass-card rounded-2xl p-1.5 flex gap-1 overflow-x-auto">
 				{#each Array(4) as _, index}
 					<div class="h-9 rounded-xl bg-lavender/15 animate-pulse {index === 0 ? 'w-20' : 'w-24'}"></div>
 				{/each}

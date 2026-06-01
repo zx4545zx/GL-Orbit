@@ -3,6 +3,7 @@ import { fail } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db/index.js';
 import { series, studios } from '$lib/server/db/schema.js';
 import { eq, isNull, asc } from 'drizzle-orm';
+import { createFollowerNotifications } from '$lib/server/notifications.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user || locals.user.role !== 'ADMIN') {
@@ -66,9 +67,32 @@ export const actions: Actions = {
 		}
 
 		const db = await getDb();
+
+		// Get previous status to detect change
+		const [prev] = await db
+			.select({ status: series.status, titleEn: series.titleEn })
+			.from(series)
+			.where(eq(series.id, id))
+			.limit(1);
+
 		await db.update(series)
 			.set({ titleEn, titleTh, studioId, posterUrl, status: status as 'UPCOMING' | 'ONGOING' | 'ENDED' })
 			.where(eq(series.id, id));
+
+		// Notify followers if status changed
+		if (prev && prev.status !== status) {
+			try {
+				const statusLabels: Record<string, string> = {
+					UPCOMING: 'กำลังจะมาฉาย',
+					ONGOING: 'กำลังฉาย',
+					ENDED: 'จบแล้ว'
+				};
+				const message = `สถานะของซีรีส์ "${prev.titleEn}" เปลี่ยนเป็น "${statusLabels[status] || status}"`;
+				await createFollowerNotifications(id, 'status_change', message, locals.user.id);
+			} catch {
+				// Notification failure should not break update
+			}
+		}
 
 		return { success: true };
 	},

@@ -91,6 +91,59 @@
 			</div>
 		</div>
 
+		<!-- Favorite Series Section -->
+		<div class="mt-8">
+			<h2 class="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-bold text-plum mb-4 sm:mb-6">ซีรีส์ที่ฉัน Favorite</h2>
+
+			{#if data.favoriteSeries && data.favoriteSeries.length > 0}
+				<div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+					{#each data.favoriteSeries as s (s.id)}
+						<a href="/series/{s.id}" class="group">
+							<div class="glass-card rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/20 transition-all duration-500 hover:-translate-y-1">
+								<div class="relative aspect-[3/4] overflow-hidden">
+									<img
+										src={s.poster}
+										alt={s.title}
+										class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+										loading="lazy"
+									/>
+									<div class="absolute inset-0 bg-gradient-to-t from-plum/80 via-plum/20 to-transparent"></div>
+									<div class="absolute top-2 sm:top-3 left-2 sm:left-3">
+										<span class="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold backdrop-blur-md {s.status === 'ONGOING' ? 'bg-mint/20 text-mint-dark' : s.status === 'UPCOMING' ? 'bg-lavender/20 text-lavender-dark' : 'bg-coral/10 text-coral-dark'}">
+											{s.status === 'ONGOING' ? 'กำลังฉาย' : s.status === 'UPCOMING' ? 'เร็วๆ นี้' : 'จบแล้ว'}
+										</span>
+									</div>
+									<div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
+										<p class="text-white/70 text-[10px] sm:text-xs mb-0.5">{s.studio}</p>
+										<h3 class="text-white font-bold text-sm sm:text-base leading-tight">{s.title}</h3>
+										{#if s.subtitle}
+											<p class="text-white/80 text-[10px] sm:text-xs mt-0.5">{s.subtitle}</p>
+										{/if}
+									</div>
+								</div>
+							</div>
+						</a>
+					{/each}
+				</div>
+			{:else}
+				<div class="glass-card rounded-2xl sm:rounded-3xl p-8 sm:p-10 text-center">
+					<div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
+						<svg class="w-7 h-7 sm:w-8 sm:h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+						</svg>
+					</div>
+					<h3 class="font-semibold text-plum mb-1">ยังไม่มีซีรีส์ที่ Favorite</h3>
+					<p class="text-sm text-plum-light mb-4">ไปค้นหาซีรีส์ที่คุณชอบแล้วเพิ่มลงในรายการ Favorite!</p>
+					<a
+						href="/series"
+						class="inline-flex px-6 py-2.5 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 text-sm touch-target"
+					>
+						ไปดูซีรีส์ทั้งหมด
+					</a>
+				</div>
+			{/if}
+		</div>
+
 		<!-- Edit Profile Form -->
 		<div class="mt-6">
 			<button

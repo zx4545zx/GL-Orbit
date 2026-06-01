@@ -78,6 +78,14 @@ export const seriesArtists = pgTable('series_artists', {
 	pk: { columns: [table.seriesId, table.artistId] }
 }));
 
+export const favorites = pgTable('favorites', {
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({
+	pk: { columns: [table.userId, table.seriesId] }
+}));
+
 export const seriesSchedules = pgTable('series_schedules', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
@@ -105,4 +113,14 @@ export const episodeSchedules = pgTable('episode_schedules', {
 	streamLink: text('stream_link'),
 	isUncut: boolean('is_uncut').notNull().default(false),
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
+});
+
+export const notifications = pgTable('notifications', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
+	type: varchar('type', { length: 50 }).notNull(),
+	message: text('message').notNull(),
+	isRead: boolean('is_read').notNull().default(false),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });
