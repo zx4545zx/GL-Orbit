@@ -1,14 +1,15 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
+	import { createAdminApi } from '$lib/admin/api.js';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import type { PageData, ActionData } from './$types.js';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	const platformsApi = createAdminApi<any>('platforms');
 
 	let result = $state<any>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
 	let allPlatforms = $derived(result.data ?? []);
 	let loading = $state(true);
+	let page = $state(1);
 	let showForm = $state(false);
 	let editingId = $state<string | null>(null);
 	let formLoading = $state(false);
@@ -17,24 +18,28 @@
 	let showConfirm = $state(false);
 	let formEl = $state<HTMLDivElement | null>(null);
 
-	$effect(() => {
-		const value = data.platforms;
-		if (value && typeof value === 'object' && 'data' in value) {
-			result = value;
+	async function loadData(p?: number) {
+		loading = true;
+		try {
+			const res = await platformsApi.list(p ?? page);
+			if (res.success && res.data) {
+				result = res.data;
+				page = res.data.page;
+			} else {
+				formError = res.error || 'ไม่สามารถโหลดข้อมูลได้';
+			}
+		} catch {
+			formError = 'เกิดข้อผิดพลาดในการโหลดข้อมูล';
+		} finally {
 			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				result = s;
-				loading = false;
-			});
 		}
-	});
+	}
 
-	$effect(() => {
-		if (form?.error) {
-			formError = form.error;
-		}
+	onMount(() => {
+		const url = new URL(window.location.href);
+		const p = parseInt(url.searchParams.get('page') ?? '1');
+		page = p;
+		loadData(p);
 	});
 
 	function scrollToForm() {
@@ -61,16 +66,37 @@
 		formError = '';
 	}
 
-	function handleEnhance() {
+	async function handleSubmit(e: Event) {
+		e.preventDefault();
 		formLoading = true;
 		formError = '';
-		return async ({ update, result: actionResult }: { update: () => Promise<void>; result: { type: string } }) => {
-			formLoading = false;
-			if (actionResult.type === 'success') {
-				closeForm();
-			}
-			await update();
+		const form = e.currentTarget as HTMLFormElement;
+		const data = new FormData(form);
+		const body: Record<string, string | null> = {
+			name: (data.get('name') as string)?.trim() ?? '',
+			logoUrl: (data.get('logoUrl') as string)?.trim() || null,
+			baseUrl: (data.get('baseUrl') as string)?.trim() || null
 		};
+		if (!body.name) {
+			formError = 'กรุณากรอกชื่อแพลตฟอร์ม';
+			formLoading = false;
+			return;
+		}
+		try {
+			const res = editingId
+				? await platformsApi.update(editingId, body)
+				: await platformsApi.create(body);
+			if (res.success) {
+				closeForm();
+				await loadData();
+			} else {
+				formError = res.error || 'เกิดข้อผิดพลาด';
+			}
+		} catch {
+			formError = 'เกิดข้อผิดพลาดในการเชื่อมต่อ';
+		} finally {
+			formLoading = false;
+		}
 	}
 
 	function confirmDelete(platform: typeof allPlatforms[0]) {
@@ -81,13 +107,10 @@
 	async function handleDelete() {
 		if (!deleteTarget) return;
 		const target = deleteTarget;
-		const formData = new FormData();
-		formData.set('id', target.id);
 		try {
-			const res = await fetch('?/delete', { method: 'POST', body: formData });
-			if (res.ok) {
-				allPlatforms = allPlatforms.filter((p: any) => p.id !== target.id);
-				result = { ...result, data: allPlatforms, total: result.total - 1 };
+			const res = await platformsApi.remove(target.id);
+			if (res.success) {
+				result = { ...result, data: result.data.filter((p: any) => p.id !== target.id), total: result.total - 1 };
 			}
 		} catch { /* ignore */ }
 		deleteTarget = null;
@@ -112,7 +135,7 @@
 	{#if showForm}
 		<div bind:this={formEl} class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไขแพลตฟอร์ม' : 'เพิ่มแพลตฟอร์ม'}</h2>
-			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
+			<form onsubmit={handleSubmit} class="space-y-4">
 				{#if editingId}
 					<input type="hidden" name="id" value={editingId} />
 				{/if}

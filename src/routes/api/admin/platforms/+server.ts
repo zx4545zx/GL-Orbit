@@ -35,3 +35,29 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 	return json({ data: allPlatforms, page, limit, total: count, totalPages: Math.ceil(count / limit) });
 };
+
+export const POST: RequestHandler = async ({ locals, request }) => {
+	if (!locals.user || locals.user.role !== 'ADMIN') {
+		error(403, 'ไม่มีสิทธิ์เข้าถึง');
+	}
+
+	const body = await request.json();
+	const { name, logoUrl, baseUrl } = body;
+
+	if (!name || typeof name !== 'string' || name.trim().length === 0) {
+		error(400, 'กรุณาระบุชื่อแพลตฟอร์ม');
+	}
+
+	const db = await getDb();
+
+	const [platform] = await db
+		.insert(platforms)
+		.values({
+			name: name.trim(),
+			logoUrl: logoUrl ?? null,
+			baseUrl: baseUrl ?? null,
+		})
+		.returning();
+
+	return json({ data: platform }, { status: 201 });
+};

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
+	import { createAdminApi } from '$lib/admin/api.js';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import type { PageData, ActionData } from './$types.js';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	const artistsApi = createAdminApi<any>('artists');
 
 	let result = $state<any>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
 	let allArtists = $derived(result.data ?? []);
@@ -16,25 +16,31 @@
 	let deleteTarget = $state<{ id: string; nickname: string } | null>(null);
 	let showConfirm = $state(false);
 	let formEl = $state<HTMLElement | null>(null);
+	let page = $state(1);
+	let totalPages = $state(1);
+	let total = $state(0);
 
-	$effect(() => {
-		const value = data.artists;
-		if (value && typeof value === 'object' && 'data' in value) {
-			result = value;
+	async function loadData(p = 1) {
+		loading = true;
+		try {
+			const res = await artistsApi.list(p);
+			if (res.success && res.data) {
+				result = res.data;
+				page = res.data.page;
+				totalPages = res.data.totalPages;
+				total = res.data.total;
+			}
+		} catch {
+			// ignore
+		} finally {
 			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				result = s;
-				loading = false;
-			});
 		}
-	});
+	}
 
-	$effect(() => {
-		if (form?.error) {
-			formError = form.error;
-		}
+	onMount(async () => {
+		const params = new URLSearchParams(window.location.search);
+		const p = parseInt(params.get('page') ?? '1');
+		await loadData(p);
 	});
 
 	function scrollToForm() {
@@ -61,16 +67,40 @@
 		formError = '';
 	}
 
-	function handleEnhance() {
+	async function onFormSubmit(e: Event) {
+		e.preventDefault();
 		formLoading = true;
 		formError = '';
-		return async ({ update, result: actionResult }: { update: () => Promise<void>; result: { type: string } }) => {
+		const form = e.currentTarget as HTMLFormElement;
+		const formData = new FormData(form);
+		const nickname = (formData.get('nickname') as string)?.trim() ?? '';
+		const fullName = (formData.get('fullName') as string)?.trim() || null;
+		const profileImageUrl = (formData.get('profileImageUrl') as string)?.trim() || null;
+
+		if (!nickname) {
+			formError = 'กรุณากรอกชื่อเล่น';
 			formLoading = false;
-			if (actionResult.type === 'success') {
-				closeForm();
+			return;
+		}
+
+		try {
+			let res;
+			if (editingId) {
+				res = await artistsApi.update(editingId, { nickname, fullName, profileImageUrl });
+			} else {
+				res = await artistsApi.create({ nickname, fullName, profileImageUrl });
 			}
-			await update();
-		};
+			if (res.success) {
+				closeForm();
+				await loadData(page);
+			} else {
+				formError = res.error ?? 'เกิดข้อผิดพลาด';
+			}
+		} catch {
+			formError = 'เกิดข้อผิดพลาดในการเชื่อมต่อ';
+		} finally {
+			formLoading = false;
+		}
 	}
 
 	function confirmDelete(artist: typeof allArtists[0]) {
@@ -81,13 +111,10 @@
 	async function handleDelete() {
 		if (!deleteTarget) return;
 		const target = deleteTarget;
-		const formData = new FormData();
-		formData.set('id', target.id);
 		try {
-			const res = await fetch('?/delete', { method: 'POST', body: formData });
-			if (res.ok) {
-				allArtists = allArtists.filter((a: any) => a.id !== target.id);
-				result = { ...result, data: allArtists, total: result.total - 1 };
+			const res = await artistsApi.remove(target.id);
+			if (res.success) {
+				result = { ...result, data: allArtists.filter((a: any) => a.id !== target.id), total: result.total - 1 };
 			}
 		} catch { /* ignore */ }
 		deleteTarget = null;
@@ -112,7 +139,7 @@
 	{#if showForm}
 		<div bind:this={formEl} class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไขนักแสดง' : 'เพิ่มนักแสดง'}</h2>
-			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
+			<form onsubmit={onFormSubmit} class="space-y-4">
 				{#if editingId}
 					<input type="hidden" name="id" value={editingId} />
 				{/if}

@@ -4,10 +4,6 @@
 	import BottomNav from '$lib/components/BottomNav.svelte';
 	import SeriesPendingShell from '$lib/components/SeriesPendingShell.svelte';
 	import SeriesDetailPendingShell from '$lib/components/SeriesDetailPendingShell.svelte';
-	import CalendarPendingShell from '$lib/components/CalendarPendingShell.svelte';
-	import ProfilePendingShell from '$lib/components/ProfilePendingShell.svelte';
-	import LoginPendingShell from '$lib/components/LoginPendingShell.svelte';
-	import RegisterPendingShell from '$lib/components/RegisterPendingShell.svelte';
 	import HomePendingShell from '$lib/components/HomePendingShell.svelte';
 
 	let { children } = $props();
@@ -32,14 +28,6 @@
 		
 		if (to === '/' && from !== '/') {
 			shellType = 'home';
-		} else if (to === '/login' && from !== '/login') {
-			shellType = 'login';
-		} else if (to === '/register' && from !== '/register') {
-			shellType = 'register';
-		} else if (to.startsWith('/calendar') && !from.startsWith('/calendar')) {
-			shellType = 'calendar';
-		} else if (to.startsWith('/profile') && !from.startsWith('/profile')) {
-			shellType = 'profile';
 		} else if (/^\/series\/[^/]+$/.test(to) && !from.startsWith('/series/')) {
 			shellType = 'series-detail';
 		} else if (to === '/series' && !from.startsWith('/series')) {
@@ -58,14 +46,6 @@
 	<div class="flex-1 pt-0 md:pt-24 pb-4 md:pb-0 px-4">
 		{#if showShell === 'home'}
 			<HomePendingShell />
-		{:else if showShell === 'login'}
-			<LoginPendingShell />
-		{:else if showShell === 'register'}
-			<RegisterPendingShell />
-		{:else if showShell === 'calendar'}
-			<CalendarPendingShell />
-		{:else if showShell === 'profile'}
-			<ProfilePendingShell />
 		{:else if showShell === 'series-detail'}
 			<SeriesDetailPendingShell />
 		{:else if showShell === 'series'}

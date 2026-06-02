@@ -36,3 +36,31 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 	return json({ data: result, page, limit, total: count, totalPages: Math.ceil(count / limit) });
 };
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user || locals.user.role !== 'ADMIN') {
+		error(403, 'ไม่มีสิทธิ์เข้าถึง');
+	}
+
+	const body = await request.json();
+	const { artistId, platform, url, iconUrl } = body;
+
+	if (!artistId || !platform || !url) {
+		return json({ success: false, error: 'กรุณากรอกข้อมูลให้ครบถ้วน (artistId, platform, url)' }, { status: 400 });
+	}
+
+	const db = await getDb();
+
+	const [inserted] = await db
+		.insert(artistSocials)
+		.values({ artistId, platform, url, iconUrl: iconUrl ?? null })
+		.returning({
+			id: artistSocials.id,
+			artistId: artistSocials.artistId,
+			platform: artistSocials.platform,
+			url: artistSocials.url,
+			iconUrl: artistSocials.iconUrl
+		});
+
+	return json({ success: true, data: inserted }, { status: 201 });
+};

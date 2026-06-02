@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db/index.js';
-import { series, studios, episodes } from '$lib/server/db/schema.js';
+import { series, studios, episodes, seriesGenres } from '$lib/server/db/schema.js';
 import { isNull, eq, asc, sql, inArray, and } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
@@ -63,4 +63,40 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		.where(isNull(series.deletedAt));
 
 	return json({ data, page, limit, total: count, totalPages: Math.ceil(count / limit) });
+};
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user || locals.user.role !== 'ADMIN') {
+		error(403, 'ไม่มีสิทธิ์เข้าถึง');
+	}
+
+	const body = await request.json();
+	const { titleEn, titleTh, studioId, posterUrl, status, genreIds } = body;
+
+	if (!titleEn) {
+		return json({ success: false, error: 'กรุณากรอกชื่อซีรีส์ (EN)' }, { status: 400 });
+	}
+
+	const db = await getDb();
+
+	const [inserted] = await db.insert(series).values({
+		titleEn,
+		titleTh: titleTh ?? null,
+		studioId: studioId ?? null,
+		posterUrl: posterUrl ?? null,
+		status: status ?? 'UPCOMING'
+	}).returning({
+		id: series.id,
+		titleEn: series.titleEn,
+		titleTh: series.titleTh,
+		studioId: series.studioId,
+		posterUrl: series.posterUrl,
+		status: series.status
+	});
+
+	if (genreIds?.length > 0) {
+		await db.insert(seriesGenres).values(genreIds.map((gid: string) => ({ seriesId: inserted.id, genreId: gid })));
+	}
+
+	return json({ success: true, data: inserted }, { status: 201 });
 };

@@ -1,6 +1,6 @@
-import { and, asc, desc, eq, isNull, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 import { getDb } from '$lib/server/db/index.js';
-import { episodes, episodeSchedules, series, studios } from '$lib/server/db/schema.js';
+import { episodes, episodeSchedules, genres, series, seriesGenres, studios } from '$lib/server/db/schema.js';
 
 export const SERIES_PAGE_LIMIT = 20;
 
@@ -14,6 +14,7 @@ export type SeriesListItem = {
 	poster: string;
 	status: 'UPCOMING' | 'ONGOING' | 'ENDED';
 	studio: string;
+	genres: { id: string; name: string }[];
 };
 
 export type SeriesListResult = {
@@ -160,6 +161,30 @@ export async function getSeriesList(filters: SeriesFilters, page: number = 1): P
 		.limit(SERIES_PAGE_LIMIT)
 		.offset(offset);
 
+	// Fetch genres for all returned series IDs
+	const seriesIds = rows.map((r) => r.id);
+	const genreRows = seriesIds.length > 0
+		? await db
+			.select({
+				seriesId: seriesGenres.seriesId,
+				id: genres.id,
+				name: genres.name
+			})
+			.from(seriesGenres)
+			.innerJoin(genres, eq(seriesGenres.genreId, genres.id))
+			.where(inArray(seriesGenres.seriesId, seriesIds))
+		: [];
+
+	const genreMap = new Map<string, { id: string; name: string }[]>();
+	for (const gr of genreRows) {
+		const list = genreMap.get(gr.seriesId);
+		if (list) {
+			list.push({ id: gr.id, name: gr.name });
+		} else {
+			genreMap.set(gr.seriesId, [{ id: gr.id, name: gr.name }]);
+		}
+	}
+
 	return {
 		items: rows.map((item) => ({
 			id: item.id,
@@ -167,7 +192,8 @@ export async function getSeriesList(filters: SeriesFilters, page: number = 1): P
 			subtitle: item.titleTh ?? '',
 			poster: item.posterUrl ?? DEFAULT_POSTER,
 			status: item.status,
-			studio: item.studioName ?? 'ไม่ระบุสตูดิโอ'
+			studio: item.studioName ?? 'ไม่ระบุสตูดิโอ',
+			genres: genreMap.get(item.id) ?? []
 		})),
 		total: countResult?.count ?? 0,
 		page,

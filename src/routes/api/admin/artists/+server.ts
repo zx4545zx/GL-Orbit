@@ -35,3 +35,36 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 	return json({ data: allArtists, page, limit, total: count, totalPages: Math.ceil(count / limit) });
 };
+
+export const POST: RequestHandler = async ({ locals, request }) => {
+	if (!locals.user || locals.user.role !== 'ADMIN') {
+		error(403, 'ไม่มีสิทธิ์เข้าถึง');
+	}
+
+	const body = await request.json();
+	const nickname = body.nickname?.trim();
+	if (!nickname) {
+		error(400, 'กรุณาระบุชื่อเล่น');
+	}
+
+	const fullName = body.fullName?.trim() || null;
+	const profileImageUrl = body.profileImageUrl?.trim() || null;
+
+	const db = await getDb();
+
+	const [created] = await db
+		.insert(artists)
+		.values({
+			nickname,
+			fullName,
+			profileImageUrl
+		})
+		.returning({
+			id: artists.id,
+			nickname: artists.nickname,
+			fullName: artists.fullName,
+			profileImageUrl: artists.profileImageUrl
+		});
+
+	return json(created, { status: 201 });
+};

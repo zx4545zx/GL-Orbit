@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
+	import { createAdminApi } from '$lib/admin/api.js';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import type { PageData, ActionData } from './$types.js';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	const seriesApi = createAdminApi<any>('series');
+	const studiosApi = createAdminApi<{ id: string; name: string }>('studios');
+	const genresApi = createAdminApi<{ id: string; name: string }>('genres');
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
@@ -12,9 +14,11 @@
 		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
 	};
 
-	let result = $state<any>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
-	let allSeries = $derived(result.data ?? []);
+	let items = $state<any[]>([]);
 	let loading = $state(true);
+	let page = $state(1);
+	let totalPages = $state(1);
+	let total = $state(0);
 	let showForm = $state(false);
 	let editingId = $state<string | null>(null);
 	let formLoading = $state(false);
@@ -22,25 +26,32 @@
 	let deleteTarget = $state<{ id: string; title: string } | null>(null);
 	let showConfirm = $state(false);
 	let formEl = $state<HTMLElement | null>(null);
+	let studios = $state<{ id: string; name: string }[]>([]);
+	let allGenres = $state<{ id: string; name: string }[]>([]);
 
-	$effect(() => {
-		const value = data.series;
-		if (value && typeof value === 'object' && 'data' in value) {
-			result = value;
-			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				result = s;
-				loading = false;
-			});
+	async function loadData() {
+		loading = true;
+		const res = await seriesApi.list(page);
+		if (res.success && res.data) {
+			items = res.data.data;
+			totalPages = res.data.totalPages;
+			total = res.data.total;
 		}
-	});
+		loading = false;
+	}
 
-	$effect(() => {
-		if (form?.error) {
-			formError = form.error;
-		}
+	async function loadDropdowns() {
+		const [sRes, gRes] = await Promise.all([
+			studiosApi.listAll(),
+			genresApi.listAll()
+		]);
+		if (sRes.success && sRes.data) studios = sRes.data.data;
+		if (gRes.success && gRes.data) allGenres = gRes.data.data;
+	}
+
+	onMount(() => {
+		loadData();
+		loadDropdowns();
 	});
 
 	function scrollToForm() {
@@ -54,7 +65,7 @@
 		scrollToForm();
 	}
 
-	function openEdit(seriesItem: typeof allSeries[0]) {
+	function openEdit(seriesItem: typeof items[0]) {
 		editingId = seriesItem.id;
 		formError = '';
 		showForm = true;
@@ -67,41 +78,73 @@
 		formError = '';
 	}
 
-	function handleEnhance() {
+	async function handleCreate(body: Record<string, unknown>) {
 		formLoading = true;
 		formError = '';
-		return async ({ update, result: actionResult }: { update: () => Promise<void>; result: { type: string } }) => {
-			formLoading = false;
-			if (actionResult.type === 'success') {
-				closeForm();
-			}
-			await update();
-		};
+		const res = await seriesApi.create(body);
+		formLoading = false;
+		if (res.success) {
+			closeForm();
+			await loadData();
+		} else {
+			formError = res.error ?? 'เกิดข้อผิดพลาด';
+		}
 	}
 
-	function confirmDelete(item: typeof allSeries[0]) {
-		deleteTarget = { id: item.id, title: item.title };
+	async function handleUpdate(id: string, body: Record<string, unknown>) {
+		formLoading = true;
+		formError = '';
+		const res = await seriesApi.update(id, body);
+		formLoading = false;
+		if (res.success) {
+			closeForm();
+			await loadData();
+		} else {
+			formError = res.error ?? 'เกิดข้อผิดพลาด';
+		}
+	}
+
+	function confirmDelete(seriesItem: typeof items[0]) {
+		deleteTarget = { id: seriesItem.id, title: seriesItem.title };
 		showConfirm = true;
 	}
 
 	async function handleDelete() {
 		if (!deleteTarget) return;
 		const target = deleteTarget;
-		const formData = new FormData();
-		formData.set('id', target.id);
-		try {
-			const res = await fetch('?/delete', { method: 'POST', body: formData });
-			if (res.ok) {
-				allSeries = allSeries.filter((s: any) => s.id !== target.id);
-				result = { ...result, data: allSeries, total: result.total - 1 };
-			}
-		} catch { /* ignore */ }
+		const res = await seriesApi.remove(target.id);
+		if (res.success) {
+			items = items.filter((s: any) => s.id !== target.id);
+		}
 		deleteTarget = null;
 	}
 
-	const editingSeries = $derived(() => allSeries.find((s: any) => s.id === editingId));
-	const studios = $derived(data.studios ?? []);
-	const allGenres = $derived(data.genres ?? []);
+	const editingSeries = $derived(() => items.find((s: any) => s.id === editingId));
+
+	function onFormSubmit(e: SubmitEvent) {
+		e.preventDefault();
+		const form = e.currentTarget as HTMLFormElement;
+		const formData = new FormData(form);
+		const body: Record<string, unknown> = {};
+		formData.forEach((value, key) => {
+			if (key === 'genreIds') {
+				if (!body[key]) body[key] = [];
+				(body[key] as string[]).push(value.toString());
+			} else {
+				body[key] = value.toString();
+			}
+		});
+		// Get selected genres properly from multi-select
+		const select = form.querySelector('select[name="genreIds"]') as HTMLSelectElement;
+		if (select) {
+			body.genreIds = Array.from(select.selectedOptions).map(o => (o as HTMLOptionElement).value);
+		}
+		if (editingId) {
+			handleUpdate(editingId, body);
+		} else {
+			handleCreate(body);
+		}
+	}
 </script>
 
 <div class="py-6 sm:py-8">
@@ -120,10 +163,7 @@
 	{#if showForm}
 		<div bind:this={formEl} class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไขซีรีส์' : 'เพิ่มซีรีส์ใหม่'}</h2>
-			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
-				{#if editingId}
-					<input type="hidden" name="id" value={editingId} />
-				{/if}
+			<form onsubmit={onFormSubmit} class="space-y-4">
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="series-title-en" class="block text-sm font-medium text-plum mb-1">ชื่อซีรีส์ (EN) <span class="text-coral">*</span></label>
@@ -214,7 +254,7 @@
 							</tr>
 						{/each}
 					{:else}
-						{#each allSeries as seriesItem (seriesItem.id)}
+						{#each items as seriesItem (seriesItem.id)}
 							<tr class="hover:bg-white/40 transition-colors">
 								<td class="px-4 sm:px-6 py-3 sm:py-4">
 									<div class="flex items-center gap-3">
@@ -277,7 +317,7 @@
 				</div>
 			{/each}
 		{:else}
-			{#each allSeries as seriesItem (seriesItem.id)}
+			{#each items as seriesItem (seriesItem.id)}
 				<div class="glass-card rounded-2xl p-4 transition-all overflow-hidden">
 					<div class="flex items-start gap-3">
 						{#if seriesItem.poster}
@@ -316,11 +356,11 @@
 		{/if}
 	</div>
 
-	{#if !loading && result.totalPages > 1}
-		<Pagination page={result.page} totalPages={result.totalPages} total={result.total} limit={result.limit} />
+	{#if !loading && totalPages > 1}
+		<Pagination page={page} totalPages={totalPages} total={total} limit={20} />
 	{/if}
 
-	{#if !loading && allSeries.length === 0}
+	{#if !loading && items.length === 0}
 		<div class="text-center py-16">
 			<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
 				<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
