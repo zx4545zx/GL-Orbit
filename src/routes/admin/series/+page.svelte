@@ -101,6 +101,7 @@
 
 	const editingSeries = $derived(() => allSeries.find((s: any) => s.id === editingId));
 	const studios = $derived(data.studios ?? []);
+	const allGenres = $derived(data.genres ?? []);
 </script>
 
 <div class="py-6 sm:py-8">
@@ -153,6 +154,18 @@
 							<option value="ENDED" selected={editingSeries()?.status === 'ENDED'}>จบแล้ว</option>
 						</select>
 					</div>
+				</div>
+				<div>
+					<label for="series-genres" class="block text-sm font-medium text-plum mb-1">ประเภท</label>
+					<select id="series-genres" name="genreIds" multiple size="4"
+						class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
+						{#each allGenres as genre}
+							<option value={genre.id} selected={editingId && editingSeries()?.genres?.includes(genre.id)}>
+								{genre.name}
+							</option>
+						{/each}
+					</select>
+					<p class="text-xs text-plum-light mt-1">กด Ctrl/Cmd เพื่อเลือกหลายประเภท</p>
 				</div>
 				<div>
 					<label for="series-poster" class="block text-sm font-medium text-plum mb-1">URL โปสเตอร์</label>

@@ -1,23 +1,27 @@
 import type { Actions, PageServerLoad } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db/index.js';
-import { series, studios } from '$lib/server/db/schema.js';
-import { eq, isNull, asc } from 'drizzle-orm';
+import { series, studios, genres, seriesGenres } from '$lib/server/db/schema.js';
+import { eq, isNull, asc, inArray } from 'drizzle-orm';
 import { createFollowerNotifications } from '$lib/server/notifications.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user || locals.user.role !== 'ADMIN') {
-		return { studios: [] };
+		return { studios: [], genres: [] };
 	}
 
 	const db = await getDb();
-	const allStudios = await db
-		.select({ id: studios.id, name: studios.name })
-		.from(studios)
-		.where(isNull(studios.deletedAt))
-		.orderBy(asc(studios.name));
+	const [allStudios, allGenres] = await Promise.all([
+		db.select({ id: studios.id, name: studios.name })
+			.from(studios)
+			.where(isNull(studios.deletedAt))
+			.orderBy(asc(studios.name)),
+		db.select({ id: genres.id, name: genres.name })
+			.from(genres)
+			.orderBy(asc(genres.name))
+	]);
 
-	return { studios: allStudios };
+	return { studios: allStudios, genres: allGenres };
 };
 
 export const actions: Actions = {
@@ -38,13 +42,19 @@ export const actions: Actions = {
 		}
 
 		const db = await getDb();
-		await db.insert(series).values({
+		const [inserted] = await db.insert(series).values({
 			titleEn,
 			titleTh,
 			studioId,
 			posterUrl,
 			status: status as 'UPCOMING' | 'ONGOING' | 'ENDED'
-		});
+		}).returning({ id: series.id });
+
+		// Handle genres
+		const genreIds = formData.getAll('genreIds').map(v => v.toString()).filter(Boolean);
+		if (genreIds.length > 0 && inserted) {
+			await db.insert(seriesGenres).values(genreIds.map(gid => ({ seriesId: inserted.id, genreId: gid })));
+		}
 
 		return { success: true };
 	},
@@ -78,6 +88,13 @@ export const actions: Actions = {
 		await db.update(series)
 			.set({ titleEn, titleTh, studioId, posterUrl, status: status as 'UPCOMING' | 'ONGOING' | 'ENDED' })
 			.where(eq(series.id, id));
+
+		// Update genres
+		await db.delete(seriesGenres).where(eq(seriesGenres.seriesId, id));
+		const genreIds = formData.getAll('genreIds').map(v => v.toString()).filter(Boolean);
+		if (genreIds.length > 0) {
+			await db.insert(seriesGenres).values(genreIds.map(gid => ({ seriesId: id, genreId: gid })));
+		}
 
 		// Notify followers if status changed
 		if (prev && prev.status !== status) {
