@@ -12,23 +12,23 @@ function makeLocals(user: unknown = null) {
 	return { user } as never;
 }
 
-describe('GET /api/notifications', () => {
+describe('GET /api/profile', () => {
 	beforeEach(() => vi.clearAllMocks());
 
 	it('returns 401 when not logged in', async () => {
-		const { GET } = await import('../../../src/routes/api/notifications/+server.js');
-		const response = await GET({ locals: makeLocals(), url: new URL('http://localhost/api/notifications') } as never) as Response;
+		const { GET } = await import('./+server.js');
+		const response = await GET({ locals: makeLocals() } as never) as Response;
 		expect(response.status).toBe(401);
 		expect(await jsonBody(response)).toEqual({ error: 'กรุณาเข้าสู่ระบบ' });
 	});
 });
 
-describe('POST /api/notifications', () => {
+describe('PATCH /api/profile', () => {
 	beforeEach(() => vi.clearAllMocks());
 
 	it('returns 401 when not logged in', async () => {
-		const { POST } = await import('../../../src/routes/api/notifications/+server.js');
-		const response = await POST({ locals: makeLocals(), request: new Request('http://localhost/api/notifications', { method: 'POST', body: '{}' }) } as never) as Response;
+		const { PATCH } = await import('./+server.js');
+		const response = await PATCH({ locals: makeLocals(), request: new Request('http://localhost/api/profile', { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: '{}' }) } as never) as Response;
 		expect(response.status).toBe(401);
 		expect(await jsonBody(response)).toEqual({ error: 'กรุณาเข้าสู่ระบบ' });
 	});

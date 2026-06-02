@@ -1,22 +1,43 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { ActionData } from './$types.js';
+	import { goto, invalidateAll } from '$app/navigation';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
-
-	let { form }: { form: ActionData } = $props();
+	import type { ApiErrorResponse } from '$lib/types.js';
 
 	let isLoading = $state(false);
+	let errorMessage = $state('');
+	let fieldErrors = $state<Record<string, string>>({});
 	let username = $state('');
 	let email = $state('');
 	let displayName = $state('');
 	let password = $state('');
 	let confirmPassword = $state('');
 
-	$effect(() => {
-		if (form?.username) username = form.username;
-		if (form?.email) email = form.email;
-		if (form?.displayName) displayName = form.displayName;
-	});
+	async function handleSubmit(e: Event) {
+		e.preventDefault();
+		isLoading = true;
+		errorMessage = '';
+		fieldErrors = {};
+
+		try {
+			const res = await fetch('/api/auth/register', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username, email, displayName, password, confirmPassword })
+			});
+			const data: ApiErrorResponse = await res.json();
+			if (!res.ok) {
+				errorMessage = data.error || 'ไม่สามารถสมัครสมาชิกได้ กรุณาลองอีกครั้ง';
+				if (data.fields) fieldErrors = data.fields;
+				return;
+			}
+			await invalidateAll();
+			await goto('/profile');
+		} catch {
+			errorMessage = 'ไม่สามารถสมัครสมาชิกได้ กรุณาลองอีกครั้ง';
+		} finally {
+			isLoading = false;
+		}
+	}
 </script>
 
 <div class="min-h-[calc(100dvh-6rem)] flex items-center justify-center px-4">
@@ -34,23 +55,13 @@
 		</div>
 
 		<div class="glass-card-strong rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-lavender/10">
-			{#if form?.error}
+			{#if errorMessage}
 				<div class="mb-4 p-3 rounded-xl bg-coral/10 border border-coral/20 text-coral-dark text-sm text-center">
-					{form.error}
+					{errorMessage}
 				</div>
 			{/if}
 
-			<form
-				method="POST"
-				use:enhance={() => {
-					isLoading = true;
-					return async ({ update }) => {
-						isLoading = false;
-						update();
-					};
-				}}
-				class="space-y-4 sm:space-y-5"
-			>
+			<form onsubmit={handleSubmit} class="space-y-4 sm:space-y-5">
 				<div>
 					<label for="username" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">ชื่อผู้ใช้</label>
 					<input
@@ -59,9 +70,12 @@
 						type="text"
 						bind:value={username}
 						placeholder="username"
-						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target"
+						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target {fieldErrors.username ? 'border-coral/50' : ''}"
 						required
 					/>
+					{#if fieldErrors.username}
+						<p class="text-xs text-coral mt-1">{fieldErrors.username}</p>
+					{/if}
 				</div>
 				<div>
 					<label for="displayName" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">ชื่อที่แสดง <span class="text-plum-light/60 font-normal">(ไม่บังคับ)</span></label>
@@ -82,9 +96,12 @@
 						type="email"
 						bind:value={email}
 						placeholder="your@email.com"
-						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target"
+						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target {fieldErrors.email ? 'border-coral/50' : ''}"
 						required
 					/>
+					{#if fieldErrors.email}
+						<p class="text-xs text-coral mt-1">{fieldErrors.email}</p>
+					{/if}
 				</div>
 				<PasswordInput
 					id="password"

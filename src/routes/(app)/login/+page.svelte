@@ -1,13 +1,41 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { ActionData } from './$types.js';
+	import { page } from '$app/state';
+	import { goto, invalidateAll } from '$app/navigation';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
 
-	let { form }: { form: ActionData } = $props();
-
 	let isLoading = $state(false);
+	let errorMessage = $state('');
 	let email = $state('');
 	let password = $state('');
+
+	$effect(() => {
+		if (page.data.user) goto('/profile');
+	});
+
+	async function handleSubmit(e: Event) {
+		e.preventDefault();
+		isLoading = true;
+		errorMessage = '';
+
+		try {
+			const res = await fetch('/api/auth/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ identifier: email, password })
+			});
+			const data = await res.json();
+			if (!res.ok) {
+				errorMessage = data.error || 'ไม่สามารถเข้าสู่ระบบได้ กรุณาลองอีกครั้ง';
+				return;
+			}
+			await invalidateAll();
+			await goto('/profile');
+		} catch {
+			errorMessage = 'ไม่สามารถเข้าสู่ระบบได้ กรุณาลองอีกครั้ง';
+		} finally {
+			isLoading = false;
+		}
+	}
 </script>
 
 <div class="min-h-[calc(100dvh-6rem)] flex items-center justify-center px-4">
@@ -25,23 +53,13 @@
 		</div>
 
 		<div class="glass-card-strong rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-lavender/10">
-			{#if form?.error}
+			{#if errorMessage}
 				<div class="mb-4 p-3 rounded-xl bg-coral/10 border border-coral/20 text-coral-dark text-sm text-center">
-					{form.error}
+					{errorMessage}
 				</div>
 			{/if}
 
-			<form
-				method="POST"
-				use:enhance={() => {
-					isLoading = true;
-					return async ({ update }) => {
-						isLoading = false;
-						update();
-					};
-				}}
-				class="space-y-4 sm:space-y-5"
-			>
+			<form onsubmit={handleSubmit} class="space-y-4 sm:space-y-5">
 				<div>
 					<label for="identifier" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">ชื่อผู้ใช้ หรือ อีเมล</label>
 					<input

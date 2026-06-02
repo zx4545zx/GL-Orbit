@@ -1,16 +1,35 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import type { NotificationItem } from '$lib/types.js';
+	import type { NotificationItem, NotificationsListResponse } from '$lib/types.js';
 
-	let { data } = $props();
-
-	let notifications = $state<NotificationItem[]>(data.notifications);
-	let offset = $state(20);
-	let hasMore = $state(data.hasMore);
+	let notifications = $state<NotificationItem[]>([]);
+	let offset = $state(0);
+	let hasMore = $state(false);
+	let initialLoading = $state(true);
 	let loading = $state(false);
 	let loadError = $state('');
 	let markingAll = $state(false);
+
+	$effect(() => {
+		async function loadInitial() {
+			initialLoading = true;
+			try {
+				const res = await fetch('/api/notifications?limit=20&offset=0');
+				if (res.status === 401) { goto('/login'); return; }
+				if (!res.ok) { loadError = 'ไม่สามารถโหลดการแจ้งเตือนได้'; return; }
+				const data: NotificationsListResponse = await res.json();
+				notifications = data.notifications ?? [];
+				offset = data.notifications.length;
+				hasMore = data.hasMore;
+			} catch {
+				loadError = 'ไม่สามารถโหลดการแจ้งเตือนได้';
+			} finally {
+				initialLoading = false;
+			}
+		}
+		loadInitial();
+	});
 
 	function formatRelativeTime(dateStr: string): string {
 		const now = Date.now();
@@ -54,13 +73,11 @@
 		try {
 			const res = await fetch(`/api/notifications?limit=20&offset=${offset}`);
 			if (!res.ok) throw new Error('ไม่สามารถโหลดการแจ้งเตือนได้');
-			const data = await res.json();
+			const data: NotificationsListResponse = await res.json();
 			const newItems: NotificationItem[] = data.notifications ?? [];
 			notifications = [...notifications, ...newItems];
-			offset += 20;
-			if (newItems.length < 20) {
-				hasMore = false;
-			}
+			offset += newItems.length;
+			hasMore = data.hasMore;
 		} catch (e) {
 			loadError = 'ไม่สามารถโหลดการแจ้งเตือนได้';
 		} finally {
@@ -104,8 +121,25 @@
 		{/if}
 	</div>
 
-	<!-- Notifications List -->
-	{#if notifications.length === 0}
+	<!-- Initial Loading State -->
+	{#if initialLoading}
+		<div class="space-y-2">
+			{#each Array(5) as _}
+				<div class="glass-card rounded-2xl p-4 animate-pulse flex items-start gap-3.5">
+					<div class="w-5 h-5 rounded-full bg-lavender/10 mt-0.5 shrink-0"></div>
+					<div class="flex-1 space-y-2">
+						<div class="h-4 w-3/4 rounded bg-lavender/10"></div>
+						<div class="h-3 w-1/4 rounded bg-lavender/10"></div>
+					</div>
+				</div>
+			{/each}
+		</div>
+	{:else if loadError && notifications.length === 0}
+		<div class="glass-card rounded-2xl py-16 px-6 text-center">
+			<p class="text-coral mb-4">{loadError}</p>
+		</div>
+	{:else if notifications.length === 0}
+		<!-- Empty State (only after initial load completes) -->
 		<div class="glass-card rounded-2xl py-16 px-6 text-center">
 			<svg class="w-16 h-16 mx-auto text-lavender/40 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
 				<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
