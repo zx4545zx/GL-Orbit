@@ -86,6 +86,19 @@ export const favorites = pgTable('favorites', {
 	pk: { columns: [table.userId, table.seriesId] }
 }));
 
+export const genres = pgTable('genres', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	name: varchar('name', { length: 255 }).notNull().unique(),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+});
+
+export const seriesGenres = pgTable('series_genres', {
+	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
+	genreId: uuid('genre_id').notNull().references(() => genres.id, { onDelete: 'cascade' })
+}, (table) => ({
+	pk: { columns: [table.seriesId, table.genreId] }
+}));
+
 export const seriesSchedules = pgTable('series_schedules', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
