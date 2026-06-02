@@ -310,7 +310,14 @@
 							<div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
 								<p class="text-white/70 text-xs sm:text-sm mb-1">{s.studio}</p>
 								<h3 class="text-white font-bold text-lg sm:text-xl mb-1">{s.title}</h3>
-								<p class="text-white/80 text-xs sm:text-sm">{s.subtitle}</p>
+								<p class="text-white/80 text-xs sm:text-sm mb-2">{s.subtitle}</p>
+								{#if s.genres && s.genres.length > 0}
+									<div class="flex flex-wrap gap-1">
+										{#each s.genres as genre}
+											<span class="px-1.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] sm:text-xs font-medium">{genre.name}</span>
+										{/each}
+									</div>
+								{/if}
 							</div>
 						</div>
 					</div>

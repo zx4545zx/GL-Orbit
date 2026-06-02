@@ -1,13 +1,18 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import type { PageData, ActionData } from './$types.js';
+	import { createAdminApi } from '$lib/admin/api.js';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	const seriesArtistsApi = createAdminApi<any>('series-artists');
+	const seriesApi = createAdminApi<any>('series');
+	const artistsApi = createAdminApi<any>('artists');
 
-	let result = $state<any>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
-	let allItems = $derived(result.data ?? []);
+	let items = $state<any[]>([]);
+	let page = $state(1);
+	let total = $state(0);
+	let totalPages = $state(1);
+	let limit = $state(20);
 	let loading = $state(true);
 	let showForm = $state(false);
 	let editingId = $state<string | null>(null);
@@ -17,24 +22,59 @@
 	let deleteTarget = $state<any>(null);
 	let showConfirm = $state(false);
 
-	$effect(() => {
-		const value = data.seriesArtists;
-		if (value && typeof value === 'object' && 'data' in value) {
-			result = value;
-			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				result = s;
-				loading = false;
-			});
-		}
-	});
+	// Dropdown data
+	let allSeries = $state<any[]>([]);
+	let allArtists = $state<any[]>([]);
 
-	$effect(() => {
-		if (form?.error) {
-			formError = form.error;
+	// Form fields
+	let formSeriesId = $state('');
+	let formArtistId = $state('');
+	let formRoleName = $state('');
+
+	// Original composite key for editing
+	let origSeriesId = $state('');
+	let origArtistId = $state('');
+
+	const roleOptions = [
+		{ value: 'LEAD', label: 'Lead' },
+		{ value: 'SUPPORTING', label: 'Supporting' },
+		{ value: 'GUEST', label: 'Guest' }
+	];
+
+	async function loadData() {
+		loading = true;
+		const url = new URL(window.location.href);
+		const currentPage = parseInt(url.searchParams.get('page') ?? '1', 10);
+		page = currentPage;
+		const res = await seriesArtistsApi.list(page, limit);
+		if (res.success && res.data) {
+			items = res.data.data ?? [];
+			page = res.data.page;
+			total = res.data.total;
+			totalPages = res.data.totalPages;
+			limit = res.data.limit;
+		} else {
+			items = [];
 		}
+		loading = false;
+	}
+
+	async function loadDropdowns() {
+		const [seriesRes, artistsRes] = await Promise.all([
+			seriesApi.listAll(),
+			artistsApi.listAll()
+		]);
+		if (seriesRes.success && seriesRes.data) {
+			allSeries = seriesRes.data.data ?? [];
+		}
+		if (artistsRes.success && artistsRes.data) {
+			allArtists = artistsRes.data.data ?? [];
+		}
+	}
+
+	onMount(() => {
+		loadData();
+		loadDropdowns();
 	});
 
 	function scrollToForm() {
@@ -45,13 +85,24 @@
 
 	function openCreate() {
 		editingId = null;
+		formSeriesId = '';
+		formArtistId = '';
+		formRoleName = '';
+		origSeriesId = '';
+		origArtistId = '';
 		formError = '';
 		showForm = true;
 		scrollToForm();
 	}
 
-	function openEdit(item: typeof allItems[0]) {
-		editingId = item.id;
+	function openEdit(item: typeof items[0]) {
+		const compositeId = `${item.seriesId}_${item.artistId}`;
+		editingId = compositeId;
+		origSeriesId = item.seriesId;
+		origArtistId = item.artistId;
+		formSeriesId = item.seriesId;
+		formArtistId = item.artistId;
+		formRoleName = item.roleName ?? '';
 		formError = '';
 		showForm = true;
 		scrollToForm();
@@ -63,41 +114,81 @@
 		formError = '';
 	}
 
-	function handleEnhance() {
+	async function handleSubmit(e: Event) {
+		e.preventDefault();
 		formLoading = true;
 		formError = '';
-		return async ({ update, result: actionResult }: { update: () => Promise<void>; result: { type: string } }) => {
-			formLoading = false;
-			if (actionResult.type === 'success') {
-				closeForm();
-			}
-			await update();
+
+		const body = {
+			seriesId: formSeriesId,
+			artistId: formArtistId,
+			roleName: formRoleName || null
 		};
+
+		try {
+			if (editingId) {
+				const res = await fetch('/api/admin/series-artists', {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({
+						id_seriesId: origSeriesId,
+						id_artistId: origArtistId,
+						...body
+					})
+				});
+				const json = await res.json();
+				if (!res.ok || !json.success) {
+					formError = json.error || 'เกิดข้อผิดพลาด';
+					formLoading = false;
+					return;
+				}
+			} else {
+				const res = await fetch('/api/admin/series-artists', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify(body)
+				});
+				const json = await res.json();
+				if (!res.ok || !json.success) {
+					formError = json.error || 'เกิดข้อผิดพลาด';
+					formLoading = false;
+					return;
+				}
+			}
+
+			closeForm();
+			await loadData();
+		} catch {
+			formError = 'เกิดข้อผิดพลาดในการเชื่อมต่อ';
+		}
+		formLoading = false;
 	}
 
 	async function handleDelete() {
 		if (!deleteTarget) return;
-		const fd = new FormData();
-		fd.set('seriesId', deleteTarget.seriesId);
-		fd.set('artistId', deleteTarget.artistId);
-		await fetch('?/delete', { method: 'POST', body: fd });
-		deleteTarget = null;
+
+		try {
+			const res = await fetch(
+				`/api/admin/series-artists?seriesId=${encodeURIComponent(deleteTarget.seriesId)}&artistId=${encodeURIComponent(deleteTarget.artistId)}`,
+				{ method: 'DELETE', credentials: 'include' }
+			);
+			const json = await res.json();
+			if (res.ok && json.success) {
+				deleteTarget = null;
+				showConfirm = false;
+				await loadData();
+			}
+		} catch {
+			// silent fail
+		}
 	}
 
-	function confirmDelete(item: typeof allItems[0]) {
+	function confirmDelete(item: typeof items[0]) {
 		deleteTarget = item;
 		showConfirm = true;
 	}
-
-	const editingItem = $derived(() => allItems.find((i: any) => i.id === editingId));
-	const seriesOptions = $derived(data.seriesList ?? []);
-	const artistOptions = $derived(data.artists ?? []);
-
-	const roleOptions = [
-		{ value: 'LEAD', label: 'Lead' },
-		{ value: 'SUPPORTING', label: 'Supporting' },
-		{ value: 'GUEST', label: 'Guest' },
-	];
 
 	function roleBadgeClass(role: string) {
 		if (role === 'LEAD') return 'bg-coral/10 text-coral-dark';
@@ -128,44 +219,35 @@
 	{#if showForm}
 		<div bind:this={formEl} class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไข' : 'เพิ่ม'}นักแสดงในซีรีส์</h2>
-			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
-				{#if editingId}
-					<input type="hidden" name="id" value={editingId} />
-				{/if}
+			<form onsubmit={handleSubmit} class="space-y-4">
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="sa-series" class="block text-sm font-medium text-plum mb-1">ซีรีส์ <span class="text-coral">*</span></label>
-						<select id="sa-series" name="seriesId" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
+						<select id="sa-series" bind:value={formSeriesId} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
 							<option value="">เลือกซีรีส์</option>
-							{#each seriesOptions as s}
-								<option value={s.id} selected={editingItem()?.seriesId === s.id}>{s.titleEn}</option>
+							{#each allSeries as s}
+								<option value={s.id}>{s.title ?? s.titleEn ?? ''}</option>
 							{/each}
 						</select>
 					</div>
 					<div>
 						<label for="sa-artist" class="block text-sm font-medium text-plum mb-1">นักแสดง <span class="text-coral">*</span></label>
-						<select id="sa-artist" name="artistId" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
+						<select id="sa-artist" bind:value={formArtistId} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
 							<option value="">เลือกนักแสดง</option>
-							{#each artistOptions as a}
-								<option value={a.id} selected={editingItem()?.artistId === a.id}>{a.nickname}</option>
+							{#each allArtists as a}
+								<option value={a.id}>{a.nickname}</option>
 							{/each}
 						</select>
 					</div>
 				</div>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<div>
-						<label for="sa-role" class="block text-sm font-medium text-plum mb-1">บทบาท <span class="text-coral">*</span></label>
-						<select id="sa-role" name="role" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
-							<option value="">เลือกบทบาท</option>
-							{#each roleOptions as r}
-								<option value={r.value} selected={editingItem()?.role === r.value}>{r.label}</option>
-							{/each}
-						</select>
-					</div>
-					<div>
-						<label for="sa-char" class="block text-sm font-medium text-plum mb-1">ชื่อตัวละคร</label>
-						<input id="sa-char" type="text" name="characterName" value={editingItem()?.characterName ?? ''} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
-					</div>
+				<div>
+					<label for="sa-role" class="block text-sm font-medium text-plum mb-1">บทบาท <span class="text-coral">*</span></label>
+					<select id="sa-role" bind:value={formRoleName} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
+						<option value="">เลือกบทบาท</option>
+						{#each roleOptions as r}
+							<option value={r.value}>{r.label}</option>
+						{/each}
+					</select>
 				</div>
 				{#if formError}
 					<p class="text-sm text-coral-dark">{formError}</p>
@@ -189,7 +271,6 @@
 						<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider">ซีรีส์</th>
 						<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider">นักแสดง</th>
 						<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider">บทบาท</th>
-						<th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-plum-light uppercase tracking-wider">ตัวละคร</th>
 						<th class="px-4 sm:px-6 py-3 sm:py-4 text-right text-xs font-semibold text-plum-light uppercase tracking-wider">จัดการ</th>
 					</tr>
 				</thead>
@@ -200,22 +281,18 @@
 								<td class="px-4 sm:px-6 py-3 sm:py-4"><div class="h-4 w-3/4 bg-lavender/10 rounded"></div></td>
 								<td class="px-4 sm:px-6 py-3 sm:py-4"><div class="h-4 w-24 bg-lavender/10 rounded"></div></td>
 								<td class="px-4 sm:px-6 py-3 sm:py-4"><div class="h-3 w-16 bg-lavender/10 rounded"></div></td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4"><div class="h-3 w-24 bg-lavender/10 rounded"></div></td>
 								<td class="px-4 sm:px-6 py-3 sm:py-4 text-right"><div class="h-8 w-16 bg-lavender/10 rounded ml-auto"></div></td>
 							</tr>
 						{/each}
 					{:else}
-						{#each allItems as item (item.id)}
+						{#each items as item (item.seriesId + '_' + item.artistId)}
 							<tr class="hover:bg-white/40 transition-colors">
-								<td class="px-4 sm:px-6 py-3 sm:py-4 text-sm text-plum">{item.series?.title ?? '-'}</td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4 text-sm text-plum">{item.artist?.nickname ?? '-'}</td>
+								<td class="px-4 sm:px-6 py-3 sm:py-4 text-sm text-plum">{item.seriesTitle ?? '-'}</td>
+								<td class="px-4 sm:px-6 py-3 sm:py-4 text-sm text-plum">{item.artistNickname ?? '-'}</td>
 								<td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm">
-									<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {roleBadgeClass(item.role)}">
-										{roleLabel(item.role)}
+									<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {roleBadgeClass(item.roleName)}">
+										{roleLabel(item.roleName)}
 									</span>
-								</td>
-								<td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-plum-light">
-									{item.characterName ?? '-'}
 								</td>
 								<td class="px-4 sm:px-6 py-3 sm:py-4 text-right">
 									<div class="flex items-center justify-end gap-1 sm:gap-2">
@@ -245,7 +322,6 @@
 						<div class="h-4 w-24 bg-lavender/10 rounded"></div>
 						<div class="flex gap-2">
 							<div class="h-6 w-16 bg-lavender/10 rounded-full"></div>
-							<div class="h-6 w-20 bg-lavender/10 rounded"></div>
 						</div>
 						<div class="flex gap-2 pt-1">
 							<div class="h-8 w-16 bg-lavender/10 rounded-lg"></div>
@@ -255,12 +331,12 @@
 				</div>
 			{/each}
 		{:else}
-			{#each allItems as item (item.id)}
+			{#each items as item (item.seriesId + '_' + item.artistId)}
 				<div class="glass-card rounded-2xl p-4 shadow-lg shadow-lavender/5 overflow-hidden">
 					<div class="flex items-start justify-between mb-3">
 						<div class="flex-1 min-w-0">
-							<p class="text-sm font-semibold text-plum truncate">{item.series?.title ?? '-'}</p>
-							<p class="text-sm text-plum-light truncate">{item.artist?.nickname ?? '-'}</p>
+							<p class="text-sm font-semibold text-plum truncate">{item.seriesTitle ?? '-'}</p>
+							<p class="text-sm text-plum-light truncate">{item.artistNickname ?? '-'}</p>
 						</div>
 						<div class="flex items-center gap-1 ml-2 shrink-0">
 							<button onclick={() => openEdit(item)} aria-label="แก้ไข" class="p-2 rounded-lg hover:bg-lavender/20 transition-colors text-plum-light hover:text-lavender-dark touch-target">
@@ -272,23 +348,20 @@
 						</div>
 					</div>
 					<div class="flex flex-wrap items-center gap-2">
-						<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {roleBadgeClass(item.role)}">
-							{roleLabel(item.role)}
+						<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {roleBadgeClass(item.roleName)}">
+							{roleLabel(item.roleName)}
 						</span>
-						{#if item.characterName}
-							<span class="text-xs text-plum-light truncate">{item.characterName}</span>
-						{/if}
 					</div>
 				</div>
 			{/each}
 		{/if}
 	</div>
 
-	{#if !loading && result.totalPages > 1}
-		<Pagination page={result.page} totalPages={result.totalPages} total={result.total} limit={result.limit} />
+	{#if !loading && totalPages > 1}
+		<Pagination {page} {totalPages} {total} {limit} />
 	{/if}
 
-	{#if !loading && allItems.length === 0}
+	{#if !loading && items.length === 0}
 		<div class="text-center py-16">
 			<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
 				<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -304,7 +377,7 @@
 <ConfirmDialog
 	bind:open={showConfirm}
 	title="ยืนยันการลบ"
-	message="คุณแน่ใจหรือไม่ว่าต้องการลบ{deleteTarget ? ` ${deleteTarget.artist?.nickname ?? ''} ออกจาก ${deleteTarget.series?.title ?? ''}` : ''}? การกระทำนี้ไม่สามารถย้อนกลับได้"
+	message={deleteTarget ? `คุณแน่ใจหรือไม่ว่าต้องการลบ ${deleteTarget.artistNickname ?? ''} ออกจาก ${deleteTarget.seriesTitle ?? ''}? การกระทำนี้ไม่สามารถย้อนกลับได้` : ''}
 	confirmLabel="ลบ"
 	cancelLabel="ยกเลิก"
 	danger={true}

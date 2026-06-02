@@ -1,30 +1,24 @@
 <script lang="ts">
+	import type { CalendarEvent, ScheduleDay, CalendarApiResponse } from '$lib/types/calendar.js';
+
 	let viewMode = $state<'grid' | 'calendar' | 'list'>('grid');
 	let currentMonth = $state(new Date());
 	let currentWeek = $state(new Date());
 	let selectedDate = $state<string | null>(null);
 
-	// State variables for calendar data
-	type CalendarEvent = {
-		time: string;
-		series: string;
-		seriesId: string;
-		episode: string;
-		platforms: string[];
-		isUncut: boolean;
-	};
+	// Separate month/grid state
+	let monthEvents = $state<Record<string, CalendarEvent[]>>({});
+	let monthAllSeries = $state<string[]>([]);
+	let monthPlatforms = $state<string[]>([]);
+	let monthLoading = $state(true);
+	let monthError = $state<string | null>(null);
+	let monthAbortCtrl = $state<AbortController | null>(null);
 
-	type ScheduleDay = {
-		day: string;
-		items: CalendarEvent[];
-	};
-
-	let events: Record<string, CalendarEvent[]> = $state({});
-	let allSeries: string[] = $state([]);
-	let platforms: string[] = $state([]);
-	let scheduleByDay: ScheduleDay[] = $state([]);
-	let loading = $state(true);
+	// Separate week/list state
+	let weekScheduleByDay = $state<ScheduleDay[]>([]);
 	let weekLoading = $state(false);
+	let weekError = $state<string | null>(null);
+	let weekAbortCtrl = $state<AbortController | null>(null);
 
 	const weekDays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 	const thaiMonths = [
@@ -44,7 +38,7 @@
 	function getStartOfWeek(date: Date): Date {
 		const d = new Date(date);
 		const day = d.getDay();
-		const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+		const diff = d.getDate() - day + (day === 0 ? -6 : 1);
 		return new Date(d.setDate(diff));
 	}
 
@@ -58,21 +52,34 @@
 	$effect(() => {
 		const year = currentMonth.getFullYear();
 		const month = currentMonth.getMonth() + 1;
-		
-		loading = true;
-		fetch(`/api/calendar?year=${year}&month=${month}`)
-			.then((r) => r.json())
+
+		monthAbortCtrl?.abort();
+		monthAbortCtrl = new AbortController();
+		monthLoading = true;
+		monthError = null;
+
+		fetch(`/api/calendar?year=${year}&month=${month}`, { signal: monthAbortCtrl.signal })
+			.then(async (r) => {
+				if (!r.ok) {
+					const data = await r.json().catch(() => ({}));
+					throw new Error(data.error || 'โหลดตารางฉายไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+				}
+				return r.json() as Promise<CalendarApiResponse>;
+			})
 			.then((data) => {
-				events = data.events;
-				allSeries = data.allSeries;
-				platforms = data.platforms;
-				scheduleByDay = data.scheduleByDay;
-				loading = false;
+				monthEvents = data.events;
+				monthAllSeries = data.allSeries;
+				monthPlatforms = data.platforms;
+				monthLoading = false;
 			})
 			.catch((err) => {
+				if (err.name === 'AbortError') return;
 				console.error('Failed to fetch calendar data:', err);
-				loading = false;
+				monthError = err.message || 'โหลดตารางฉายไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
+				monthLoading = false;
 			});
+
+		return () => monthAbortCtrl?.abort();
 	});
 
 	// Fetch weekly data when currentWeek changes (for list view)
@@ -83,18 +90,32 @@
 		const endDate = getEndOfWeek(currentWeek);
 		const startDateStr = formatDateLocal(startDate);
 		const endDateStr = formatDateLocal(endDate);
-		
+
+		weekAbortCtrl?.abort();
+		weekAbortCtrl = new AbortController();
 		weekLoading = true;
-		fetch(`/api/calendar?startDate=${startDateStr}&endDate=${endDateStr}`)
-			.then((r) => r.json())
+		weekError = null;
+
+		fetch(`/api/calendar?startDate=${startDateStr}&endDate=${endDateStr}`, { signal: weekAbortCtrl.signal })
+			.then(async (r) => {
+				if (!r.ok) {
+					const data = await r.json().catch(() => ({}));
+					throw new Error(data.error || 'โหลดรายการประจำสัปดาห์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+				}
+				return r.json() as Promise<CalendarApiResponse>;
+			})
 			.then((data) => {
-				scheduleByDay = data.scheduleByDay;
+				weekScheduleByDay = data.scheduleByDay;
 				weekLoading = false;
 			})
 			.catch((err) => {
+				if (err.name === 'AbortError') return;
 				console.error('Failed to fetch weekly data:', err);
+				weekError = err.message || 'โหลดรายการประจำสัปดาห์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
 				weekLoading = false;
 			});
+
+		return () => weekAbortCtrl?.abort();
 	});
 
 	const platformColorClasses = [
@@ -110,7 +131,7 @@
 
 	const platformColors = $derived((() => {
 		const map: Record<string, string> = {};
-		platforms.forEach((p, i) => {
+		monthPlatforms.forEach((p, i) => {
 			map[p] = platformColorClasses[i % platformColorClasses.length];
 		});
 		return map;
@@ -196,11 +217,11 @@
 	}
 
 	function hasEvents(fullDate: string) {
-		return events[fullDate] && events[fullDate].length > 0;
+		return monthEvents[fullDate] && monthEvents[fullDate].length > 0;
 	}
 
 	function getEventCount(fullDate: string) {
-		return events[fullDate]?.length || 0;
+		return monthEvents[fullDate]?.length || 0;
 	}
 
 	function selectDate(fullDate: string) {
@@ -210,14 +231,14 @@
 	}
 
 	const calendarDays = $derived(generateCalendarDays(currentMonth));
-	const selectedEvents = $derived(selectedDate ? events[selectedDate] || [] : []);
+	const selectedEvents = $derived(selectedDate ? monthEvents[selectedDate] || [] : []);
 
 	const daysInMonthCurrent = $derived(getDaysInMonth(currentMonth));
 	const monthDays = $derived(Array.from({ length: daysInMonthCurrent }, (_, i) => i + 1));
 
 	function getEventsForSeriesAndDay(seriesName: string, day: number) {
 		const dateStr = formatDateLocal(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day));
-		return events[dateStr]?.filter(e => e.series === seriesName) || [];
+		return monthEvents[dateStr]?.filter(e => e.series === seriesName) || [];
 	}
 
 	const dayColors: Record<string, string> = {
@@ -271,132 +292,150 @@
 
 	{#if viewMode === 'grid'}
 		<!-- Grid / Timeline View — Series rows × Date columns -->
-			<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
-				<!-- Header: Month nav + day columns -->
-				<div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-lavender/20">
+		{#if monthError}
+			<div class="glass-card rounded-xl p-4 mb-4 flex items-center gap-3 text-coral-dark">
+				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+				</svg>
+				<p class="text-sm">{monthError}</p>
+			</div>
+		{/if}
+
+		<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+			<!-- Header: Month nav + day columns -->
+			<div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-lavender/20">
+				<button
+					aria-label="เดือนก่อนหน้า"
+					onclick={prevMonth}
+					class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+				>
+					<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+				</button>
+				<div class="flex items-center gap-2 sm:gap-3">
+					<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
+						{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
+					</h2>
 					<button
-						aria-label="เดือนก่อนหน้า"
-						onclick={prevMonth}
-						class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+						onclick={goToToday}
+						class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
 					>
-						<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-					</button>
-					<div class="flex items-center gap-2 sm:gap-3">
-						<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
-							{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
-						</h2>
-						<button
-							onclick={goToToday}
-							class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
-						>
-							วันนี้
-						</button>
-					</div>
-					<button
-						aria-label="เดือนถัดไป"
-						onclick={nextMonth}
-						class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-					>
-						<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+						วันนี้
 					</button>
 				</div>
+				<button
+					aria-label="เดือนถัดไป"
+					onclick={nextMonth}
+					class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+				>
+					<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+				</button>
+			</div>
 
-				<div class="overflow-x-auto">
-					<table class="w-full min-w-[800px]">
-						<thead>
-							<tr class="border-b border-lavender/10">
-								<!-- Series name column -->
-								<th class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-plum-light w-32 sm:w-40 border-r border-lavender/10">
-									ซีรีส์
+			<div class="overflow-x-auto">
+				<table class="w-full min-w-[800px]">
+					<thead>
+						<tr class="border-b border-lavender/10">
+							<!-- Series name column -->
+							<th class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-plum-light w-32 sm:w-40 border-r border-lavender/10">
+								ซีรีส์
+							</th>
+							<!-- Day columns -->
+							{#each monthDays as day}
+								{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
+								{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
+								{@const dayOfWeek = dateObj.getDay()}
+								<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[36px] sm:min-w-[48px] {isToday ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
+									<div class="font-bold">{day}</div>
+									<div class="text-[8px] sm:text-[10px] opacity-70">
+										{#if dayOfWeek === 0}อา
+										{:else if dayOfWeek === 1}จ
+										{:else if dayOfWeek === 2}อ
+										{:else if dayOfWeek === 3}พ
+										{:else if dayOfWeek === 4}พฤ
+										{:else if dayOfWeek === 5}ศ
+										{:else}ส
+										{/if}
+									</div>
 								</th>
-								<!-- Day columns -->
-								{#each monthDays as day}
-									{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
-									{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
-									{@const dayOfWeek = dateObj.getDay()}
-									<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[36px] sm:min-w-[48px] {isToday ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
-										<div class="font-bold">{day}</div>
-										<div class="text-[8px] sm:text-[10px] opacity-70">
-											{#if dayOfWeek === 0}อา
-											{:else if dayOfWeek === 1}จ
-											{:else if dayOfWeek === 2}อ
-											{:else if dayOfWeek === 3}พ
-											{:else if dayOfWeek === 4}พฤ
-											{:else if dayOfWeek === 5}ศ
-											{:else}ส
-											{/if}
-										</div>
-									</th>
-								{/each}
-							</tr>
-						</thead>
-						<tbody>
-							{#if loading}
-								{#each Array(6) as _, rowIndex}
-									<tr class="border-b border-lavender/5 {rowIndex % 2 === 0 ? 'bg-white/20' : ''}">
-										<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
-											<div class="h-4 w-24 bg-lavender/10 rounded animate-pulse"></div>
+							{/each}
+						</tr>
+					</thead>
+					<tbody>
+						{#if monthLoading}
+							{#each Array(6) as _, rowIndex}
+								<tr class="border-b border-lavender/5 {rowIndex % 2 === 0 ? 'bg-white/20' : ''}">
+									<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
+										<div class="h-4 w-24 bg-lavender/10 rounded animate-pulse"></div>
+									</td>
+									{#each monthDays as day}
+										<td class="px-0.5 sm:px-1 py-1 sm:py-2">
+											<div class="h-6 sm:h-8 w-full bg-lavender/10 rounded animate-pulse"></div>
 										</td>
-										{#each monthDays as day}
-											<td class="px-0.5 sm:px-1 py-1 sm:py-2">
-												<div class="h-6 sm:h-8 w-full bg-lavender/10 rounded animate-pulse"></div>
-											</td>
-										{/each}
-									</tr>
-								{/each}
-							{:else}
-								{#each allSeries as seriesName, seriesIndex}
-									<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
-										<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
-											<div class="font-semibold text-plum text-xs sm:text-sm truncate">{seriesName}</div>
-										</td>
-										{#each monthDays as day}
-											{@const dayEvents = getEventsForSeriesAndDay(seriesName, day)}
-											{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
-											{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
-											<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isToday ? 'bg-coral/5' : ''}">
-												{#if dayEvents.length > 0}
-													<div class="space-y-0.5">
-														{#each dayEvents as event}
-															<div class="relative group rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platforms[0]] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
-																<div class="font-bold">{event.time}</div>
-																<div class="mt-0.5">{event.episode}</div>
-																{#if event.isUncut}
-																	<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
-																{/if}
-																<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-plum text-white text-[8px] sm:text-[9px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-																	{event.platforms.join(', ')}
-																	<div class="absolute top-full left-1/2 -translate-x-1/2 border-2 border-transparent border-t-plum"></div>
-																</div>
+									{/each}
+								</tr>
+							{/each}
+						{:else}
+							{#each monthAllSeries as seriesName, seriesIndex}
+								<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
+									<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
+										<div class="font-semibold text-plum text-xs sm:text-sm truncate">{seriesName}</div>
+									</td>
+									{#each monthDays as day}
+										{@const dayEvents = getEventsForSeriesAndDay(seriesName, day)}
+										{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
+										{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
+										<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isToday ? 'bg-coral/5' : ''}">
+											{#if dayEvents.length > 0}
+												<div class="space-y-0.5">
+													{#each dayEvents as event}
+														<div class="relative group rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platforms[0]] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
+															<div class="font-bold">{event.time}</div>
+															<div class="mt-0.5">{event.episode}</div>
+															{#if event.isUncut}
+																<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
+															{/if}
+															<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-plum text-white text-[8px] sm:text-[9px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+																{event.platforms.join(', ')}
+																<div class="absolute top-full left-1/2 -translate-x-1/2 border-2 border-transparent border-t-plum"></div>
 															</div>
-														{/each}
-													</div>
-												{:else}
-													<div class="w-full h-6 sm:h-8"></div>
-												{/if}
-											</td>
-										{/each}
-									</tr>
-								{/each}
-							{/if}
-						</tbody>
-					</table>
-				</div>
+														</div>
+													{/each}
+												</div>
+											{:else}
+												<div class="w-full h-6 sm:h-8"></div>
+											{/if}
+										</td>
+									{/each}
+								</tr>
+							{/each}
+						{/if}
+					</tbody>
+				</table>
 			</div>
+		</div>
 
-			<!-- Platform Legend -->
-			<div class="mt-4 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-plum-light">
-				<span>แพลตฟอร์ม:</span>
-				{#each Object.entries(platformColors) as [platform, colorClass]}
-					<div class="flex items-center gap-1">
-						<div class="w-3 h-3 rounded {colorClass.split(' ')[0]}"></div>
-						<span>{platform}</span>
-					</div>
-				{/each}
-			</div>
+		<!-- Platform Legend -->
+		<div class="mt-4 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-plum-light">
+			<span>แพลตฟอร์ม:</span>
+			{#each Object.entries(platformColors) as [platform, colorClass]}
+				<div class="flex items-center gap-1">
+					<div class="w-3 h-3 rounded {colorClass.split(' ')[0]}"></div>
+					<span>{platform}</span>
+				</div>
+			{/each}
+		</div>
 
 	{:else if viewMode === 'calendar'}
-		{#if loading}
+		{#if monthError}
+			<div class="glass-card rounded-xl p-4 mb-4 flex items-center gap-3 text-coral-dark">
+				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+				</svg>
+				<p class="text-sm">{monthError}</p>
+			</div>
+		{/if}
+
+		{#if monthLoading}
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 				<div class="lg:col-span-2">
 					<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
@@ -432,129 +471,128 @@
 		{:else}
 			<!-- Calendar View -->
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-			<div class="lg:col-span-2">
-				<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
-					<div class="flex items-center justify-between mb-4 sm:mb-6">
-						<button
-							aria-label="เดือนก่อนหน้า"
-							onclick={prevMonth}
-							class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-						>
-							<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-						</button>
-						<div class="flex items-center gap-2 sm:gap-3">
-							<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-2xl font-bold text-plum">
-								{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
-							</h2>
+				<div class="lg:col-span-2">
+					<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
+						<div class="flex items-center justify-between mb-4 sm:mb-6">
 							<button
-								onclick={goToToday}
-								class="px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
+								aria-label="เดือนก่อนหน้า"
+								onclick={prevMonth}
+								class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
 							>
-								วันนี้
+								<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+							</button>
+							<div class="flex items-center gap-2 sm:gap-3">
+								<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-2xl font-bold text-plum">
+									{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
+								</h2>
+								<button
+									onclick={goToToday}
+									class="px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
+								>
+									วันนี้
+								</button>
+							</div>
+							<button
+								aria-label="เดือนถัดไป"
+								onclick={nextMonth}
+								class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+							>
+								<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
 							</button>
 						</div>
-						<button
-							aria-label="เดือนถัดไป"
-							onclick={nextMonth}
-							class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-						>
-							<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-						</button>
-					</div>
 
-					<div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
-						{#each weekDays as day}
-							<div class="text-center py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold text-plum-light uppercase">{day}</div>
-						{/each}
-					</div>
-
-					<div class="grid grid-cols-7 gap-0.5 sm:gap-1">
-						{#each calendarDays as day}
-							{@const eventCount = getEventCount(day.fullDate)}
-							{@const isSelected = selectedDate === day.fullDate}
-							<button
-								onclick={() => selectDate(day.fullDate)}
-								class="relative aspect-square rounded-lg sm:rounded-xl p-0.5 sm:p-1 transition-all duration-300 flex flex-col items-center justify-center gap-0.5 touch-target
-									{day.month !== 'current' ? 'text-plum-light/40' : 'text-plum'}
-									{isToday(day.fullDate) ? 'ring-1 sm:ring-2 ring-coral' : ''}
-									{isSelected ? 'bg-gradient-to-br from-coral/20 to-lavender/20' : 'hover:bg-white/40'}
-									{eventCount > 0 && !isSelected ? 'bg-white/30' : ''}"
-							>
-								<span class="text-xs sm:text-sm font-medium">{day.date}</span>
-								{#if eventCount > 0}
-									<div class="flex gap-0.5">
-										{#each Array(Math.min(eventCount, 3)) as _, i}
-											<div class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-coral"></div>
-										{/each}
-									</div>
-								{/if}
-								{#if isToday(day.fullDate)}
-									<span class="absolute -top-1.5 -right-1 px-1.5 py-0.5 bg-coral rounded-md text-[8px] sm:text-[10px] text-white font-bold shadow-sm leading-none">วันนี้</span>
-								{/if}
-							</button>
-						{/each}
-					</div>
-
-					<div class="mt-3 sm:mt-4 flex items-center gap-3 sm:gap-4 text-[10px] sm:text-xs text-plum-light">
-						<div class="flex items-center gap-1 sm:gap-1.5">
-							<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-coral"></div>
-							<span>มีซีรีส์ฉาย</span>
-						</div>
-						<div class="flex items-center gap-1 sm:gap-1.5">
-							<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-coral ring-1 sm:ring-1 ring-coral"></div>
-							<span>วันนี้</span>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="lg:col-span-1">
-				<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:sticky lg:top-28">
-					{#if selectedDate && selectedEvents.length > 0}
-						{@const d = new Date(selectedDate)}
-						<h3 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum mb-1">
-							{d.getDate()} {thaiMonths[d.getMonth()]}
-						</h3>
-						<p class="text-xs sm:text-sm text-plum-light mb-4 sm:mb-5">มี {selectedEvents.length} รายการ</p>
-
-						<div class="space-y-2 sm:space-y-3">
-							{#each selectedEvents as event}
-								<div class="glass-card-strong rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:shadow-lg transition-all">
-									<div class="flex items-center gap-2 mb-1.5 sm:mb-2">
-										<span class="px-2 py-0.5 rounded-lg bg-coral/10 text-coral-dark text-xs font-bold">{event.time}</span>
-										{#if event.isUncut}
-											<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-xs font-medium">Uncut</span>
-										{/if}
-									</div>
-									<h4 class="font-semibold text-plum text-sm mb-0.5 sm:mb-1">{event.series}</h4>
-									<div class="flex items-center gap-2 text-xs text-plum-light">
-										<span>{event.episode}</span>
-										<span>•</span>
-										<span>{event.platforms.join(', ')}</span>
-									</div>
-								</div>
+						<div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
+							{#each weekDays as day}
+								<div class="text-center py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold text-plum-light uppercase">{day}</div>
 							{/each}
 						</div>
-					{:else}
-						<div class="text-center py-8 sm:py-10">
-							<div class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
-								<svg class="w-6 h-6 sm:w-8 sm:h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-								</svg>
-							</div>
-							<p class="text-plum-light text-xs sm:text-sm">
-								{#if selectedDate}
-									ไม่มีซีรีส์ฉายในวันนี้
-								{:else}
-									เลือกวันที่มีจุดสีชมพู<br/>เพื่อดูรายละเอียด
-								{/if}
-							</p>
+
+						<div class="grid grid-cols-7 gap-0.5 sm:gap-1">
+							{#each calendarDays as day}
+								{@const eventCount = getEventCount(day.fullDate)}
+								{@const isSelected = selectedDate === day.fullDate}
+								<button
+									onclick={() => selectDate(day.fullDate)}
+									class="relative aspect-square rounded-lg sm:rounded-xl p-0.5 sm:p-1 transition-all duration-300 flex flex-col items-center justify-center gap-0.5 touch-target
+										{day.month !== 'current' ? 'text-plum-light/40' : 'text-plum'}
+										{isToday(day.fullDate) ? 'ring-1 sm:ring-2 ring-coral' : ''}
+										{isSelected ? 'bg-gradient-to-br from-coral/20 to-lavender/20' : 'hover:bg-white/40'}
+										{eventCount > 0 && !isSelected ? 'bg-white/30' : ''}"
+								>
+									<span class="text-xs sm:text-sm font-medium">{day.date}</span>
+									{#if eventCount > 0}
+										<div class="flex gap-0.5">
+											{#each Array(Math.min(eventCount, 3)) as _, i}
+												<div class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-coral"></div>
+											{/each}
+										</div>
+									{/if}
+									{#if isToday(day.fullDate)}
+										<span class="absolute -top-1.5 -right-1 px-1.5 py-0.5 bg-coral rounded-md text-[8px] sm:text-[10px] text-white font-bold shadow-sm leading-none">วันนี้</span>
+									{/if}
+								</button>
+							{/each}
 						</div>
-					{/if}
+
+						<div class="mt-3 sm:mt-4 flex items-center gap-3 sm:gap-4 text-[10px] sm:text-xs text-plum-light">
+							<div class="flex items-center gap-1 sm:gap-1.5">
+								<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-coral"></div>
+								<span>มีซีรีส์ฉาย</span>
+							</div>
+							<div class="flex items-center gap-1 sm:gap-1.5">
+								<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-coral ring-1 sm:ring-1 ring-coral"></div>
+								<span>วันนี้</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="lg:col-span-1">
+					<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:sticky lg:top-28">
+						{#if selectedDate && selectedEvents.length > 0}
+							{@const d = new Date(selectedDate)}
+							<h3 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum mb-1">
+								{d.getDate()} {thaiMonths[d.getMonth()]}
+							</h3>
+							<p class="text-xs sm:text-sm text-plum-light mb-4 sm:mb-5">มี {selectedEvents.length} รายการ</p>
+
+							<div class="space-y-2 sm:space-y-3">
+								{#each selectedEvents as event}
+									<div class="glass-card-strong rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:shadow-lg transition-all">
+										<div class="flex items-center gap-2 mb-1.5 sm:mb-2">
+											<span class="px-2 py-0.5 rounded-lg bg-coral/10 text-coral-dark text-xs font-bold">{event.time}</span>
+											{#if event.isUncut}
+												<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-xs font-medium">Uncut</span>
+											{/if}
+										</div>
+										<h4 class="font-semibold text-plum text-sm mb-0.5 sm:mb-1">{event.series}</h4>
+										<div class="flex items-center gap-2 text-xs text-plum-light">
+											<span>{event.episode}</span>
+											<span>•</span>
+											<span>{event.platforms.join(', ')}</span>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{:else}
+							<div class="text-center py-8 sm:py-10">
+								<div class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+									<svg class="w-6 h-6 sm:w-8 sm:h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+									</svg>
+								</div>
+								<p class="text-plum-light text-xs sm:text-sm">
+									{#if selectedDate}
+										ไม่มีซีรีส์ฉายในวันนี้
+									{:else}
+										เลือกวันที่มีจุดสีชมพู<br/>เพื่อดูรายละเอียด
+									{/if}
+								</p>
+							</div>
+						{/if}
+					</div>
 				</div>
 			</div>
-		</div>
-
 		{/if}
 	{:else}
 		<!-- List View -->
@@ -589,6 +627,15 @@
 			</div>
 		</div>
 
+		{#if weekError}
+			<div class="glass-card rounded-xl p-4 mb-4 flex items-center gap-3 text-coral-dark">
+				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+				</svg>
+				<p class="text-sm">{weekError}</p>
+			</div>
+		{/if}
+
 		{#if weekLoading}
 			<div class="space-y-4">
 				{#each Array(3) as _}
@@ -604,7 +651,7 @@
 			</div>
 		{:else}
 			<div class="space-y-4 sm:space-y-6">
-				{#each scheduleByDay as day}
+				{#each weekScheduleByDay as day}
 					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
 						<div class="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r {dayColors[day.day] || 'from-lavender/20 to-lavender/5'} border-b border-white/50">
 							<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum flex items-center gap-2 sm:gap-3">

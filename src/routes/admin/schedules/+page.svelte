@@ -1,10 +1,22 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import Pagination from '$lib/components/Pagination.svelte';
+	import { onMount } from 'svelte';
+	import { createAdminApi } from '$lib/admin/api.js';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import type { PageData, ActionData } from './$types.js';
+	import type { PaginatedResponse } from '$lib/admin/types.js';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	const schedulesApi = createAdminApi<any>('schedules');
+	const seriesApi = createAdminApi<any>('series');
+	const platformsApi = createAdminApi<any>('platforms');
+
+	const dayOptions = [
+		{ value: 1, label: 'จันทร์' },
+		{ value: 2, label: 'อังคาร' },
+		{ value: 3, label: 'พุธ' },
+		{ value: 4, label: 'พฤหัสบดี' },
+		{ value: 5, label: 'ศุกร์' },
+		{ value: 6, label: 'เสาร์' },
+		{ value: 0, label: 'อาทิตย์' }
+	];
 
 	const dayColors: Record<string, string> = {
 		'จันทร์': 'bg-coral/10 text-coral-dark',
@@ -16,8 +28,10 @@
 		'อาทิตย์': 'bg-rose-100 text-rose-700'
 	};
 
-	let result = $state<any>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
+	let result = $state<PaginatedResponse<any>>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
 	let allSchedules = $derived(result.data ?? []);
+	let allSeries: any[] = $state([]);
+	let allPlatforms: any[] = $state([]);
 	let loading = $state(true);
 	let showForm = $state(false);
 	let editingId = $state<string | null>(null);
@@ -27,24 +41,49 @@
 	let deleteTarget = $state<string | null>(null);
 	let showConfirm = $state(false);
 
+	let formSeriesId = $state('');
+	let formPlatformId = $state('');
+	let formDayOfWeek = $state('1');
+	let formAirTime = $state('');
+	let formIsUncut = $state(false);
+
+	const editingSchedule = $derived(allSchedules.find((s: any) => s.id === editingId));
+
 	$effect(() => {
-		const value = data.schedules;
-		if (value && typeof value === 'object' && 'data' in value) {
-			result = value;
-			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				result = s;
-				loading = false;
-			});
+		if (editingSchedule) {
+			formSeriesId = editingSchedule.seriesId ?? '';
+			formPlatformId = editingSchedule.platformId ?? '';
+			formDayOfWeek = String(editingSchedule.dayOfWeek ?? 1);
+			formAirTime = editingSchedule.time ?? '';
+			formIsUncut = editingSchedule.isUncut ?? false;
 		}
 	});
 
-	$effect(() => {
-		if (form?.error) {
-			formError = form.error;
+	async function loadData(page = 1) {
+		loading = true;
+		const res = await schedulesApi.list(page);
+		if (res.success && res.data) {
+			result = res.data;
 		}
+		loading = false;
+	}
+
+	async function loadDropdowns() {
+		const [seriesRes, platformsRes] = await Promise.all([
+			seriesApi.listAll(),
+			platformsApi.listAll()
+		]);
+		if (seriesRes.success && seriesRes.data) {
+			allSeries = seriesRes.data.data;
+		}
+		if (platformsRes.success && platformsRes.data) {
+			allPlatforms = platformsRes.data.data;
+		}
+	}
+
+	onMount(() => {
+		loadData();
+		loadDropdowns();
 	});
 
 	function scrollToForm() {
@@ -55,12 +94,17 @@
 
 	function openCreate() {
 		editingId = null;
+		formSeriesId = '';
+		formPlatformId = '';
+		formDayOfWeek = '1';
+		formAirTime = '';
+		formIsUncut = false;
 		formError = '';
 		showForm = true;
 		scrollToForm();
 	}
 
-	function openEdit(schedule: typeof allSchedules[0]) {
+	function openEdit(schedule: any) {
 		editingId = schedule.id;
 		formError = '';
 		showForm = true;
@@ -73,37 +117,80 @@
 		formError = '';
 	}
 
-	function handleEnhance() {
+	async function handleSubmit(e: Event) {
+		e.preventDefault();
 		formLoading = true;
 		formError = '';
-		return async ({ update, result: actionResult }: { update: () => Promise<void>; result: { type: string } }) => {
-			formLoading = false;
-			if (actionResult.type === 'success') {
-				closeForm();
-			}
-			await update();
+
+		const body = {
+			seriesId: formSeriesId,
+			platformId: formPlatformId,
+			dayOfWeek: parseInt(formDayOfWeek, 10),
+			airTime: formAirTime,
+			isUncut: formIsUncut
 		};
+
+		if (!body.seriesId || !body.platformId || !body.airTime) {
+			formError = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+			formLoading = false;
+			return;
+		}
+
+		let res;
+		if (editingId) {
+			res = await schedulesApi.update(editingId, body);
+		} else {
+			res = await schedulesApi.create(body);
+		}
+
+		formLoading = false;
+		if (res.success) {
+			closeForm();
+			loadData(result.page);
+		} else {
+			formError = res.error ?? 'เกิดข้อผิดพลาด';
+		}
 	}
 
 	async function handleDelete() {
 		if (!deleteTarget) return;
-		try {
-			await fetch('?/delete', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body: new URLSearchParams({ id: deleteTarget })
-			});
-		} catch {
-			// silent
-		}
+		const res = await schedulesApi.remove(deleteTarget);
 		deleteTarget = null;
 		showConfirm = false;
+		if (res.success) {
+			loadData(result.page);
+		}
 	}
 
-	const editingSchedule = $derived(() => allSchedules.find((s: any) => s.id === editingId));
-	const seriesList = $derived(data.seriesList ?? []);
-	const platforms = $derived(data.platforms ?? []);
-	const dayOptions = $derived(data.dayOptions ?? []);
+	function goToPage(p: number) {
+		if (p < 1 || p > result.totalPages || p === result.page) return;
+		loadData(p);
+	}
+
+	function pageNumbers() {
+		const pages: (number | string)[] = [];
+		const maxVisible = 5;
+		const page = result.page;
+		const totalPages = result.totalPages;
+		let start = Math.max(1, page - Math.floor(maxVisible / 2));
+		let end = Math.min(totalPages, start + maxVisible - 1);
+		if (end - start + 1 < maxVisible) {
+			start = Math.max(1, end - maxVisible + 1);
+		}
+		if (start > 1) {
+			pages.push(1);
+			if (start > 2) pages.push('...');
+		}
+		for (let i = start; i <= end; i++) pages.push(i);
+		if (end < totalPages) {
+			if (end < totalPages - 1) pages.push('...');
+			pages.push(totalPages);
+		}
+		return pages;
+	}
+
+	const startItem = $derived((result.page - 1) * result.limit + 1);
+	const endItem = $derived(Math.min(result.page * result.limit, result.total));
 </script>
 
 <div class="py-6 sm:py-8">
@@ -122,17 +209,17 @@
 	{#if showForm}
 		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไขตารางฉาย' : 'เพิ่มตารางฉาย'}</h2>
-			<form bind:this={formEl} method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
+			<form bind:this={formEl} onsubmit={handleSubmit} class="space-y-4">
 				{#if editingId}
 					<input type="hidden" name="id" value={editingId} />
 				{/if}
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="schedule-series" class="block text-sm font-medium text-plum mb-1">ซีรีส์ <span class="text-coral">*</span></label>
-						<select id="schedule-series" name="seriesId" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
+						<select id="schedule-series" name="seriesId" bind:value={formSeriesId} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
 							<option value="">เลือกซีรีส์</option>
-							{#each seriesList as s}
-								<option value={s.id} selected={s.id === editingSchedule()?.seriesId}>
+							{#each allSeries as s}
+								<option value={s.id}>
 									{s.titleEn}
 								</option>
 							{/each}
@@ -140,10 +227,10 @@
 					</div>
 					<div>
 						<label for="schedule-platform" class="block text-sm font-medium text-plum mb-1">แพลตฟอร์ม <span class="text-coral">*</span></label>
-						<select id="schedule-platform" name="platformId" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
+						<select id="schedule-platform" name="platformId" bind:value={formPlatformId} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
 							<option value="">เลือกแพลตฟอร์ม</option>
-							{#each platforms as p}
-								<option value={p.id} selected={p.id === editingSchedule()?.platformId}>
+							{#each allPlatforms as p}
+								<option value={p.id}>
 									{p.name}
 								</option>
 							{/each}
@@ -153,21 +240,19 @@
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="schedule-day" class="block text-sm font-medium text-plum mb-1">วัน <span class="text-coral">*</span></label>
-						<select id="schedule-day" name="dayOfWeek" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
+						<select id="schedule-day" name="dayOfWeek" bind:value={formDayOfWeek} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
 							{#each dayOptions as d}
-								<option value={d.value} selected={d.value === editingSchedule()?.dayOfWeek}>
-									{d.label}
-								</option>
+								<option value={d.value}>{d.label}</option>
 							{/each}
 						</select>
 					</div>
 					<div>
 						<label for="schedule-time" class="block text-sm font-medium text-plum mb-1">เวลา <span class="text-coral">*</span></label>
-						<input id="schedule-time" type="time" name="airTime" value={editingSchedule()?.time ?? ''} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
+						<input id="schedule-time" type="time" name="airTime" bind:value={formAirTime} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
 					</div>
 				</div>
 				<div class="flex items-center gap-2">
-					<input id="schedule-uncut" type="checkbox" name="isUncut" checked={editingSchedule()?.isUncut ?? false} class="w-4 h-4 rounded border-lavender/30 text-coral focus:ring-coral/30" />
+					<input id="schedule-uncut" type="checkbox" name="isUncut" bind:checked={formIsUncut} class="w-4 h-4 rounded border-lavender/30 text-coral focus:ring-coral/30" />
 					<label for="schedule-uncut" class="text-sm text-plum">Uncut Version</label>
 				</div>
 				{#if formError}
@@ -245,7 +330,44 @@
 	{/if}
 
 	{#if !loading && result.totalPages > 1}
-		<Pagination page={result.page} totalPages={result.totalPages} total={result.total} limit={result.limit} />
+		<div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 px-2">
+			<p class="text-sm text-plum-light">
+				แสดง <span class="font-medium text-plum">{startItem}</span> – <span class="font-medium text-plum">{endItem}</span>
+				จาก <span class="font-medium text-plum">{result.total}</span> รายการ
+			</p>
+			<div class="flex items-center gap-1.5">
+				<button
+					onclick={() => goToPage(result.page - 1)}
+					disabled={result.page <= 1}
+					aria-label="หน้าก่อนหน้า"
+					class="px-3 py-2 rounded-lg text-sm font-medium transition-all touch-target disabled:opacity-40 disabled:cursor-not-allowed {result.page <= 1 ? 'text-plum-light/50' : 'text-plum hover:bg-lavender/20'}"
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+				</button>
+
+				{#each pageNumbers() as p}
+					{#if p === '...'}
+						<span class="px-2 text-sm text-plum-light">...</span>
+					{:else}
+						<button
+							onclick={() => goToPage(p as number)}
+							class="min-w-[2.25rem] h-9 px-2.5 rounded-lg text-sm font-medium transition-all touch-target {result.page === p ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-md shadow-coral/25' : 'text-plum hover:bg-lavender/20'}"
+						>
+							{p}
+						</button>
+					{/if}
+				{/each}
+
+				<button
+					onclick={() => goToPage(result.page + 1)}
+					disabled={result.page >= result.totalPages}
+					aria-label="หน้าถัดไป"
+					class="px-3 py-2 rounded-lg text-sm font-medium transition-all touch-target disabled:opacity-40 disabled:cursor-not-allowed {result.page >= result.totalPages ? 'text-plum-light/50' : 'text-plum hover:bg-lavender/20'}"
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+				</button>
+			</div>
+		</div>
 	{/if}
 
 	{#if !loading && allSchedules.length === 0}

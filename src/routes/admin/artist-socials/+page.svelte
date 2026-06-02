@@ -1,59 +1,91 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
+	import { createAdminApi } from '$lib/admin/api.js';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import type { PageData, ActionData } from './$types.js';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	interface ArtistSocial {
+		id: string;
+		artistId: string;
+		platform: string;
+		url: string;
+		iconUrl?: string | null;
+		artist?: { nickname: string };
+	}
 
-	let result = $state<any>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
+	interface Artist {
+		id: string;
+		nickname: string;
+	}
+
+	const artistSocialsApi = createAdminApi<ArtistSocial>('artist-socials');
+	const artistsApi = createAdminApi<Artist>('artists');
+
+	let result = $state<{ data: ArtistSocial[]; page: number; limit: number; total: number; totalPages: number }>({
+		data: [], page: 1, limit: 20, total: 0, totalPages: 1
+	});
 	let allItems = $derived(result.data ?? []);
+	let allArtists = $state<Artist[]>([]);
 	let loading = $state(true);
 	let showForm = $state(false);
 	let editingId = $state<string | null>(null);
 	let formLoading = $state(false);
 	let formError = $state('');
-
 	let formEl = $state<HTMLElement | null>(null);
-	function scrollToForm() {
-		setTimeout(() => {
-			formEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-		}, 50);
-	}
+
+	let formArtistId = $state('');
+	let formPlatform = $state('');
+	let formUrl = $state('');
+	let formIconUrl = $state('');
 
 	let deleteTarget = $state<string | null>(null);
 	let showConfirm = $state(false);
 
-	$effect(() => {
-		const value = data.socials;
-		if (value && typeof value === 'object' && 'data' in value) {
-			result = value;
-			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				result = s;
-				loading = false;
-			});
-		}
-	});
+	function scrollToForm() {
+		setTimeout(() => formEl?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+	}
 
-	$effect(() => {
-		if (form?.error) {
-			formError = form.error;
+	async function loadData() {
+		loading = true;
+		const params = new URLSearchParams(window.location.search);
+		const page = parseInt(params.get('page') ?? '1', 10);
+		const res = await artistSocialsApi.list(page);
+		if (res.success && res.data) {
+			result = res.data;
 		}
+		loading = false;
+	}
+
+	async function loadDropdowns() {
+		const res = await artistsApi.listAll();
+		if (res.success && res.data) {
+			allArtists = res.data.data;
+		}
+	}
+
+	onMount(() => {
+		loadData();
+		loadDropdowns();
 	});
 
 	function openCreate() {
 		editingId = null;
 		formError = '';
+		formArtistId = '';
+		formPlatform = '';
+		formUrl = '';
+		formIconUrl = '';
 		showForm = true;
 		scrollToForm();
 	}
 
-	function openEdit(item: typeof allItems[0]) {
+	function openEdit(item: ArtistSocial) {
 		editingId = item.id;
 		formError = '';
+		formArtistId = item.artistId;
+		formPlatform = item.platform;
+		formUrl = item.url;
+		formIconUrl = item.iconUrl ?? '';
 		showForm = true;
 		scrollToForm();
 	}
@@ -61,19 +93,36 @@
 	function closeForm() {
 		showForm = false;
 		editingId = null;
-		formError = '';
 	}
 
-	function handleEnhance() {
+	const editingItem = $derived(editingId ? allItems.find((i) => i.id === editingId) : null);
+
+	async function handleSubmit(e: Event) {
+		e.preventDefault();
 		formLoading = true;
 		formError = '';
-		return async ({ update, result: actionResult }: { update: () => Promise<void>; result: { type: string } }) => {
-			formLoading = false;
-			if (actionResult.type === 'success') {
-				closeForm();
-			}
-			await update();
+
+		const body = {
+			artistId: formArtistId,
+			platform: formPlatform,
+			url: formUrl,
+			iconUrl: formIconUrl || null
 		};
+
+		let res;
+		if (editingId) {
+			res = await artistSocialsApi.update(editingId, body);
+		} else {
+			res = await artistSocialsApi.create(body);
+		}
+
+		formLoading = false;
+		if (res.success) {
+			closeForm();
+			await loadData();
+		} else {
+			formError = res.error ?? 'เกิดข้อผิดพลาด';
+		}
 	}
 
 	function confirmDelete(id: string) {
@@ -83,20 +132,12 @@
 
 	async function handleDelete() {
 		if (!deleteTarget) return;
-		try {
-			await fetch('?/delete', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body: new URLSearchParams({ id: deleteTarget })
-			});
-		} catch (e) {
-			console.error('Delete failed', e);
-		}
+		const res = await artistSocialsApi.remove(deleteTarget);
 		deleteTarget = null;
+		if (res.success) {
+			await loadData();
+		}
 	}
-
-	const editingItem = $derived(() => allItems.find((i: any) => i.id === editingId));
-	const artistOptions = $derived(data.artists ?? []);
 
 	const platformOptions = [
 		{ value: 'INSTAGRAM', label: 'Instagram' },
@@ -140,33 +181,30 @@
 	{#if showForm}
 		<div bind:this={formEl} class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไข' : 'เพิ่ม'}โซเชียลมีเดีย</h2>
-			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
-				{#if editingId}
-					<input type="hidden" name="id" value={editingId} />
-				{/if}
+			<form onsubmit={handleSubmit} class="space-y-4">
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="soc-artist" class="block text-sm font-medium text-plum mb-1">นักแสดง <span class="text-coral">*</span></label>
-						<select id="soc-artist" name="artistId" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
+						<select id="soc-artist" bind:value={formArtistId} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
 							<option value="">เลือกนักแสดง</option>
-							{#each artistOptions as a}
-								<option value={a.id} selected={editingItem()?.artistId === a.id}>{a.nickname}</option>
+							{#each allArtists as a}
+								<option value={a.id}>{a.nickname}</option>
 							{/each}
 						</select>
 					</div>
 					<div>
 						<label for="soc-platform" class="block text-sm font-medium text-plum mb-1">แพลตฟอร์ม <span class="text-coral">*</span></label>
-						<select id="soc-platform" name="platform" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
+						<select id="soc-platform" bind:value={formPlatform} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
 							<option value="">เลือกแพลตฟอร์ม</option>
 							{#each platformOptions as p}
-								<option value={p.value} selected={editingItem()?.platform === p.value}>{p.label}</option>
+								<option value={p.value}>{p.label}</option>
 							{/each}
 						</select>
 					</div>
 				</div>
 				<div>
 					<label for="soc-url" class="block text-sm font-medium text-plum mb-1">URL โซเชียลมีเดีย <span class="text-coral">*</span></label>
-					<input id="soc-url" type="url" name="url" value={editingItem()?.url ?? ''} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
+					<input id="soc-url" type="url" bind:value={formUrl} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
 				</div>
 				{#if formError}
 					<p class="text-sm text-coral-dark">{formError}</p>

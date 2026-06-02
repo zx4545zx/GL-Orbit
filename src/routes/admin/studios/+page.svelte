@@ -1,19 +1,28 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { createAdminApi } from '$lib/admin/api.js';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import type { PageData, ActionData } from './$types.js';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	interface Studio {
+		id: string;
+		name: string;
+		logoUrl?: string;
+		officialSite?: string;
+	}
 
-	let result = $state<any>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
-	let allStudios = $derived(result.data ?? []);
+	const studiosApi = createAdminApi<Studio>('studios');
+
+	let items = $state<Studio[]>([]);
 	let loading = $state(true);
 	let showForm = $state(false);
 	let editingId = $state<string | null>(null);
 	let formLoading = $state(false);
 	let formError = $state('');
+	let page = $state(1);
+	let totalPages = $state(1);
+	let total = $state(0);
+	let limit = $state(20);
 
 	let formEl = $state<HTMLElement | null>(null);
 	let showConfirm = $state(false);
@@ -26,24 +35,23 @@
 		}, 50);
 	}
 
-	$effect(() => {
-		const value = data.studios;
-		if (value && typeof value === 'object' && 'data' in value) {
-			result = value;
-			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				result = s;
-				loading = false;
-			});
+	async function loadData(p?: number) {
+		loading = true;
+		const pNum = p ?? page;
+		const res = await studiosApi.list(pNum);
+		if (res.success && res.data) {
+			items = res.data.data;
+			page = res.data.page;
+			totalPages = res.data.totalPages;
+			total = res.data.total;
+			limit = res.data.limit;
 		}
-	});
+		loading = false;
+	}
 
-	$effect(() => {
-		if (form?.error) {
-			formError = form.error;
-		}
+	onMount(() => {
+		const params = new URL(window.location.href).searchParams;
+		loadData(parseInt(params.get('page') ?? '1'));
 	});
 
 	function openCreate() {
@@ -53,7 +61,7 @@
 		scrollToForm();
 	}
 
-	function openEdit(studio: typeof allStudios[0]) {
+	function openEdit(studio: Studio) {
 		editingId = studio.id;
 		formError = '';
 		showForm = true;
@@ -66,21 +74,41 @@
 		formError = '';
 	}
 
-	function handleEnhance() {
+	const editingStudio = $derived(() => items.find((s) => s.id === editingId));
+
+	async function onFormSubmit(e: SubmitEvent) {
+		e.preventDefault();
 		formLoading = true;
 		formError = '';
-		return async ({ update, result: actionResult }: { update: () => Promise<void>; result: { type: string } }) => {
+		const form = e.currentTarget as HTMLFormElement;
+		const formData = new FormData(form);
+		const name = formData.get('name')?.toString().trim() ?? '';
+		const logoUrl = formData.get('logoUrl')?.toString().trim() || undefined;
+		const officialSite = formData.get('officialSite')?.toString().trim() || undefined;
+
+		if (!name) {
+			formError = 'กรุณากรอกชื่อสตูดิโอ';
 			formLoading = false;
-			if (actionResult.type === 'success') {
-				closeForm();
-			}
-			await update();
-		};
+			return;
+		}
+
+		let res;
+		if (editingId) {
+			res = await studiosApi.update(editingId, { name, logoUrl, officialSite });
+		} else {
+			res = await studiosApi.create({ name, logoUrl, officialSite });
+		}
+
+		formLoading = false;
+		if (res.success) {
+			closeForm();
+			await loadData();
+		} else {
+			formError = res.error ?? 'เกิดข้อผิดพลาด';
+		}
 	}
 
-	const editingStudio = $derived(() => allStudios.find((s: any) => s.id === editingId));
-
-	function confirmDelete(studio: typeof allStudios[0]) {
+	function confirmDelete(studio: Studio) {
 		deleteTarget = studio.id;
 		showConfirm = true;
 	}
@@ -88,19 +116,13 @@
 	async function handleDelete() {
 		if (!deleteTarget) return;
 		deleteLoading = true;
-		try {
-			const res = await fetch('?/delete', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body: new URLSearchParams({ id: deleteTarget })
-			});
-			if (res.ok) {
-				await invalidateAll();
-			}
-		} catch {
-			// Silently fail — the page will reflect the error if any
-		} finally {
-			deleteLoading = false;
+		const res = await studiosApi.remove(deleteTarget);
+		deleteLoading = false;
+		if (res.success) {
+			deleteTarget = null;
+			showConfirm = false;
+			await loadData();
+		} else {
 			deleteTarget = null;
 			showConfirm = false;
 		}
@@ -123,7 +145,7 @@
 	{#if showForm}
 		<div bind:this={formEl} class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไขสตูดิโอ' : 'เพิ่มสตูดิโอ'}</h2>
-			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
+			<form onsubmit={onFormSubmit} class="space-y-4">
 				{#if editingId}
 					<input type="hidden" name="id" value={editingId} />
 				{/if}
@@ -176,7 +198,7 @@
 								</tr>
 							{/each}
 						{:else}
-							{#each allStudios as studio (studio.id)}
+							{#each items as studio (studio.id)}
 								<tr class="hover:bg-white/40 transition-colors">
 									<td class="px-4 sm:px-6 py-3 sm:py-4">
 										<div class="flex items-center gap-3">
@@ -235,7 +257,7 @@
 				</div>
 			{/each}
 		{:else}
-			{#each allStudios as studio (studio.id)}
+			{#each items as studio (studio.id)}
 				<div class="glass-card rounded-xl p-3 sm:p-4 overflow-hidden">
 					<div class="flex items-center gap-3">
 						{#if studio.logoUrl}
@@ -267,11 +289,11 @@
 		{/if}
 	</div>
 
-	{#if !loading && result.totalPages > 1}
-		<Pagination page={result.page} totalPages={result.totalPages} total={result.total} limit={result.limit} />
+	{#if !loading && totalPages > 1}
+		<Pagination {page} {totalPages} {total} {limit} />
 	{/if}
 
-	{#if !loading && allStudios.length === 0}
+	{#if !loading && items.length === 0}
 		<div class="text-center py-16">
 			<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
 				<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">

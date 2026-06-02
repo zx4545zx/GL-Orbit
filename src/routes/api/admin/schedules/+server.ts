@@ -6,6 +6,39 @@ import type { RequestHandler } from './$types.js';
 
 const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
 
+export const POST: RequestHandler = async ({ locals, request }) => {
+	if (!locals.user || locals.user.role !== 'ADMIN') {
+		error(403, 'ไม่มีสิทธิ์เข้าถึง');
+	}
+
+	const body = await request.json() as {
+		seriesId?: string;
+		platformId?: string;
+		dayOfWeek?: number;
+		airTime?: string;
+		isUncut?: boolean;
+	};
+
+	if (!body.seriesId || !body.platformId || body.dayOfWeek === undefined || !body.airTime) {
+		error(400, 'กรุณากรอกข้อมูลให้ครบถ้วน');
+	}
+
+	const db = await getDb();
+
+	const [created] = await db
+		.insert(seriesSchedules)
+		.values({
+			seriesId: body.seriesId,
+			platformId: body.platformId,
+			dayOfWeek: body.dayOfWeek,
+			airTime: body.airTime,
+			isUncut: body.isUncut ?? false
+		})
+		.returning();
+
+	return json({ data: created }, { status: 201 });
+};
+
 export const GET: RequestHandler = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role !== 'ADMIN') {
 		error(403, 'ไม่มีสิทธิ์เข้าถึง');

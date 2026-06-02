@@ -48,3 +48,31 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 	return json({ data, page, limit, total: count, totalPages: Math.ceil(count / limit) });
 };
+
+export const POST: RequestHandler = async ({ locals, request }) => {
+	if (!locals.user || locals.user.role !== 'ADMIN') {
+		error(403, 'ไม่มีสิทธิ์เข้าถึง');
+	}
+
+	const db = await getDb();
+	const body = await request.json();
+
+	const { episodeId, platformId, airDate, streamLink, isUncut } = body;
+
+	if (!episodeId || !platformId || !airDate) {
+		error(400, 'กรุณากรอกข้อมูลให้ครบถ้วน (episodeId, platformId, airDate)');
+	}
+
+	const [inserted] = await db
+		.insert(episodeSchedules)
+		.values({
+			episodeId,
+			platformId,
+			airDate: new Date(airDate),
+			streamLink: streamLink ?? null,
+			isUncut: isUncut ?? false
+		})
+		.returning();
+
+	return json(inserted, { status: 201 });
+};

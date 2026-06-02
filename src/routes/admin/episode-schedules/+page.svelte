@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
+	import { createAdminApi } from '$lib/admin/api.js';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import type { PageData, ActionData } from './$types.js';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	const episodeSchedulesApi = createAdminApi<any>('episode-schedules');
+	const episodesApi = createAdminApi<any>('episodes');
+	const platformsApi = createAdminApi<any>('platforms');
 
 	let result = $state<any>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
 	let allItems = $derived(result.data ?? []);
@@ -19,24 +21,38 @@
 	let deleteTarget = $state<string | null>(null);
 	let showConfirm = $state(false);
 
-	$effect(() => {
-		const value = data.schedules;
-		if (value && typeof value === 'object' && 'data' in value) {
-			result = value;
-			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				result = s;
-				loading = false;
-			});
-		}
-	});
+	let allEpisodes = $state<any[]>([]);
+	let allPlatforms = $state<any[]>([]);
 
-	$effect(() => {
-		if (form?.error) {
-			formError = form.error;
+	const editingItem = $derived(() => allItems.find((i: any) => i.id === editingId));
+	const episodeOptions = $derived(allEpisodes);
+	const platformOptions = $derived(allPlatforms);
+
+	async function loadData(page = 1) {
+		loading = true;
+		const res = await episodeSchedulesApi.list(page);
+		if (res.success && res.data) {
+			result = res.data;
 		}
+		loading = false;
+	}
+
+	async function loadDropdowns() {
+		const [episodesRes, platformsRes] = await Promise.all([
+			episodesApi.listAll(),
+			platformsApi.listAll()
+		]);
+		if (episodesRes.success && episodesRes.data) {
+			allEpisodes = episodesRes.data.data;
+		}
+		if (platformsRes.success && platformsRes.data) {
+			allPlatforms = platformsRes.data.data;
+		}
+	}
+
+	onMount(() => {
+		loadData();
+		loadDropdowns();
 	});
 
 	function scrollToForm() {
@@ -65,6 +81,46 @@
 		formError = '';
 	}
 
+	async function handleSubmit(e: Event) {
+		e.preventDefault();
+		const form = e.currentTarget as HTMLFormElement;
+		const fd = new FormData(form);
+		formLoading = true;
+		formError = '';
+
+		const airDate = fd.get('airDate')?.toString() ?? '';
+		const airTime = fd.get('airTime')?.toString() ?? '';
+
+		const body: Record<string, any> = {
+			episodeId: fd.get('episodeId')?.toString() ?? '',
+			platformId: fd.get('platformId')?.toString() ?? '',
+			airDate: airTime ? `${airDate}T${airTime}` : airDate,
+			streamLink: fd.get('streamLink')?.toString().trim() || null,
+			isUncut: fd.get('isUncut') === 'on'
+		};
+
+		if (!body.episodeId || !body.platformId || !airDate) {
+			formError = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+			formLoading = false;
+			return;
+		}
+
+		let res;
+		if (editingId) {
+			res = await episodeSchedulesApi.update(editingId, body);
+		} else {
+			res = await episodeSchedulesApi.create(body);
+		}
+
+		formLoading = false;
+		if (res.success) {
+			closeForm();
+			loadData(result.page);
+		} else {
+			formError = res.error || 'เกิดข้อผิดพลาด';
+		}
+	}
+
 	function confirmDelete(id: string) {
 		deleteTarget = id;
 		showConfirm = true;
@@ -72,29 +128,17 @@
 
 	async function handleDelete() {
 		if (!deleteTarget) return;
-		const fd = new FormData();
-		fd.append('id', deleteTarget);
-		await fetch('?/delete', { method: 'POST', body: fd });
-		deleteTarget = null;
-		showConfirm = false;
-		window.location.reload();
+		const res = await episodeSchedulesApi.remove(deleteTarget);
+		if (res.success) {
+			deleteTarget = null;
+			showConfirm = false;
+			loadData(result.page);
+		} else {
+			deleteTarget = null;
+			showConfirm = false;
+			formError = res.error || 'เกิดข้อผิดพลาด';
+		}
 	}
-
-	function handleEnhance() {
-		formLoading = true;
-		formError = '';
-		return async ({ update, result: actionResult }: { update: () => Promise<void>; result: { type: string } }) => {
-			formLoading = false;
-			if (actionResult.type === 'success') {
-				closeForm();
-			}
-			await update();
-		};
-	}
-
-	const editingItem = $derived(() => allItems.find((i: any) => i.id === editingId));
-	const episodeOptions = $derived(data.episodes ?? []);
-	const platformOptions = $derived(data.platforms ?? []);
 
 	function formatDate(dateStr: string | null) {
 		if (!dateStr) return '-';
@@ -121,12 +165,9 @@
 	</div>
 
 	{#if showForm}
-		<div bind:this={formEl} class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
+		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไข' : 'เพิ่ม'}ตารางฉายรายตอน</h2>
-			<form method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
-				{#if editingId}
-					<input type="hidden" name="id" value={editingId} />
-				{/if}
+			<form bind:this={formEl} onsubmit={handleSubmit} class="space-y-4">
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="es-episode" class="block text-sm font-medium text-plum mb-1">ตอน <span class="text-coral">*</span></label>
@@ -147,18 +188,24 @@
 						</select>
 					</div>
 				</div>
-				<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 					<div>
 						<label for="es-date" class="block text-sm font-medium text-plum mb-1">วันที่ฉาย <span class="text-coral">*</span></label>
-						<input id="es-date" type="date" name="airDate" value={editingItem()?.airDate ?? ''} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
+						<input id="es-date" type="date" name="airDate" value={editingItem()?.airDate?.split('T')[0] ?? ''} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
 					</div>
 					<div>
-						<label for="es-time" class="block text-sm font-medium text-plum mb-1">เวลาฉาย <span class="text-coral">*</span></label>
-						<input id="es-time" type="time" name="airTime" value={editingItem()?.airTime ?? ''} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
+						<label for="es-time" class="block text-sm font-medium text-plum mb-1">เวลาฉาย</label>
+						<input id="es-time" type="time" name="airTime" value={editingItem()?.airTime ?? ''} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
 					</div>
 					<div>
 						<label for="es-url" class="block text-sm font-medium text-plum mb-1">ลิงก์สตรีม</label>
-						<input id="es-url" type="url" name="streamUrl" value={editingItem()?.streamUrl ?? ''} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
+						<input id="es-url" type="url" name="streamLink" value={editingItem()?.streamLink ?? ''} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base" />
+					</div>
+					<div class="flex items-end pb-2.5">
+						<label class="flex items-center gap-2 cursor-pointer touch-target">
+							<input type="checkbox" name="isUncut" checked={editingItem()?.isUncut ?? false} class="w-4 h-4 rounded border-lavender/30 text-coral focus:ring-coral/30" />
+							<span class="text-sm font-medium text-plum">Uncut</span>
+						</label>
 					</div>
 				</div>
 				{#if formError}

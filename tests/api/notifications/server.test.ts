@@ -1,24 +1,35 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('$lib/server/db/index.js', () => ({
-	getDb: vi.fn()
-}));
+const mockGetDb = vi.fn();
+vi.mock('$lib/server/db/index.js', () => ({ getDb: mockGetDb }));
 vi.mock('$lib/server/db/schema.js', () => ({}));
 
+async function jsonBody(response: Response) {
+	return await response.json() as Record<string, unknown>;
+}
+
+function makeLocals(user: unknown = null) {
+	return { user } as never;
+}
+
 describe('GET /api/notifications', () => {
-	it('should return 401 if not logged in', async () => {
-		// Integration test: mock RequestEvent with locals.user = null
-		// Needs SvelteKit test helper setup
-		expect(true).toBe(true); // Placeholder — full test requires SvelteKit test env
+	beforeEach(() => vi.clearAllMocks());
+
+	it('returns 401 when not logged in', async () => {
+		const { GET } = await import('../../../src/routes/api/notifications/+server.js');
+		const response = await GET({ locals: makeLocals(), url: new URL('http://localhost/api/notifications') } as never) as Response;
+		expect(response.status).toBe(401);
+		expect(await jsonBody(response)).toEqual({ error: 'กรุณาเข้าสู่ระบบ' });
 	});
 });
 
 describe('POST /api/notifications', () => {
-	it('should mark single notification as read', async () => {
-		expect(true).toBe(true); // Placeholder
-	});
+	beforeEach(() => vi.clearAllMocks());
 
-	it('should mark all notifications as read when no id given', async () => {
-		expect(true).toBe(true); // Placeholder
+	it('returns 401 when not logged in', async () => {
+		const { POST } = await import('../../../src/routes/api/notifications/+server.js');
+		const response = await POST({ locals: makeLocals(), request: new Request('http://localhost/api/notifications', { method: 'POST', body: '{}' }) } as never) as Response;
+		expect(response.status).toBe(401);
+		expect(await jsonBody(response)).toEqual({ error: 'กรุณาเข้าสู่ระบบ' });
 	});
 });

@@ -1,13 +1,15 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
+	import { createAdminApi } from '$lib/admin/api.js';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import type { PageData, ActionData } from './$types.js';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	const episodesApi = createAdminApi<any>('episodes');
+	const seriesApi = createAdminApi<{ id: string; titleEn: string }>('series');
 
 	let result = $state<any>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
 	let allEpisodes = $derived(result.data ?? []);
+	let allSeries = $state<{ id: string; titleEn: string }[]>([]);
 	let loading = $state(true);
 	let showForm = $state(false);
 	let editingId = $state<string | null>(null);
@@ -18,24 +20,26 @@
 	let deleteTarget = $state<string | null>(null);
 	let showConfirm = $state(false);
 
-	$effect(() => {
-		const value = data.episodes;
-		if (value && typeof value === 'object' && 'data' in value) {
-			result = value;
-			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				result = s;
-				loading = false;
-			});
+	async function loadData() {
+		loading = true;
+		const pageParam = new URL(window.location.href).searchParams.get('page') ?? '1';
+		const res = await episodesApi.list(parseInt(pageParam, 10));
+		if (res.success && res.data) {
+			result = res.data;
 		}
-	});
+		loading = false;
+	}
 
-	$effect(() => {
-		if (form?.error) {
-			formError = form.error;
+	async function loadDropdowns() {
+		const res = await seriesApi.listAll();
+		if (res.success && res.data) {
+			allSeries = res.data.data;
 		}
+	}
+
+	onMount(() => {
+		loadData();
+		loadDropdowns();
 	});
 
 	function scrollToForm() {
@@ -64,16 +68,38 @@
 		formError = '';
 	}
 
-	function handleEnhance() {
+	async function onFormSubmit(e: SubmitEvent) {
+		e.preventDefault();
 		formLoading = true;
 		formError = '';
-		return async ({ update, result: actionResult }: { update: () => Promise<void>; result: { type: string } }) => {
+		const form = e.currentTarget as HTMLFormElement;
+		const formData = new FormData(form);
+		const seriesId = formData.get('seriesId')?.toString() ?? '';
+		const episodeNumber = parseInt(formData.get('episodeNumber')?.toString() ?? '0', 10);
+		const title = formData.get('title')?.toString().trim() || null;
+		const coverUrl = formData.get('coverUrl')?.toString().trim() || null;
+		const trailerUrl = formData.get('trailerUrl')?.toString().trim() || null;
+
+		if (!seriesId || episodeNumber < 1) {
+			formError = 'กรุณาเลือกซีรีส์และกรอกหมายเลขตอน';
 			formLoading = false;
-			if (actionResult.type === 'success') {
-				closeForm();
-			}
-			await update();
-		};
+			return;
+		}
+
+		let res;
+		if (editingId) {
+			res = await episodesApi.update(editingId, { seriesId, episodeNumber, title, coverUrl, trailerUrl });
+		} else {
+			res = await episodesApi.create({ seriesId, episodeNumber, title, coverUrl, trailerUrl });
+		}
+
+		formLoading = false;
+		if (res.success) {
+			closeForm();
+			await loadData();
+		} else {
+			formError = res.error ?? 'เกิดข้อผิดพลาด';
+		}
 	}
 
 	function confirmDelete(id: string) {
@@ -83,19 +109,20 @@
 
 	async function handleDelete() {
 		if (!deleteTarget) return;
-		const fd = new FormData();
-		fd.append('id', deleteTarget);
-		await fetch('?/delete', { method: 'POST', body: fd });
-		deleteTarget = null;
-		window.location.reload();
+		const res = await episodesApi.remove(deleteTarget);
+		if (res.success) {
+			deleteTarget = null;
+			showConfirm = false;
+			await loadData();
+		}
 	}
 
 	function cancelDelete() {
 		deleteTarget = null;
+		showConfirm = false;
 	}
 
 	const editingEpisode = $derived(() => allEpisodes.find((e: any) => e.id === editingId));
-	const seriesList = $derived(data.seriesList ?? []);
 </script>
 
 <div class="py-6 sm:py-8">
@@ -114,7 +141,7 @@
 	{#if showForm}
 		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-lavender/5">
 			<h2 class="text-lg font-semibold text-plum mb-4">{editingId ? 'แก้ไขตอน' : 'เพิ่มตอน'}</h2>
-			<form bind:this={formEl} method="POST" action={editingId ? '?/update' : '?/create'} use:enhance={handleEnhance} class="space-y-4">
+			<form bind:this={formEl} onsubmit={onFormSubmit} class="space-y-4">
 				{#if editingId}
 					<input type="hidden" name="id" value={editingId} />
 				{/if}
@@ -123,7 +150,7 @@
 						<label for="ep-series" class="block text-sm font-medium text-plum mb-1">ซีรีส์ <span class="text-coral">*</span></label>
 						<select id="ep-series" name="seriesId" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 text-sm sm:text-base">
 							<option value="">เลือกซีรีส์</option>
-							{#each seriesList as s}
+							{#each allSeries as s}
 								<option value={s.id} selected={s.id === editingEpisode()?.seriesId}>
 									{s.titleEn}
 								</option>
