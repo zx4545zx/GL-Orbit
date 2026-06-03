@@ -49,9 +49,9 @@ thoughts/
 
 # Testing
 coverage/
+.playwright-mcp/
 
 # Local worktrees
 .worktrees/
 
 # Misc
-1
