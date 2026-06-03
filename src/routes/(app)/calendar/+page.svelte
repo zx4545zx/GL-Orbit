@@ -28,11 +28,9 @@
 	const weekScheduleByDay = $derived(calendar.scheduleByDay);
 
 	// Detect client-side navigation for pending shell
-	// Only show when navigating FROM another page (pathname changes)
-	// Don't show when just changing query params on the same page
 	const isNavigating = $derived(
 		navigating.to !== null &&
-		navigating.to.url.pathname !== page.url.pathname
+		navigating.to.url.pathname === page.url.pathname
 	);
 
 	const weekDays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
@@ -414,6 +412,9 @@
 												<div class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-coral"></div>
 											{/each}
 										</div>
+									{/if}
+									{#if isToday(day.fullDate)}
+										<span class="absolute -top-1.5 -right-1 px-1.5 py-0.5 bg-coral rounded-md text-[8px] sm:text-[10px] text-white font-bold shadow-sm leading-none">วันนี้</span>
 									{/if}
 								</button>
 							{/each}
