@@ -9,18 +9,14 @@
 	let { children } = $props();
 
 	let showShell = $state<string | null>(null);
-	let shellTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	$effect(() => {
 		const to = navigating.to?.url.pathname;
 		const from = page.url.pathname;
 		
 		if (!to || to === from) {
-			// Navigation complete or same route - hide shell after minimum display time
-			if (shellTimeout) clearTimeout(shellTimeout);
-			shellTimeout = setTimeout(() => {
-				showShell = null;
-			}, 500); // Minimum 500ms display time
+			// Navigation complete or same route - hide shell immediately
+			showShell = null;
 			return;
 		}
 		
@@ -35,7 +31,6 @@
 		}
 		
 		if (shellType) {
-			if (shellTimeout) clearTimeout(shellTimeout);
 			showShell = shellType;
 		}
 	});

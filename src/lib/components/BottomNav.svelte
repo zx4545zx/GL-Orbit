@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { navigating, page } from '$app/state';
+	import { user } from '$lib/stores/user.js';
 	import NotificationBadge from './NotificationBadge.svelte';
 
-	const user = $derived(page.data.user);
+	const currentUser = $derived($user);
 	let unreadCount = $state(0);
 
 	$effect(() => {
-		if (!user) {
+		if (!currentUser) {
 			unreadCount = 0;
 			return;
 		}
@@ -65,7 +66,7 @@
 	];
 
 	const authItem = $derived(
-		user
+		currentUser
 			? {
 					href: '/profile',
 					label: 'โปรไฟล์',
@@ -87,7 +88,7 @@
 	);
 
 	const notificationItem = $derived(
-		user
+		currentUser
 			? {
 					href: '/notifications',
 					label: 'แจ้งเตือน',

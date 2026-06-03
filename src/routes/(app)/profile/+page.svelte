@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import type { ProfileResponse, ProfileUpdateResponse, ApiErrorResponse } from '$lib/types.js';

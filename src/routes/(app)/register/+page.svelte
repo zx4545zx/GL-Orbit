@@ -1,7 +1,12 @@
 <script lang="ts">
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
+	import { user } from '$lib/stores/user.js';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import type { ApiErrorResponse } from '$lib/types.js';
+
+	$effect(() => {
+		if ($user) goto('/profile');
+	});
 
 	let isLoading = $state(false);
 	let errorMessage = $state('');
@@ -30,7 +35,6 @@
 				if (data.fields) fieldErrors = data.fields;
 				return;
 			}
-			await invalidateAll();
 			await goto('/profile');
 		} catch {
 			errorMessage = 'ไม่สามารถสมัครสมาชิกได้ กรุณาลองอีกครั้ง';

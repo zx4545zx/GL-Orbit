@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	const user = $derived(page.data.user);
+	import { user } from '$lib/stores/user.js';
+	const currentUser = $derived($user);
 </script>
 
 <footer class="mt-12 sm:mt-20 relative overflow-hidden">
@@ -46,7 +46,7 @@
 					<li><a href="/" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">หน้าแรก</a></li>
 					<li><a href="/calendar" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">ตารางฉาย</a></li>
 					<li><a href="/series" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">ซีรีส์ทั้งหมด</a></li>
-					{#if user}
+					{#if currentUser}
 						<li><a href="/profile" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">โปรไฟล์</a></li>
 					{:else}
 						<li><a href="/login" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">เข้าสู่ระบบ</a></li>

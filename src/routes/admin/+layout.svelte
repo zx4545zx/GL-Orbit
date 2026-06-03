@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { navigating } from '$app/state';
+	import { page, navigating } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { slide } from 'svelte/transition';
+	import { user } from '$lib/stores/user.js';
 	import AdminSeriesPendingShell from '$lib/components/AdminSeriesPendingShell.svelte';
 	import AdminArtistsPendingShell from '$lib/components/AdminArtistsPendingShell.svelte';
 	import AdminStudiosPendingShell from '$lib/components/AdminStudiosPendingShell.svelte';
@@ -29,11 +30,18 @@
 
 	const pendingAdminShell = $derived.by(() => {
 		const to = navigating.to?.url.pathname;
-		const from = $page.url.pathname;
+		const from = page.url.pathname;
 		
 		if (!to || !to.startsWith('/admin/') || to === from) return null;
 		
 		return shellMap[to] || null;
+	});
+
+	// Client-side admin auth guard
+	$effect(() => {
+		if ($user === undefined) return; // Still loading
+		if ($user === null) { goto('/login'); return; }
+		if ($user.role !== 'ADMIN') { goto('/profile'); return; }
 	});
 
 	const navItems = [
@@ -64,7 +72,7 @@
 
 		<nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
 			{#each navItems as item}
-				{@const isActive = $page.url.pathname === item.href}
+				{@const isActive = page.url.pathname === item.href}
 				<a
 					href={item.href}
 					class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {isActive ? 'bg-gradient-to-r from-coral/10 to-lavender/10 text-coral-dark shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-plum'}"
@@ -116,7 +124,7 @@
 
 				<nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
 					{#each navItems as item}
-						{@const isActive = $page.url.pathname === item.href}
+						{@const isActive = page.url.pathname === item.href}
 						<a
 							href={item.href}
 							onclick={closeMobile}

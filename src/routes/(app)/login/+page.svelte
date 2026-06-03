@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
+	import { user } from '$lib/stores/user.js';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
 
 	let isLoading = $state(false);
@@ -9,7 +9,7 @@
 	let password = $state('');
 
 	$effect(() => {
-		if (page.data.user) goto('/profile');
+		if ($user) goto('/profile');
 	});
 
 	async function handleSubmit(e: Event) {
@@ -28,7 +28,6 @@
 				errorMessage = data.error || 'ไม่สามารถเข้าสู่ระบบได้ กรุณาลองอีกครั้ง';
 				return;
 			}
-			await invalidateAll();
 			await goto('/profile');
 		} catch {
 			errorMessage = 'ไม่สามารถเข้าสู่ระบบได้ กรุณาลองอีกครั้ง';

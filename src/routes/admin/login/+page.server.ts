@@ -1,17 +1,8 @@
-import type { Actions, PageServerLoad } from './$types.js';
+import type { Actions } from './$types.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { getUserByIdentifier } from '$lib/server/auth/user.js';
 import { verifyPassword } from '$lib/server/auth/password.js';
 import { createSession } from '$lib/server/auth/session.js';
-
-export const load: PageServerLoad = async ({ locals }) => {
-	if (locals.user) {
-		if (locals.user.role === 'ADMIN') {
-			redirect(302, '/admin/series');
-		}
-		redirect(302, '/profile');
-	}
-};
 
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
