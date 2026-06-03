@@ -5,6 +5,7 @@
 	import SeriesPendingShell from '$lib/components/SeriesPendingShell.svelte';
 	import SeriesDetailPendingShell from '$lib/components/SeriesDetailPendingShell.svelte';
 	import HomePendingShell from '$lib/components/HomePendingShell.svelte';
+	import CalendarPendingShell from '$lib/components/CalendarPendingShell.svelte';
 
 	let { children } = $props();
 
@@ -28,6 +29,8 @@
 			shellType = 'series-detail';
 		} else if (to === '/series' && !from.startsWith('/series')) {
 			shellType = 'series';
+		} else if (to === '/calendar' && !from.startsWith('/calendar')) {
+			shellType = 'calendar';
 		}
 		
 		if (shellType) {
@@ -45,6 +48,8 @@
 			<SeriesDetailPendingShell />
 		{:else if showShell === 'series'}
 			<SeriesPendingShell />
+		{:else if showShell === 'calendar'}
+			<CalendarPendingShell />
 		{:else}
 			{@render children()}
 		{/if}
