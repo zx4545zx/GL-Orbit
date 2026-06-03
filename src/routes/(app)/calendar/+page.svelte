@@ -1,24 +1,37 @@
 <script lang="ts">
-	import type { CalendarEvent, ScheduleDay, CalendarApiResponse } from '$lib/types/calendar.js';
+	import { goto } from '$app/navigation';
+	import { page, navigating } from '$app/state';
+	import CalendarPendingShell from '$lib/components/CalendarPendingShell.svelte';
+	import type { CalendarEvent } from '$lib/types/calendar.js';
+	import type { PageData } from './$types.js';
+
+	let { data }: { data: PageData } = $props();
 
 	let viewMode = $state<'grid' | 'calendar' | 'list'>('grid');
-	let currentMonth = $state(new Date());
-	let currentWeek = $state(new Date());
 	let selectedDate = $state<string | null>(null);
 
-	// Separate month/grid state
-	let monthEvents = $state<Record<string, CalendarEvent[]>>({});
-	let monthAllSeries = $state<string[]>([]);
-	let monthPlatforms = $state<string[]>([]);
-	let monthLoading = $state(true);
-	let monthError = $state<string | null>(null);
-	let monthAbortCtrl = $state<AbortController | null>(null);
+	// Current month derived from load params
+	const currentMonth = $derived(new Date(data.params.year, data.params.month - 1, 1));
 
-	// Separate week/list state
-	let weekScheduleByDay = $state<ScheduleDay[]>([]);
-	let weekLoading = $state(false);
-	let weekError = $state<string | null>(null);
-	let weekAbortCtrl = $state<AbortController | null>(null);
+	// Current week for list view
+	const currentWeek = $derived(
+		data.params.startDate
+			? new Date(data.params.startDate)
+			: new Date()
+	);
+
+	// Calendar data from load function
+	const calendar = $derived(data.calendar);
+	const monthEvents = $derived(calendar.events);
+	const monthAllSeries = $derived(calendar.allSeries);
+	const monthPlatforms = $derived(calendar.platforms);
+	const weekScheduleByDay = $derived(calendar.scheduleByDay);
+
+	// Detect client-side navigation for pending shell
+	const isNavigating = $derived(
+		navigating.to !== null &&
+		navigating.to.url.pathname === page.url.pathname
+	);
 
 	const weekDays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 	const thaiMonths = [
@@ -26,7 +39,6 @@
 		'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
 	];
 
-	// Helper function to format date using local time (not UTC)
 	function formatDateLocal(date: Date): string {
 		const year = date.getFullYear();
 		const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -34,7 +46,6 @@
 		return `${year}-${month}-${day}`;
 	}
 
-	// Get start of week (Monday)
 	function getStartOfWeek(date: Date): Date {
 		const d = new Date(date);
 		const day = d.getDay();
@@ -42,159 +53,47 @@
 		return new Date(d.setDate(diff));
 	}
 
-	// Get end of week (Sunday)
 	function getEndOfWeek(date: Date): Date {
 		const start = getStartOfWeek(date);
 		return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7);
 	}
 
-	// Fetch calendar data when currentMonth changes (for grid/calendar views)
-	$effect(() => {
-		const year = currentMonth.getFullYear();
-		const month = currentMonth.getMonth() + 1;
-
-		monthAbortCtrl?.abort();
-		monthAbortCtrl = new AbortController();
-		monthLoading = true;
-		monthError = null;
-
-		fetch(`/api/calendar?year=${year}&month=${month}`, { signal: monthAbortCtrl.signal })
-			.then(async (r) => {
-				if (!r.ok) {
-					const data = await r.json().catch(() => ({}));
-					throw new Error(data.error || 'โหลดตารางฉายไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
-				}
-				return r.json() as Promise<CalendarApiResponse>;
-			})
-			.then((data) => {
-				monthEvents = data.events;
-				monthAllSeries = data.allSeries;
-				monthPlatforms = data.platforms;
-				monthLoading = false;
-			})
-			.catch((err) => {
-				if (err.name === 'AbortError') return;
-				console.error('Failed to fetch calendar data:', err);
-				monthError = err.message || 'โหลดตารางฉายไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
-				monthLoading = false;
-			});
-
-		return () => monthAbortCtrl?.abort();
-	});
-
-	// Fetch weekly data when currentWeek changes (for list view)
-	$effect(() => {
-		if (viewMode !== 'list') return;
-
-		const startDate = getStartOfWeek(currentWeek);
-		const endDate = getEndOfWeek(currentWeek);
-		const startDateStr = formatDateLocal(startDate);
-		const endDateStr = formatDateLocal(endDate);
-
-		weekAbortCtrl?.abort();
-		weekAbortCtrl = new AbortController();
-		weekLoading = true;
-		weekError = null;
-
-		fetch(`/api/calendar?startDate=${startDateStr}&endDate=${endDateStr}`, { signal: weekAbortCtrl.signal })
-			.then(async (r) => {
-				if (!r.ok) {
-					const data = await r.json().catch(() => ({}));
-					throw new Error(data.error || 'โหลดรายการประจำสัปดาห์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
-				}
-				return r.json() as Promise<CalendarApiResponse>;
-			})
-			.then((data) => {
-				weekScheduleByDay = data.scheduleByDay;
-				weekLoading = false;
-			})
-			.catch((err) => {
-				if (err.name === 'AbortError') return;
-				console.error('Failed to fetch weekly data:', err);
-				weekError = err.message || 'โหลดรายการประจำสัปดาห์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
-				weekLoading = false;
-			});
-
-		return () => weekAbortCtrl?.abort();
-	});
-
-	const platformColorClasses = [
-		'bg-red-50 text-red-600 border-red-200',
-		'bg-green-50 text-green-600 border-green-200',
-		'bg-orange-50 text-orange-600 border-orange-200',
-		'bg-blue-50 text-blue-600 border-blue-200',
-		'bg-purple-50 text-purple-600 border-purple-200',
-		'bg-pink-50 text-pink-600 border-pink-200',
-		'bg-teal-50 text-teal-600 border-teal-200',
-		'bg-indigo-50 text-indigo-600 border-indigo-200'
-	];
-
-	const platformColors = $derived((() => {
-		const map: Record<string, string> = {};
-		monthPlatforms.forEach((p, i) => {
-			map[p] = platformColorClasses[i % platformColorClasses.length];
-		});
-		return map;
-	})());
-
-	function getDaysInMonth(date: Date) {
-		return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-	}
-
-	function getFirstDayOfMonth(date: Date) {
-		return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-	}
-
-	function generateCalendarDays(date: Date) {
-		const daysInMonth = getDaysInMonth(date);
-		const firstDay = getFirstDayOfMonth(date);
-		const days: Array<{ date: number; month: 'prev' | 'current' | 'next'; fullDate: string }> = [];
-
-		const prevMonthDays = new Date(date.getFullYear(), date.getMonth(), 0).getDate();
-		for (let i = firstDay - 1; i >= 0; i--) {
-			const d = new Date(date.getFullYear(), date.getMonth() - 1, prevMonthDays - i);
-			days.push({ date: prevMonthDays - i, month: 'prev', fullDate: formatDateLocal(d) });
-		}
-
-		for (let i = 1; i <= daysInMonth; i++) {
-			const d = new Date(date.getFullYear(), date.getMonth(), i);
-			days.push({ date: i, month: 'current', fullDate: formatDateLocal(d) });
-		}
-
-		const remaining = 42 - days.length;
-		for (let i = 1; i <= remaining; i++) {
-			const d = new Date(date.getFullYear(), date.getMonth() + 1, i);
-			days.push({ date: i, month: 'next', fullDate: formatDateLocal(d) });
-		}
-
-		return days;
-	}
-
 	function prevMonth() {
-		currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+		const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+		goto(`/calendar?year=${newDate.getFullYear()}&month=${newDate.getMonth() + 1}`);
 	}
 
 	function nextMonth() {
-		currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+		const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+		goto(`/calendar?year=${newDate.getFullYear()}&month=${newDate.getMonth() + 1}`);
 	}
 
 	function goToToday() {
-		currentMonth = new Date();
+		const today = new Date();
+		goto(`/calendar?year=${today.getFullYear()}&month=${today.getMonth() + 1}`);
 	}
 
 	function prevWeek() {
-		currentWeek = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate() - 7);
+		const newDate = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate() - 7);
+		const start = getStartOfWeek(newDate);
+		const end = getEndOfWeek(newDate);
+		goto(`/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
 	}
 
 	function nextWeek() {
-		currentWeek = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate() + 7);
+		const newDate = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate() + 7);
+		const start = getStartOfWeek(newDate);
+		const end = getEndOfWeek(newDate);
+		goto(`/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
 	}
 
 	function goToThisWeek() {
-		currentWeek = new Date();
+		const today = new Date();
+		const start = getStartOfWeek(today);
+		const end = getEndOfWeek(today);
+		goto(`/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
 	}
 
-	// Get week range text (e.g., "26 พ.ค. - 1 มิ.ย. 2569")
 	function getWeekRangeText(): string {
 		const start = getStartOfWeek(currentWeek);
 		const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
@@ -241,6 +140,58 @@
 		return monthEvents[dateStr]?.filter(e => e.series === seriesName) || [];
 	}
 
+	function getDaysInMonth(date: Date) {
+		return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+	}
+
+	function getFirstDayOfMonth(date: Date) {
+		return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+	}
+
+	function generateCalendarDays(date: Date) {
+		const daysInMonth = getDaysInMonth(date);
+		const firstDay = getFirstDayOfMonth(date);
+		const days: Array<{ date: number; month: 'prev' | 'current' | 'next'; fullDate: string }> = [];
+
+		const prevMonthDays = new Date(date.getFullYear(), date.getMonth(), 0).getDate();
+		for (let i = firstDay - 1; i >= 0; i--) {
+			const d = new Date(date.getFullYear(), date.getMonth() - 1, prevMonthDays - i);
+			days.push({ date: prevMonthDays - i, month: 'prev', fullDate: formatDateLocal(d) });
+		}
+
+		for (let i = 1; i <= daysInMonth; i++) {
+			const d = new Date(date.getFullYear(), date.getMonth(), i);
+			days.push({ date: i, month: 'current', fullDate: formatDateLocal(d) });
+		}
+
+		const remaining = 42 - days.length;
+		for (let i = 1; i <= remaining; i++) {
+			const d = new Date(date.getFullYear(), date.getMonth() + 1, i);
+			days.push({ date: i, month: 'next', fullDate: formatDateLocal(d) });
+		}
+
+		return days;
+	}
+
+	const platformColorClasses = [
+		'bg-red-50 text-red-600 border-red-200',
+		'bg-green-50 text-green-600 border-green-200',
+		'bg-orange-50 text-orange-600 border-orange-200',
+		'bg-blue-50 text-blue-600 border-blue-200',
+		'bg-purple-50 text-purple-600 border-purple-200',
+		'bg-pink-50 text-pink-600 border-pink-200',
+		'bg-teal-50 text-teal-600 border-teal-200',
+		'bg-indigo-50 text-indigo-600 border-indigo-200'
+	];
+
+	const platformColors = $derived((() => {
+		const map: Record<string, string> = {};
+		monthPlatforms.forEach((p, i) => {
+			map[p] = platformColorClasses[i % platformColorClasses.length];
+		});
+		return map;
+	})());
+
 	const dayColors: Record<string, string> = {
 		'จันทร์': 'from-coral/20 to-coral/5',
 		'อังคาร': 'from-orange-300/20 to-orange-300/5',
@@ -276,105 +227,86 @@
 	</div>
 {/snippet}
 
-<div class="py-6 sm:py-8 max-w-6xl mx-auto">
-	<!-- Title -->
-	<div class="text-center mb-6 sm:mb-8">
-		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
-			ตารางฉาย<span class="text-coral">ประจำเดือน</span>
-		</h1>
-		<p class="text-sm sm:text-base text-plum-light">อัปเดตตารางฉายซีรีส์ GL ล่าสุด</p>
-	</div>
+<svelte:head>
+	<title>{data.meta.title}</title>
+	<meta name="description" content={data.meta.description} />
+</svelte:head>
 
-	<!-- Normal View Toggle -->
-	<div class="mb-6 sm:mb-8">
-		{@render viewToggle()}
-	</div>
+{#if isNavigating}
+	<CalendarPendingShell />
+{:else}
+	<div class="py-6 sm:py-8 max-w-6xl mx-auto">
+		<!-- Title -->
+		<div class="text-center mb-6 sm:mb-8">
+			<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
+				ตารางฉาย<span class="text-coral">ประจำเดือน</span>
+			</h1>
+			<p class="text-sm sm:text-base text-plum-light">อัปเดตตารางฉายซีรีส์ GL ล่าสุด</p>
+		</div>
 
-	{#if viewMode === 'grid'}
-		<!-- Grid / Timeline View — Series rows × Date columns -->
-		{#if monthError}
-			<div class="glass-card rounded-xl p-4 mb-4 flex items-center gap-3 text-coral-dark">
-				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-				</svg>
-				<p class="text-sm">{monthError}</p>
-			</div>
-		{/if}
+		<!-- Normal View Toggle -->
+		<div class="mb-6 sm:mb-8">
+			{@render viewToggle()}
+		</div>
 
-		<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
-			<!-- Header: Month nav + day columns -->
-			<div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-lavender/20">
-				<button
-					aria-label="เดือนก่อนหน้า"
-					onclick={prevMonth}
-					class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-				>
-					<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-				</button>
-				<div class="flex items-center gap-2 sm:gap-3">
-					<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
-						{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
-					</h2>
+		{#if viewMode === 'grid'}
+			<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+				<div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-lavender/20">
 					<button
-						onclick={goToToday}
-						class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
+						aria-label="เดือนก่อนหน้า"
+						onclick={prevMonth}
+						class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
 					>
-						วันนี้
+						<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+					</button>
+					<div class="flex items-center gap-2 sm:gap-3">
+						<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
+							{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
+						</h2>
+						<button
+							onclick={goToToday}
+							class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
+						>
+							วันนี้
+						</button>
+					</div>
+					<button
+						aria-label="เดือนถัดไป"
+						onclick={nextMonth}
+						class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+					>
+						<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
 					</button>
 				</div>
-				<button
-					aria-label="เดือนถัดไป"
-					onclick={nextMonth}
-					class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-				>
-					<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-				</button>
-			</div>
 
-			<div class="overflow-x-auto">
-				<table class="w-full min-w-[800px]">
-					<thead>
-						<tr class="border-b border-lavender/10">
-							<!-- Series name column -->
-							<th class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-plum-light w-32 sm:w-40 border-r border-lavender/10">
-								ซีรีส์
-							</th>
-							<!-- Day columns -->
-							{#each monthDays as day}
-								{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
-								{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
-								{@const dayOfWeek = dateObj.getDay()}
-								<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[36px] sm:min-w-[48px] {isToday ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
-									<div class="font-bold">{day}</div>
-									<div class="text-[8px] sm:text-[10px] opacity-70">
-										{#if dayOfWeek === 0}อา
-										{:else if dayOfWeek === 1}จ
-										{:else if dayOfWeek === 2}อ
-										{:else if dayOfWeek === 3}พ
-										{:else if dayOfWeek === 4}พฤ
-										{:else if dayOfWeek === 5}ศ
-										{:else}ส
-										{/if}
-									</div>
+				<div class="overflow-x-auto">
+					<table class="w-full min-w-[800px]">
+						<thead>
+							<tr class="border-b border-lavender/10">
+								<th class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-plum-light w-32 sm:w-40 border-r border-lavender/10">
+									ซีรีส์
 								</th>
-							{/each}
-						</tr>
-					</thead>
-					<tbody>
-						{#if monthLoading}
-							{#each Array(6) as _, rowIndex}
-								<tr class="border-b border-lavender/5 {rowIndex % 2 === 0 ? 'bg-white/20' : ''}">
-									<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
-										<div class="h-4 w-24 bg-lavender/10 rounded animate-pulse"></div>
-									</td>
-									{#each monthDays as day}
-										<td class="px-0.5 sm:px-1 py-1 sm:py-2">
-											<div class="h-6 sm:h-8 w-full bg-lavender/10 rounded animate-pulse"></div>
-										</td>
-									{/each}
-								</tr>
-							{/each}
-						{:else}
+								{#each monthDays as day}
+									{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
+									{@const isTodayDate = formatDateLocal(dateObj) === formatDateLocal(new Date())}
+									{@const dayOfWeek = dateObj.getDay()}
+									<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[36px] sm:min-w-[48px] {isTodayDate ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
+										<div class="font-bold">{day}</div>
+										<div class="text-[8px] sm:text-[10px] opacity-70">
+											{#if dayOfWeek === 0}อา
+											{:else if dayOfWeek === 1}จ
+											{:else if dayOfWeek === 2}อ
+											{:else if dayOfWeek === 3}พ
+											{:else if dayOfWeek === 4}พฤ
+											{:else if dayOfWeek === 5}ศ
+											{:else}ส
+											{/if}
+										</div>
+									</th>
+								{/each}
+							</tr>
+						</thead>
+						<tbody>
 							{#each monthAllSeries as seriesName, seriesIndex}
 								<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
 									<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
@@ -383,8 +315,8 @@
 									{#each monthDays as day}
 										{@const dayEvents = getEventsForSeriesAndDay(seriesName, day)}
 										{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
-										{@const isToday = formatDateLocal(dateObj) === formatDateLocal(new Date())}
-										<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isToday ? 'bg-coral/5' : ''}">
+										{@const isTodayDate = formatDateLocal(dateObj) === formatDateLocal(new Date())}
+										<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isTodayDate ? 'bg-coral/5' : ''}">
 											{#if dayEvents.length > 0}
 												<div class="space-y-0.5">
 													{#each dayEvents as event}
@@ -408,68 +340,22 @@
 									{/each}
 								</tr>
 							{/each}
-						{/if}
-					</tbody>
-				</table>
-			</div>
-		</div>
-
-		<!-- Platform Legend -->
-		<div class="mt-4 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-plum-light">
-			<span>แพลตฟอร์ม:</span>
-			{#each Object.entries(platformColors) as [platform, colorClass]}
-				<div class="flex items-center gap-1">
-					<div class="w-3 h-3 rounded {colorClass.split(' ')[0]}"></div>
-					<span>{platform}</span>
+						</tbody>
+					</table>
 				</div>
-			{/each}
-		</div>
-
-	{:else if viewMode === 'calendar'}
-		{#if monthError}
-			<div class="glass-card rounded-xl p-4 mb-4 flex items-center gap-3 text-coral-dark">
-				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-				</svg>
-				<p class="text-sm">{monthError}</p>
 			</div>
-		{/if}
 
-		{#if monthLoading}
-			<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-				<div class="lg:col-span-2">
-					<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
-						<div class="flex items-center justify-between mb-4 sm:mb-6">
-							<div class="h-8 w-8 sm:h-10 sm:w-10 bg-lavender/10 rounded-xl animate-pulse"></div>
-							<div class="h-6 w-40 bg-lavender/10 rounded animate-pulse"></div>
-							<div class="h-8 w-8 sm:h-10 sm:w-10 bg-lavender/10 rounded-xl animate-pulse"></div>
-						</div>
-						<div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
-							{#each Array(7) as _}
-								<div class="h-8 bg-lavender/10 rounded animate-pulse"></div>
-							{/each}
-						</div>
-						<div class="grid grid-cols-7 gap-0.5 sm:gap-1">
-							{#each Array(42) as _}
-								<div class="aspect-square bg-lavender/10 rounded animate-pulse"></div>
-							{/each}
-						</div>
+			<div class="mt-4 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-plum-light">
+				<span>แพลตฟอร์ม:</span>
+				{#each Object.entries(platformColors) as [platform, colorClass]}
+					<div class="flex items-center gap-1">
+						<div class="w-3 h-3 rounded {colorClass.split(' ')[0]}"></div>
+						<span>{platform}</span>
 					</div>
-				</div>
-				<div class="lg:col-span-1">
-					<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 space-y-3">
-						<div class="h-6 w-1/2 bg-lavender/10 rounded animate-pulse"></div>
-						<div class="h-4 w-1/3 bg-lavender/10 rounded animate-pulse"></div>
-						<div class="space-y-2 pt-2">
-							{#each Array(2) as _}
-								<div class="h-20 bg-lavender/10 rounded animate-pulse"></div>
-							{/each}
-						</div>
-					</div>
-				</div>
+				{/each}
 			</div>
-		{:else}
-			<!-- Calendar View -->
+
+		{:else if viewMode === 'calendar'}
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 				<div class="lg:col-span-2">
 					<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
@@ -593,63 +479,38 @@
 					</div>
 				</div>
 			</div>
-		{/if}
-	{:else}
-		<!-- List View -->
-		<!-- Week Navigation -->
-		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6">
-			<div class="flex items-center justify-between">
-				<button
-					aria-label="สัปดาห์ก่อนหน้า"
-					onclick={prevWeek}
-					class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-				>
-					<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-				</button>
-				<div class="flex items-center gap-2 sm:gap-3">
-					<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
-						{getWeekRangeText()}
-					</h2>
+		{:else}
+			<!-- List View -->
+			<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6">
+				<div class="flex items-center justify-between">
 					<button
-						onclick={goToThisWeek}
-						class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
+						aria-label="สัปดาห์ก่อนหน้า"
+						onclick={prevWeek}
+						class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
 					>
-						สัปดาห์นี้
+						<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+					</button>
+					<div class="flex items-center gap-2 sm:gap-3">
+						<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
+							{getWeekRangeText()}
+						</h2>
+						<button
+							onclick={goToThisWeek}
+							class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
+						>
+							สัปดาห์นี้
+						</button>
+					</div>
+					<button
+						aria-label="สัปดาห์ถัดไป"
+						onclick={nextWeek}
+						class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+					>
+						<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
 					</button>
 				</div>
-				<button
-					aria-label="สัปดาห์ถัดไป"
-					onclick={nextWeek}
-					class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-				>
-					<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-				</button>
 			</div>
-		</div>
 
-		{#if weekError}
-			<div class="glass-card rounded-xl p-4 mb-4 flex items-center gap-3 text-coral-dark">
-				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-				</svg>
-				<p class="text-sm">{weekError}</p>
-			</div>
-		{/if}
-
-		{#if weekLoading}
-			<div class="space-y-4">
-				{#each Array(3) as _}
-					<div class="glass-card rounded-2xl p-6">
-						<div class="h-8 w-32 bg-lavender/10 rounded animate-pulse mb-4"></div>
-						<div class="space-y-3">
-							{#each Array(2) as _}
-								<div class="h-16 bg-lavender/10 rounded animate-pulse"></div>
-							{/each}
-						</div>
-					</div>
-				{/each}
-			</div>
-		{:else}
 			<div class="space-y-4 sm:space-y-6">
 				{#each weekScheduleByDay as day}
 					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
@@ -694,20 +555,20 @@
 				{/each}
 			</div>
 		{/if}
-	{/if}
 
-	<div class="mt-6 sm:mt-10 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 flex items-start gap-3 sm:gap-4">
-		<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-lavender/20 flex items-center justify-center flex-shrink-0">
-			<svg class="w-4 h-4 sm:w-5 sm:h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-			</svg>
-		</div>
-		<div>
-			<h3 class="font-semibold text-plum mb-1 text-sm sm:text-base">หมายเหตุ</h3>
-			<p class="text-xs sm:text-sm text-plum-light leading-relaxed">
-				เวลาฉายแสดงตามเวลาในประเทศไทย หากมีการเปลี่ยนแปลงตารางฉาย
-				ระบบจะอัปเดตให้โดยอัตโนมัติ ติ่งทุกคนสามารถตรวจสอบเวลาฉาย Uncut version ได้จากป้ายสีชมพู
-			</p>
+		<div class="mt-6 sm:mt-10 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 flex items-start gap-3 sm:gap-4">
+			<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-lavender/20 flex items-center justify-center flex-shrink-0">
+				<svg class="w-4 h-4 sm:w-5 sm:h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+				</svg>
+			</div>
+			<div>
+				<h3 class="font-semibold text-plum mb-1 text-sm sm:text-base">หมายเหตุ</h3>
+				<p class="text-xs sm:text-sm text-plum-light leading-relaxed">
+					เวลาฉายแสดงตามเวลาในประเทศไทย หากมีการเปลี่ยนแปลงตารางฉาย
+					ระบบจะอัปเดตให้โดยอัตโนมัติ ติ่งทุกคนสามารถตรวจสอบเวลาฉาย Uncut version ได้จากป้ายสีชมพู
+				</p>
+			</div>
 		</div>
 	</div>
-</div>
+{/if}
