@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	const offset = Number.isNaN(rawOffset) ? 0 : Math.max(0, rawOffset);
 	const db = await getDb();
 
-	const rawRows = await db
+	const listRowsPromise = db
 		.select({ id: notifications.id, seriesId: notifications.seriesId, type: notifications.type, message: notifications.message, isRead: notifications.isRead, createdAt: notifications.createdAt, seriesTitle: series.titleEn })
 		.from(notifications)
 		.innerJoin(series, eq(notifications.seriesId, series.id))
@@ -21,8 +21,10 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		.limit(limit)
 		.offset(offset);
 
-	const [{ count: unreadCount }] = await db.select({ count: sql<number>`count(*)::int` }).from(notifications).where(and(eq(notifications.userId, locals.user.id), eq(notifications.isRead, false)));
-	const [{ count: totalCount }] = await db.select({ count: sql<number>`count(*)::int` }).from(notifications).where(eq(notifications.userId, locals.user.id));
+	const unreadCountPromise = db.select({ count: sql<number>`count(*)::int` }).from(notifications).where(and(eq(notifications.userId, locals.user.id), eq(notifications.isRead, false)));
+	const totalCountPromise = db.select({ count: sql<number>`count(*)::int` }).from(notifications).where(eq(notifications.userId, locals.user.id));
+
+	const [rawRows, [{ count: unreadCount }], [{ count: totalCount }]] = await Promise.all([listRowsPromise, unreadCountPromise, totalCountPromise]);
 
 	return json({
 		notifications: rawRows.map((r) => ({ ...r, type: r.type as 'new_episode' | 'status_change', createdAt: r.createdAt.toISOString() })),

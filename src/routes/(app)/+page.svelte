@@ -1,38 +1,22 @@
 <script lang="ts">
-	import type { PageData } from './$types.js';
+	import { onMount } from 'svelte';
+	import { fetchHome, type FeaturedSeriesItem, type UpcomingScheduleItem } from './home.js';
 
-	let { data }: { data: PageData } = $props();
-
-	let featuredSeries = $state<Awaited<PageData['featuredSeries']>>([]);
-	let upcomingSchedule = $state<Awaited<PageData['upcomingSchedule']>>([]);
+	let featuredSeries = $state<FeaturedSeriesItem[]>([]);
+	let upcomingSchedule = $state<UpcomingScheduleItem[]>([]);
 	let loadingFeatured = $state(true);
 	let loadingSchedule = $state(true);
 
-	$effect(() => {
-		const value = data.featuredSeries;
-		if (Array.isArray(value)) {
-			featuredSeries = value;
+	onMount(async () => {
+		try {
+			const data = await fetchHome();
+			featuredSeries = data.featuredSeries;
 			loadingFeatured = false;
-		} else {
-			loadingFeatured = true;
-			Promise.resolve(value).then((s) => {
-				featuredSeries = s;
-				loadingFeatured = false;
-			});
-		}
-	});
-
-	$effect(() => {
-		const value = data.upcomingSchedule;
-		if (Array.isArray(value)) {
-			upcomingSchedule = value;
+			upcomingSchedule = data.upcomingSchedule;
 			loadingSchedule = false;
-		} else {
-			loadingSchedule = true;
-			Promise.resolve(value).then((s) => {
-				upcomingSchedule = s;
-				loadingSchedule = false;
-			});
+		} catch {
+			loadingFeatured = false;
+			loadingSchedule = false;
 		}
 	});
 
@@ -239,4 +223,3 @@
 		</div>
 	</div>
 </section>
-

@@ -1,37 +1,67 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { page, navigating } from '$app/state';
-	import CalendarPendingShell from '$lib/components/CalendarPendingShell.svelte';
-	import type { CalendarEvent } from '$lib/types/calendar.js';
-	import type { PageData } from './$types.js';
-
-	let { data }: { data: PageData } = $props();
+	import type { CalendarEvent, CalendarApiResponse } from '$lib/types/calendar.js';
+	import { fetchCalendar } from './calendar.js';
 
 	let viewMode = $state<'grid' | 'calendar' | 'list'>('grid');
 	let selectedDate = $state<string | null>(null);
 
+	let calendar = $state<CalendarApiResponse>({ events: {}, allSeries: [], platforms: [], scheduleByDay: [] });
+	const now = new Date();
+	let params_y = $state(now.getFullYear());
+	let params_m = $state(now.getMonth() + 1);
+	let params_sd = $state<string | null>(null);
+	let params_ed = $state<string | null>(null);
+	let loading = $state(true);
+
+	onMount(async () => {
+		loading = true;
+		const yearParam = page.url.searchParams.get('year');
+		const monthParam = page.url.searchParams.get('month');
+		const startDateParam = page.url.searchParams.get('startDate');
+		const endDateParam = page.url.searchParams.get('endDate');
+
+		try {
+			const result = await fetchCalendar(
+				yearParam ? parseInt(yearParam, 10) : undefined,
+				monthParam ? parseInt(monthParam, 10) : undefined,
+				startDateParam,
+				endDateParam
+			);
+			calendar = result.calendar;
+			params_y = result.params.year;
+			params_m = result.params.month;
+			params_sd = result.params.startDate;
+			params_ed = result.params.endDate;
+		} catch {
+			calendar = { events: {}, allSeries: [], platforms: [], scheduleByDay: [] };
+			const now = new Date();
+			params_y = now.getFullYear();
+			params_m = now.getMonth() + 1;
+			params_sd = null;
+			params_ed = null;
+		} finally {
+			loading = false;
+		}
+	});
+
 	// Current month derived from load params
-	const currentMonth = $derived(new Date(data.params.year, data.params.month - 1, 1));
+	const currentMonth = $derived(new Date(params_y, params_m - 1, 1));
 
 	// Current week for list view
 	const currentWeek = $derived(
-		data.params.startDate
-			? new Date(data.params.startDate)
+		params_sd
+			? new Date(params_sd)
 			: new Date()
 	);
 
 	// Calendar data from load function
-	const calendar = $derived(data.calendar);
 	const monthEvents = $derived(calendar.events);
 	const monthAllSeries = $derived(calendar.allSeries);
 	const monthPlatforms = $derived(calendar.platforms);
 	const weekScheduleByDay = $derived(calendar.scheduleByDay);
-
-	// Detect client-side navigation for pending shell
-	const isNavigating = $derived(
-		navigating.to !== null &&
-		navigating.to.url.pathname === page.url.pathname
-	);
 
 	const weekDays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 	const thaiMonths = [
@@ -227,23 +257,21 @@
 	</div>
 {/snippet}
 
-<svelte:head>
-	<title>{data.meta.title}</title>
-	<meta name="description" content={data.meta.description} />
-</svelte:head>
+<div class="py-6 sm:py-8 max-w-6xl mx-auto">
+	<!-- Title -->
+	<div class="text-center mb-6 sm:mb-8">
+		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
+			ตารางฉาย<span class="text-coral">ประจำเดือน</span>
+		</h1>
+		<p class="text-sm sm:text-base text-plum-light">อัปเดตตารางฉายซีรีส์ GL ล่าสุด</p>
+	</div>
 
-{#if isNavigating}
-	<CalendarPendingShell />
-{:else}
-	<div class="py-6 sm:py-8 max-w-6xl mx-auto">
-		<!-- Title -->
-		<div class="text-center mb-6 sm:mb-8">
-			<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
-				ตารางฉาย<span class="text-coral">ประจำเดือน</span>
-			</h1>
-			<p class="text-sm sm:text-base text-plum-light">อัปเดตตารางฉายซีรีส์ GL ล่าสุด</p>
+	{#if loading}
+		<div class="glass-card rounded-2xl sm:rounded-3xl p-8 text-center">
+			<div class="w-12 h-12 mx-auto rounded-xl bg-lavender/10 animate-pulse mb-4"></div>
+			<p class="text-plum-light">กำลังโหลดตารางฉาย...</p>
 		</div>
-
+	{:else}
 		<!-- Normal View Toggle -->
 		<div class="mb-6 sm:mb-8">
 			{@render viewToggle()}
@@ -570,5 +598,5 @@
 				</p>
 			</div>
 		</div>
-	</div>
-{/if}
+	{/if}
+</div>

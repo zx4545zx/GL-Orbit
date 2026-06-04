@@ -1,25 +1,24 @@
 <script lang="ts">
-	import type { PageData } from './$types.js';
+	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
 	import ArtistSheet from '$lib/components/ArtistSheet.svelte';
+	import { fetchSeriesDetail } from './detail.js';
 
-	let { data }: { data: PageData } = $props();
-
-	let series = $state<Awaited<PageData['series']> | null>(null);
+	let series = $state<any>(null);
 	let loading = $state(true);
 	let selectedArtistId = $state<string | null>(null);
 
-	$effect(() => {
-		const value = data.series;
-		if (value && typeof value === 'object' && 'id' in value) {
-			series = value;
+	onMount(async () => {
+		loading = true;
+		try {
+			const id = page.params.id;
+			if (!id) throw new Error('Missing series ID');
+			series = await fetchSeriesDetail(id);
+		} catch {
+			series = null;
+		} finally {
 			loading = false;
-		} else {
-			loading = true;
-			Promise.resolve(value).then((s) => {
-				series = s;
-				loading = false;
-			});
 		}
 	});
 

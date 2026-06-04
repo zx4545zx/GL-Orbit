@@ -1,41 +1,11 @@
 <script lang="ts">
-	import { page, navigating } from '$app/state';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { slide } from 'svelte/transition';
 	import { user } from '$lib/stores/user.js';
-	import AdminSeriesPendingShell from '$lib/components/AdminSeriesPendingShell.svelte';
-	import AdminArtistsPendingShell from '$lib/components/AdminArtistsPendingShell.svelte';
-	import AdminStudiosPendingShell from '$lib/components/AdminStudiosPendingShell.svelte';
-	import AdminPlatformsPendingShell from '$lib/components/AdminPlatformsPendingShell.svelte';
-	import AdminEpisodesPendingShell from '$lib/components/AdminEpisodesPendingShell.svelte';
-	import AdminSchedulesPendingShell from '$lib/components/AdminSchedulesPendingShell.svelte';
-	import AdminArtistSocialsPendingShell from '$lib/components/AdminArtistSocialsPendingShell.svelte';
-	import AdminSeriesArtistsPendingShell from '$lib/components/AdminSeriesArtistsPendingShell.svelte';
-	import AdminEpisodeSchedulesPendingShell from '$lib/components/AdminEpisodeSchedulesPendingShell.svelte';
 
 	let { children } = $props();
 	let mobileOpen = $state(false);
-
-	const shellMap: Record<string, string> = {
-		'/admin/series': 'series',
-		'/admin/artists': 'artists',
-		'/admin/studios': 'studios',
-		'/admin/platforms': 'platforms',
-		'/admin/episodes': 'episodes',
-		'/admin/schedules': 'schedules',
-		'/admin/artist-socials': 'artist-socials',
-		'/admin/series-artists': 'series-artists',
-		'/admin/episode-schedules': 'episode-schedules'
-	};
-
-	const pendingAdminShell = $derived.by(() => {
-		const to = navigating.to?.url.pathname;
-		const from = page.url.pathname;
-		
-		if (!to || !to.startsWith('/admin/') || to === from) return null;
-		
-		return shellMap[to] || null;
-	});
 
 	// Client-side admin auth guard
 	$effect(() => {
@@ -151,27 +121,7 @@
 	<!-- Main Content -->
 	<main class="flex-1 lg:ml-64 pt-14 lg:pt-0 min-h-screen overflow-x-hidden">
 		<div class="max-w-6xl mx-auto px-4 py-6 overflow-x-hidden">
-			{#if pendingAdminShell === 'series'}
-				<AdminSeriesPendingShell />
-			{:else if pendingAdminShell === 'artists'}
-				<AdminArtistsPendingShell />
-			{:else if pendingAdminShell === 'studios'}
-				<AdminStudiosPendingShell />
-			{:else if pendingAdminShell === 'platforms'}
-				<AdminPlatformsPendingShell />
-			{:else if pendingAdminShell === 'episodes'}
-				<AdminEpisodesPendingShell />
-			{:else if pendingAdminShell === 'schedules'}
-				<AdminSchedulesPendingShell />
-			{:else if pendingAdminShell === 'artist-socials'}
-				<AdminArtistSocialsPendingShell />
-			{:else if pendingAdminShell === 'series-artists'}
-				<AdminSeriesArtistsPendingShell />
-			{:else if pendingAdminShell === 'episode-schedules'}
-				<AdminEpisodeSchedulesPendingShell />
-			{:else}
-				{@render children()}
-			{/if}
+			{@render children()}
 		</div>
 	</main>
 </div>

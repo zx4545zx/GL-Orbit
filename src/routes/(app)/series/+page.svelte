@@ -1,18 +1,14 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import type { PageData } from './$types.js';
-
-	let { data }: { data: PageData } = $props();
+	import { fetchSeries, type FilterKey, type SeriesApiResponseItem, type SeriesFilters } from './series.js';
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
 		UPCOMING: { text: 'เร็วๆ นี้', class: 'bg-lavender/20 text-lavender-dark' },
 		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
 	};
-
-	type FilterKey = 'ALL' | 'ONGOING' | 'UPCOMING' | 'ENDED';
-	type SeriesItem = PageData['series']['items'][number];
 
 	const filterOptions: { key: FilterKey; label: string }[] = [
 		{ key: 'ALL', label: 'ทั้งหมด' },
@@ -21,48 +17,31 @@
 		{ key: 'ENDED', label: 'จบแล้ว' }
 	];
 
-	// Intentional: capture SSR initial values for first render.
-	// The reactive $effect below syncs state after client-side navigations.
-	// svelte-ignore state_referenced_locally
-	let filterStatus = $state<FilterKey>(data.filters.status);
-	// svelte-ignore state_referenced_locally
-	let searchQuery = $state(data.filters.search);
-	// svelte-ignore state_referenced_locally
-	let allSeries = $state<SeriesItem[]>(data.series.items);
-	// svelte-ignore state_referenced_locally
-	let total = $state(data.series.total);
-	// svelte-ignore state_referenced_locally
-	let currentPage = $state(data.series.page);
-	let loading = $state(false);
+	let allSeries = $state<SeriesApiResponseItem[]>([]);
+	let total = $state(0);
+	let currentPage = $state(1);
+	let filterStatus = $state<FilterKey>('ALL');
+	let searchQuery = $state('');
+	let loading = $state(true);
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
-	let pendingUrl: string | null = $state(null);
 	let loadMoreController: AbortController | null = $state(null);
 
-	// Navigation version tracking to guard stale in-flight navigations
-	let navVersion = $state(0);
-	let latestDesiredUrl: string | null = $state(null);
-
-	/** Returns the current URL path + search for this page (used in same-URL guard). */
-	function getCurrentSeriesUrl(): string {
-		return page.url.pathname + page.url.search;
+	function getParamsFromUrl() {
+		const s = page.url.searchParams.get('search') ?? '';
+		const st = (page.url.searchParams.get('status')?.toUpperCase() ?? 'ALL') as FilterKey;
+		return { search: s, status: st };
 	}
 
-	// Sync local state from server data (after navigation or initial load)
-	$effect(() => {
-		const serverUrl = buildUrl(data.filters.search, data.filters.status);
-		// If there is a pending navigation and the server data does not match,
-		// the response is stale — ignore it so newer user input is not overwritten.
-		if (pendingUrl !== null && serverUrl !== pendingUrl) {
-			return;
-		}
-		allSeries = data.series.items;
-		total = data.series.total;
-		currentPage = data.series.page;
-		filterStatus = data.filters.status;
-		searchQuery = data.filters.search;
-		loadMoreError = '';
-		pendingUrl = null;
+	onMount(async () => {
+		loading = true;
+		const { search, status } = getParamsFromUrl();
+		searchQuery = search;
+		filterStatus = status;
+		const result = await fetchSeries(search, status);
+		allSeries = result.series.items;
+		total = result.series.total;
+		currentPage = result.series.page;
 		loading = false;
 	});
 
@@ -76,6 +55,10 @@
 		return query ? `/series?${query}` : '/series';
 	}
 
+	function getCurrentSeriesUrl(): string {
+		return page.url.pathname + page.url.search;
+	}
+
 	async function updateUrl(search: string, status: string) {
 		// Abort any in-flight Load More to prevent racing
 		if (loadMoreController) {
@@ -87,41 +70,16 @@
 		const target = buildUrl(search, status);
 		const current = getCurrentSeriesUrl();
 
-		// Increment navigation version and set tracking state on every call,
-		// even for same-URL no-ops, to invalidate any stale in-flight navigation.
-		navVersion++;
-		const myVersion = navVersion;
-		latestDesiredUrl = target;
-		pendingUrl = target;
-
-		// Same-URL/no-op: invalidate older navigations and return
-		if (target === current) {
-			loading = false;
-			return;
-		}
+		if (target === current) return;
 
 		loading = true;
 		try {
 			await goto(target, { replaceState: true, noScroll: true, keepFocus: true });
-			// If this call is stale, repair by navigating to the latest desired URL
-			if (navVersion !== myVersion) {
-				const currentAfterGoto = getCurrentSeriesUrl();
-				if (latestDesiredUrl !== null && currentAfterGoto !== latestDesiredUrl) {
-					await goto(latestDesiredUrl, { replaceState: true, noScroll: true, keepFocus: true });
-				}
-				return;
-			}
-			// Latest version: pendingUrl cleared by sync effect on data arrival
+			// After goto, component remounts and onMount re-fetches
 		} catch {
-			// Only clear loading / pending state if this call is still the latest version.
-			// Resync optimistic UI controls to URL-backed server state.
-			if (navVersion === myVersion) {
-				loading = false;
-				pendingUrl = null;
-				latestDesiredUrl = null;
-				searchQuery = data.filters.search;
-				filterStatus = data.filters.status;
-			}
+			loading = false;
+			searchQuery = getParamsFromUrl().search;
+			filterStatus = getParamsFromUrl().status;
 		}
 	}
 
@@ -132,7 +90,6 @@
 		searchTimer = undefined;
 	}
 
-	// Cleanup timer on component teardown
 	$effect(() => {
 		return () => clearSearchTimer();
 	});
@@ -148,7 +105,7 @@
 
 	function updateStatus(status: FilterKey) {
 		clearSearchTimer();
-		filterStatus = status; // Optimistic update before navigation
+		filterStatus = status;
 		updateUrl(searchQuery, status);
 	}
 
@@ -165,7 +122,6 @@
 		loadMoreLoading = true;
 		loadMoreError = '';
 
-		// Capture current filter query string so we can detect if filters changed mid-flight
 		const currentFilterQuery = page.url.searchParams.toString();
 
 		try {
@@ -177,7 +133,6 @@
 			if (!res.ok) throw new Error('Load failed');
 			const result = await res.json();
 
-			// Only apply results if not aborted and filters still match
 			if (controller.signal.aborted) return;
 			if (page.url.searchParams.toString() !== currentFilterQuery) return;
 
@@ -190,7 +145,6 @@
 			if (err instanceof Error && err.name === 'AbortError') return;
 			loadMoreError = 'โหลดไม่สำเร็จ กรุณาลองใหม่';
 		} finally {
-			// Only clear loading for the current controller
 			if (loadMoreController === controller) {
 				loadMoreLoading = false;
 				loadMoreController = null;
@@ -200,18 +154,8 @@
 </script>
 
 <svelte:head>
-	<title>{data.meta.title}</title>
-	<meta name="description" content={data.meta.description} />
-	<meta name="robots" content={data.meta.robots} />
-	<link rel="canonical" href={data.meta.canonicalPath} />
-	<link rel="alternate" hreflang="th" href="/series" />
-	<link rel="alternate" hreflang="x-default" href="/series" />
-	<meta property="og:title" content={data.meta.ogTitle} />
-	<meta property="og:description" content={data.meta.ogDescription} />
-	<meta property="og:type" content="website" />
-	<meta property="og:url" content={data.meta.canonicalPath} />
-	<meta name="twitter:card" content="summary_large_image" />
-	{@html `<script type="application/ld+json">${data.meta.jsonLd}</script>`}
+	<title>ซีรีส์ทั้งหมด | GL-Orbit</title>
+	<meta name="description" content="รวบรวมซีรีส์ GL จากทุกสตูดิโอ" />
 </svelte:head>
 
 {#snippet searchFilter()}
