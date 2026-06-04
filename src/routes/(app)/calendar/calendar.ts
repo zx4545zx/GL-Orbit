@@ -4,6 +4,35 @@
 
 import type { CalendarApiResponse } from '$lib/types/calendar.js';
 
+export interface CalendarParams {
+	year?: number;
+	month?: number;
+	startDate: string | null;
+	endDate: string | null;
+	/** Stable string derived from the search params, suitable as a reactive dependency key. */
+	key: string;
+}
+
+/**
+ * Parse query search params into structured fetch arguments.
+ * Pure function, no side effects, fully testable.
+ */
+export function parseCalendarParams(searchParams: URLSearchParams): CalendarParams {
+	const yearParam = searchParams.get('year');
+	const monthParam = searchParams.get('month');
+	const startDateParam = searchParams.get('startDate');
+	const endDateParam = searchParams.get('endDate');
+
+	const year = yearParam ? parseInt(yearParam, 10) : undefined;
+	const month = monthParam ? parseInt(monthParam, 10) : undefined;
+	const startDate = startDateParam ?? null;
+	const endDate = endDateParam ?? null;
+
+	const key = searchParams.toString();
+
+	return { year, month, startDate, endDate, key };
+}
+
 export async function fetchCalendar(year?: number, month?: number, startDate?: string | null, endDate?: string | null): Promise<{ calendar: CalendarApiResponse; params: { year: number; month: number; startDate: string | null; endDate: string | null } }> {
 	let apiUrl: string;
 	let displayYear: number;

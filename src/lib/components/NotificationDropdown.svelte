@@ -126,7 +126,7 @@
 
 	<!-- Dropdown -->
 	{#if isOpen}
-		<div class="absolute right-0 top-full mt-2 w-80 sm:w-96 glass-card rounded-2xl shadow-xl shadow-lavender/20 border border-white/50 overflow-hidden z-50 animate-fade-in">
+		<div class="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl shadow-lavender/20 border border-white/50 overflow-hidden z-50 animate-fade-in">
 			<!-- Header -->
 			<div class="flex items-center justify-between px-4 py-3 border-b border-lavender/10">
 				<h3 class="text-sm font-semibold text-plum">การแจ้งเตือน</h3>

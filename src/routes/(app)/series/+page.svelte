@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { fetchSeries, type FilterKey, type SeriesApiResponseItem, type SeriesFilters } from './series.js';
+	import { fetchSeries, parseSeriesParams, type FilterKey, type SeriesApiResponseItem } from './series.js';
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
@@ -25,24 +24,54 @@
 	let loading = $state(true);
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
-	let loadMoreController: AbortController | null = $state(null);
+	let loadMoreController: AbortController | null = null;
 
-	function getParamsFromUrl() {
-		const s = page.url.searchParams.get('search') ?? '';
-		const st = (page.url.searchParams.get('status')?.toUpperCase() ?? 'ALL') as FilterKey;
-		return { search: s, status: st };
-	}
+	// Abort previous in-flight request so the latest query always wins
+	let abortController: AbortController | null = null;
 
-	onMount(async () => {
+	$effect(() => {
+		const search = page.url.search;
+
+		// Abort previous full-list fetch
+		if (abortController) {
+			abortController.abort();
+		}
+		abortController = new AbortController();
+		const signal = abortController.signal;
+
+		// Also abort any in-flight Load More to prevent racing
+		if (loadMoreController) {
+			loadMoreController.abort();
+			loadMoreController = null;
+			loadMoreLoading = false;
+		}
+
+		const params = parseSeriesParams(new URLSearchParams(search));
+
+		// Sync local state from URL
+		searchQuery = params.search;
+		filterStatus = params.status;
+		currentPage = params.page;
+
 		loading = true;
-		const { search, status } = getParamsFromUrl();
-		searchQuery = search;
-		filterStatus = status;
-		const result = await fetchSeries(search, status);
-		allSeries = result.series.items;
-		total = result.series.total;
-		currentPage = result.series.page;
-		loading = false;
+
+		fetchSeries(params.search, params.status, params.page)
+			.then((result) => {
+				if (signal.aborted) return;
+				allSeries = result.series.items;
+				total = result.series.total;
+				currentPage = result.series.page;
+			})
+			.catch(() => {
+				if (signal.aborted) return;
+				allSeries = [];
+				total = 0;
+				currentPage = 1;
+			})
+			.finally(() => {
+				if (signal.aborted) return;
+				loading = false;
+			});
 	});
 
 	const hasMore = $derived(allSeries.length < total);
@@ -73,14 +102,8 @@
 		if (target === current) return;
 
 		loading = true;
-		try {
-			await goto(target, { replaceState: true, noScroll: true, keepFocus: true });
-			// After goto, component remounts and onMount re-fetches
-		} catch {
-			loading = false;
-			searchQuery = getParamsFromUrl().search;
-			filterStatus = getParamsFromUrl().status;
-		}
+		await goto(target, { replaceState: true, noScroll: true, keepFocus: true });
+		// $effect reacts to page.url.search change and re-fetches
 	}
 
 	let searchTimer: ReturnType<typeof setTimeout> | undefined;
@@ -96,7 +119,6 @@
 
 	function scheduleSearchUpdate() {
 		clearSearchTimer();
-		loading = true;
 		searchTimer = setTimeout(() => {
 			searchTimer = undefined;
 			updateUrl(searchQuery, filterStatus);

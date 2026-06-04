@@ -27,6 +27,31 @@ export interface SeriesFilters {
 
 export type FilterKey = 'ALL' | 'ONGOING' | 'UPCOMING' | 'ENDED';
 
+export interface SeriesParams {
+	search: string;
+	status: FilterKey;
+	page: number;
+	/** Stable string derived from the search params, suitable as a reactive dependency key. */
+	key: string;
+}
+
+/**
+ * Parse query search params into structured fetch arguments.
+ * Pure function, no side effects, fully testable.
+ */
+export function parseSeriesParams(searchParams: URLSearchParams): SeriesParams {
+	const search = searchParams.get('search') ?? '';
+	const statusRaw = (searchParams.get('status') ?? '').toUpperCase();
+	const status: FilterKey = (['ALL', 'ONGOING', 'UPCOMING', 'ENDED'] as FilterKey[]).includes(statusRaw as FilterKey)
+		? (statusRaw as FilterKey)
+		: 'ALL';
+	const pageRaw = searchParams.get('page');
+	const page = pageRaw ? parseInt(pageRaw, 10) : 1;
+	const key = searchParams.toString();
+
+	return { search, status, page, key };
+}
+
 export async function fetchSeries(search: string, status: FilterKey, pageNum = 1): Promise<{ series: SeriesApiResponse; filters: SeriesFilters }> {
 	const params = new URLSearchParams();
 	if (search) params.set('search', search);

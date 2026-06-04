@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import type { CalendarEvent, CalendarApiResponse } from '$lib/types/calendar.js';
-	import { fetchCalendar } from './calendar.js';
+	import { fetchCalendar, parseCalendarParams } from './calendar.js';
 
 	let viewMode = $state<'grid' | 'calendar' | 'list'>('grid');
 	let selectedDate = $state<string | null>(null);
@@ -14,37 +13,46 @@
 	let params_m = $state(now.getMonth() + 1);
 	let params_sd = $state<string | null>(null);
 	let params_ed = $state<string | null>(null);
-	let loading = $state(true);
+	let contentLoading = $state(true);
 
-	onMount(async () => {
-		loading = true;
-		const yearParam = page.url.searchParams.get('year');
-		const monthParam = page.url.searchParams.get('month');
-		const startDateParam = page.url.searchParams.get('startDate');
-		const endDateParam = page.url.searchParams.get('endDate');
+	// Abort previous in-flight request so the latest query always wins
+	let abortController: AbortController | null = null;
 
-		try {
-			const result = await fetchCalendar(
-				yearParam ? parseInt(yearParam, 10) : undefined,
-				monthParam ? parseInt(monthParam, 10) : undefined,
-				startDateParam,
-				endDateParam
-			);
-			calendar = result.calendar;
-			params_y = result.params.year;
-			params_m = result.params.month;
-			params_sd = result.params.startDate;
-			params_ed = result.params.endDate;
-		} catch {
-			calendar = { events: {}, allSeries: [], platforms: [], scheduleByDay: [] };
-			const now = new Date();
-			params_y = now.getFullYear();
-			params_m = now.getMonth() + 1;
-			params_sd = null;
-			params_ed = null;
-		} finally {
-			loading = false;
+	$effect(() => {
+		const search = page.url.search;
+
+		if (abortController) {
+			abortController.abort();
 		}
+		abortController = new AbortController();
+		const signal = abortController.signal;
+
+		const params = parseCalendarParams(new URLSearchParams(search));
+
+		contentLoading = true;
+
+		fetchCalendar(params.year, params.month, params.startDate, params.endDate)
+			.then((result) => {
+				if (signal.aborted) return;
+				calendar = result.calendar;
+				params_y = result.params.year;
+				params_m = result.params.month;
+				params_sd = result.params.startDate;
+				params_ed = result.params.endDate;
+			})
+			.catch(() => {
+				if (signal.aborted) return;
+				calendar = { events: {}, allSeries: [], platforms: [], scheduleByDay: [] };
+				const now = new Date();
+				params_y = now.getFullYear();
+				params_m = now.getMonth() + 1;
+				params_sd = null;
+				params_ed = null;
+			})
+			.finally(() => {
+				if (signal.aborted) return;
+				contentLoading = false;
+			});
 	});
 
 	// Current month derived from load params
@@ -266,47 +274,49 @@
 		<p class="text-sm sm:text-base text-plum-light">อัปเดตตารางฉายซีรีส์ GL ล่าสุด</p>
 	</div>
 
-	{#if loading}
-		<div class="glass-card rounded-2xl sm:rounded-3xl p-8 text-center">
-			<div class="w-12 h-12 mx-auto rounded-xl bg-lavender/10 animate-pulse mb-4"></div>
-			<p class="text-plum-light">กำลังโหลดตารางฉาย...</p>
-		</div>
-	{:else}
-		<!-- Normal View Toggle -->
-		<div class="mb-6 sm:mb-8">
-			{@render viewToggle()}
-		</div>
+	<!-- Normal View Toggle -->
+	<div class="mb-6 sm:mb-8">
+		{@render viewToggle()}
+	</div>
 
-		{#if viewMode === 'grid'}
-			<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
-				<div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-lavender/20">
+	<!-- Grid View -->
+	{#if viewMode === 'grid'}
+		<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+			<!-- Controls (always visible, independent of contentLoading) -->
+			<div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-lavender/20">
+				<button
+					aria-label="เดือนก่อนหน้า"
+					onclick={prevMonth}
+					class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+				>
+					<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+				</button>
+				<div class="flex items-center gap-2 sm:gap-3">
+					<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
+						{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
+					</h2>
 					<button
-						aria-label="เดือนก่อนหน้า"
-						onclick={prevMonth}
-						class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+						onclick={goToToday}
+						class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
 					>
-						<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-					</button>
-					<div class="flex items-center gap-2 sm:gap-3">
-						<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
-							{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
-						</h2>
-						<button
-							onclick={goToToday}
-							class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
-						>
-							วันนี้
-						</button>
-					</div>
-					<button
-						aria-label="เดือนถัดไป"
-						onclick={nextMonth}
-						class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-					>
-						<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+						วันนี้
 					</button>
 				</div>
+				<button
+					aria-label="เดือนถัดไป"
+					onclick={nextMonth}
+					class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+				>
+					<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+				</button>
+			</div>
 
+			{#if contentLoading}
+				<div class="p-8 text-center">
+					<div class="w-12 h-12 mx-auto rounded-xl bg-lavender/10 animate-pulse mb-4"></div>
+					<p class="text-plum-light">กำลังโหลดตารางฉาย...</p>
+				</div>
+			{:else}
 				<div class="overflow-x-auto">
 					<table class="w-full min-w-[800px]">
 						<thead>
@@ -371,50 +381,58 @@
 						</tbody>
 					</table>
 				</div>
-			</div>
 
-			<div class="mt-4 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-plum-light">
-				<span>แพลตฟอร์ม:</span>
-				{#each Object.entries(platformColors) as [platform, colorClass]}
-					<div class="flex items-center gap-1">
-						<div class="w-3 h-3 rounded {colorClass.split(' ')[0]}"></div>
-						<span>{platform}</span>
-					</div>
-				{/each}
-			</div>
+				<div class="mt-4 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-plum-light px-4 sm:px-6 pb-4 sm:pb-6">
+					<span>แพลตฟอร์ม:</span>
+					{#each Object.entries(platformColors) as [platform, colorClass]}
+						<div class="flex items-center gap-1">
+							<div class="w-3 h-3 rounded {colorClass.split(' ')[0]}"></div>
+							<span>{platform}</span>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</div>
 
-		{:else if viewMode === 'calendar'}
-			<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-				<div class="lg:col-span-2">
-					<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
-						<div class="flex items-center justify-between mb-4 sm:mb-6">
+	{:else if viewMode === 'calendar'}
+		<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+			<div class="lg:col-span-2">
+				<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
+					<!-- Controls (always visible, independent of contentLoading) -->
+					<div class="flex items-center justify-between mb-4 sm:mb-6">
+						<button
+							aria-label="เดือนก่อนหน้า"
+							onclick={prevMonth}
+							class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+						>
+							<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+						</button>
+						<div class="flex items-center gap-2 sm:gap-3">
+							<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-2xl font-bold text-plum">
+								{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
+							</h2>
 							<button
-								aria-label="เดือนก่อนหน้า"
-								onclick={prevMonth}
-								class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+								onclick={goToToday}
+								class="px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
 							>
-								<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-							</button>
-							<div class="flex items-center gap-2 sm:gap-3">
-								<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-2xl font-bold text-plum">
-									{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
-								</h2>
-								<button
-									onclick={goToToday}
-									class="px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
-								>
-									วันนี้
-								</button>
-							</div>
-							<button
-								aria-label="เดือนถัดไป"
-								onclick={nextMonth}
-								class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-							>
-								<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+								วันนี้
 							</button>
 						</div>
+						<button
+							aria-label="เดือนถัดไป"
+							onclick={nextMonth}
+							class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+						>
+							<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+						</button>
+					</div>
 
+					{#if contentLoading}
+						<div class="p-8 text-center">
+							<div class="w-12 h-12 mx-auto rounded-xl bg-lavender/10 animate-pulse mb-4"></div>
+							<p class="text-plum-light">กำลังโหลดตารางฉาย...</p>
+						</div>
+					{:else}
 						<div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
 							{#each weekDays as day}
 								<div class="text-center py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold text-plum-light uppercase">{day}</div>
@@ -458,87 +476,96 @@
 								<span>วันนี้</span>
 							</div>
 						</div>
-					</div>
+					{/if}
 				</div>
+			</div>
 
-				<div class="lg:col-span-1">
-					<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:sticky lg:top-28">
-						{#if selectedDate && selectedEvents.length > 0}
-							{@const d = new Date(selectedDate)}
-							<h3 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum mb-1">
-								{d.getDate()} {thaiMonths[d.getMonth()]}
-							</h3>
-							<p class="text-xs sm:text-sm text-plum-light mb-4 sm:mb-5">มี {selectedEvents.length} รายการ</p>
+			<div class="lg:col-span-1">
+				<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:sticky lg:top-28">
+					{#if selectedDate && selectedEvents.length > 0}
+						{@const d = new Date(selectedDate)}
+						<h3 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum mb-1">
+							{d.getDate()} {thaiMonths[d.getMonth()]}
+						</h3>
+						<p class="text-xs sm:text-sm text-plum-light mb-4 sm:mb-5">มี {selectedEvents.length} รายการ</p>
 
-							<div class="space-y-2 sm:space-y-3">
-								{#each selectedEvents as event}
-									<div class="glass-card-strong rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:shadow-lg transition-all">
-										<div class="flex items-center gap-2 mb-1.5 sm:mb-2">
-											<span class="px-2 py-0.5 rounded-lg bg-coral/10 text-coral-dark text-xs font-bold">{event.time}</span>
-											{#if event.isUncut}
-												<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-xs font-medium">Uncut</span>
-											{/if}
-										</div>
-										<h4 class="font-semibold text-plum text-sm mb-0.5 sm:mb-1">{event.series}</h4>
-										<div class="flex items-center gap-2 text-xs text-plum-light">
-											<span>{event.episode}</span>
-											<span>•</span>
-											<span>{event.platforms.join(', ')}</span>
-										</div>
+						<div class="space-y-2 sm:space-y-3">
+							{#each selectedEvents as event}
+								<div class="glass-card-strong rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:shadow-lg transition-all">
+									<div class="flex items-center gap-2 mb-1.5 sm:mb-2">
+										<span class="px-2 py-0.5 rounded-lg bg-coral/10 text-coral-dark text-xs font-bold">{event.time}</span>
+										{#if event.isUncut}
+											<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-xs font-medium">Uncut</span>
+										{/if}
 									</div>
-								{/each}
-							</div>
-						{:else}
-							<div class="text-center py-8 sm:py-10">
-								<div class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
-									<svg class="w-6 h-6 sm:w-8 sm:h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-									</svg>
+									<h4 class="font-semibold text-plum text-sm mb-0.5 sm:mb-1">{event.series}</h4>
+									<div class="flex items-center gap-2 text-xs text-plum-light">
+										<span>{event.episode}</span>
+										<span>•</span>
+										<span>{event.platforms.join(', ')}</span>
+									</div>
 								</div>
-								<p class="text-plum-light text-xs sm:text-sm">
-									{#if selectedDate}
-										ไม่มีซีรีส์ฉายในวันนี้
-									{:else}
-										เลือกวันที่มีจุดสีชมพู<br/>เพื่อดูรายละเอียด
-									{/if}
-								</p>
+							{/each}
+						</div>
+					{:else}
+						<div class="text-center py-8 sm:py-10">
+							<div class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+								<svg class="w-6 h-6 sm:w-8 sm:h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+								</svg>
 							</div>
-						{/if}
-					</div>
+							<p class="text-plum-light text-xs sm:text-sm">
+								{#if selectedDate}
+									ไม่มีซีรีส์ฉายในวันนี้
+								{:else}
+									เลือกวันที่มีจุดสีชมพู<br/>เพื่อดูรายละเอียด
+								{/if}
+							</p>
+						</div>
+					{/if}
 				</div>
+			</div>
+		</div>
+
+	{:else}
+		<!-- List View -->
+		<!-- Controls (always visible, independent of contentLoading) -->
+		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6">
+			<div class="flex items-center justify-between">
+				<button
+					aria-label="สัปดาห์ก่อนหน้า"
+					onclick={prevWeek}
+					class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+				>
+					<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+				</button>
+				<div class="flex items-center gap-2 sm:gap-3">
+					<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
+						{getWeekRangeText()}
+					</h2>
+					<button
+						onclick={goToThisWeek}
+						class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
+					>
+						สัปดาห์นี้
+					</button>
+				</div>
+				<button
+					aria-label="สัปดาห์ถัดไป"
+					onclick={nextWeek}
+					class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+				>
+					<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+				</button>
+			</div>
+		</div>
+
+		{#if contentLoading}
+			<div class="glass-card rounded-2xl sm:rounded-3xl p-8 text-center">
+				<div class="w-12 h-12 mx-auto rounded-xl bg-lavender/10 animate-pulse mb-4"></div>
+				<p class="text-plum-light">กำลังโหลดตารางฉาย...</p>
 			</div>
 		{:else}
-			<!-- List View -->
-			<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6">
-				<div class="flex items-center justify-between">
-					<button
-						aria-label="สัปดาห์ก่อนหน้า"
-						onclick={prevWeek}
-						class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-					>
-						<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-					</button>
-					<div class="flex items-center gap-2 sm:gap-3">
-						<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
-							{getWeekRangeText()}
-						</h2>
-						<button
-							onclick={goToThisWeek}
-							class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
-						>
-							สัปดาห์นี้
-						</button>
-					</div>
-					<button
-						aria-label="สัปดาห์ถัดไป"
-						onclick={nextWeek}
-						class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-					>
-						<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-					</button>
-				</div>
-			</div>
-
 			<div class="space-y-4 sm:space-y-6">
 				{#each weekScheduleByDay as day}
 					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
@@ -583,20 +610,21 @@
 				{/each}
 			</div>
 		{/if}
-
-		<div class="mt-6 sm:mt-10 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 flex items-start gap-3 sm:gap-4">
-			<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-lavender/20 flex items-center justify-center flex-shrink-0">
-				<svg class="w-4 h-4 sm:w-5 sm:h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-				</svg>
-			</div>
-			<div>
-				<h3 class="font-semibold text-plum mb-1 text-sm sm:text-base">หมายเหตุ</h3>
-				<p class="text-xs sm:text-sm text-plum-light leading-relaxed">
-					เวลาฉายแสดงตามเวลาในประเทศไทย หากมีการเปลี่ยนแปลงตารางฉาย
-					ระบบจะอัปเดตให้โดยอัตโนมัติ ติ่งทุกคนสามารถตรวจสอบเวลาฉาย Uncut version ได้จากป้ายสีชมพู
-				</p>
-			</div>
-		</div>
 	{/if}
+
+	<!-- Notes section (always visible, independent of contentLoading) -->
+	<div class="mt-6 sm:mt-10 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 flex items-start gap-3 sm:gap-4">
+		<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-lavender/20 flex items-center justify-center flex-shrink-0">
+			<svg class="w-4 h-4 sm:w-5 sm:h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+			</svg>
+		</div>
+		<div>
+			<h3 class="font-semibold text-plum mb-1 text-sm sm:text-base">หมายเหตุ</h3>
+			<p class="text-xs sm:text-sm text-plum-light leading-relaxed">
+				เวลาฉายแสดงตามเวลาในประเทศไทย หากมีการเปลี่ยนแปลงตารางฉาย
+				ระบบจะอัปเดตให้โดยอัตโนมัติ ติ่งทุกคนสามารถตรวจสอบเวลาฉาย Uncut version ได้จากป้ายสีชมพู
+			</p>
+		</div>
+	</div>
 </div>
