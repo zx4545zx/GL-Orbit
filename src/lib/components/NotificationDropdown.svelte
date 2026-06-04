@@ -63,6 +63,7 @@
 	}
 
 	async function markRead(n: NotificationItem) {
+		goto(`/series/${n.seriesId}`);
 		try {
 			await fetch('/api/notifications', {
 				method: 'POST',
@@ -72,7 +73,6 @@
 		} catch {
 			// Fail silent — notification will still open
 		}
-		goto(`/series/${n.seriesId}`);
 	}
 
 	async function markAllRead() {
