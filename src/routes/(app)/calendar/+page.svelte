@@ -255,9 +255,7 @@
 				<button
 					onclick={() => {
 						viewMode = btn.key;
-						if (btn.key === 'list') {
-							goto(getViewUrl('list', params_y, params_m, params_sd, params_ed));
-						}
+						goto(getViewUrl(btn.key, params_y, params_m, params_sd, params_ed));
 					}}
 					class="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 flex items-center gap-1.5 sm:gap-2 touch-target {active ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/60'}"
 				>

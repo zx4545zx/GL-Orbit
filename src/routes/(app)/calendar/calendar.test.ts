@@ -80,6 +80,16 @@ describe('getViewUrl', () => {
 		const url = getViewUrl('list', undefined, undefined, '2026-06-01', '2026-06-07');
 		expect(url).toBe('/calendar?startDate=2026-06-01&endDate=2026-06-07');
 	});
+
+	it('returns month URL for grid view even when week params exist (switching FROM list)', () => {
+		const url = getViewUrl('grid', 2026, 6, '2026-06-01', '2026-06-07');
+		expect(url).toBe('/calendar?year=2026&month=6');
+	});
+
+	it('returns month URL for calendar view even when week params exist (switching FROM list)', () => {
+		const url = getViewUrl('calendar', 2026, 6, '2026-06-01', '2026-06-07');
+		expect(url).toBe('/calendar?year=2026&month=6');
+	});
 });
 
 describe('calendar page client-side fetch', () => {
@@ -185,5 +195,17 @@ describe('calendar page loading structure — source-level regression', () => {
 		const notesPos = source.indexOf('หมายเหตุ');
 		expect(notesPos).toBeGreaterThan(0);
 		expect(notesPos).toBeGreaterThan(lastClosingIf);
+	});
+
+	it('view toggle onclick delegates to goto(getViewUrl(...)) for ALL view modes (not just list)', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		// The onclick handler should NOT have a per-mode guard like `if (btn.key === 'list')`.
+		// Instead it should call goto(getViewUrl(btn.key, ...)) unconditionally.
+		// This ensures switching back from list to grid/calendar also changes the URL.
+		const hasPerModeGuard = source.includes(`if (btn.key === 'list')`);
+		// The correct pattern is unconditional goto with btn.key
+		const hasBtnKeyPattern = source.includes(`goto(getViewUrl(btn.key`);
+		expect(hasPerModeGuard).toBe(false);
+		expect(hasBtnKeyPattern).toBe(true);
 	});
 });
