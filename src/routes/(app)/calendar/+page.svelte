@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import type { CalendarEvent, CalendarApiResponse } from '$lib/types/calendar.js';
-	import { fetchCalendar, parseCalendarParams } from './calendar.js';
+	import { fetchCalendar, parseCalendarParams, getViewUrl } from './calendar.js';
 
 	let viewMode = $state<'grid' | 'calendar' | 'list'>('grid');
 	let selectedDate = $state<string | null>(null);
@@ -253,7 +253,12 @@
 			{#each viewButtons as btn}
 				{@const active = viewMode === btn.key}
 				<button
-					onclick={() => viewMode = btn.key}
+					onclick={() => {
+						viewMode = btn.key;
+						if (btn.key === 'list') {
+							goto(getViewUrl('list', params_y, params_m, params_sd, params_ed));
+						}
+					}}
 					class="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 flex items-center gap-1.5 sm:gap-2 touch-target {active ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/60'}"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">{@html btn.icon}</svg>

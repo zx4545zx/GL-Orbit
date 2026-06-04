@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { fetchCalendar, parseCalendarParams } from './calendar.js';
+import { fetchCalendar, parseCalendarParams, getViewUrl } from './calendar.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -57,6 +57,28 @@ describe('parseCalendarParams', () => {
 		const weekKey = parseCalendarParams(new URLSearchParams('startDate=2024-06-01&endDate=2024-06-07')).key;
 
 		expect(weekKey).not.toBe(monthKey);
+	});
+});
+
+describe('getViewUrl', () => {
+	it('returns week URL (startDate/endDate) for list view', () => {
+		const url = getViewUrl('list', 2026, 6, null, null);
+		expect(url).toMatch(/^\/calendar\?startDate=\d{4}-\d{2}-\d{2}&endDate=\d{4}-\d{2}-\d{2}$/);
+	});
+
+	it('returns month URL (year/month) for grid view', () => {
+		const url = getViewUrl('grid', 2026, 6, null, null);
+		expect(url).toBe('/calendar?year=2026&month=6');
+	});
+
+	it('returns month URL (year/month) for calendar view', () => {
+		const url = getViewUrl('calendar', 2026, 6, null, null);
+		expect(url).toBe('/calendar?year=2026&month=6');
+	});
+
+	it('preserves existing week params when switching to list view', () => {
+		const url = getViewUrl('list', undefined, undefined, '2026-06-01', '2026-06-07');
+		expect(url).toBe('/calendar?startDate=2026-06-01&endDate=2026-06-07');
 	});
 });
 
