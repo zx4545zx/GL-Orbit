@@ -28,6 +28,7 @@
 				errorMessage = data.error || 'ไม่สามารถเข้าสู่ระบบได้ กรุณาลองอีกครั้ง';
 				return;
 			}
+			user.set(data.user);
 			await goto('/profile');
 		} catch {
 			errorMessage = 'ไม่สามารถเข้าสู่ระบบได้ กรุณาลองอีกครั้ง';

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { user } from '$lib/stores/user.js';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import type { ProfileResponse, ProfileUpdateResponse, ApiErrorResponse } from '$lib/types.js';
 
@@ -52,13 +53,19 @@
 		loadProfile();
 	});
 
-	function handleLogout() {
-		const f = document.createElement('form');
-		f.method = 'POST';
-		f.action = '/logout';
-		document.body.appendChild(f);
-		f.submit();
-		document.body.removeChild(f);
+	let isLoggingOut = $state(false);
+
+	async function handleLogout(e: Event) {
+		e.preventDefault();
+		if (isLoggingOut) return;
+		isLoggingOut = true;
+		try {
+			await fetch('/logout', { method: 'POST' });
+			user.set(null);
+			await goto('/');
+		} finally {
+			isLoggingOut = false;
+		}
 	}
 
 	async function handleUpdateProfile(e: Event) {
@@ -377,10 +384,16 @@
 				{/if}
 				<button
 					onclick={handleLogout}
-					class="w-full py-3 rounded-xl border-2 border-coral/30 bg-coral/5 text-coral-dark font-semibold hover:bg-coral/10 hover:border-coral/50 hover:scale-[1.02] transition-all duration-300 text-sm sm:text-base touch-target flex items-center justify-center gap-2"
+					disabled={isLoggingOut}
+					class="w-full py-3 rounded-xl border-2 border-coral/30 bg-coral/5 text-coral-dark font-semibold hover:bg-coral/10 hover:border-coral/50 hover:scale-[1.02] transition-all duration-300 disabled:opacity-60 text-sm sm:text-base touch-target flex items-center justify-center gap-2"
 				>
-					<svg class="w-5 h-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-					ออกจากระบบ
+					{#if isLoggingOut}
+						<svg class="animate-spin w-5 h-5 text-coral-dark" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+						กำลังออกจากระบบ...
+					{:else}
+						<svg class="w-5 h-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+						ออกจากระบบ
+					{/if}
 				</button>
 			</div>
 		{/if}

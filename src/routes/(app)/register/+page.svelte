@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { user } from '$lib/stores/user.js';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
-	import type { ApiErrorResponse } from '$lib/types.js';
+
 
 	$effect(() => {
 		if ($user) goto('/profile');
@@ -29,12 +29,13 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ username, email, displayName, password, confirmPassword })
 			});
-			const data: ApiErrorResponse = await res.json();
+			const data = await res.json();
 			if (!res.ok) {
 				errorMessage = data.error || 'ไม่สามารถสมัครสมาชิกได้ กรุณาลองอีกครั้ง';
 				if (data.fields) fieldErrors = data.fields;
 				return;
 			}
+			user.set(data.user);
 			await goto('/profile');
 		} catch {
 			errorMessage = 'ไม่สามารถสมัครสมาชิกได้ กรุณาลองอีกครั้ง';
