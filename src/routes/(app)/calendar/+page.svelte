@@ -315,9 +315,42 @@
 			</div>
 
 			{#if contentLoading}
-				<div class="p-8 text-center">
-					<div class="w-12 h-12 mx-auto rounded-xl bg-lavender/10 animate-pulse mb-4"></div>
-					<p class="text-plum-light">กำลังโหลดตารางฉาย...</p>
+				<div class="grid-loading-skeleton p-4 sm:p-6">
+					<div class="overflow-x-auto">
+						<table class="w-full min-w-[800px]">
+							<thead>
+								<tr class="border-b border-lavender/10">
+									<th class="px-3 sm:px-4 py-3 text-left w-32 sm:w-40 border-r border-lavender/10">
+										<div class="h-4 w-16 bg-lavender/10 rounded animate-pulse"></div>
+									</th>
+									{#each Array(7) as _, i}
+										<th class="px-1 sm:px-2 py-3 text-center min-w-[36px] sm:min-w-[48px]">
+											<div class="h-3 w-5 mx-auto bg-lavender/10 rounded animate-pulse mb-1"></div>
+											<div class="h-2 w-3 mx-auto bg-lavender/5 rounded animate-pulse"></div>
+										</th>
+									{/each}
+								</tr>
+							</thead>
+							<tbody>
+								{#each Array(5) as _, row}
+									<tr class="border-b border-lavender/5 {row % 2 === 0 ? 'bg-white/20' : ''}">
+										<td class="px-3 sm:px-4 py-3 border-r border-lavender/10">
+											<div class="h-4 w-24 bg-lavender/10 rounded animate-pulse"></div>
+										</td>
+										{#each Array(7) as _, col}
+											<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center">
+												{#if (row * 7 + col) % 3 === 0}
+													<div class="h-8 sm:h-10 bg-lavender/5 rounded-md sm:rounded-lg animate-pulse"></div>
+												{:else}
+													<div class="h-8 sm:h-10"></div>
+												{/if}
+											</td>
+										{/each}
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
 				</div>
 			{:else}
 				<div class="overflow-x-auto">
@@ -431,9 +464,17 @@
 					</div>
 
 					{#if contentLoading}
-						<div class="p-8 text-center">
-							<div class="w-12 h-12 mx-auto rounded-xl bg-lavender/10 animate-pulse mb-4"></div>
-							<p class="text-plum-light">กำลังโหลดตารางฉาย...</p>
+						<div class="calendar-loading-skeleton">
+							<div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
+								{#each weekDays as day}
+									<div class="h-3 sm:h-4 bg-lavender/10 rounded animate-pulse"></div>
+								{/each}
+							</div>
+							<div class="grid grid-cols-7 gap-0.5 sm:gap-1">
+								{#each Array(35) as _, i}
+									<div class="aspect-square rounded-lg sm:rounded-xl bg-lavender/5 animate-pulse"></div>
+								{/each}
+							</div>
 						</div>
 					{:else}
 						<div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
@@ -564,9 +605,28 @@
 		</div>
 
 		{#if contentLoading}
-			<div class="glass-card rounded-2xl sm:rounded-3xl p-8 text-center">
-				<div class="w-12 h-12 mx-auto rounded-xl bg-lavender/10 animate-pulse mb-4"></div>
-				<p class="text-plum-light">กำลังโหลดตารางฉาย...</p>
+			<div class="list-loading-skeleton space-y-4 sm:space-y-6">
+				{#each Array(3) as _, card}
+					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+						<div class="px-4 sm:px-6 py-3 sm:py-4 bg-lavender/10 border-b border-white/50">
+							<div class="h-5 sm:h-6 w-24 sm:w-32 bg-lavender/10 rounded animate-pulse"></div>
+						</div>
+						<div class="divide-y divide-lavender/10">
+							{#each Array(2) as _, item}
+								<div class="px-4 sm:px-6 py-4 sm:py-5 flex items-center gap-3 sm:gap-5">
+									<div class="flex-shrink-0 w-12 sm:w-16">
+										<div class="h-4 w-10 sm:w-12 mx-auto bg-lavender/10 rounded animate-pulse"></div>
+									</div>
+									<div class="flex-1 space-y-2 min-w-0">
+										<div class="h-4 w-40 sm:w-56 bg-lavender/10 rounded animate-pulse"></div>
+										<div class="h-3 w-28 sm:w-36 bg-lavender/5 rounded animate-pulse"></div>
+									</div>
+									<div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-lavender/5 animate-pulse"></div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/each}
 			</div>
 		{:else}
 			<div class="space-y-4 sm:space-y-6">

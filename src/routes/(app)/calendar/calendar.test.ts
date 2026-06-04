@@ -180,11 +180,30 @@ describe('calendar page loading structure — source-level regression', () => {
 		expect(thisWeekPos).toBeLessThan(thisWeekLoadingPos);
 	});
 
-	it('loading skeleton text appears inside a contentLoading block (after {#if contentLoading})', () => {
+	it('removes text-based loading indicator กำลังโหลดตารางฉาย', () => {
 		const source = readFileSync(pagePath, 'utf-8');
-		const loadingPos = source.indexOf('{#if contentLoading}');
-		const skeletonPos = source.indexOf('กำลังโหลดตารางฉาย');
-		expect(skeletonPos).toBeGreaterThan(loadingPos);
+		expect(source).not.toContain('กำลังโหลดตารางฉาย');
+	});
+
+	it('grid view has structural table skeleton with day headers and series rows', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		const gridSkeletonPos = source.indexOf('grid-loading-skeleton');
+		expect(gridSkeletonPos).toBeGreaterThan(0);
+		// Assert it's inside a grid view contentLoading block
+		const gridViewBlock = source.indexOf('{#if viewMode === \'grid\'}');
+		expect(gridSkeletonPos).toBeGreaterThan(gridViewBlock);
+	});
+
+	it('calendar view has 7-column month grid skeleton', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		const calSkeletonPos = source.indexOf('calendar-loading-skeleton');
+		expect(calSkeletonPos).toBeGreaterThan(0);
+	});
+
+	it('list view has grouped day-card skeleton with event rows', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		const listSkeletonPos = source.indexOf('list-loading-skeleton');
+		expect(listSkeletonPos).toBeGreaterThan(0);
 	});
 
 	it('notes section (หมายเหตุ) appears outside any contentLoading block', () => {
