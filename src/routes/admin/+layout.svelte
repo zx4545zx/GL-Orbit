@@ -23,6 +23,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>ผู้ดูแลระบบ | GL-Orbit</title>
+	<meta name="robots" content="noindex, nofollow" />
+</svelte:head>
+
 <div class="min-h-screen bg-gray-50 flex">
 	<!-- Desktop Sidebar -->
 	<aside class="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-30">

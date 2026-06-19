@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, safeJsonLd } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 	import type { FeaturedSeriesItem, UpcomingScheduleItem } from './home.js';
 
@@ -9,12 +11,45 @@
 	const loadingFeatured = false;
 	const loadingSchedule = false;
 
+	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/'));
+	const homeJsonLd = $derived(safeJsonLd([
+		buildWebPageJsonLd(page.url.origin, '/', DEFAULT_SEO_TITLE, DEFAULT_SEO_DESCRIPTION),
+		{
+			'@context': 'https://schema.org',
+			'@type': 'WebSite',
+			name: SITE_NAME,
+			url: canonicalUrl,
+			inLanguage: 'th-TH',
+			potentialAction: {
+				'@type': 'SearchAction',
+				target: `${absoluteUrl(page.url.origin, '/series')}?search={search_term_string}`,
+				'query-input': 'required name=search_term_string'
+			}
+		},
+		buildBreadcrumbJsonLd(page.url.origin, [{ name: 'หน้าแรก', path: '/' }])
+	]));
+
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
 		UPCOMING: { text: ' upcoming', class: 'bg-lavender/20 text-lavender-dark' },
 		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
 	};
 </script>
+
+<svelte:head>
+	<title>{DEFAULT_SEO_TITLE}</title>
+	<meta name="description" content={DEFAULT_SEO_DESCRIPTION} />
+	<meta name="robots" content="index, follow" />
+	<link rel="canonical" href={canonicalUrl} />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={DEFAULT_SEO_TITLE} />
+	<meta property="og:description" content={DEFAULT_SEO_DESCRIPTION} />
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+	<meta name="twitter:title" content={DEFAULT_SEO_TITLE} />
+	<meta name="twitter:description" content={DEFAULT_SEO_DESCRIPTION} />
+	<script type="application/ld+json">{homeJsonLd}</script>
+</svelte:head>
 
 <!-- Hero Section -->
 <section class="relative min-h-[70vh] sm:min-h-[80vh] flex items-center justify-center overflow-hidden -mx-4 px-4 md:-mt-24">

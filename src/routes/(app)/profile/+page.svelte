@@ -105,6 +105,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>โปรไฟล์ของฉัน | GL-Orbit</title>
+	<meta name="robots" content="noindex, nofollow" />
+</svelte:head>
+
 <div class="py-8 sm:py-12">
 	<div class="max-w-md mx-auto">
 		{#if loadingProfilePage}

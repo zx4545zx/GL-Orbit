@@ -24,6 +24,11 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{config.title} | GL-Orbit</title>
+	<meta name="robots" content="noindex, nofollow" />
+</svelte:head>
+
 <div class="min-h-[60vh] flex items-center justify-center px-4">
 	<div class="text-center max-w-md mx-auto">
 		<div class="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl glass-card-strong flex items-center justify-center mx-auto mb-6 sm:mb-8 animate-float">

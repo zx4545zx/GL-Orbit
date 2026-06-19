@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { DEFAULT_OG_IMAGE, absoluteUrl } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 	import type { FilterKey, SeriesApiResponseItem } from './series.js';
 
@@ -151,8 +152,13 @@
 	<meta name="description" content={data.seo.description} />
 	<meta name="robots" content={data.seo.robots} />
 	<link rel="canonical" href={`${page.url.origin}${data.seo.canonicalPath}`} />
+	<meta property="og:type" content="website" />
 	<meta property="og:title" content={data.seo.ogTitle} />
 	<meta property="og:description" content={data.seo.ogDescription} />
+	<meta property="og:url" content={`${page.url.origin}${data.seo.canonicalPath}`} />
+	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+	<meta name="twitter:title" content={data.seo.ogTitle} />
+	<meta name="twitter:description" content={data.seo.ogDescription} />
 	<script type="application/ld+json">{data.seo.jsonLd}</script>
 </svelte:head>
 

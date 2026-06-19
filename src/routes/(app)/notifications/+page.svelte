@@ -1,23 +1,23 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import type { PageData } from './$types.js';
 	import type { NotificationItem, NotificationsListResponse } from '$lib/types.js';
-	import { fetchNotifications } from './notifications.js';
+
+	let { data }: { data: PageData } = $props();
 
 	let notifications = $state<NotificationItem[]>([]);
 	let offset = $state(0);
 	let hasMore = $state(false);
-	let initialLoading = $state(true);
+	let initialLoading = $state(false);
 	let loading = $state(false);
 	let loadError = $state('');
 	let markingAll = $state(false);
 
-	onMount(async () => {
-		const result = await fetchNotifications(20, 0);
-		notifications = result.notifications;
-		offset = result.offset + result.notifications.length;
-		hasMore = result.hasMore;
-		loadError = result.loadError;
+	$effect(() => {
+		notifications = data.notifications;
+		offset = data.offset + data.notifications.length;
+		hasMore = data.hasMore;
+		loadError = '';
 		initialLoading = false;
 	});
 
@@ -93,6 +93,11 @@
 		}
 	}
 </script>
+
+<svelte:head>
+	<title>การแจ้งเตือน | GL-Orbit</title>
+	<meta name="robots" content="noindex, nofollow" />
+</svelte:head>
 
 <div class="max-w-2xl mx-auto py-6 px-1">
 	<!-- Header -->

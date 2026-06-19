@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { navigating, page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { DEFAULT_OG_IMAGE, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, safeJsonLd } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 	import type { CalendarEvent, CalendarApiResponse } from '$lib/types/calendar.js';
 
@@ -201,12 +202,38 @@
 		'อาทิตย์': 'from-rose-300/20 to-rose-300/5'
 	};
 
+	const seoTitle = 'ตารางฉายซีรีส์ GL | GL-Orbit';
+	const seoDescription = 'ติดตามตารางฉายซีรีส์ Girls\' Love รายเดือนและรายสัปดาห์ พร้อมเวลาฉาย แพลตฟอร์มรับชม และป้าย Uncut version';
+	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/calendar'));
+	const calendarJsonLd = $derived(safeJsonLd([
+		buildWebPageJsonLd(page.url.origin, '/calendar', seoTitle, seoDescription),
+		buildBreadcrumbJsonLd(page.url.origin, [
+			{ name: 'หน้าแรก', path: '/' },
+			{ name: 'ตารางฉาย', path: '/calendar' }
+		])
+	]));
+
 	const viewButtons = [
 		{ key: 'grid' as const, label: 'ตาราง', short: 'ตาราง', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>' },
 		{ key: 'calendar' as const, label: 'ปฏิทิน', short: 'ปฏิทิน', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
 		{ key: 'list' as const, label: 'รายการ', short: 'รายการ', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>' }
 	];
 </script>
+
+<svelte:head>
+	<title>{seoTitle}</title>
+	<meta name="description" content={seoDescription} />
+	<meta name="robots" content="index, follow" />
+	<link rel="canonical" href={canonicalUrl} />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={seoTitle} />
+	<meta property="og:description" content={seoDescription} />
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+	<meta name="twitter:title" content={seoTitle} />
+	<meta name="twitter:description" content={seoDescription} />
+	<script type="application/ld+json">{calendarJsonLd}</script>
+</svelte:head>
 
 {#snippet viewToggle()}
 	<div class="flex justify-center">

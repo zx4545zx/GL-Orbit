@@ -1,0 +1,53 @@
+export const SITE_NAME = 'GL-Orbit';
+export const SITE_LOCALE = 'th_TH';
+export const DEFAULT_SEO_TITLE = 'GL-Orbit | ตารางฉายและข้อมูลซีรีส์ GL';
+export const DEFAULT_SEO_DESCRIPTION = 'ศูนย์กลางข้อมูลซีรีส์ Girls\' Love พร้อมตารางฉาย เวลาออกอากาศ แพลตฟอร์มรับชม และข้อมูลนักแสดงสำหรับแฟนคลับ GL';
+export const DEFAULT_OG_IMAGE = '/icons/pwa-512x512.png';
+
+export function absoluteUrl(origin: string, path: string): string {
+	return new URL(path, origin).toString();
+}
+
+export function safeJsonLd(data: unknown): string {
+	return JSON.stringify(data)
+		.replace(/</g, '\\u003c')
+		.replace(/>/g, '\\u003e')
+		.replace(/&/g, '\\u0026')
+		.replace(/\u2028/g, '\\u2028')
+		.replace(/\u2029/g, '\\u2029');
+}
+
+export function truncateSeo(text: string, maxLength = 155): string {
+	const normalized = text.replace(/\s+/g, ' ').trim();
+	if (normalized.length <= maxLength) return normalized;
+	return `${normalized.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
+export function buildBreadcrumbJsonLd(origin: string, items: Array<{ name: string; path: string }>) {
+	return {
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: items.map((item, index) => ({
+			'@type': 'ListItem',
+			position: index + 1,
+			name: item.name,
+			item: absoluteUrl(origin, item.path)
+		}))
+	};
+}
+
+export function buildWebPageJsonLd(origin: string, path: string, name: string, description: string) {
+	return {
+		'@context': 'https://schema.org',
+		'@type': 'WebPage',
+		name,
+		description,
+		url: absoluteUrl(origin, path),
+		inLanguage: 'th-TH',
+		isPartOf: {
+			'@type': 'WebSite',
+			name: SITE_NAME,
+			url: absoluteUrl(origin, '/')
+		}
+	};
+}
