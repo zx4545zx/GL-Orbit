@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { fetchCalendar, parseCalendarParams, getViewUrl } from './calendar.js';
+import { parseCalendarParams, getViewUrl } from './calendar.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -89,38 +89,6 @@ describe('getViewUrl', () => {
 	it('returns month URL for calendar view even when week params exist (switching FROM list)', () => {
 		const url = getViewUrl('calendar', 2026, 6, '2026-06-01', '2026-06-07');
 		expect(url).toBe('/calendar?year=2026&month=6');
-	});
-});
-
-describe('calendar page client-side fetch', () => {
-	it('calls /api/calendar with year and month params', async () => {
-		const mockResponse = { events: {}, allSeries: [], platforms: [], scheduleByDay: [] };
-		const mockFetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: () => Promise.resolve(mockResponse)
-		});
-		vi.stubGlobal('fetch', mockFetch);
-
-		const result = await fetchCalendar(2024, 6);
-
-		expect(mockFetch).toHaveBeenCalledWith('/api/calendar?year=2024&month=6');
-		expect(result.calendar).toEqual(mockResponse);
-		expect(result.params.year).toBe(2024);
-		expect(result.params.month).toBe(6);
-
-		vi.unstubAllGlobals();
-	});
-
-	it('handles API errors gracefully', async () => {
-		const mockFetch = vi.fn().mockResolvedValue({
-			ok: false,
-			json: () => Promise.resolve({ error: 'ไม่พบข้อมูล' })
-		});
-		vi.stubGlobal('fetch', mockFetch);
-
-		await expect(fetchCalendar(2024, 6)).rejects.toThrow('ไม่พบข้อมูล');
-
-		vi.unstubAllGlobals();
 	});
 });
 

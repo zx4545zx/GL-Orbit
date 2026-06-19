@@ -1,7 +1,3 @@
-/**
- * Client-side fetch module for home page.
- */
-
 export interface FeaturedSeriesItem {
 	id: string;
 	poster: string;
@@ -23,13 +19,4 @@ export interface UpcomingScheduleItem {
 export interface HomeApiResponse {
 	featuredSeries: FeaturedSeriesItem[];
 	upcomingSchedule: UpcomingScheduleItem[];
-}
-
-export async function fetchHome(fetcher: typeof fetch = fetch): Promise<HomeApiResponse> {
-	const res = await fetcher('/api/home');
-	const data = await res.json();
-	return {
-		featuredSeries: data.featuredSeries ?? [],
-		upcomingSchedule: data.upcomingSchedule ?? []
-	};
 }
