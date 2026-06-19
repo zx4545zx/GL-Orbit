@@ -28,7 +28,7 @@
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<div class="min-h-screen bg-gray-50 flex">
+<div class="min-h-dvh bg-gray-50 flex">
 	<!-- Desktop Sidebar -->
 	<aside class="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-30">
 		<div class="h-16 flex items-center px-6 border-b border-gray-100">
@@ -115,7 +115,7 @@
 	{/if}
 
 	<!-- Main Content -->
-	<main class="flex-1 lg:ml-64 pt-14 lg:pt-0 min-h-screen overflow-x-hidden">
+	<main class="flex-1 lg:ml-64 pt-14 lg:pt-0 min-h-dvh overflow-x-hidden">
 		<div class="max-w-6xl mx-auto px-4 py-6 overflow-x-hidden">
 			{@render children()}
 		</div>

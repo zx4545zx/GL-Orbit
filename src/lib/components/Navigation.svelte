@@ -90,7 +90,7 @@
 						class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-lavender/20 transition-all touch-target"
 					>
 						{#if currentUser.avatarUrl}
-							<img src={currentUser.avatarUrl} alt="" class="w-7 h-7 rounded-full object-cover" />
+							<img src={currentUser.avatarUrl} alt="" width={28} height={28} loading="eager" decoding="async" class="w-7 h-7 rounded-full object-cover" />
 						{:else}
 							<div class="w-7 h-7 rounded-full bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center">
 								<span class="text-xs font-bold text-coral-dark">{(currentUser.displayName || currentUser.username).charAt(0).toUpperCase()}</span>

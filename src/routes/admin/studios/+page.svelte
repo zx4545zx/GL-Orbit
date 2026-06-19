@@ -203,7 +203,7 @@
 									<td class="px-4 sm:px-6 py-3 sm:py-4">
 										<div class="flex items-center gap-3">
 											{#if studio.logoUrl}
-												<img src={studio.logoUrl} alt={studio.name} class="w-10 h-10 rounded-lg object-cover bg-gray-100" />
+												<img src={studio.logoUrl} alt={studio.name} width={40} height={40} loading="lazy" decoding="async" class="w-10 h-10 rounded-lg object-cover bg-gray-100" />
 											{:else}
 												<div class="w-10 h-10 rounded-lg bg-lavender/10 flex items-center justify-center">
 													<svg class="w-5 h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5"/></svg>
@@ -261,7 +261,7 @@
 				<div class="glass-card rounded-xl p-3 sm:p-4 overflow-hidden">
 					<div class="flex items-center gap-3">
 						{#if studio.logoUrl}
-							<img src={studio.logoUrl} alt={studio.name} class="w-10 h-10 rounded-lg object-cover bg-gray-100 shrink-0" />
+							<img src={studio.logoUrl} alt={studio.name} width={40} height={40} loading="lazy" decoding="async" class="w-10 h-10 rounded-lg object-cover bg-gray-100 shrink-0" />
 						{:else}
 							<div class="w-10 h-10 rounded-lg bg-lavender/10 flex items-center justify-center shrink-0">
 								<svg class="w-5 h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5"/></svg>

@@ -22,44 +22,45 @@ export const GET: RequestHandler = async () => {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	const featuredSeries = await db
-		.select({
-			id: series.id,
-			titleEn: series.titleEn,
-			titleTh: series.titleTh,
-			posterUrl: series.posterUrl,
-			status: series.status,
-			studioName: studios.name
-		})
-		.from(series)
-		.leftJoin(studios, eq(series.studioId, studios.id))
-		.where(and(eq(series.status, 'ONGOING'), isNull(series.deletedAt)))
-		.orderBy(asc(series.titleEn))
-		.limit(8);
-
-	const upcomingSchedules = await db
-		.select({
-			airDate: episodeSchedules.airDate,
-			isUncut: episodeSchedules.isUncut,
-			episodeNumber: episodes.episodeNumber,
-			episodeTitle: episodes.title,
-			seriesId: series.id,
-			seriesTitleEn: series.titleEn,
-			seriesTitleTh: series.titleTh,
-			platformName: platforms.name
-		})
-		.from(episodeSchedules)
-		.innerJoin(episodes, eq(episodeSchedules.episodeId, episodes.id))
-		.innerJoin(series, eq(episodes.seriesId, series.id))
-		.innerJoin(platforms, eq(episodeSchedules.platformId, platforms.id))
-		.where(and(
-			gte(episodeSchedules.airDate, today),
-			isNull(episodeSchedules.deletedAt),
-			isNull(episodes.deletedAt),
-			isNull(series.deletedAt)
-		))
-		.orderBy(asc(episodeSchedules.airDate))
-		.limit(5);
+	const [featuredSeries, upcomingSchedules] = await Promise.all([
+		db
+			.select({
+				id: series.id,
+				titleEn: series.titleEn,
+				titleTh: series.titleTh,
+				posterUrl: series.posterUrl,
+				status: series.status,
+				studioName: studios.name
+			})
+			.from(series)
+			.leftJoin(studios, eq(series.studioId, studios.id))
+			.where(and(eq(series.status, 'ONGOING'), isNull(series.deletedAt)))
+			.orderBy(asc(series.titleEn))
+			.limit(8),
+		db
+			.select({
+				airDate: episodeSchedules.airDate,
+				isUncut: episodeSchedules.isUncut,
+				episodeNumber: episodes.episodeNumber,
+				episodeTitle: episodes.title,
+				seriesId: series.id,
+				seriesTitleEn: series.titleEn,
+				seriesTitleTh: series.titleTh,
+				platformName: platforms.name
+			})
+			.from(episodeSchedules)
+			.innerJoin(episodes, eq(episodeSchedules.episodeId, episodes.id))
+			.innerJoin(series, eq(episodes.seriesId, series.id))
+			.innerJoin(platforms, eq(episodeSchedules.platformId, platforms.id))
+			.where(and(
+				gte(episodeSchedules.airDate, today),
+				isNull(episodeSchedules.deletedAt),
+				isNull(episodes.deletedAt),
+				isNull(series.deletedAt)
+			))
+			.orderBy(asc(episodeSchedules.airDate))
+			.limit(5)
+	]);
 
 	const dayShortNames = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 

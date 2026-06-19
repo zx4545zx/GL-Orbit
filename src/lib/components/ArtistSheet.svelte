@@ -162,6 +162,10 @@
 					<img
 						src={data.artist.profileImageUrl}
 						alt={data.artist.nickname}
+						width={80}
+						height={80}
+						loading="eager"
+						decoding="async"
 						class="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg shadow-lavender/20"
 					/>
 					<h2 class="mt-3 font-[family-name:var(--font-display)] text-xl font-bold text-plum">
@@ -185,7 +189,7 @@
 									class="flex items-center gap-3 px-4 py-3 rounded-xl glass-card hover:bg-white transition-colors touch-target"
 								>
 									{#if social.iconUrl}
-										<img src={social.iconUrl} alt={social.platform} class="w-6 h-6 rounded-full object-cover flex-shrink-0" />
+										<img src={social.iconUrl} alt={social.platform} width={24} height={24} loading="lazy" decoding="async" class="w-6 h-6 rounded-full object-cover flex-shrink-0" />
 									{:else}
 										<div class="w-6 h-6 rounded-full bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center flex-shrink-0">
 											<svg class="w-3.5 h-3.5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,8 +220,11 @@
 									<img
 										src={s.posterUrl}
 										alt={s.titleEn}
+										width={300}
+										height={450}
 										class="w-full aspect-[2/3] object-cover"
 										loading="lazy"
+										decoding="async"
 									/>
 									<div class="p-2 space-y-0.5">
 										<p class="text-xs font-semibold text-plum truncate">{s.titleEn}</p>

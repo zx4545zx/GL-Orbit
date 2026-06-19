@@ -139,7 +139,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12">
 			<div class="md:col-span-1">
 				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl shadow-lavender/10 max-w-xs sm:max-w-none mx-auto">
-					<img src={series.poster} alt={series.titleEn} class="w-full aspect-[2/3] object-cover" loading="eager" />
+					<img src={series.poster} alt={series.titleEn} width={400} height={600} class="w-full aspect-[2/3] object-cover" loading="eager" decoding="async" fetchpriority="high" />
 				</div>
 				<FavoriteButton seriesId={series.id} className="w-full justify-center mt-3" />
 			</div>
@@ -188,7 +188,7 @@
 						{#each series.platforms as platform}
 							<span class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl glass-card text-xs sm:text-sm font-medium text-plum flex items-center gap-2">
 								{#if platform.logo}
-									<img src={platform.logo} alt={platform.name} class="w-5 h-5 rounded-full object-cover border border-lavender/30" />
+									<img src={platform.logo} alt={platform.name} width={20} height={20} loading="lazy" decoding="async" class="w-5 h-5 rounded-full object-cover border border-lavender/30" />
 								{/if}
 								{platform.name}
 							</span>
@@ -212,7 +212,7 @@
 							onclick={() => selectedArtistId = artist.id}
 							onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedArtistId = artist.id; } }}
 						>
-							<img src={artist.image} alt={artist.name} class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover flex-shrink-0" />
+							<img src={artist.image} alt={artist.name} width={56} height={56} loading="lazy" decoding="async" class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover flex-shrink-0" />
 							<div class="min-w-0">
 								<div class="font-semibold text-plum text-sm sm:text-base truncate">{artist.name}</div>
 								<div class="text-xs sm:text-sm text-plum-light">{artist.role}</div>
@@ -267,7 +267,7 @@
 											<div class="flex items-center justify-between gap-3 py-2 px-3 sm:px-4 rounded-xl bg-white/50">
 												<div class="flex items-center gap-2 sm:gap-3 min-w-0">
 													{#if sch.platformLogo}
-														<img src={sch.platformLogo} alt={sch.platform} class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover flex-shrink-0 border border-lavender/30" />
+														<img src={sch.platformLogo} alt={sch.platform} width={28} height={28} loading="lazy" decoding="async" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover flex-shrink-0 border border-lavender/30" />
 													{:else}
 														<div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-lavender/20 flex items-center justify-center flex-shrink-0 border border-lavender/30">
 															<span class="text-[10px] font-bold text-lavender-dark">{sch.platform.charAt(0)}</span>

@@ -144,7 +144,7 @@
 			</div>
 		{:else}
 			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-				{#each featuredSeries as series (series.id)}
+				{#each featuredSeries as series, i (series.id)}
 					<a href="/series/{series.id}" class="group">
 						<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/20 transition-all duration-500 hover:-translate-y-2">
 							<div class="relative aspect-[3/4] overflow-hidden">
@@ -152,7 +152,11 @@
 									src={series.poster}
 									alt={series.title}
 									class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-									loading="lazy"
+									width={400}
+									height={533}
+									loading={i === 0 ? 'eager' : 'lazy'}
+									decoding="async"
+									fetchpriority={i === 0 ? 'high' : 'auto'}
 								/>
 								<div class="absolute inset-0 bg-gradient-to-t from-plum/80 via-plum/20 to-transparent"></div>
 								<div class="absolute top-3 sm:top-4 left-3 sm:left-4">
@@ -175,7 +179,7 @@
 </section>
 
 <!-- Upcoming Schedule -->
-<section class="py-12 sm:py-20 -mx-4 px-4 relative">
+<section class="pt-12 sm:pt-20 pb-4 sm:pb-6 -mx-4 px-4 relative">
 	<div class="absolute inset-0 bg-gradient-to-b from-lavender/5 to-coral/5 pointer-events-none"></div>
 	
 	<div class="relative max-w-6xl mx-auto">

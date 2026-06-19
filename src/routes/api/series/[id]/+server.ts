@@ -14,25 +14,27 @@ export const GET: RequestHandler = async ({ params }) => {
 
 	const db = await getDb();
 
-	const [seriesResult] = await db
-		.select({
-			id: series.id,
-			titleEn: series.titleEn,
-			titleTh: series.titleTh,
-			posterUrl: series.posterUrl,
-			status: series.status,
-			studioId: series.studioId,
-			studioName: studios.name
-		})
-		.from(series)
-		.leftJoin(studios, eq(series.studioId, studios.id))
-		.where(and(eq(series.id, params.id), isNull(series.deletedAt)));
+	// q1 (series), q2 (artists), q3 (episodes) are independent.
+	// q4 (schedule) depends on q3 only — nest it so it starts the moment q3
+	// finishes, without waiting for q1/q2. Cuts 4 sequential round-trips to 2.
+	const seriesPromise = (async () => {
+		const [r] = await db
+			.select({
+				id: series.id,
+				titleEn: series.titleEn,
+				titleTh: series.titleTh,
+				posterUrl: series.posterUrl,
+				status: series.status,
+				studioId: series.studioId,
+				studioName: studios.name
+			})
+			.from(series)
+			.leftJoin(studios, eq(series.studioId, studios.id))
+			.where(and(eq(series.id, params.id), isNull(series.deletedAt)));
+		return r;
+	})();
 
-	if (!seriesResult) {
-		error(404, 'ไม่พบซีรีส์นี้');
-	}
-
-	const artistsResult = await db
+	const artistsPromise = db
 		.select({
 			id: artists.id,
 			nickname: artists.nickname,
@@ -44,18 +46,61 @@ export const GET: RequestHandler = async ({ params }) => {
 		.innerJoin(artists, eq(seriesArtists.artistId, artists.id))
 		.where(eq(seriesArtists.seriesId, params.id));
 
-	const episodesResult = await db
-		.select({
-			id: episodes.id,
-			episodeNumber: episodes.episodeNumber,
-			title: episodes.title,
-			coverUrl: episodes.coverUrl
-		})
-		.from(episodes)
-		.where(and(eq(episodes.seriesId, params.id), isNull(episodes.deletedAt)))
-		.orderBy(asc(episodes.episodeNumber));
+	const episodesWithSchedulePromise = (async () => {
+		const episodesResult = await db
+			.select({
+				id: episodes.id,
+				episodeNumber: episodes.episodeNumber,
+				title: episodes.title,
+				coverUrl: episodes.coverUrl
+			})
+			.from(episodes)
+			.where(and(eq(episodes.seriesId, params.id), isNull(episodes.deletedAt)))
+			.orderBy(asc(episodes.episodeNumber));
 
-	const episodeIds = episodesResult.map((ep) => ep.id);
+		const episodeIds = episodesResult.map((ep) => ep.id);
+
+		type ScheduleRow = {
+			episodeId: string;
+			airDate: Date | null;
+			platformId: string | null;
+			platformName: string | null;
+			platformLogo: string | null;
+			streamLink: string | null;
+		};
+
+		const scheduleResult: ScheduleRow[] = episodeIds.length > 0
+			? await db
+				.select({
+					episodeId: episodeSchedules.episodeId,
+					airDate: episodeSchedules.airDate,
+					platformId: platforms.id,
+					platformName: platforms.name,
+					platformLogo: platforms.logoUrl,
+					streamLink: episodeSchedules.streamLink
+				})
+				.from(episodeSchedules)
+				.leftJoin(platforms, eq(episodeSchedules.platformId, platforms.id))
+				.where(and(
+					inArray(episodeSchedules.episodeId, episodeIds),
+					isNull(episodeSchedules.deletedAt)
+				))
+			: [];
+
+		return { episodes: episodesResult, schedule: scheduleResult };
+	})();
+
+	const [seriesResult, artistsResult, episodesWithSchedule] = await Promise.all([
+		seriesPromise,
+		artistsPromise,
+		episodesWithSchedulePromise
+	]);
+
+	if (!seriesResult) {
+		error(404, 'ไม่พบซีรีส์นี้');
+	}
+
+	const episodesResult = episodesWithSchedule.episodes;
 
 	type ScheduleRow = {
 		episodeId: string;
@@ -65,26 +110,7 @@ export const GET: RequestHandler = async ({ params }) => {
 		platformLogo: string | null;
 		streamLink: string | null;
 	};
-
-	let scheduleResult: ScheduleRow[] = [];
-
-	if (episodeIds.length > 0) {
-		scheduleResult = await db
-			.select({
-				episodeId: episodeSchedules.episodeId,
-				airDate: episodeSchedules.airDate,
-				platformId: platforms.id,
-				platformName: platforms.name,
-				platformLogo: platforms.logoUrl,
-				streamLink: episodeSchedules.streamLink
-			})
-			.from(episodeSchedules)
-			.leftJoin(platforms, eq(episodeSchedules.platformId, platforms.id))
-			.where(and(
-				inArray(episodeSchedules.episodeId, episodeIds),
-				isNull(episodeSchedules.deletedAt)
-			));
-	}
+	const scheduleResult: ScheduleRow[] = episodesWithSchedule.schedule;
 
 	// --- FIXED: group-by instead of first-wins ---
 	const scheduleMap = new Map<string, ScheduleRow[]>();
