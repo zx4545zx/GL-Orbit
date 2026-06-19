@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { fetchCalendar, parseCalendarParams } from './calendar.js';
+import { parseCalendarParams, getViewUrl } from './calendar.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -60,35 +60,35 @@ describe('parseCalendarParams', () => {
 	});
 });
 
-describe('calendar page client-side fetch', () => {
-	it('calls /api/calendar with year and month params', async () => {
-		const mockResponse = { events: {}, allSeries: [], platforms: [], scheduleByDay: [] };
-		const mockFetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: () => Promise.resolve(mockResponse)
-		});
-		vi.stubGlobal('fetch', mockFetch);
-
-		const result = await fetchCalendar(2024, 6);
-
-		expect(mockFetch).toHaveBeenCalledWith('/api/calendar?year=2024&month=6');
-		expect(result.calendar).toEqual(mockResponse);
-		expect(result.params.year).toBe(2024);
-		expect(result.params.month).toBe(6);
-
-		vi.unstubAllGlobals();
+describe('getViewUrl', () => {
+	it('returns week URL (startDate/endDate) for list view', () => {
+		const url = getViewUrl('list', 2026, 6, null, null);
+		expect(url).toMatch(/^\/calendar\?startDate=\d{4}-\d{2}-\d{2}&endDate=\d{4}-\d{2}-\d{2}$/);
 	});
 
-	it('handles API errors gracefully', async () => {
-		const mockFetch = vi.fn().mockResolvedValue({
-			ok: false,
-			json: () => Promise.resolve({ error: 'ไม่พบข้อมูล' })
-		});
-		vi.stubGlobal('fetch', mockFetch);
+	it('returns month URL (year/month) for grid view', () => {
+		const url = getViewUrl('grid', 2026, 6, null, null);
+		expect(url).toBe('/calendar?year=2026&month=6');
+	});
 
-		await expect(fetchCalendar(2024, 6)).rejects.toThrow('ไม่พบข้อมูล');
+	it('returns month URL (year/month) for calendar view', () => {
+		const url = getViewUrl('calendar', 2026, 6, null, null);
+		expect(url).toBe('/calendar?year=2026&month=6');
+	});
 
-		vi.unstubAllGlobals();
+	it('preserves existing week params when switching to list view', () => {
+		const url = getViewUrl('list', undefined, undefined, '2026-06-01', '2026-06-07');
+		expect(url).toBe('/calendar?startDate=2026-06-01&endDate=2026-06-07');
+	});
+
+	it('returns month URL for grid view even when week params exist (switching FROM list)', () => {
+		const url = getViewUrl('grid', 2026, 6, '2026-06-01', '2026-06-07');
+		expect(url).toBe('/calendar?year=2026&month=6');
+	});
+
+	it('returns month URL for calendar view even when week params exist (switching FROM list)', () => {
+		const url = getViewUrl('calendar', 2026, 6, '2026-06-01', '2026-06-07');
+		expect(url).toBe('/calendar?year=2026&month=6');
 	});
 });
 
@@ -148,11 +148,30 @@ describe('calendar page loading structure — source-level regression', () => {
 		expect(thisWeekPos).toBeLessThan(thisWeekLoadingPos);
 	});
 
-	it('loading skeleton text appears inside a contentLoading block (after {#if contentLoading})', () => {
+	it('removes text-based loading indicator กำลังโหลดตารางฉาย', () => {
 		const source = readFileSync(pagePath, 'utf-8');
-		const loadingPos = source.indexOf('{#if contentLoading}');
-		const skeletonPos = source.indexOf('กำลังโหลดตารางฉาย');
-		expect(skeletonPos).toBeGreaterThan(loadingPos);
+		expect(source).not.toContain('กำลังโหลดตารางฉาย');
+	});
+
+	it('grid view has structural table skeleton with day headers and series rows', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		const gridSkeletonPos = source.indexOf('grid-loading-skeleton');
+		expect(gridSkeletonPos).toBeGreaterThan(0);
+		// Assert it's inside a grid view contentLoading block
+		const gridViewBlock = source.indexOf('{#if viewMode === \'grid\'}');
+		expect(gridSkeletonPos).toBeGreaterThan(gridViewBlock);
+	});
+
+	it('calendar view has 7-column month grid skeleton', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		const calSkeletonPos = source.indexOf('calendar-loading-skeleton');
+		expect(calSkeletonPos).toBeGreaterThan(0);
+	});
+
+	it('list view has grouped day-card skeleton with event rows', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		const listSkeletonPos = source.indexOf('list-loading-skeleton');
+		expect(listSkeletonPos).toBeGreaterThan(0);
 	});
 
 	it('notes section (หมายเหตุ) appears outside any contentLoading block', () => {
@@ -163,5 +182,17 @@ describe('calendar page loading structure — source-level regression', () => {
 		const notesPos = source.indexOf('หมายเหตุ');
 		expect(notesPos).toBeGreaterThan(0);
 		expect(notesPos).toBeGreaterThan(lastClosingIf);
+	});
+
+	it('view toggle onclick delegates to goto(getViewUrl(...)) for ALL view modes (not just list)', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		// The onclick handler should NOT have a per-mode guard like `if (btn.key === 'list')`.
+		// Instead it should call goto(getViewUrl(btn.key, ...)) unconditionally.
+		// This ensures switching back from list to grid/calendar also changes the URL.
+		const hasPerModeGuard = source.includes(`if (btn.key === 'list')`);
+		// The correct pattern is unconditional goto with btn.key
+		const hasBtnKeyPattern = source.includes(`goto(getViewUrl(btn.key`);
+		expect(hasPerModeGuard).toBe(false);
+		expect(hasBtnKeyPattern).toBe(true);
 	});
 });

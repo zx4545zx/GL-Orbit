@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, safeJsonLd } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
-	import type { FeaturedSeriesItem, UpcomingScheduleItem } from './home.js';
+	import type { FeaturedSeriesItem, UpcomingScheduleItem } from '$lib/types/home.js';
 
 	let { data }: { data: PageData } = $props();
 
