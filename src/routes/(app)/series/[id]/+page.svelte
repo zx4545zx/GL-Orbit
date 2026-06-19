@@ -1,26 +1,13 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { page } from '$app/state';
 	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
 	import ArtistSheet from '$lib/components/ArtistSheet.svelte';
-	import { fetchSeriesDetail } from './detail.js';
+	import type { PageData } from './$types.js';
 
-	let series = $state<any>(null);
-	let loading = $state(true);
+	let { data }: { data: PageData } = $props();
+
+	const series = $derived(data.series);
+	const loading = false;
 	let selectedArtistId = $state<string | null>(null);
-
-	onMount(async () => {
-		loading = true;
-		try {
-			const id = page.params.id;
-			if (!id) throw new Error('Missing series ID');
-			series = await fetchSeriesDetail(id);
-		} catch {
-			series = null;
-		} finally {
-			loading = false;
-		}
-	});
 
 	const statusConfig: Record<string, { text: string; class: string; bg: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'text-mint-dark', bg: 'bg-mint/20' },
@@ -32,18 +19,19 @@
 
 	// --- Collapsible schedule state ---
 	let expandedEpisodes = $state(new Set<number>());
-	let initialized = $state(false);
+	let initializedSeriesId = $state<string | null>(null);
 
 	$effect(() => {
-		if (series && !initialized) {
+		if (series && initializedSeriesId !== series.id) {
+			const nextExpanded = new Set<number>();
 			for (const item of series.schedule) {
 				const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA');
 				if (hasSchedules) {
-					expandedEpisodes.add(item.episode);
+					nextExpanded.add(item.episode);
 				}
 			}
-			expandedEpisodes = new Set(expandedEpisodes);
-			initialized = true;
+			expandedEpisodes = nextExpanded;
+			initializedSeriesId = series.id;
 		}
 	});
 

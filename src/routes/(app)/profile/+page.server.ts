@@ -1,0 +1,42 @@
+import { redirect } from '@sveltejs/kit';
+import { and, desc, eq, isNull } from 'drizzle-orm';
+import { toProfileUser } from '$lib/server/auth/public-user.js';
+import { getDb } from '$lib/server/db/index.js';
+import * as schema from '$lib/server/db/schema.js';
+import type { PageServerLoad } from './$types.js';
+
+const FALLBACK_POSTER = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=600&fit=crop';
+
+export const load: PageServerLoad = async ({ locals }) => {
+	if (!locals.user) {
+		throw redirect(303, '/login');
+	}
+
+	const db = await getDb();
+	const favoriteSeries = await db
+		.select({
+			id: schema.series.id,
+			titleEn: schema.series.titleEn,
+			titleTh: schema.series.titleTh,
+			posterUrl: schema.series.posterUrl,
+			status: schema.series.status,
+			studioName: schema.studios.name
+		})
+		.from(schema.favorites)
+		.innerJoin(schema.series, eq(schema.favorites.seriesId, schema.series.id))
+		.leftJoin(schema.studios, eq(schema.series.studioId, schema.studios.id))
+		.where(and(eq(schema.favorites.userId, locals.user.id), isNull(schema.series.deletedAt)))
+		.orderBy(desc(schema.favorites.createdAt));
+
+	return {
+		profileUser: toProfileUser(locals.user),
+		favoriteSeries: favoriteSeries.map((s) => ({
+			id: s.id,
+			title: s.titleEn,
+			subtitle: s.titleTh ?? '',
+			poster: s.posterUrl ?? FALLBACK_POSTER,
+			status: s.status,
+			studio: s.studioName ?? 'ไม่ระบุสตูดิโอ'
+		}))
+	};
+};

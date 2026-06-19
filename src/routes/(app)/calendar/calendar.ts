@@ -33,7 +33,13 @@ export function parseCalendarParams(searchParams: URLSearchParams): CalendarPara
 	return { year, month, startDate, endDate, key };
 }
 
-export async function fetchCalendar(year?: number, month?: number, startDate?: string | null, endDate?: string | null): Promise<{ calendar: CalendarApiResponse; params: { year: number; month: number; startDate: string | null; endDate: string | null } }> {
+export async function fetchCalendar(
+	year?: number,
+	month?: number,
+	startDate?: string | null,
+	endDate?: string | null,
+	fetcher: typeof fetch = fetch
+): Promise<{ calendar: CalendarApiResponse; params: { year: number; month: number; startDate: string | null; endDate: string | null } }> {
 	let apiUrl: string;
 	let displayYear: number;
 	let displayMonth: number;
@@ -57,7 +63,7 @@ export async function fetchCalendar(year?: number, month?: number, startDate?: s
 		apiUrl = `/api/calendar?year=${displayYear}&month=${displayMonth}`;
 	}
 
-	const res = await fetch(apiUrl);
+	const res = await fetcher(apiUrl);
 
 	if (!res.ok) {
 		const body = await res.json().catch(() => ({ error: 'เกิดข้อผิดพลาด' }));

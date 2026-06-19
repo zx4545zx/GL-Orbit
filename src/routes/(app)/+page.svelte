@@ -1,24 +1,13 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { fetchHome, type FeaturedSeriesItem, type UpcomingScheduleItem } from './home.js';
+	import type { PageData } from './$types.js';
+	import type { FeaturedSeriesItem, UpcomingScheduleItem } from './home.js';
 
-	let featuredSeries = $state<FeaturedSeriesItem[]>([]);
-	let upcomingSchedule = $state<UpcomingScheduleItem[]>([]);
-	let loadingFeatured = $state(true);
-	let loadingSchedule = $state(true);
+	let { data }: { data: PageData } = $props();
 
-	onMount(async () => {
-		try {
-			const data = await fetchHome();
-			featuredSeries = data.featuredSeries;
-			loadingFeatured = false;
-			upcomingSchedule = data.upcomingSchedule;
-			loadingSchedule = false;
-		} catch {
-			loadingFeatured = false;
-			loadingSchedule = false;
-		}
-	});
+	const featuredSeries = $derived<FeaturedSeriesItem[]>(data.featuredSeries);
+	const upcomingSchedule = $derived<UpcomingScheduleItem[]>(data.upcomingSchedule);
+	const loadingFeatured = false;
+	const loadingSchedule = false;
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },

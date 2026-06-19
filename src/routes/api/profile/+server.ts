@@ -2,21 +2,10 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { getDb } from '$lib/server/db/index.js';
 import * as schema from '$lib/server/db/schema.js';
+import { toProfileUser } from '$lib/server/auth/public-user.js';
 import { eq, and, isNull, desc } from 'drizzle-orm';
 
 const FALLBACK_POSTER = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=600&fit=crop';
-
-function serializeUser(user: NonNullable<App.Locals['user']>) {
-	return {
-		id: user.id,
-		email: user.email,
-		username: user.username,
-		displayName: user.displayName,
-		avatarUrl: user.avatarUrl,
-		role: user.role,
-		createdAt: user.createdAt.toISOString()
-	};
-}
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user) return json({ error: 'กรุณาเข้าสู่ระบบ' }, { status: 401 });
@@ -30,7 +19,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		.orderBy(desc(schema.favorites.createdAt));
 
 	return json({
-		user: serializeUser(locals.user),
+		user: toProfileUser(locals.user),
 		favoriteSeries: favoriteSeries.map((s) => ({ id: s.id, title: s.titleEn, subtitle: s.titleTh ?? '', poster: s.posterUrl ?? FALLBACK_POSTER, status: s.status, studio: s.studioName ?? 'ไม่ระบุสตูดิโอ' }))
 	});
 };
@@ -50,5 +39,5 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 		.returning();
 
 	if (!updated) return json({ error: 'ไม่พบผู้ใช้' }, { status: 404 });
-	return json({ success: true, message: 'อัปเดตโปรไฟล์สำเร็จ', user: serializeUser(updated) });
+	return json({ success: true, message: 'อัปเดตโปรไฟล์สำเร็จ', user: toProfileUser(updated) });
 };

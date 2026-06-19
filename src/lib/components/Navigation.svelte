@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { user } from '$lib/stores/user.js';
 	import NotificationDropdown from './NotificationDropdown.svelte';
 
 	const navLinks = [
@@ -9,7 +8,7 @@
 		{ href: '/series', label: 'ซีรีส์ทั้งหมด' }
 	];
 
-	const currentUser = $derived($user);
+	const currentUser = $derived(page.data.user);
 
 	let unreadCount = $state(0);
 
@@ -47,7 +46,7 @@
 	<div class="glass-card-strong mx-2 sm:mx-4 mt-2 sm:mt-4 rounded-2xl px-4 sm:px-6 py-3 sm:py-4">
 		<div class="flex items-center justify-between">
 			<!-- Logo -->
-			<a href="/" data-sveltekit-preload-data="tap" class="flex items-center gap-2 group touch-target">
+			<a href="/" class="flex items-center gap-2 group touch-target">
 				<div class="relative w-8 h-8 sm:w-10 sm:h-10">
 					<div class="absolute inset-0 bg-gradient-to-br from-coral to-lavender rounded-xl rotate-3 group-hover:rotate-6 transition-transform duration-300"></div>
 					<div class="absolute inset-0 bg-white rounded-xl flex items-center justify-center">
@@ -64,7 +63,6 @@
 				{#each navLinks as link}
 					<a
 						href={link.href}
-						data-sveltekit-preload-data="tap"
 						class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 touch-target flex items-center {page.url.pathname === link.href ? 'bg-coral/10 text-coral-dark' : 'text-plum-light hover:bg-lavender/20 hover:text-plum'}"
 					>
 						{link.label}
@@ -78,7 +76,6 @@
 					{#if currentUser.role === 'ADMIN'}
 						<a
 							href="/admin/series"
-							data-sveltekit-preload-data="tap"
 							class="px-4 py-2 rounded-xl text-sm font-medium text-plum-light hover:bg-lavender/20 hover:text-plum transition-all touch-target flex items-center"
 						>
 							จัดการ

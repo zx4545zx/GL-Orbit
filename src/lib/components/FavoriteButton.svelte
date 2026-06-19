@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { user } from '$lib/stores/user.js';
+	import { page } from '$app/state';
 
 	let { seriesId, className = '' }: { seriesId: string; className?: string } = $props();
 
@@ -12,7 +12,7 @@
 	$effect(() => {
 		if (!seriesId) return;
 
-		if (!$user) {
+		if (!page.data.user) {
 			checking = false;
 			return;
 		}
@@ -31,7 +31,7 @@
 	});
 
 	async function handleToggle() {
-		if (!$user) {
+		if (!page.data.user) {
 			window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
 			return;
 		}

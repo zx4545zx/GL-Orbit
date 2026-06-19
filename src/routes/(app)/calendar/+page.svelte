@@ -1,59 +1,20 @@
 <script lang="ts">
-	import { page } from '$app/state';
+	import { navigating, page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import type { PageData } from './$types.js';
 	import type { CalendarEvent, CalendarApiResponse } from '$lib/types/calendar.js';
-	import { fetchCalendar, parseCalendarParams } from './calendar.js';
+
+	let { data }: { data: PageData } = $props();
 
 	let viewMode = $state<'grid' | 'calendar' | 'list'>('grid');
 	let selectedDate = $state<string | null>(null);
 
-	let calendar = $state<CalendarApiResponse>({ events: {}, allSeries: [], platforms: [], scheduleByDay: [] });
-	const now = new Date();
-	let params_y = $state(now.getFullYear());
-	let params_m = $state(now.getMonth() + 1);
-	let params_sd = $state<string | null>(null);
-	let params_ed = $state<string | null>(null);
-	let contentLoading = $state(true);
-
-	// Abort previous in-flight request so the latest query always wins
-	let abortController: AbortController | null = null;
-
-	$effect(() => {
-		const search = page.url.search;
-
-		if (abortController) {
-			abortController.abort();
-		}
-		abortController = new AbortController();
-		const signal = abortController.signal;
-
-		const params = parseCalendarParams(new URLSearchParams(search));
-
-		contentLoading = true;
-
-		fetchCalendar(params.year, params.month, params.startDate, params.endDate)
-			.then((result) => {
-				if (signal.aborted) return;
-				calendar = result.calendar;
-				params_y = result.params.year;
-				params_m = result.params.month;
-				params_sd = result.params.startDate;
-				params_ed = result.params.endDate;
-			})
-			.catch(() => {
-				if (signal.aborted) return;
-				calendar = { events: {}, allSeries: [], platforms: [], scheduleByDay: [] };
-				const now = new Date();
-				params_y = now.getFullYear();
-				params_m = now.getMonth() + 1;
-				params_sd = null;
-				params_ed = null;
-			})
-			.finally(() => {
-				if (signal.aborted) return;
-				contentLoading = false;
-			});
-	});
+	const calendar = $derived<CalendarApiResponse>(data.calendar);
+	const params_y = $derived(data.params.year);
+	const params_m = $derived(data.params.month);
+	const params_sd = $derived<string | null>(data.params.startDate);
+	const params_ed = $derived<string | null>(data.params.endDate);
+	const contentLoading = $derived(Boolean(navigating.to && navigating.to.url.pathname === page.url.pathname));
 
 	// Current month derived from load params
 	const currentMonth = $derived(new Date(params_y, params_m - 1, 1));

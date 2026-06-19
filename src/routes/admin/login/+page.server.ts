@@ -42,6 +42,6 @@ export const actions: Actions = {
 			expires: expiresAt
 		});
 
-		redirect(302, '/admin/series');
+		throw redirect(303, '/admin/series');
 	}
 };

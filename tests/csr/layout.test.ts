@@ -7,11 +7,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const layoutPath = resolve(__dirname, '../../src/routes/+layout.svelte');
 
-describe('Root layout CSR configuration', () => {
-	it('exports ssr = false to disable server-side rendering', async () => {
-		// Import the actual layout module
-		const mod = await import('../../src/routes/+layout.js');
-		expect(mod.ssr).toBe(false);
+describe('Root layout SSR configuration', () => {
+	it('does not opt out of SvelteKit SSR', () => {
+		const source = readFileSync(layoutPath, 'utf-8');
+		expect(source).not.toContain('ssr = false');
 	});
 });
 

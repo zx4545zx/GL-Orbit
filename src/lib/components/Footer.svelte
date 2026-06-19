@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { user } from '$lib/stores/user.js';
-	const currentUser = $derived($user);
+	import { page } from '$app/state';
+
+	const currentUser = $derived(page.data.user);
 </script>
 
 <footer class="mt-12 sm:mt-20 relative overflow-hidden">

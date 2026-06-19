@@ -25,8 +25,8 @@ export interface HomeApiResponse {
 	upcomingSchedule: UpcomingScheduleItem[];
 }
 
-export async function fetchHome(): Promise<HomeApiResponse> {
-	const res = await fetch('/api/home');
+export async function fetchHome(fetcher: typeof fetch = fetch): Promise<HomeApiResponse> {
+	const res = await fetcher('/api/home');
 	const data = await res.json();
 	return {
 		featuredSeries: data.featuredSeries ?? [],

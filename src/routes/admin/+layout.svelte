@@ -1,18 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
 	import { slide } from 'svelte/transition';
-	import { user } from '$lib/stores/user.js';
 
 	let { children } = $props();
 	let mobileOpen = $state(false);
-
-	// Client-side admin auth guard
-	$effect(() => {
-		if ($user === undefined) return; // Still loading
-		if ($user === null) { goto('/login'); return; }
-		if ($user.role !== 'ADMIN') { goto('/profile'); return; }
-	});
 
 	const navItems = [
 		{ href: '/admin/series', label: 'ซีรีส์', icon: 'M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z' },
