@@ -95,6 +95,10 @@
   }
 }
 
+:root {
+  overflow-x: hidden;
+}
+
 body {
   font-family: var(--font-body);
   color: var(--color-plum);
