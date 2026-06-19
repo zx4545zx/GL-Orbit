@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { navigating, page } from '$app/state';
-	import { user } from '$lib/stores/user.js';
 	import NotificationBadge from './NotificationBadge.svelte';
 
-	const currentUser = $derived($user);
+	const currentUser = $derived(page.data.user);
 	let unreadCount = $state(0);
 
 	$effect(() => {

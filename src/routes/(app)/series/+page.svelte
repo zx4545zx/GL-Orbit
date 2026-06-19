@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { fetchSeries, parseSeriesParams, type FilterKey, type SeriesApiResponseItem } from './series.js';
+	import type { PageData } from './$types.js';
+	import type { FilterKey, SeriesApiResponseItem } from './series.js';
+
+	let { data }: { data: PageData } = $props();
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
@@ -16,65 +19,34 @@
 		{ key: 'ENDED', label: 'จบแล้ว' }
 	];
 
-	let allSeries = $state<SeriesApiResponseItem[]>([]);
-	let total = $state(0);
-	let currentPage = $state(1);
+	let extraSeries = $state<SeriesApiResponseItem[]>([]);
+	let loadedPage = $state<number | null>(null);
 	let filterStatus = $state<FilterKey>('ALL');
 	let searchQuery = $state('');
-	let loading = $state(true);
+	let loading = $state(false);
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
 	let loadMoreController: AbortController | null = null;
 
-	// Abort previous in-flight request so the latest query always wins
-	let abortController: AbortController | null = null;
+	const allSeries = $derived([...data.series.items, ...extraSeries]);
+	const total = $derived(data.series.total);
+	const currentPage = $derived(loadedPage ?? data.series.page);
+	const hasMore = $derived(allSeries.length < total);
 
 	$effect(() => {
-		const search = page.url.search;
-
-		// Abort previous full-list fetch
-		if (abortController) {
-			abortController.abort();
-		}
-		abortController = new AbortController();
-		const signal = abortController.signal;
-
-		// Also abort any in-flight Load More to prevent racing
 		if (loadMoreController) {
 			loadMoreController.abort();
 			loadMoreController = null;
 			loadMoreLoading = false;
 		}
 
-		const params = parseSeriesParams(new URLSearchParams(search));
-
-		// Sync local state from URL
-		searchQuery = params.search;
-		filterStatus = params.status;
-		currentPage = params.page;
-
-		loading = true;
-
-		fetchSeries(params.search, params.status, params.page)
-			.then((result) => {
-				if (signal.aborted) return;
-				allSeries = result.series.items;
-				total = result.series.total;
-				currentPage = result.series.page;
-			})
-			.catch(() => {
-				if (signal.aborted) return;
-				allSeries = [];
-				total = 0;
-				currentPage = 1;
-			})
-			.finally(() => {
-				if (signal.aborted) return;
-				loading = false;
-			});
+		extraSeries = [];
+		loadedPage = null;
+		searchQuery = data.filters.search;
+		filterStatus = data.filters.status;
+		loadMoreError = '';
+		loading = false;
 	});
-
-	const hasMore = $derived(allSeries.length < total);
 
 	function buildUrl(search: string, status: string): string {
 		const params = new URLSearchParams();
@@ -159,9 +131,8 @@
 			if (page.url.searchParams.toString() !== currentFilterQuery) return;
 
 			if (result && Array.isArray(result.items)) {
-				allSeries = [...allSeries, ...result.items];
-				currentPage = result.page;
-				total = result.total;
+				extraSeries = [...extraSeries, ...result.items];
+				loadedPage = result.page;
 			}
 		} catch (err) {
 			if (err instanceof Error && err.name === 'AbortError') return;
@@ -176,8 +147,13 @@
 </script>
 
 <svelte:head>
-	<title>ซีรีส์ทั้งหมด | GL-Orbit</title>
-	<meta name="description" content="รวบรวมซีรีส์ GL จากทุกสตูดิโอ" />
+	<title>{data.seo.title}</title>
+	<meta name="description" content={data.seo.description} />
+	<meta name="robots" content={data.seo.robots} />
+	<link rel="canonical" href={`${page.url.origin}${data.seo.canonicalPath}`} />
+	<meta property="og:title" content={data.seo.ogTitle} />
+	<meta property="og:description" content={data.seo.ogDescription} />
+	<script type="application/ld+json">{data.seo.jsonLd}</script>
 </svelte:head>
 
 {#snippet searchFilter()}

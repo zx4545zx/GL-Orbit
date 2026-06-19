@@ -14,12 +14,12 @@ describe('profile logout loading state', () => {
 		expect(source).toContain('animate-spin');
 	});
 
-	it('uses client POST logout flow and clears the shared user store', () => {
+	it('uses client POST logout flow and invalidates SvelteKit data', () => {
 		const logoutSource = source.slice(source.indexOf('async function handleLogout'));
 		const normalized = logoutSource.replace(/\s+/g, ' ');
 
 		expect(normalized).toContain("await fetch('/logout', { method: 'POST' });");
-		expect(normalized).toContain('user.set(null)');
-		expect(normalized).toContain("await goto('/');");
+		expect(normalized).toContain("await goto('/', { invalidateAll: true });");
+		expect(normalized).not.toContain('user.set(null)');
 	});
 });

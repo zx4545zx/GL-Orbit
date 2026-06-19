@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types.js';
 import { getUserByEmail, getUserByUsername, createUser } from '$lib/server/auth/user.js';
 import { hashPassword } from '$lib/server/auth/password.js';
 import { createSession } from '$lib/server/auth/session.js';
+import { toPublicUser } from '$lib/server/auth/public-user.js';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	let body: { username?: unknown; email?: unknown; displayName?: unknown; password?: unknown; confirmPassword?: unknown };
@@ -39,6 +40,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 	return json({
 		success: true,
-		user: { id: user.id, username: user.username, email: user.email, displayName: user.displayName, avatarUrl: user.avatarUrl, role: user.role }
+		user: toPublicUser(user)
 	});
 };

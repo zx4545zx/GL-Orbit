@@ -1,5 +1,6 @@
 import type { InferSelectModel } from 'drizzle-orm';
-import type { users, sessions } from './lib/server/db/schema.js';
+import type { sessions, users } from './lib/server/db/schema.js';
+import type { PublicUser } from './lib/types.js';
 
 declare global {
 	namespace App {
@@ -8,7 +9,9 @@ declare global {
 			user: InferSelectModel<typeof users> | null;
 			session: InferSelectModel<typeof sessions> | null;
 		}
-		// interface PageData {}
+		interface PageData {
+			user: PublicUser | null;
+		}
 		// interface PageState {}
 		// interface Platform {}
 	}

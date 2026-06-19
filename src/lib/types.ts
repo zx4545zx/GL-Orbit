@@ -1,3 +1,12 @@
+export interface PublicUser {
+	id: string;
+	email: string;
+	username: string;
+	displayName: string | null;
+	avatarUrl: string | null;
+	role: 'ADMIN' | 'USER';
+}
+
 export interface NotificationItem {
 	id: string;
 	seriesId: string;
@@ -32,14 +41,7 @@ export interface ApiErrorResponse {
 
 export interface AuthSuccessResponse {
 	success: true;
-	user: {
-		id: string;
-		username: string;
-		email: string;
-		displayName: string | null;
-		avatarUrl: string | null;
-		role: 'ADMIN' | 'USER';
-	};
+	user: PublicUser;
 }
 
 export interface FavoriteSeriesItem {
@@ -51,13 +53,7 @@ export interface FavoriteSeriesItem {
 	studio: string;
 }
 
-export interface ProfileUser {
-	id: string;
-	email: string;
-	username: string;
-	displayName: string | null;
-	avatarUrl: string | null;
-	role: 'ADMIN' | 'USER';
+export interface ProfileUser extends PublicUser {
 	createdAt: string;
 }
 

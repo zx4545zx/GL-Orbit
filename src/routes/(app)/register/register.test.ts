@@ -8,14 +8,11 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const source = readFileSync(resolve(__dirname, '+page.svelte'), 'utf-8');
 
 describe('register success state sync', () => {
-	it('writes returned user into the shared store before navigating', () => {
+	it('invalidates SvelteKit data before navigating to profile', () => {
 		const submitSource = source.slice(source.indexOf('async function handleSubmit'));
-		const setIdx = submitSource.indexOf('user.set(data.user)');
-		const gotoIdx = submitSource.indexOf("await goto('/profile')");
 
-		expect(setIdx).toBeGreaterThanOrEqual(0);
-		expect(gotoIdx).toBeGreaterThanOrEqual(0);
-		expect(setIdx).toBeLessThan(gotoIdx);
+		expect(submitSource).toContain("await goto('/profile', { invalidateAll: true });");
+		expect(submitSource).not.toContain('user.set(data.user)');
 	});
 
 	it('keeps field error handling and the existing loading label', () => {

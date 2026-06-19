@@ -1,5 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { getDb } from '../db/index.js';
 import * as schema from '../db/schema.js';
 
@@ -47,29 +47,22 @@ export async function validateSession(token: string) {
 
 		const db = await getDb();
 
-		// Verify session exists in DB and is not expired
-		const [session] = await db
-			.select()
+		const [result] = await db
+			.select({ user: schema.users, session: schema.sessions })
 			.from(schema.sessions)
-			.where(eq(schema.sessions.tokenHash, tokenHash))
+			.innerJoin(schema.users, eq(schema.sessions.userId, schema.users.id))
+			.where(and(eq(schema.sessions.tokenHash, tokenHash), eq(schema.sessions.userId, userId)))
 			.limit(1);
 
-		if (!session) return null;
-		if (new Date() > session.expiresAt) {
+		if (!result) return null;
+		if (new Date() > result.session.expiresAt) {
 			await destroySession(token);
 			return null;
 		}
 
-		// Get user
-		const [user] = await db
-			.select()
-			.from(schema.users)
-			.where(eq(schema.users.id, userId))
-			.limit(1);
+		if (!result.user.isActive) return null;
 
-		if (!user || !user.isActive) return null;
-
-		return { user, session };
+		return result;
 	} catch {
 		return null;
 	}

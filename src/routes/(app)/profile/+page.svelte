@@ -1,13 +1,16 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { user } from '$lib/stores/user.js';
+	import { goto, invalidateAll } from '$app/navigation';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
+	import type { PageData } from './$types.js';
 	import type { ProfileResponse, ProfileUpdateResponse, ApiErrorResponse } from '$lib/types.js';
 
-	let loadingProfilePage = $state(true);
+	let { data }: { data: PageData } = $props();
+
+	let loadingProfilePage = $state(false);
 	let pageError = $state('');
-	let profileUser = $state<ProfileResponse['user'] | null>(null);
-	let favoriteSeries = $state<ProfileResponse['favoriteSeries']>([]);
+	let updatedProfileUser = $state<ProfileResponse['user'] | null>(null);
+	const profileUser = $derived(updatedProfileUser ?? data.profileUser);
+	const favoriteSeries = $derived<ProfileResponse['favoriteSeries']>(data.favoriteSeries);
 
 	let editMode = $state(false);
 	let passwordMode = $state(false);
@@ -24,33 +27,11 @@
 	let confirmNewPassword = $state('');
 
 	$effect(() => {
-		if (!loadingProfilePage && !profileUser) return;
-		if (profileUser) {
-			displayName = profileUser.displayName ?? '';
-			avatarUrl = profileUser.avatarUrl ?? '';
-		}
-	});
-
-	$effect(() => {
-		async function loadProfile() {
-			loadingProfilePage = true;
-			pageError = '';
-			try {
-				const res = await fetch('/api/profile');
-				if (res.status === 401) { goto('/login'); return; }
-				if (!res.ok) { pageError = 'ไม่สามารถโหลดโปรไฟล์ได้'; return; }
-				const data: ProfileResponse = await res.json();
-				profileUser = data.user;
-				favoriteSeries = data.favoriteSeries;
-				displayName = data.user.displayName ?? '';
-				avatarUrl = data.user.avatarUrl ?? '';
-			} catch {
-				pageError = 'ไม่สามารถโหลดโปรไฟล์ได้';
-			} finally {
-				loadingProfilePage = false;
-			}
-		}
-		loadProfile();
+		updatedProfileUser = null;
+		displayName = data.profileUser.displayName ?? '';
+		avatarUrl = data.profileUser.avatarUrl ?? '';
+		loadingProfilePage = false;
+		pageError = '';
 	});
 
 	let isLoggingOut = $state(false);
@@ -61,8 +42,7 @@
 		isLoggingOut = true;
 		try {
 			await fetch('/logout', { method: 'POST' });
-			user.set(null);
-			await goto('/');
+			await goto('/', { invalidateAll: true });
 		} finally {
 			isLoggingOut = false;
 		}
@@ -87,9 +67,10 @@
 				return;
 			}
 			const data: ProfileUpdateResponse = await res.json();
-			profileUser = data.user;
+			updatedProfileUser = data.user;
 			successMessage = data.message;
 			editMode = false;
+			await invalidateAll();
 		} catch {
 			errorMessage = 'ไม่สามารถอัปเดตโปรไฟล์ได้';
 		} finally {
