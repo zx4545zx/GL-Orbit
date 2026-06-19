@@ -259,7 +259,7 @@
 								<td class="px-4 sm:px-6 py-3 sm:py-4">
 									<div class="flex items-center gap-3">
 										{#if seriesItem.poster}
-											<img src={seriesItem.poster} alt={seriesItem.title} class="w-10 h-14 rounded-lg object-cover bg-gray-100 flex-shrink-0" />
+											<img src={seriesItem.poster} alt={seriesItem.title} width={40} height={56} loading="lazy" decoding="async" class="w-10 h-14 rounded-lg object-cover bg-gray-100 flex-shrink-0" />
 										{:else}
 											<div class="w-10 h-14 rounded-lg bg-lavender/10 flex items-center justify-center flex-shrink-0">
 												<svg class="w-5 h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
@@ -321,7 +321,7 @@
 				<div class="glass-card rounded-2xl p-4 transition-all overflow-hidden">
 					<div class="flex items-start gap-3">
 						{#if seriesItem.poster}
-							<img src={seriesItem.poster} alt={seriesItem.title} class="w-14 h-20 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
+							<img src={seriesItem.poster} alt={seriesItem.title} width={56} height={80} loading="lazy" decoding="async" class="w-14 h-20 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
 						{:else}
 							<div class="w-14 h-20 rounded-xl bg-lavender/10 flex items-center justify-center flex-shrink-0">
 								<svg class="w-6 h-6 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>

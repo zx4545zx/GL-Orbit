@@ -139,7 +139,7 @@
 			<div class="text-center mb-8">
 				<div class="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4">
 					{#if profileUser.avatarUrl}
-						<img src={profileUser.avatarUrl} alt="" class="w-full h-full rounded-3xl object-cover shadow-lg shadow-lavender/20" />
+						<img src={profileUser.avatarUrl} alt="" width={96} height={96} loading="eager" decoding="async" class="w-full h-full rounded-3xl object-cover shadow-lg shadow-lavender/20" />
 					{:else}
 						<div class="w-full h-full rounded-3xl bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center shadow-lg shadow-lavender/20">
 							<span class="text-2xl sm:text-3xl font-bold text-coral-dark">
@@ -208,8 +208,11 @@
 										<img
 											src={s.poster}
 											alt={s.title}
+											width={400}
+											height={533}
 											class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
 											loading="lazy"
+											decoding="async"
 										/>
 										<div class="absolute inset-0 bg-gradient-to-t from-plum/80 via-plum/20 to-transparent"></div>
 										<div class="absolute top-2 sm:top-3 left-2 sm:left-3">

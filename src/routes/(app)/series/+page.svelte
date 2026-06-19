@@ -246,8 +246,11 @@
 							<img
 								src={s.poster}
 								alt={s.title}
+								width={400}
+								height={533}
 								class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
 								loading="lazy"
+								decoding="async"
 							/>
 							<div class="absolute inset-0 bg-gradient-to-t from-plum/80 via-plum/20 to-transparent"></div>
 							<div class="absolute top-3 sm:top-4 left-3 sm:left-4">
