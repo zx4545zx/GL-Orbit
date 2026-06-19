@@ -44,6 +44,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>สมัครสมาชิก | GL-Orbit</title>
+	<meta name="robots" content="noindex, nofollow" />
+</svelte:head>
+
 <div class="min-h-[calc(100dvh-6rem)] flex items-center justify-center px-4">
 	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
 	<div class="absolute top-10 sm:top-20 left-4 sm:left-10 w-48 h-48 sm:w-72 sm:h-72 bg-coral/15 rounded-full blur-3xl"></div>

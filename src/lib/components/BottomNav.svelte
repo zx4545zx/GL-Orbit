@@ -156,17 +156,16 @@
 
 <nav
 	class="fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300 {navHidden ? 'translate-y-full' : 'translate-y-0'}"
-	style="padding-bottom: env(safe-area-inset-bottom, 0px);"
 >
-	<div class="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-		<div class="flex items-center justify-around px-2">
+	<div class="bottom-nav-surface bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+		<div class="flex items-start justify-around px-1.5 pt-1">
 			{#each navItems as item}
 				{@const active = isActive(item.href)}
 				<a
 					href={item.href}
 					data-sveltekit-preload-data="hover"
 					aria-current={active ? 'page' : undefined}
-					class="group flex flex-col items-center justify-center gap-1 py-2 px-3 min-w-[64px] touch-target transition-all duration-300"
+					class="group flex flex-1 min-w-0 flex-col items-center justify-start gap-0.5 px-1 py-2 touch-target transition-all duration-300"
 				>
 					<div class="relative flex items-center justify-center">
 						{#if active}
@@ -182,7 +181,7 @@
 						</div>
 					</div>
 					<span
-						class="text-[10px] font-medium leading-none transition-all duration-300 {active ? 'text-coral-dark font-semibold' : 'text-plum-light/70'}"
+						class="max-w-full truncate text-[10px] font-medium leading-tight transition-all duration-300 {active ? 'text-coral-dark font-semibold' : 'text-plum-light/70'}"
 					>
 						{item.label}
 					</span>

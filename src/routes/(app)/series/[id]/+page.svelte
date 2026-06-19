@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
 	import ArtistSheet from '$lib/components/ArtistSheet.svelte';
+	import { absoluteUrl, buildBreadcrumbJsonLd, safeJsonLd, truncateSeo } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
@@ -16,6 +18,31 @@
 	};
 
 	const s = $derived(series ? statusConfig[series.status] : null);
+	const seoTitle = $derived(`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''} | GL-Orbit`);
+	const seoDescription = $derived(truncateSeo(
+		series.description || `${series.titleEn} ซีรีส์ GL จาก ${series.studio} พร้อมข้อมูลนักแสดง จำนวนตอน ตารางฉาย และแพลตฟอร์มรับชม`
+	));
+	const canonicalUrl = $derived(absoluteUrl(page.url.origin, `/series/${series.id}`));
+	const seriesJsonLd = $derived(safeJsonLd([
+		{
+			'@context': 'https://schema.org',
+			'@type': 'TVSeries',
+			name: series.titleEn,
+			alternateName: series.titleTh || undefined,
+			image: series.poster,
+			description: seoDescription,
+			url: canonicalUrl,
+			productionCompany: { '@type': 'Organization', name: series.studio },
+			numberOfEpisodes: series.episodes,
+			datePublished: series.year ? String(series.year) : undefined,
+			actor: series.artists.map((artist) => ({ '@type': 'Person', name: artist.name }))
+		},
+		buildBreadcrumbJsonLd(page.url.origin, [
+			{ name: 'หน้าแรก', path: '/' },
+			{ name: 'ซีรีส์ทั้งหมด', path: '/series' },
+			{ name: series.titleEn, path: `/series/${series.id}` }
+		])
+	]));
 
 	// --- Collapsible schedule state ---
 	let expandedEpisodes = $state(new Set<number>());
@@ -58,6 +85,22 @@
 		return first.airDate;
 	}
 </script>
+
+<svelte:head>
+	<title>{seoTitle}</title>
+	<meta name="description" content={seoDescription} />
+	<meta name="robots" content="index, follow" />
+	<link rel="canonical" href={canonicalUrl} />
+	<meta property="og:type" content="video.tv_show" />
+	<meta property="og:title" content={seoTitle} />
+	<meta property="og:description" content={seoDescription} />
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:image" content={series.poster} />
+	<meta name="twitter:title" content={seoTitle} />
+	<meta name="twitter:description" content={seoDescription} />
+	<meta name="twitter:image" content={series.poster} />
+	<script type="application/ld+json">{seriesJsonLd}</script>
+</svelte:head>
 
 {#if loading || !series}
 	<div class="py-6 sm:py-8 max-w-6xl mx-auto">

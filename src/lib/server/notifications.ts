@@ -1,6 +1,7 @@
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { getDb } from './db/index.js';
-import { favorites, notifications } from './db/schema.js';
-import { eq } from 'drizzle-orm';
+import { favorites, notifications, series } from './db/schema.js';
+import type { NotificationItem, NotificationsListResponse } from '$lib/types.js';
 
 export type NotificationType = 'new_episode' | 'status_change';
 
@@ -12,6 +13,70 @@ export interface NotificationRecord {
 	message: string;
 	isRead: boolean;
 	createdAt: Date;
+}
+
+export function parseNotificationPagination(searchParams: URLSearchParams): { limit: number; offset: number } {
+	const rawLimit = parseInt(searchParams.get('limit') ?? '20', 10);
+	const limit = Number.isNaN(rawLimit) ? 20 : Math.min(50, Math.max(1, rawLimit));
+	const rawOffset = parseInt(searchParams.get('offset') ?? '0', 10);
+	const offset = Number.isNaN(rawOffset) ? 0 : Math.max(0, rawOffset);
+	return { limit, offset };
+}
+
+export async function getUserNotifications(
+	userId: string,
+	limit = 20,
+	offset = 0
+): Promise<NotificationsListResponse> {
+	const db = await getDb();
+
+	const listRowsPromise = db
+		.select({
+			id: notifications.id,
+			seriesId: notifications.seriesId,
+			type: notifications.type,
+			message: notifications.message,
+			isRead: notifications.isRead,
+			createdAt: notifications.createdAt,
+			seriesTitle: series.titleEn
+		})
+		.from(notifications)
+		.innerJoin(series, eq(notifications.seriesId, series.id))
+		.where(eq(notifications.userId, userId))
+		.orderBy(desc(notifications.createdAt))
+		.limit(limit)
+		.offset(offset);
+
+	const unreadCountPromise = db
+		.select({ count: sql<number>`count(*)::int` })
+		.from(notifications)
+		.where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
+
+	const totalCountPromise = db
+		.select({ count: sql<number>`count(*)::int` })
+		.from(notifications)
+		.where(eq(notifications.userId, userId));
+
+	const [rawRows, [{ count: unreadCount }], [{ count: totalCount }]] = await Promise.all([
+		listRowsPromise,
+		unreadCountPromise,
+		totalCountPromise
+	]);
+
+	const notificationItems: NotificationItem[] = rawRows.map((row) => ({
+		...row,
+		type: row.type as NotificationType,
+		createdAt: row.createdAt.toISOString()
+	}));
+
+	return {
+		notifications: notificationItems,
+		unreadCount,
+		totalCount,
+		hasMore: offset + rawRows.length < totalCount,
+		limit,
+		offset
+	};
 }
 
 /**

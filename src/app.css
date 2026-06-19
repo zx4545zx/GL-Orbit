@@ -80,6 +80,21 @@
   50% { box-shadow: 0 0 40px rgba(255, 107, 157, 0.6); }
 }
 
+:root {
+  /* Android standalone PWAs often report safe-area-inset-bottom as 0 even when
+     gesture/navigation bars visually overlap fixed UI. Keep a small fallback
+     so the mobile bottom nav never sits under the system bar. */
+  --app-safe-bottom-fallback: 1.75rem;
+  --app-safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--app-safe-bottom-fallback));
+  --bottom-nav-reserved-space: calc(5.5rem + var(--app-safe-bottom));
+}
+
+@media (display-mode: standalone) {
+  :root {
+    --app-safe-bottom-fallback: 2rem;
+  }
+}
+
 body {
   font-family: var(--font-body);
   color: var(--color-plum);
@@ -112,6 +127,20 @@ body {
 .touch-target {
   min-width: 44px;
   min-height: 44px;
+}
+
+.mobile-bottom-safe-space {
+  padding-bottom: var(--bottom-nav-reserved-space);
+}
+
+.bottom-nav-surface {
+  padding-bottom: var(--app-safe-bottom);
+}
+
+@media (min-width: 768px) {
+  .mobile-bottom-safe-space {
+    padding-bottom: 0;
+  }
 }
 
 /* Container queries support */

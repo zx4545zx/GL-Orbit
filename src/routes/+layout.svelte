@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
-	import { navigating } from '$app/state';
+	import { navigating, page } from '$app/state';
+	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, SITE_LOCALE, SITE_NAME, absoluteUrl } from '$lib/seo.js';
 
 	let { children } = $props();
 
@@ -25,6 +26,18 @@
 		};
 	});
 </script>
+
+<svelte:head>
+	<meta name="application-name" content={SITE_NAME} />
+	<meta name="apple-mobile-web-app-title" content={SITE_NAME} />
+	<meta property="og:site_name" content={SITE_NAME} />
+	<meta property="og:locale" content={SITE_LOCALE} />
+	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={DEFAULT_SEO_TITLE} />
+	<meta name="twitter:description" content={DEFAULT_SEO_DESCRIPTION} />
+	<meta name="twitter:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+</svelte:head>
 
 {#if routeChanging}
 	<div class="fixed top-0 left-0 right-0 z-[60]">
