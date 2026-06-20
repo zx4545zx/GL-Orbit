@@ -55,3 +55,12 @@ coverage/
 .worktrees/
 
 # Misc
+/* editor/IDE config
+.codex/
+.gemini/
+.zed/
+opencode.json
+config/
+.mcp.json
+.neon
+.mcp

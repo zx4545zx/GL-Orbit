@@ -26,15 +26,16 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 export const PATCH: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) return json({ error: 'กรุณาเข้าสู่ระบบ' }, { status: 401 });
-	let body: { displayName?: unknown; avatarUrl?: unknown };
+	let body: { displayName?: unknown; avatarUrl?: unknown; coverUrl?: unknown };
 	try { body = await request.json(); } catch { return json({ error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 }); }
 	const displayName = typeof body.displayName === 'string' && body.displayName.trim() ? body.displayName.trim() : null;
 	const avatarUrl = typeof body.avatarUrl === 'string' && body.avatarUrl.trim() ? body.avatarUrl.trim() : null;
+	const coverUrl = typeof body.coverUrl === 'string' && body.coverUrl.trim() ? body.coverUrl.trim() : null;
 
 	const db = await getDb();
 	const [updated] = await db
 		.update(schema.users)
-		.set({ displayName, avatarUrl, updatedAt: new Date() })
+		.set({ displayName, avatarUrl, coverUrl, updatedAt: new Date() })
 		.where(eq(schema.users.id, locals.user.id))
 		.returning();
 

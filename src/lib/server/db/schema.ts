@@ -9,6 +9,7 @@ export const users = pgTable('users', {
 	email: varchar('email', { length: 255 }).notNull().unique(),
 	displayName: varchar('display_name', { length: 255 }),
 	avatarUrl: text('avatar_url'),
+	coverUrl: text('cover_url'),
 	passwordHash: varchar('password_hash', { length: 255 }).notNull(),
 	role: userRoleEnum('role').notNull().default('USER'),
 	isActive: boolean('is_active').notNull().default(true),
@@ -79,6 +80,14 @@ export const seriesArtists = pgTable('series_artists', {
 }));
 
 export const favorites = pgTable('favorites', {
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({
+	pk: { columns: [table.userId, table.seriesId] }
+}));
+
+export const watched = pgTable('watched', {
 	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
 	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
+	import WatchedButton from '$lib/components/WatchedButton.svelte';
 	import ArtistSheet from '$lib/components/ArtistSheet.svelte';
 	import { absoluteUrl, buildBreadcrumbJsonLd, safeJsonLd, truncateSeo } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
@@ -141,7 +142,10 @@
 				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl shadow-lavender/10 max-w-xs sm:max-w-none mx-auto">
 					<img src={series.poster} alt={series.titleEn} width={400} height={600} class="w-full aspect-[2/3] object-cover" loading="eager" decoding="async" fetchpriority="high" />
 				</div>
-				<FavoriteButton seriesId={series.id} className="w-full justify-center mt-3" />
+				<div class="flex gap-2 mt-3">
+					<FavoriteButton seriesId={series.id} className="flex-1 justify-center" />
+					<WatchedButton seriesId={series.id} className="flex-1 justify-center" />
+				</div>
 			</div>
 
 			<div class="md:col-span-2 space-y-4 sm:space-y-6">

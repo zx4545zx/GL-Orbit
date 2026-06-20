@@ -36,6 +36,20 @@
       "when": 1780385678804,
       "tag": "0004_wealthy_callisto",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781972059760,
+      "tag": "0005_flowery_shape",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781973711094,
+      "tag": "0006_nervous_nuke",
+      "breakpoints": true
     }
   ]
 }
