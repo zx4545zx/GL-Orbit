@@ -11,6 +11,7 @@ export function toPublicUser(user: DbUser): PublicUser {
 		username: user.username,
 		displayName: user.displayName,
 		avatarUrl: user.avatarUrl,
+		coverUrl: user.coverUrl,
 		role: user.role
 	};
 }

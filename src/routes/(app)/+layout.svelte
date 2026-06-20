@@ -1,14 +1,62 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import Navigation from '$lib/components/Navigation.svelte';
 	import BottomNav from '$lib/components/BottomNav.svelte';
+	import BackToTopButton from '$lib/components/BackToTopButton.svelte';
 
 	let { children } = $props();
+
+	// Show the floating back-to-top button only on series pages
+	const showBackToTop = $derived(page.url.pathname.startsWith('/series'));
+
+	// Shared scroll state — drives both the auto-hide nav bars and the floating button position.
+	let bottomNavHidden = $state(false);
+	let navHidden = $state(false);
+
+	$effect(() => {
+		let lastScrollY = window.scrollY;
+		let ticking = false;
+
+		function onScroll() {
+			if (ticking) return;
+			ticking = true;
+			requestAnimationFrame(() => {
+				const currentY = window.scrollY;
+				const delta = currentY - lastScrollY;
+				const atTop = currentY <= 0;
+
+				if (atTop) {
+					navHidden = false;
+					bottomNavHidden = false;
+				} else if (delta > 10) {
+					navHidden = true;
+					bottomNavHidden = true;
+				} else if (delta < -2) {
+					navHidden = false;
+					bottomNavHidden = false;
+				}
+
+				if (!atTop && Math.abs(delta) > 2) {
+					lastScrollY = currentY;
+				} else if (atTop) {
+					lastScrollY = 0;
+				}
+				ticking = false;
+			});
+		}
+
+		window.addEventListener('scroll', onScroll, { passive: true });
+		return () => window.removeEventListener('scroll', onScroll);
+	});
 </script>
 
 <div class="min-h-dvh flex flex-col">
-	<Navigation />
+	<Navigation {navHidden} />
 	<div class="flex-1 pt-0 md:pt-24 mobile-bottom-safe-space px-4">
 		{@render children()}
 	</div>
-	<BottomNav />
+	<BottomNav {bottomNavHidden} />
+	{#if showBackToTop}
+		<BackToTopButton {bottomNavHidden} />
+	{/if}
 </div>

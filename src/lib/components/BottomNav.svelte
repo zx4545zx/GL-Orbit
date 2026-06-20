@@ -2,6 +2,8 @@
 	import { navigating, page } from '$app/state';
 	import NotificationBadge from './NotificationBadge.svelte';
 
+	let { bottomNavHidden = false }: { bottomNavHidden?: boolean } = $props();
+
 	const currentUser = $derived(page.data.user);
 	let unreadCount = $state(0);
 
@@ -108,41 +110,6 @@
 		items.push(authItem);
 		return items;
 	});
-	let navHidden = $state(false);
-
-	$effect(() => {
-		let lastScrollY = window.scrollY;
-		let ticking = false;
-
-		function onScroll() {
-			if (ticking) return;
-			ticking = true;
-
-			requestAnimationFrame(() => {
-				const currentY = window.scrollY;
-				const delta = currentY - lastScrollY;
-				const atTop = currentY <= 0;
-
-				if (atTop) {
-					navHidden = false;
-				} else if (delta > 10) {
-					navHidden = true;
-				} else if (delta < -2) {
-					navHidden = false;
-				}
-
-				if (!atTop && Math.abs(delta) > 2) {
-					lastScrollY = currentY;
-				} else if (atTop) {
-					lastScrollY = 0;
-				}
-				ticking = false;
-			});
-		}
-
-		window.addEventListener('scroll', onScroll, { passive: true });
-		return () => window.removeEventListener('scroll', onScroll);
-	});
 
 	const activePathname = $derived(navigating.to?.url.pathname ?? page.url.pathname);
 
@@ -155,7 +122,7 @@
 </script>
 
 <nav
-	class="fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300 {navHidden ? 'translate-y-full' : 'translate-y-0'}"
+	class="fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300 {bottomNavHidden ? 'translate-y-full' : 'translate-y-0'}"
 	style="padding-bottom: env(safe-area-inset-bottom, 0px);"
 >
 	<div class="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">

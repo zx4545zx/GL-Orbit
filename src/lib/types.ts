@@ -4,6 +4,7 @@ export interface PublicUser {
 	username: string;
 	displayName: string | null;
 	avatarUrl: string | null;
+	coverUrl: string | null;
 	role: 'ADMIN' | 'USER';
 }
 
@@ -53,6 +54,15 @@ export interface FavoriteSeriesItem {
 	studio: string;
 }
 
+export interface WatchedSeriesItem {
+	id: string;
+	title: string;
+	subtitle: string;
+	poster: string;
+	status: 'UPCOMING' | 'ONGOING' | 'ENDED';
+	studio: string;
+}
+
 export interface ProfileUser extends PublicUser {
 	createdAt: string;
 }
@@ -60,6 +70,7 @@ export interface ProfileUser extends PublicUser {
 export interface ProfileResponse {
 	user: ProfileUser;
 	favoriteSeries: FavoriteSeriesItem[];
+	watchedSeries: WatchedSeriesItem[];
 }
 
 export interface ProfileUpdateResponse {
