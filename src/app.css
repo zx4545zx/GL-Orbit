@@ -88,6 +88,24 @@
   overflow-x: hidden;
 }
 
+/* iOS standalone PWA only: fill the transparent status-bar safe area.
+   Android keeps using manifest/theme-color, so this does not change its app bar. */
+@supports (-webkit-touch-callout: none) {
+  @media (display-mode: standalone) {
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: env(safe-area-inset-top, 0px);
+      background: #FF6B9D;
+      pointer-events: none;
+      z-index: 2147483647;
+    }
+  }
+}
+
 body {
   font-family: var(--font-body);
   color: var(--color-plum);
