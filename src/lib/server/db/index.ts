@@ -3,7 +3,9 @@ import { drizzle } from 'drizzle-orm/neon-http';
 import type { NeonQueryFunction } from '@neondatabase/serverless';
 import * as schema from './schema.js';
 
-let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
+export type Db = ReturnType<typeof drizzle<typeof schema>>;
+
+let _db: Db | null = null;
 let _sql: NeonQueryFunction<false, false> | null = null;
 
 async function getSql(): Promise<NeonQueryFunction<false, false>> {
@@ -18,7 +20,7 @@ async function getSql(): Promise<NeonQueryFunction<false, false>> {
 	return _sql;
 }
 
-export async function getDb(): Promise<ReturnType<typeof drizzle<typeof schema>>> {
+export async function getDb(): Promise<Db> {
 	if (!_db) {
 		const sql = await getSql();
 		_db = drizzle(sql, { schema });
@@ -26,7 +28,7 @@ export async function getDb(): Promise<ReturnType<typeof drizzle<typeof schema>>
 	return _db;
 }
 
-export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
+export const db = new Proxy({} as Db, {
 	async get(_, prop: string | symbol) {
 		if (!_db) {
 			const sql = await getSql();

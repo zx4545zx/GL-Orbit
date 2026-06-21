@@ -1,10 +1,11 @@
+import { adminFetch } from './action-feedback.js';
 import type { ApiResponse, PaginatedResponse } from './types.js';
 
 const BASE = '/api/admin';
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<ApiResponse<T>> {
 	try {
-		const res = await fetch(url, {
+		const res = await adminFetch(url, {
 			...options,
 			credentials: 'include',
 			headers: {
@@ -16,7 +17,13 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<ApiResp
 		if (!res.ok) {
 			return { success: false, error: json.error || `HTTP ${res.status}` };
 		}
-		return json;
+		// Some admin endpoints already return { success, data }, while paginated GET
+		// endpoints return raw { data, page, limit, total, totalPages }. Normalize
+		// successful responses so callers can always rely on ApiResponse<T>.
+		if (json && typeof json === 'object' && 'success' in json) {
+			return json;
+		}
+		return { success: true, data: json as T };
 	} catch {
 		return { success: false, error: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' };
 	}

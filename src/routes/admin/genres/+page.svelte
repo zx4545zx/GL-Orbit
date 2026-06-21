@@ -160,8 +160,9 @@
 </div>
 
 {#if deleteTarget}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-		<div class="bg-white w-full max-w-sm rounded-xl p-6 space-y-4 shadow-xl">
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-plum/35 backdrop-blur-sm p-4">
+		<div class="relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/70 bg-white/90 p-6 space-y-4 shadow-2xl shadow-plum/15 backdrop-blur-xl">
+			<div class="pointer-events-none absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-white via-cream/70 to-lavender/10"></div>
 			<h3 class="text-lg font-semibold text-plum">ยืนยันการลบ</h3>
 			<p class="text-sm text-gray-600">ต้องการลบประเภทนี้ใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้</p>
 			<div class="flex gap-3 justify-end">
