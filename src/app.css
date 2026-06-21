@@ -88,20 +88,36 @@
   overflow-x: hidden;
 }
 
-/* iOS standalone PWA only: fill the transparent status-bar safe area.
-   Android keeps using manifest/theme-color, so this does not change its app bar. */
+/* iOS standalone PWA: paint a coral status bar and push content below it.
+   Android keeps using manifest/theme-color, so this does not change its app bar.
+   --pwa-safe-top defaults to 0 so every non-iOS context stays unaffected; fixed
+   top chrome (nav/admin header) uses `top: var(--pwa-safe-top)` to clear it too. */
+:root {
+  --pwa-safe-top: 0px;
+}
+
 @supports (-webkit-touch-callout: none) {
   @media (display-mode: standalone) {
+    :root {
+      --pwa-safe-top: env(safe-area-inset-top, 0px);
+    }
+
+    /* Offset in-flow content so titles/headers are not hidden behind the status bar. */
+    body {
+      padding-top: var(--pwa-safe-top);
+    }
+
+    /* Coral fill occupying the status-bar safe area; sits behind all app chrome. */
     body::before {
       content: '';
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: env(safe-area-inset-top, 0px);
+      height: var(--pwa-safe-top);
       background: #FF6B9D;
       pointer-events: none;
-      z-index: 2147483647;
+      z-index: 0;
     }
   }
 }

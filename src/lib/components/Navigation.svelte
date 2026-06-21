@@ -44,7 +44,7 @@
 	});
 </script>
 
-<nav class="fixed top-0 left-0 right-0 z-50 hidden md:block transition-transform duration-300 ease-out {navHidden ? '-translate-y-full' : 'translate-y-0'}">
+<nav class="fixed top-[var(--pwa-safe-top)] left-0 right-0 z-50 hidden md:block transition-transform duration-300 ease-out {navHidden ? '-translate-y-full' : 'translate-y-0'}">
 	<div class="glass-card-strong mx-2 sm:mx-4 mt-2 sm:mt-4 rounded-2xl px-4 sm:px-6 py-3 sm:py-4">
 		<div class="flex items-center justify-between">
 			<!-- Logo -->

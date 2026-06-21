@@ -83,7 +83,7 @@
 	</aside>
 
 	<!-- Mobile Header -->
-	<header class="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200">
+	<header class="lg:hidden fixed top-[var(--pwa-safe-top)] left-0 right-0 z-40 bg-white border-b border-gray-200">
 		<div class="flex items-center justify-between h-14 px-4">
 			<button onclick={() => mobileOpen = !mobileOpen} class="p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors touch-target" aria-label="เปิดเมนู">
 				<svg class="w-6 h-6 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
