@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
 	import WatchedButton from '$lib/components/WatchedButton.svelte';
+	import ShareButton from '$lib/components/ShareButton.svelte';
 	import { absoluteUrl, buildBreadcrumbJsonLd, jsonLdScript, safeJsonLd, truncateSeo } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 
@@ -143,6 +144,12 @@
 				<div class="flex gap-2 mt-3">
 					<FavoriteButton seriesId={series.id} className="flex-1 justify-center" />
 					<WatchedButton seriesId={series.id} className="flex-1 justify-center" />
+					<ShareButton
+						title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`}
+						text={`ดู «${series.titleEn}» บน GL-Orbit — ข้อมูลนักแสดง ตารางฉาย แพลตฟอร์มรับชม`}
+						url={canonicalUrl}
+						className="justify-center"
+					/>
 				</div>
 			</div>
 
