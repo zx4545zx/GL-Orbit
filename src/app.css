@@ -122,6 +122,24 @@ body {
   min-height: 44px;
 }
 
+/* Prevent iOS Safari auto-zoom on input focus.
+   iOS zooms the viewport when an input has font-size < 16px. */
+input,
+textarea,
+select,
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='url'],
+input[type='search'],
+input[type='tel'],
+input[type='number'],
+input[type='datetime-local'],
+input[type='date'],
+input[type='time'] {
+  font-size: max(16px, 1rem);
+}
+
 .mobile-bottom-safe-space {
   padding-bottom: var(--bottom-nav-reserved-space);
 }
