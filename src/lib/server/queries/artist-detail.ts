@@ -29,9 +29,9 @@ export type ArtistDetail = {
 };
 
 const FALLBACK_AVATAR =
-	'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop';
+	'/placeholders/avatar.svg';
 const FALLBACK_POSTER =
-	'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=900&fit=crop';
+	'/placeholders/poster.svg';
 
 export async function getArtistDetail(id: string): Promise<ArtistDetail | null> {
 	const cacheKey = `query:artist:${id}`;

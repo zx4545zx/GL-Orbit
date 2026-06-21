@@ -5,7 +5,7 @@ import * as schema from '$lib/server/db/schema.js';
 import { toProfileUser } from '$lib/server/auth/public-user.js';
 import { eq, and, isNull, desc } from 'drizzle-orm';
 
-const FALLBACK_POSTER = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=600&fit=crop';
+const FALLBACK_POSTER = '/placeholders/poster.svg';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user) return json({ error: 'กรุณาเข้าสู่ระบบ' }, { status: 401 });

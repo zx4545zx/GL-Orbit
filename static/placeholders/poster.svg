@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="ไม่มีโปสเตอร์">
+	<defs>
+		<radialGradient id="c1" cx="22%" cy="18%" r="65%">
+			<stop offset="0%" stop-color="#FF6B9D" stop-opacity="0.28"/>
+			<stop offset="100%" stop-color="#FF6B9D" stop-opacity="0"/>
+		</radialGradient>
+		<radialGradient id="c2" cx="82%" cy="82%" r="65%">
+			<stop offset="0%" stop-color="#C4B5FD" stop-opacity="0.32"/>
+			<stop offset="100%" stop-color="#C4B5FD" stop-opacity="0"/>
+		</radialGradient>
+		<radialGradient id="c3" cx="50%" cy="50%" r="55%">
+			<stop offset="0%" stop-color="#6EE7B7" stop-opacity="0.16"/>
+			<stop offset="100%" stop-color="#6EE7B7" stop-opacity="0"/>
+		</radialGradient>
+	</defs>
+	<rect width="400" height="600" fill="#FFF5F7"/>
+	<rect width="400" height="600" fill="url(#c1)"/>
+	<rect width="400" height="600" fill="url(#c2)"/>
+	<rect width="400" height="600" fill="url(#c3)"/>
+	<!-- framed poster motif with play triangle -->
+	<g transform="translate(200,265)">
+		<rect x="-70" y="-90" width="140" height="180" rx="16" fill="#FFF5F7" stroke="#C4B5FD" stroke-width="4" opacity="0.9"/>
+		<circle cx="0" cy="0" r="34" fill="none" stroke="#8B5CF6" stroke-width="5" opacity="0.5"/>
+		<path d="M-12,-18 L20,0 L-12,18 Z" fill="#FF6B9D" opacity="0.6"/>
+	</g>
+	<text x="200" y="415" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="30" font-weight="700" fill="#2D1B2E" opacity="0.55">GL-Orbit</text>
+	<text x="200" y="448" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="18" fill="#8B5CF6" opacity="0.65">ไม่มีโปสเตอร์</text>
+</svg>

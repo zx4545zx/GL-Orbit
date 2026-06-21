@@ -68,7 +68,7 @@ export async function getHomeData(): Promise<HomeApiResponse> {
 			id: s.id,
 			title: s.titleEn,
 			subtitle: s.titleTh ?? '',
-			poster: s.posterUrl ?? 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=600&fit=crop',
+			poster: s.posterUrl ?? '/placeholders/poster.svg',
 			status: s.status,
 			studio: s.studioName ?? 'ไม่ระบุสตูดิโอ'
 		})),

@@ -155,7 +155,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		titleTh: seriesResult.titleTh ?? '',
 		status: seriesResult.status as SeriesDetail['status'],
 		studio: seriesResult.studioName ?? 'ไม่ระบุสตูดิโอ',
-		poster: seriesResult.posterUrl ?? 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=900&fit=crop',
+		poster: seriesResult.posterUrl ?? '/placeholders/poster.svg',
 		description: '',
 		genres: [],
 		episodes: episodesResult.length,
@@ -165,7 +165,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 			id: a.id,
 			name: a.nickname,
 			role: a.roleName ?? 'นักแสดง',
-			image: a.profileImageUrl ?? 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop'
+			image: a.profileImageUrl ?? '/placeholders/avatar.svg'
 		})),
 		schedule
 	};

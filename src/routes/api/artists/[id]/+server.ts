@@ -57,7 +57,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			id: artistResult.id,
 			nickname: artistResult.nickname,
 			fullName: artistResult.fullName ?? '',
-			profileImageUrl: artistResult.profileImageUrl ?? 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop'
+			profileImageUrl: artistResult.profileImageUrl ?? '/placeholders/avatar.svg'
 		},
 		socials: socialsResult.map((s) => ({
 			platform: s.platform,
@@ -68,7 +68,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			id: s.id,
 			titleEn: s.titleEn,
 			titleTh: s.titleTh ?? '',
-			posterUrl: s.posterUrl ?? 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=900&fit=crop',
+			posterUrl: s.posterUrl ?? '/placeholders/poster.svg',
 			roleName: s.roleName ?? 'นักแสดง'
 		}))
 	};

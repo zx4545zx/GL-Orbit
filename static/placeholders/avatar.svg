@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="ไม่มีรูปโปรไฟล์">
+	<defs>
+		<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0%" stop-color="#FFB8D0"/>
+			<stop offset="55%" stop-color="#C4B5FD"/>
+			<stop offset="100%" stop-color="#A7F3D0"/>
+		</linearGradient>
+	</defs>
+	<rect width="200" height="200" fill="url(#bg)"/>
+	<!-- person bust silhouette -->
+	<g fill="#FFF5F7" opacity="0.92">
+		<circle cx="100" cy="82" r="36"/>
+		<path d="M40 178 C40 138 66 118 100 118 C134 118 160 138 160 178 Z"/>
+	</g>
+</svg>

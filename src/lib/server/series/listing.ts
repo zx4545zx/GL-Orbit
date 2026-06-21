@@ -39,7 +39,7 @@ export type SeriesSeoMeta = {
 	jsonLd: string;
 };
 
-const DEFAULT_POSTER = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=600&fit=crop';
+const DEFAULT_POSTER = '/placeholders/poster.svg';
 
 const STATUS_FROM_URL: Record<string, SeriesStatusFilter> = {
 	all: 'ALL',
