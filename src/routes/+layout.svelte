@@ -1,9 +1,29 @@
 <script lang="ts">
 	import '../app.css';
 	import { navigating, page } from '$app/state';
+	import { onMount } from 'svelte';
 	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, SITE_LOCALE, SITE_NAME, absoluteUrl } from '$lib/seo.js';
 
 	let { children } = $props();
+
+	// iOS Safari (in-browser, not PWA) ignores the viewport `user-scalable=no`
+	// directive for accessibility reasons, so pinch-zoom still works there.
+	// Block it here by cancelling any multi-finger touch gesture. This app has no
+	// map/image pinch features, so disabling multi-touch has no downside.
+	// PWA standalone mode is already covered by the viewport meta.
+	onMount(() => {
+		const blockMultiTouch = (e: TouchEvent) => {
+			if (e.touches.length > 1) {
+				e.preventDefault();
+			}
+		};
+		window.addEventListener('touchstart', blockMultiTouch, { passive: false });
+		window.addEventListener('touchmove', blockMultiTouch, { passive: false });
+		return () => {
+			window.removeEventListener('touchstart', blockMultiTouch);
+			window.removeEventListener('touchmove', blockMultiTouch);
+		};
+	});
 
 	const routeChanging = $derived(
 		Boolean(navigating.to && (!navigating.from || navigating.to.url.pathname !== navigating.from.url.pathname))
