@@ -88,6 +88,15 @@
   overflow-x: hidden;
 }
 
+/* Disable iOS double-tap-to-zoom and the 300ms click delay globally.
+   `manipulation` keeps panning enabled but drops the double-tap zoom gesture.
+   Pinch-zoom is blocked via the viewport meta (honored in PWA standalone).
+   Inputs/buttons already had font-size>=16px (input-zoom fix) so nothing else breaks. */
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
 /* iOS standalone PWA: paint a coral status bar and push content below it.
    Android keeps using manifest/theme-color, so this does not change its app bar.
    --pwa-safe-top defaults to 0 so every non-iOS context stays unaffected; fixed
