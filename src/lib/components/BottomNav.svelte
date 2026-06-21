@@ -123,9 +123,11 @@
 
 <nav
 	class="fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300 {bottomNavHidden ? 'translate-y-full' : 'translate-y-0'}"
-	style="padding-bottom: env(safe-area-inset-bottom, 0px);"
 >
-	<div class="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+	<div
+		class="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+		style="padding-bottom: env(safe-area-inset-bottom, 0px);"
+	>
 		<div class="flex items-center justify-around px-2">
 			{#each navItems as item}
 				{@const active = isActive(item.href)}
