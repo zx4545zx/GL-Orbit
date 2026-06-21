@@ -109,7 +109,7 @@
 
 			<ShareButton
 				title={`${artist.nickname}${artist.fullName ? ` (${artist.fullName})` : ''}`}
-				text={`ฝพ่วยรู้จัก «${artist.nickname}» นักแสดงซีรีส์ GL บน GL-Orbit — โซเชียลและผลงาน`}
+				text={`ฝากรู้จัก «${artist.nickname}» นักแสดงซีรีส์ GL บน GL-Orbit — โซเชียลและผลงาน`}
 				url={canonicalUrl}
 				ariaLabel="แชร์นักแสดงนี้"
 			/>
