@@ -107,7 +107,11 @@
       padding-top: var(--pwa-safe-top);
     }
 
-    /* Coral fill occupying the status-bar safe area; sits behind all app chrome. */
+    /* Coral fill occupying the status-bar safe area.
+       Must sit ABOVE scrolling page content (max z-30) so it never gets painted
+       over when content scrolls up into the strip, but BELOW nav chrome (z-40/50)
+       and overlays (z-55+) so they stay interactive/visible. Nav chrome starts at
+       top: safe-top so it does not overlap this strip anyway. */
     body::before {
       content: '';
       position: fixed;
@@ -117,7 +121,7 @@
       height: var(--pwa-safe-top);
       background: #FF6B9D;
       pointer-events: none;
-      z-index: 0;
+      z-index: 35;
     }
   }
 }
