@@ -141,7 +141,7 @@
 						/>
 					</div>
 					<!-- sparkle accent -->
-					<span class="absolute -top-1 -right-1 text-coral animate-pulse-glow text-xl">✦</span>
+					<span class="absolute -top-1 -right-1 text-coral text-xl">✦</span>
 				</div>
 
 				<h1 class="mt-3 font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum">
