@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { createAdminApi } from '$lib/admin/api.js';
-	import Pagination from '$lib/components/Pagination.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 
 	interface Studio {
@@ -19,10 +18,7 @@
 	let editingId = $state<string | null>(null);
 	let formLoading = $state(false);
 	let formError = $state('');
-	let page = $state(1);
-	let totalPages = $state(1);
 	let total = $state(0);
-	let limit = $state(20);
 
 	let formEl = $state<HTMLElement | null>(null);
 	let showConfirm = $state(false);
@@ -35,23 +31,18 @@
 		}, 50);
 	}
 
-	async function loadData(p?: number) {
+	async function loadData() {
 		loading = true;
-		const pNum = p ?? page;
-		const res = await studiosApi.list(pNum);
+		const res = await studiosApi.listAll();
 		if (res.success && res.data) {
 			items = res.data.data;
-			page = res.data.page;
-			totalPages = res.data.totalPages;
 			total = res.data.total;
-			limit = res.data.limit;
 		}
 		loading = false;
 	}
 
 	onMount(() => {
-		const params = new URL(window.location.href).searchParams;
-		loadData(parseInt(params.get('page') ?? '1'));
+		loadData();
 	});
 
 	function openCreate() {
@@ -289,8 +280,8 @@
 		{/if}
 	</div>
 
-	{#if !loading && totalPages > 1}
-		<Pagination {page} {totalPages} {total} {limit} />
+	{#if !loading && total > 0}
+		<p class="text-xs sm:text-sm text-plum-light mt-4 px-2">ทั้งหมด {total} สตูดิโอ</p>
 	{/if}
 
 	{#if !loading && items.length === 0}

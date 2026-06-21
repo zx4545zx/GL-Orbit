@@ -1,7 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db/index.js';
 import { series, seriesGenres } from '$lib/server/db/schema.js';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { createFollowerNotifications } from '$lib/server/notifications.js';
 import type { RequestHandler } from './$types.js';
 
@@ -23,8 +23,12 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 	const [prev] = await db
 		.select({ status: series.status, titleEn: series.titleEn })
 		.from(series)
-		.where(eq(series.id, id))
+		.where(and(eq(series.id, id), isNull(series.deletedAt)))
 		.limit(1);
+
+	if (!prev) {
+		error(404, 'ไม่พบซีรีส์');
+	}
 
 	const [updated] = await db.update(series)
 		.set({
@@ -34,7 +38,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 			posterUrl: posterUrl ?? null,
 			status: status ?? 'UPCOMING'
 		})
-		.where(eq(series.id, id))
+		.where(and(eq(series.id, id), isNull(series.deletedAt)))
 		.returning({
 			id: series.id,
 			titleEn: series.titleEn,
@@ -43,6 +47,10 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 			posterUrl: series.posterUrl,
 			status: series.status
 		});
+
+	if (!updated) {
+		error(404, 'ไม่พบซีรีส์');
+	}
 
 	// Update genres
 	await db.delete(seriesGenres).where(eq(seriesGenres.seriesId, id));

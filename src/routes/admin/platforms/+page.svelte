@@ -1,15 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { createAdminApi } from '$lib/admin/api.js';
-	import Pagination from '$lib/components/Pagination.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 
 	const platformsApi = createAdminApi<any>('platforms');
 
-	let result = $state<any>({ data: [], page: 1, limit: 20, total: 0, totalPages: 1 });
+	let result = $state<any>({ data: [], total: 0 });
 	let allPlatforms = $derived(result.data ?? []);
 	let loading = $state(true);
-	let page = $state(1);
 	let showForm = $state(false);
 	let editingId = $state<string | null>(null);
 	let formLoading = $state(false);
@@ -18,13 +16,12 @@
 	let showConfirm = $state(false);
 	let formEl = $state<HTMLDivElement | null>(null);
 
-	async function loadData(p?: number) {
+	async function loadData() {
 		loading = true;
 		try {
-			const res = await platformsApi.list(p ?? page);
+			const res = await platformsApi.listAll();
 			if (res.success && res.data) {
 				result = res.data;
-				page = res.data.page;
 			} else {
 				formError = res.error || 'ไม่สามารถโหลดข้อมูลได้';
 			}
@@ -36,10 +33,7 @@
 	}
 
 	onMount(() => {
-		const url = new URL(window.location.href);
-		const p = parseInt(url.searchParams.get('page') ?? '1');
-		page = p;
-		loadData(p);
+		loadData();
 	});
 
 	function scrollToForm() {
@@ -278,8 +272,8 @@
 		{/if}
 	</div>
 
-	{#if !loading && result.totalPages > 1}
-		<Pagination page={result.page} totalPages={result.totalPages} total={result.total} limit={result.limit} />
+	{#if !loading && result.total > 0}
+		<p class="text-xs sm:text-sm text-plum-light mt-4 px-2">ทั้งหมด {result.total} ช่องทาง</p>
 	{/if}
 
 	{#if !loading && allPlatforms.length === 0}
