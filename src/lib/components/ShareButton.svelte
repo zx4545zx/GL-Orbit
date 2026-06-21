@@ -12,12 +12,14 @@
 		title,
 		text,
 		url,
-		className = ''
+		className = '',
+		ariaLabel = 'แชร์'
 	}: {
 		title: string;
 		text: string;
 		url: string;
 		className?: string;
+		ariaLabel?: string;
 	} = $props();
 
 	let menuOpen = $state(false);
@@ -108,7 +110,7 @@
 <div class="relative" bind:this={rootEl}>
 	<button
 		onclick={handleShare}
-		aria-label="แชร์ซีรีส์นี้"
+		aria-label={ariaLabel}
 		aria-haspopup="menu"
 		aria-expanded={menuOpen}
 		class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 touch-target glass-card text-plum-light hover:text-coral-dark hover:bg-coral/5 {className}"

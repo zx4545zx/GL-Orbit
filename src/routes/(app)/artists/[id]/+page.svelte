@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { absoluteUrl, jsonLdScript, safeJsonLd, truncateSeo, buildBreadcrumbJsonLd } from '$lib/seo.js';
+	import ShareButton from '$lib/components/ShareButton.svelte';
 	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
@@ -96,14 +97,23 @@
 
 <div class="py-4 sm:py-6 pb-10">
 	<div class="max-w-lg mx-auto px-1 sm:px-2">
-		<!-- Back -->
-		<button
-			onclick={goBack}
-			class="inline-flex items-center gap-2 text-plum-light hover:text-coral-dark transition-colors mb-4 touch-target text-sm sm:text-base"
-		>
-			<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-			<span class="font-medium">กลับ</span>
-		</button>
+		<!-- Header: back + share -->
+		<div class="flex items-center justify-between mb-4">
+			<button
+				onclick={goBack}
+				class="inline-flex items-center gap-2 text-plum-light hover:text-coral-dark transition-colors touch-target text-sm sm:text-base"
+			>
+				<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+				<span class="font-medium">กลับ</span>
+			</button>
+
+			<ShareButton
+				title={`${artist.nickname}${artist.fullName ? ` (${artist.fullName})` : ''}`}
+				text={`ฝพ่วยรู้จัก «${artist.nickname}» นักแสดงซีรีส์ GL บน GL-Orbit — โซเชียลและผลงาน`}
+				url={canonicalUrl}
+				ariaLabel="แชร์นักแสดงนี้"
+			/>
+		</div>
 
 		<!-- ============ PROFILE CARD ============ -->
 		<div class="glass-card rounded-3xl overflow-hidden animate-slide-up">

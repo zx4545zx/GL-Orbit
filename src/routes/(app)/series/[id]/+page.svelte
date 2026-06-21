@@ -148,6 +148,7 @@
 						title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`}
 						text={`ดู «${series.titleEn}» บน GL-Orbit — ข้อมูลนักแสดง ตารางฉาย แพลตฟอร์มรับชม`}
 						url={canonicalUrl}
+						ariaLabel="แชร์ซีรีส์นี้"
 						className="justify-center"
 					/>
 				</div>
