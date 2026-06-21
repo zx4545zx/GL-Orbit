@@ -131,7 +131,7 @@
 		<div
 			role="menu"
 			aria-label="ตัวเลือกแชร์"
-			class="absolute right-0 top-full mt-2 z-50 w-60 glass-card-strong rounded-2xl p-2 shadow-xl shadow-lavender/25 animate-fade-in"
+			class="absolute right-0 top-full mt-2 z-50 w-60 bg-white border border-lavender/20 rounded-2xl p-2 shadow-xl shadow-lavender/25 animate-fade-in"
 		>
 			<p class="px-3 pt-1.5 pb-2 text-xs font-semibold text-plum-light uppercase tracking-wider">แชร์ไปยัง</p>
 
