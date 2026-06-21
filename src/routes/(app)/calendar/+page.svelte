@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { navigating, page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { DEFAULT_OG_IMAGE, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, safeJsonLd } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 	import type { CalendarEvent, CalendarApiResponse } from '$lib/types/calendar.js';
 	import { getViewUrl } from './calendar.js';
@@ -233,7 +233,7 @@
 	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
 	<meta name="twitter:title" content={seoTitle} />
 	<meta name="twitter:description" content={seoDescription} />
-	<script type="application/ld+json">{calendarJsonLd}</script>
+	{@html jsonLdScript(calendarJsonLd)}
 </svelte:head>
 
 {#snippet viewToggle()}

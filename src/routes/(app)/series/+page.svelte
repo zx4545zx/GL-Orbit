@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { DEFAULT_OG_IMAGE, absoluteUrl } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, absoluteUrl, jsonLdScript } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 	import type { FilterKey, SeriesApiResponseItem } from './series.js';
 
@@ -159,7 +159,7 @@
 	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
 	<meta name="twitter:title" content={data.seo.ogTitle} />
 	<meta name="twitter:description" content={data.seo.ogDescription} />
-	<script type="application/ld+json">{data.seo.jsonLd}</script>
+	{@html jsonLdScript(data.seo.jsonLd)}
 </svelte:head>
 
 {#snippet searchFilter()}

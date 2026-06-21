@@ -2,15 +2,13 @@
 	import { page } from '$app/state';
 	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
 	import WatchedButton from '$lib/components/WatchedButton.svelte';
-	import ArtistSheet from '$lib/components/ArtistSheet.svelte';
-	import { absoluteUrl, buildBreadcrumbJsonLd, safeJsonLd, truncateSeo } from '$lib/seo.js';
+	import { absoluteUrl, buildBreadcrumbJsonLd, jsonLdScript, safeJsonLd, truncateSeo } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
 
 	const series = $derived(data.series);
 	const loading = false;
-	let selectedArtistId = $state<string | null>(null);
 
 	const statusConfig: Record<string, { text: string; class: string; bg: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'text-mint-dark', bg: 'bg-mint/20' },
@@ -100,7 +98,7 @@
 	<meta name="twitter:title" content={seoTitle} />
 	<meta name="twitter:description" content={seoDescription} />
 	<meta name="twitter:image" content={series.poster} />
-	<script type="application/ld+json">{seriesJsonLd}</script>
+	{@html jsonLdScript(seriesJsonLd)}
 </svelte:head>
 
 {#if loading || !series}
@@ -208,20 +206,16 @@
 				<h2 class="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-bold text-plum mb-4 sm:mb-6">นักแสดง</h2>
 				<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
 					{#each series.artists as artist}
-						<!-- svelte-ignore a11y_no_static_element_interactions -->
-						<div
-							class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-coral"
-							role="button"
-							tabindex="0"
-							onclick={() => selectedArtistId = artist.id}
-							onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedArtistId = artist.id; } }}
+						<a
+							href={`/artists/${artist.id}`}
+							class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-coral"
 						>
 							<img src={artist.image} alt={artist.name} width={56} height={56} loading="lazy" decoding="async" class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover flex-shrink-0" />
 							<div class="min-w-0">
 								<div class="font-semibold text-plum text-sm sm:text-base truncate">{artist.name}</div>
 								<div class="text-xs sm:text-sm text-plum-light">{artist.role}</div>
 							</div>
-						</div>
+						</a>
 					{/each}
 				</div>
 			</section>
@@ -305,11 +299,4 @@
 			</section>
 		{/if}
 	</div>
-
-	{#if selectedArtistId}
-		<ArtistSheet
-			artistId={selectedArtistId}
-			onclose={() => selectedArtistId = null}
-		/>
-	{/if}
 {/if}

@@ -17,6 +17,20 @@ export function safeJsonLd(data: unknown): string {
 		.replace(/\u2029/g, '\\u2029');
 }
 
+/**
+ * Wrap an already-escaped JSON-LD string (output of `safeJsonLd`) in a
+ * `<script type="application/ld+json">` tag, ready for `{@html ...}`.
+ *
+ * Svelte treats `<script>` element bodies as raw text and does NOT evaluate
+ * `{...}` expressions inside them, so `<script>{json}</script>` emits the
+ * literal string `{json}`. Rendering the entire tag via `{@html}` is the
+ * correct approach. Input MUST be pre-escaped (e.g. via `safeJsonLd`) so a
+ * `</script>` sequence in the data cannot break out of the element.
+ */
+export function jsonLdScript(jsonLdString: string): string {
+	return `<script type="application/ld+json">${jsonLdString}<\/script>`;
+}
+
 export function truncateSeo(text: string, maxLength = 155): string {
 	const normalized = text.replace(/\s+/g, ' ').trim();
 	if (normalized.length <= maxLength) return normalized;

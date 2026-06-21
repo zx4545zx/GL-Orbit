@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, safeJsonLd } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 	import type { FeaturedSeriesItem, UpcomingScheduleItem } from '$lib/types/home.js';
 
@@ -48,7 +48,7 @@
 	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
 	<meta name="twitter:title" content={DEFAULT_SEO_TITLE} />
 	<meta name="twitter:description" content={DEFAULT_SEO_DESCRIPTION} />
-	<script type="application/ld+json">{homeJsonLd}</script>
+	{@html jsonLdScript(homeJsonLd)}
 </svelte:head>
 
 <!-- Hero Section -->
