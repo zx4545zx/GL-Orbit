@@ -48,7 +48,8 @@ export const platforms = pgTable('platforms', {
 export const artists = pgTable('artists', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	nickname: varchar('nickname', { length: 255 }).notNull(),
-	fullName: varchar('full_name', { length: 255 }),
+	fullNameTh: varchar('full_name_th', { length: 255 }),
+	fullNameEn: varchar('full_name_en', { length: 255 }).notNull(),
 	profileImageUrl: text('profile_image_url'),
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
 });

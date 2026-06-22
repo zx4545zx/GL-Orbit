@@ -69,7 +69,8 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		.select({
 			id: artists.id,
 			nickname: artists.nickname,
-			fullName: artists.fullName,
+			fullNameTh: artists.fullNameTh,
+			fullNameEn: artists.fullNameEn,
 			profileImageUrl: artists.profileImageUrl,
 			roleName: seriesArtists.roleName
 		})

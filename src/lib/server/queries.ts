@@ -44,7 +44,8 @@ export async function getSeriesFull(db: Db, id: string) {
 		.select({
 			id: artists.id,
 			nickname: artists.nickname,
-			fullName: artists.fullName,
+			fullNameTh: artists.fullNameTh,
+			fullNameEn: artists.fullNameEn,
 			profileImageUrl: artists.profileImageUrl,
 			roleName: seriesArtists.roleName
 		})
@@ -147,7 +148,7 @@ export async function getReferenceData(db: Db) {
 		db.select({ id: studios.id, name: studios.name }).from(studios).where(isNull(studios.deletedAt)).orderBy(asc(studios.name)),
 		db.select({ id: platforms.id, name: platforms.name, logoUrl: platforms.logoUrl, baseUrl: platforms.baseUrl }).from(platforms).where(isNull(platforms.deletedAt)).orderBy(asc(platforms.name)),
 		db
-			.select({ id: artists.id, nickname: artists.nickname, fullName: artists.fullName, profileImageUrl: artists.profileImageUrl })
+			.select({ id: artists.id, nickname: artists.nickname, fullNameTh: artists.fullNameTh, fullNameEn: artists.fullNameEn, profileImageUrl: artists.profileImageUrl })
 			.from(artists)
 			.where(isNull(artists.deletedAt))
 			.orderBy(asc(artists.nickname)),

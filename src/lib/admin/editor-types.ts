@@ -13,7 +13,8 @@ export interface PlatformRef {
 export interface ArtistRef {
 	id: string;
 	nickname: string;
-	fullName: string | null;
+	fullNameTh: string | null;
+	fullNameEn: string;
 	profileImageUrl: string | null;
 }
 export interface GenreRef {

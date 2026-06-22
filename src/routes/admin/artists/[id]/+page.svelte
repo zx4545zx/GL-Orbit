@@ -8,7 +8,8 @@
 
 	let loadedArtistId = $state(data.artist.id);
 	let nickname = $state(data.artist.nickname);
-	let fullName = $state(data.artist.fullName ?? '');
+	let fullNameTh = $state(data.artist.fullNameTh ?? '');
+	let fullNameEn = $state(data.artist.fullNameEn);
 	let profileImageUrl = $state(data.artist.profileImageUrl ?? '');
 	let savingArtist = $state(false);
 	let artistError = $state('');
@@ -45,7 +46,8 @@
 		if (data.artist.id !== loadedArtistId) {
 			loadedArtistId = data.artist.id;
 			nickname = data.artist.nickname;
-			fullName = data.artist.fullName ?? '';
+			fullNameTh = data.artist.fullNameTh ?? '';
+			fullNameEn = data.artist.fullNameEn;
 			profileImageUrl = data.artist.profileImageUrl ?? '';
 			activeTab = 'profile';
 			artistError = '';
@@ -63,7 +65,8 @@
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				nickname: nickname.trim(),
-				fullName: fullName.trim() || null,
+				fullNameTh: fullNameTh.trim() || null,
+				fullNameEn: fullNameEn.trim(),
 				profileImageUrl: profileImageUrl.trim() || null
 			})
 		});
@@ -166,7 +169,7 @@
 		</button>
 		<div class="min-w-0 flex-1">
 			<h1 class="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-bold text-plum truncate">{data.artist.nickname}</h1>
-			{#if data.artist.fullName}<p class="text-sm text-plum-light truncate">{data.artist.fullName}</p>{/if}
+			{#if data.artist.fullNameEn}<p class="text-sm text-plum-light truncate">{data.artist.fullNameEn}</p>{/if}
 		</div>
 	</div>
 
@@ -200,9 +203,15 @@
 									<label for="artist-nickname" class="block text-sm font-medium text-plum mb-1.5">ชื่อเล่น <span class="text-coral">*</span></label>
 									<input id="artist-nickname" bind:value={nickname} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
 								</div>
-								<div>
-									<label for="artist-fullname" class="block text-sm font-medium text-plum mb-1.5">ชื่อเต็ม</label>
-									<input id="artist-fullname" bind:value={fullName} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+								<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+									<div>
+										<label for="artist-fullname-en" class="block text-sm font-medium text-plum mb-1.5">ชื่อเต็ม (EN) <span class="text-coral">*</span></label>
+										<input id="artist-fullname-en" bind:value={fullNameEn} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+									</div>
+									<div>
+										<label for="artist-fullname-th" class="block text-sm font-medium text-plum mb-1.5">ชื่อเต็ม (TH)</label>
+										<input id="artist-fullname-th" bind:value={fullNameTh} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+									</div>
 								</div>
 								<div>
 									<label for="artist-profile-image" class="block text-sm font-medium text-plum mb-1.5">URL รูปโปรไฟล์</label>

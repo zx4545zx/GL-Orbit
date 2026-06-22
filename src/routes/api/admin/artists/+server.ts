@@ -19,7 +19,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		.select({
 			id: artists.id,
 			nickname: artists.nickname,
-			fullName: artists.fullName,
+			fullNameTh: artists.fullNameTh,
+			fullNameEn: artists.fullNameEn,
 			profileImageUrl: artists.profileImageUrl
 		})
 		.from(artists)
@@ -47,7 +48,12 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		error(400, 'กรุณาระบุชื่อเล่น');
 	}
 
-	const fullName = body.fullName?.trim() || null;
+	const fullNameEn = body.fullNameEn?.trim();
+	if (!fullNameEn) {
+		error(400, 'กรุณาระบุชื่อเต็ม (EN)');
+	}
+
+	const fullNameTh = body.fullNameTh?.trim() || null;
 	const profileImageUrl = body.profileImageUrl?.trim() || null;
 
 	const db = await getDb();
@@ -56,13 +62,15 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		.insert(artists)
 		.values({
 			nickname,
-			fullName,
+			fullNameTh,
+			fullNameEn,
 			profileImageUrl
 		})
 		.returning({
 			id: artists.id,
 			nickname: artists.nickname,
-			fullName: artists.fullName,
+			fullNameTh: artists.fullNameTh,
+			fullNameEn: artists.fullNameEn,
 			profileImageUrl: artists.profileImageUrl
 		});
 

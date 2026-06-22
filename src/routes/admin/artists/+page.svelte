@@ -7,7 +7,8 @@
 	interface Artist {
 		id: string;
 		nickname: string;
-		fullName: string | null;
+		fullNameTh: string | null;
+		fullNameEn: string;
 		profileImageUrl: string | null;
 	}
 
@@ -38,7 +39,8 @@
 		search.trim()
 			? artists.filter((a) =>
 					a.nickname.toLowerCase().includes(search.toLowerCase()) ||
-					(a.fullName ?? '').toLowerCase().includes(search.toLowerCase())
+					(a.fullNameEn ?? '').toLowerCase().includes(search.toLowerCase()) ||
+					(a.fullNameTh ?? '').toLowerCase().includes(search.toLowerCase())
 				)
 			: artists
 	);
@@ -48,10 +50,15 @@
 		const form = e.currentTarget as HTMLFormElement;
 		const fd = new FormData(form);
 		const nickname = fd.get('nickname')?.toString().trim() ?? '';
-		const fullName = fd.get('fullName')?.toString().trim() || null;
+		const fullNameEn = fd.get('fullNameEn')?.toString().trim() ?? '';
+		const fullNameTh = fd.get('fullNameTh')?.toString().trim() || null;
 		const profileImageUrl = fd.get('profileImageUrl')?.toString().trim() || null;
 		if (!nickname) {
 			createError = 'กรุณากรอกชื่อเล่น';
+			return;
+		}
+		if (!fullNameEn) {
+			createError = 'กรุณากรอกชื่อเต็ม (EN)';
 			return;
 		}
 		createLoading = true;
@@ -61,7 +68,7 @@
 				method: 'POST',
 				credentials: 'include',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ nickname, fullName, profileImageUrl })
+				body: JSON.stringify({ nickname, fullNameEn, fullNameTh, profileImageUrl })
 			});
 			const json = await res.json();
 			if (!res.ok) {
@@ -115,9 +122,13 @@
 						<input id="artist-create-nickname" name="nickname" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
 					</div>
 					<div>
-						<label for="artist-create-fullname" class="block text-sm font-medium text-plum mb-1">ชื่อเต็ม</label>
-						<input id="artist-create-fullname" name="fullName" class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+						<label for="artist-create-fullname-en" class="block text-sm font-medium text-plum mb-1">ชื่อเต็ม (EN) <span class="text-coral">*</span></label>
+						<input id="artist-create-fullname-en" name="fullNameEn" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
 					</div>
+				</div>
+				<div>
+					<label for="artist-create-fullname-th" class="block text-sm font-medium text-plum mb-1">ชื่อเต็ม (TH)</label>
+					<input id="artist-create-fullname-th" name="fullNameTh" class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
 				</div>
 				<div>
 					<label for="artist-create-image" class="block text-sm font-medium text-plum mb-1">URL รูปโปรไฟล์</label>
@@ -150,7 +161,7 @@
 						{:else}
 							<div class="w-12 h-12 rounded-full bg-lavender/10 flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-lavender-dark/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>
 						{/if}
-						<div class="flex-1 min-w-0"><h3 class="font-semibold text-plum text-sm sm:text-base truncate">{artist.nickname}</h3><p class="text-xs sm:text-sm text-plum-light truncate mt-0.5">{artist.fullName ?? '-'}</p></div>
+						<div class="flex-1 min-w-0"><h3 class="font-semibold text-plum text-sm sm:text-base truncate">{artist.nickname}</h3><p class="text-xs sm:text-sm text-plum-light truncate mt-0.5">{artist.fullNameEn}{artist.fullNameTh ? ` · ${artist.fullNameTh}` : ''}</p></div>
 						<button type="button" onclick={(e) => { e.stopPropagation(); deleteTarget = artist; showConfirm = true; }} aria-label="ลบ" class="p-2 rounded-lg hover:bg-coral/10 text-plum-light/60 hover:text-coral-dark transition-colors touch-target flex-shrink-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
 						<svg class="w-5 h-5 text-plum-light/40 group-hover:text-coral-dark group-hover:translate-x-0.5 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
 					</div>

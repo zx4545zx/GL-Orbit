@@ -14,7 +14,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		.select({
 			id: artists.id,
 			nickname: artists.nickname,
-			fullName: artists.fullName,
+			fullNameTh: artists.fullNameTh,
+			fullNameEn: artists.fullNameEn,
 			profileImageUrl: artists.profileImageUrl
 		})
 		.from(artists)

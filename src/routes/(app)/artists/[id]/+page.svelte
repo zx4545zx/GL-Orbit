@@ -12,7 +12,7 @@
 	const seoTitle = $derived(`${artist.nickname} | นักแสดง | GL-Orbit`);
 	const seoDescription = $derived(
 		truncateSeo(
-			`${artist.nickname}${artist.fullName ? ` (${artist.fullName})` : ''} — นักแสดงซีรีส์ GL พร้อมลิงก์โซเชียลมีเดียและผลงานซีรีส์ทั้งหมด`
+			`${artist.nickname}${artist.fullNameEn ? ` (${artist.fullNameEn})` : ''}${artist.fullNameTh ? ` · ${artist.fullNameTh}` : ''} — นักแสดงซีรีส์ GL พร้อมลิงก์โซเชียลมีเดียและผลงานซีรีส์ทั้งหมด`
 		)
 	);
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, `/artists/${artist.id}`));
@@ -22,7 +22,8 @@
 				'@context': 'https://schema.org',
 				'@type': 'Person',
 				name: artist.nickname,
-				additionalName: artist.fullName || undefined,
+				additionalName: artist.fullNameEn || undefined,
+				alternateName: artist.fullNameTh || undefined,
 				image: artist.profileImageUrl,
 				url: canonicalUrl,
 				sameAs: artist.socials.map((s) => s.url),
@@ -112,7 +113,7 @@
 			</button>
 
 			<ShareButton
-				title={`${artist.nickname}${artist.fullName ? ` (${artist.fullName})` : ''}`}
+				title={`${artist.nickname}${artist.fullNameEn ? ` (${artist.fullNameEn})` : ''}`}
 				text={`ฝากรู้จัก «${artist.nickname}» นักแสดงซีรีส์ GL บน GL-Orbit — โซเชียลและผลงาน`}
 				url={canonicalUrl}
 				ariaLabel="แชร์นักแสดงนี้"
@@ -154,8 +155,11 @@
 				<h1 class="mt-1 px-1 py-2 font-[family-name:var(--font-display)] text-4xl font-extrabold leading-[1.5] text-gradient sm:text-5xl sm:leading-[1.45]">
 					{artist.nickname}
 				</h1>
-				{#if artist.fullName}
-					<p class="mt-1 text-sm font-medium text-plum-light sm:text-base">{artist.fullName}</p>
+				{#if artist.fullNameEn}
+					<p class="mt-1 text-sm font-medium text-plum-light sm:text-base">{artist.fullNameEn}</p>
+				{/if}
+				{#if artist.fullNameTh}
+					<p class="mt-0.5 text-sm font-medium text-plum-light/85 sm:text-base">{artist.fullNameTh}</p>
 				{/if}
 
 				<!-- meta chips -->

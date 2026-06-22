@@ -73,10 +73,10 @@ export const editorApi = {
 		req<{ id: string; name: string }>('/api/admin/studios', { method: 'POST', body: JSON.stringify({ name }) }),
 	createPlatform: (name: string) =>
 		req<{ data: { id: string; name: string } }>('/api/admin/platforms', { method: 'POST', body: JSON.stringify({ name }) }),
-	createArtist: (nickname: string, fullName: string | null, profileImageUrl: string | null) =>
+	createArtist: (nickname: string, fullNameEn: string, fullNameTh: string | null, profileImageUrl: string | null) =>
 		req<{ id: string; nickname: string }>('/api/admin/artists', {
 			method: 'POST',
-			body: JSON.stringify({ nickname, fullName, profileImageUrl })
+			body: JSON.stringify({ nickname, fullNameEn, fullNameTh, profileImageUrl })
 		}),
 	createGenre: (name: string) =>
 		req<{ success: boolean; data: { id: string; name: string } }>('/api/admin/genres', {

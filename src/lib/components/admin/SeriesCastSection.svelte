@@ -69,7 +69,18 @@
 			createLoading = false;
 			return;
 		}
-		const res = await editorApi.createArtist(nickname, values.fullName?.trim() || null, values.profileImageUrl?.trim() || null);
+		const fullNameEn = values.fullNameEn?.trim();
+		if (!fullNameEn) {
+			createError = 'กรุณากรอกชื่อเต็ม (EN)';
+			createLoading = false;
+			return;
+		}
+		const res = await editorApi.createArtist(
+			nickname,
+			fullNameEn,
+			values.fullNameTh?.trim() || null,
+			values.profileImageUrl?.trim() || null
+		);
 		createLoading = false;
 		if (!res.ok || !res.data) {
 			createError = res.error ?? 'สร้างไม่สำเร็จ';
@@ -93,7 +104,7 @@
 		</div>
 
 		<div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2.5">
-			<SearchableSelect bind:value={pickedArtistId} options={available.map((a) => ({ id: a.id, label: a.fullName ? `${a.nickname} (${a.fullName})` : a.nickname }))} placeholder="ค้นหานักแสดง..." emptyText="ไม่พบนักแสดง" />
+			<SearchableSelect bind:value={pickedArtistId} options={available.map((a) => ({ id: a.id, label: a.fullNameEn ? `${a.nickname} (${a.fullNameEn})` : a.nickname }))} placeholder="ค้นหานักแสดง..." emptyText="ไม่พบนักแสดง" />
 			<input type="text" bind:value={roleName} placeholder="ชื่อตัวละคร (ถ้ามี)" class="w-full px-3 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
 			<button type="button" onclick={add} disabled={busy || !pickedArtistId} class="px-4 py-2.5 rounded-xl bg-coral text-white font-medium hover:bg-coral-dark transition-colors text-sm touch-target disabled:opacity-50 whitespace-nowrap">
 				เพิ่ม
@@ -128,8 +139,8 @@
 							<div class="font-medium text-plum text-sm truncate">{member.nickname}</div>
 							{#if member.roleName}
 								<div class="text-xs text-plum-light truncate">รับบท: {member.roleName}</div>
-							{:else if member.fullName}
-								<div class="text-xs text-plum-light truncate">{member.fullName}</div>
+							{:else if member.fullNameEn}
+								<div class="text-xs text-plum-light truncate">{member.fullNameEn}{member.fullNameTh ? ` · ${member.fullNameTh}` : ''}</div>
 							{/if}
 						</div>
 						<button type="button" onclick={() => remove(member.id)} disabled={busy} aria-label="นำออก" class="p-2 rounded-lg hover:bg-coral/10 text-plum-light hover:text-coral-dark transition-colors touch-target disabled:opacity-50 flex-shrink-0">
@@ -149,7 +160,8 @@
 	title="สร้างนักแสดงใหม่"
 	fields={[
 		{ key: 'nickname', label: 'ชื่อเล่น', placeholder: 'เช่น Engfa', required: true },
-		{ key: 'fullName', label: 'ชื่อ-สกุล', placeholder: 'ชื่อเต็ม (ถ้ามี)' },
+		{ key: 'fullNameEn', label: 'ชื่อเต็ม (EN)', placeholder: 'Full name (EN)', required: true },
+		{ key: 'fullNameTh', label: 'ชื่อเต็ม (TH)', placeholder: 'ชื่อเต็ม (TH) (ถ้ามี)' },
 		{ key: 'profileImageUrl', label: 'URL รูปโปรไฟล์', type: 'url', placeholder: 'https://...' }
 	]}
 	onsubmit={handleCreate}

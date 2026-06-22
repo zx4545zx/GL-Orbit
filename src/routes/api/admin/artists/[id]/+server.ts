@@ -16,7 +16,12 @@ export const PUT: RequestHandler = async ({ locals, params, request }) => {
 		error(400, 'กรุณาระบุชื่อเล่น');
 	}
 
-	const fullName = body.fullName?.trim() || null;
+	const fullNameEn = body.fullNameEn?.trim();
+	if (!fullNameEn) {
+		error(400, 'กรุณาระบุชื่อเต็ม (EN)');
+	}
+
+	const fullNameTh = body.fullNameTh?.trim() || null;
 	const profileImageUrl = body.profileImageUrl?.trim() || null;
 
 	const db = await getDb();
@@ -25,14 +30,16 @@ export const PUT: RequestHandler = async ({ locals, params, request }) => {
 		.update(artists)
 		.set({
 			nickname,
-			fullName,
+			fullNameTh,
+			fullNameEn,
 			profileImageUrl
 		})
 		.where(eq(artists.id, id))
 		.returning({
 			id: artists.id,
 			nickname: artists.nickname,
-			fullName: artists.fullName,
+			fullNameTh: artists.fullNameTh,
+			fullNameEn: artists.fullNameEn,
 			profileImageUrl: artists.profileImageUrl
 		});
 

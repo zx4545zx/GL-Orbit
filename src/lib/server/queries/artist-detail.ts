@@ -14,7 +14,8 @@ const CACHE_TTL = 30_000;
 export type ArtistDetail = {
 	id: string;
 	nickname: string;
-	fullName: string;
+	fullNameTh: string | null;
+	fullNameEn: string;
 	profileImageUrl: string;
 	socials: { platform: string; url: string; iconUrl: string | null }[];
 	series: {
@@ -48,7 +49,8 @@ export async function getArtistDetail(id: string): Promise<ArtistDetail | null> 
 			.select({
 				id: artists.id,
 				nickname: artists.nickname,
-				fullName: artists.fullName,
+				fullNameTh: artists.fullNameTh,
+				fullNameEn: artists.fullNameEn,
 				profileImageUrl: artists.profileImageUrl
 			})
 			.from(artists)
@@ -93,7 +95,8 @@ export async function getArtistDetail(id: string): Promise<ArtistDetail | null> 
 	const result: ArtistDetail = {
 		id: artistResult.id,
 		nickname: artistResult.nickname,
-		fullName: artistResult.fullName ?? '',
+		fullNameTh: artistResult.fullNameTh ?? null,
+		fullNameEn: artistResult.fullNameEn,
 		profileImageUrl: artistResult.profileImageUrl ?? FALLBACK_AVATAR,
 		socials: socialsResult.map((s) => ({
 			platform: s.platform,

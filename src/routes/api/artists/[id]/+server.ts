@@ -18,7 +18,8 @@ export const GET: RequestHandler = async ({ params }) => {
 		.select({
 			id: artists.id,
 			nickname: artists.nickname,
-			fullName: artists.fullName,
+			fullNameTh: artists.fullNameTh,
+			fullNameEn: artists.fullNameEn,
 			profileImageUrl: artists.profileImageUrl
 		})
 		.from(artists)
@@ -56,7 +57,8 @@ export const GET: RequestHandler = async ({ params }) => {
 		artist: {
 			id: artistResult.id,
 			nickname: artistResult.nickname,
-			fullName: artistResult.fullName ?? '',
+			fullNameTh: artistResult.fullNameTh ?? null,
+			fullNameEn: artistResult.fullNameEn,
 			profileImageUrl: artistResult.profileImageUrl ?? '/placeholders/avatar.svg'
 		},
 		socials: socialsResult.map((s) => ({
