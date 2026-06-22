@@ -263,9 +263,9 @@
 								<h3 class="text-white font-bold text-lg sm:text-xl mb-1">{s.title}</h3>
 								<p class="text-white/80 text-xs sm:text-sm mb-2">{s.subtitle}</p>
 								{#if s.genres && s.genres.length > 0}
-									<div class="flex flex-wrap gap-1">
+									<div class="hidden flex-wrap gap-1 sm:flex">
 										{#each s.genres as genre}
-											<span class="px-1.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] sm:text-xs font-medium">{genre.name}</span>
+											<span class="px-1.5 py-0.5 rounded-full bg-white/20 text-white text-xs font-medium">{genre.name}</span>
 										{/each}
 									</div>
 								{/if}
