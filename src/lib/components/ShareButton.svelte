@@ -96,7 +96,7 @@
 		aria-label={ariaLabel}
 		aria-haspopup="menu"
 		aria-expanded={menuOpen}
-		class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 touch-target active:scale-[0.97] bg-white border border-plum/10 text-plum-light shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-lavender/30 hover:text-lavender-dark hover:bg-gradient-to-br hover:from-lavender/[0.04] hover:to-transparent {menuOpen ? 'border-lavender/30 text-lavender-dark bg-gradient-to-br from-lavender/[0.06] to-transparent shadow-md' : ''} {className}"
+		class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 touch-target active:scale-[0.97] border border-plum/10 text-plum-light hover:shadow-sm hover:-translate-y-0.5 hover:border-lavender/30 hover:text-lavender-dark {menuOpen ? 'border-lavender/30 text-lavender-dark shadow-sm' : ''} {className}"
 	>
 		<div class="w-7 h-7 rounded-full bg-plum/5 flex items-center justify-center shrink-0 ring-1 ring-plum/5 group-hover:ring-lavender/20 transition-all duration-300">
 			<svg class="w-3.5 h-3.5 text-plum-light/70 group-hover:text-lavender-dark transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

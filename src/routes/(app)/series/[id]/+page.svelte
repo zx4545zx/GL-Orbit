@@ -141,7 +141,7 @@
 				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl shadow-lavender/10 max-w-xs sm:max-w-none mx-auto">
 					<img src={series.poster} alt={series.titleEn} width={400} height={600} class="w-full aspect-[2/3] object-cover" loading="eager" decoding="async" fetchpriority="high" />
 				</div>
-				<div class="bg-white/70 backdrop-blur-sm border border-lavender/15 rounded-2xl p-2 shadow-lg shadow-lavender/10 mt-3">
+				<div class="border border-lavender/15 rounded-2xl p-2 mt-3">
 					<div class="flex gap-2">
 						<FavoriteButton seriesId={series.id} className="flex-1 justify-center" />
 						<WatchedButton seriesId={series.id} className="flex-1 justify-center" />

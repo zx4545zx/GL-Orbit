@@ -68,7 +68,7 @@
 	disabled={isLoading}
 	aria-label={isLoading ? 'กำลังโหลด' : watched ? 'เลิก mark ดูแล้ว' : 'mark ว่าดูแล้ว'}
 	aria-pressed={isLoading ? undefined : watched}
-	class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 touch-target active:scale-[0.97] {isLoading ? 'bg-white/60 border border-plum/5 text-plum-light/50 cursor-wait shadow-sm' : watched ? 'bg-gradient-to-br from-mint/[0.09] to-mint/[0.03] border border-mint/25 text-mint-dark shadow-sm shadow-mint/5' : 'bg-white border border-plum/10 text-plum-light shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-mint/20 hover:text-mint-dark hover:bg-gradient-to-br hover:from-mint/[0.04] hover:to-transparent'} {className}"
+	class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 touch-target active:scale-[0.97] {isLoading ? 'border border-plum/5 text-plum-light/50 cursor-wait' : watched ? 'border border-mint/25 text-mint-dark shadow-sm shadow-mint/5' : 'border border-plum/10 text-plum-light hover:shadow-sm hover:-translate-y-0.5 hover:border-mint/20 hover:text-mint-dark'} {className}"
 >
 	{#if isLoading}
 		<svg class="w-4 h-4 animate-spin text-plum-light/60" fill="none" viewBox="0 0 24 24">
