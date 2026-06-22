@@ -1,13 +1,4 @@
 <script lang="ts">
-	/**
-	 * Share button with smart fallback.
-	 * - Mobile / supporting browsers → native share sheet (navigator.share)
-	 * - Desktop / unsupported → custom glass-card popover (LINE / Facebook / X / Copy link)
-	 *
-	 * Card preview on the recipient side is handled by OpenGraph meta tags
-	 * on the page itself — nothing to do here.
-	 */
-
 	let {
 		title,
 		text,
@@ -27,7 +18,6 @@
 	let copiedTimer: ReturnType<typeof setTimeout> | null = null;
 	let rootEl: HTMLDivElement | null = $state(null);
 
-	// Brand share intents
 	const lineUrl = $derived(
 		`https://line.me/R/msg/text/?${encodeURIComponent(`${title}\n${text}\n${url}`)}`
 	);
@@ -38,7 +28,6 @@
 		`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`
 	);
 
-	// SVG brand paths (same set as the artist detail page)
 	const LINE_PATH =
 		'M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.05.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314';
 	const FB_PATH =
@@ -47,15 +36,12 @@
 		'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z';
 
 	async function handleShare() {
-		// Prefer native share sheet (mobile + supporting desktop browsers)
 		if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
 			try {
 				await navigator.share({ title, text, url });
 				return;
 			} catch (err) {
-				// User dismissed the sheet — keep menu closed, do nothing.
 				if (err instanceof DOMException && err.name === 'AbortError') return;
-				// Other failures (e.g. permission denied) → fall through to custom menu.
 			}
 		}
 		menuOpen = !menuOpen;
@@ -65,7 +51,6 @@
 		try {
 			await navigator.clipboard.writeText(url);
 		} catch {
-			// Legacy / insecure-context fallback
 			const ta = document.createElement('textarea');
 			ta.value = url;
 			ta.style.position = 'fixed';
@@ -98,9 +83,7 @@
 	}
 
 	function selectOption(e: MouseEvent) {
-		// Social links open in a new tab — close the menu right away.
 		menuOpen = false;
-		// allow default anchor navigation
 		e.stopPropagation();
 	}
 </script>
@@ -113,17 +96,19 @@
 		aria-label={ariaLabel}
 		aria-haspopup="menu"
 		aria-expanded={menuOpen}
-		class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 touch-target bg-white border border-plum/10 text-plum-light shadow-sm hover:text-coral-dark hover:border-coral/20 hover:bg-coral/5 {className}"
+		class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 touch-target active:scale-[0.97] bg-white border border-plum/10 text-plum-light shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-lavender/30 hover:text-lavender-dark hover:bg-gradient-to-br hover:from-lavender/[0.04] hover:to-transparent {menuOpen ? 'border-lavender/30 text-lavender-dark bg-gradient-to-br from-lavender/[0.06] to-transparent shadow-md' : ''} {className}"
 	>
-		<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				stroke-width="2"
-				d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-2.684-4.684M5.342 8.684a3 3 0 104.026 4.026m-4.026-4.026L18.058 5.5M5.342 15.316L18.058 18.5"
-			/>
-		</svg>
-		<span class="inline">แชร์</span>
+		<div class="w-7 h-7 rounded-full bg-plum/5 flex items-center justify-center shrink-0 ring-1 ring-plum/5 group-hover:ring-lavender/20 transition-all duration-300">
+			<svg class="w-3.5 h-3.5 text-plum-light/70 group-hover:text-lavender-dark transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="1.8"
+					d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-2.684-4.684M5.342 8.684a3 3 0 104.026 4.026m-4.026-4.026L18.058 5.5M5.342 15.316L18.058 18.5"
+				/>
+			</svg>
+		</div>
+		<span>แชร์</span>
 	</button>
 
 	{#if menuOpen}
@@ -135,7 +120,6 @@
 		>
 			<p class="px-3 pt-1.5 pb-2 text-xs font-semibold text-plum-light uppercase tracking-wider">แชร์ไปยัง</p>
 
-			<!-- LINE -->
 			<a
 				href={lineUrl}
 				target="_blank"
@@ -150,7 +134,6 @@
 				<span class="text-sm font-medium text-plum">LINE</span>
 			</a>
 
-			<!-- Facebook -->
 			<a
 				href={facebookUrl}
 				target="_blank"
@@ -165,7 +148,6 @@
 				<span class="text-sm font-medium text-plum">Facebook</span>
 			</a>
 
-			<!-- X (Twitter) -->
 			<a
 				href={xUrl}
 				target="_blank"
@@ -182,7 +164,6 @@
 
 			<div class="my-1.5 h-px bg-lavender/20"></div>
 
-			<!-- Copy link -->
 			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 			<button
 				type="button"
