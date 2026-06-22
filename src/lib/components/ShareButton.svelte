@@ -32,7 +32,7 @@
 	const buttonClass = $derived(
 		variant === 'command'
 			? `group relative isolate inline-flex min-h-[3.35rem] items-center gap-3 overflow-hidden rounded-2xl px-3 py-3 text-left text-sm transition-all duration-300 touch-target active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/35 bg-lavender/10 text-lavender-dark shadow-lg shadow-lavender/15' : 'border border-white/70 bg-white/60 text-plum hover:-translate-y-0.5 hover:border-lavender/35 hover:bg-lavender/5 hover:shadow-lg hover:shadow-lavender/10'} ${className}`
-			: `group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 touch-target active:scale-[0.97] border border-plum/10 text-plum-light hover:shadow-sm hover:-translate-y-0.5 hover:border-lavender/30 hover:text-lavender-dark ${menuOpen ? 'border-lavender/30 text-lavender-dark shadow-sm' : ''} ${className}`
+			: `group relative isolate inline-flex items-center gap-2.5 overflow-hidden rounded-full px-3.5 py-2 text-sm font-semibold transition-all duration-300 touch-target active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/35 bg-lavender/10 text-lavender-dark shadow-lg shadow-lavender/15' : 'border border-white/70 bg-white/55 text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl hover:-translate-y-0.5 hover:border-coral/25 hover:bg-white/85 hover:text-lavender-dark hover:shadow-lg hover:shadow-lavender/15'} ${className}`
 	);
 
 	const LINE_PATH =
@@ -124,8 +124,9 @@
 				<span class="mt-1 block truncate text-xs font-bold sm:text-sm">ส่งต่อให้เพื่อน</span>
 			</span>
 		{:else}
-			<div class="w-7 h-7 rounded-full bg-plum/5 flex items-center justify-center shrink-0 ring-1 ring-plum/5 group-hover:ring-lavender/20 transition-all duration-300">
-				<svg class="w-3.5 h-3.5 text-plum-light/70 group-hover:text-lavender-dark transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<span class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_0%,rgba(196,181,253,0.22),transparent_45%),linear-gradient(135deg,rgba(255,255,255,0.65),rgba(255,255,255,0.2))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+			<div class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-plum/5 text-plum-light ring-1 ring-plum/5 transition-all duration-300 group-hover:rotate-[-4deg] group-hover:bg-lavender group-hover:text-white group-hover:ring-lavender/20 {menuOpen ? 'bg-lavender text-white shadow-md shadow-lavender/25' : ''}">
+				<svg class="h-4 w-4 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"

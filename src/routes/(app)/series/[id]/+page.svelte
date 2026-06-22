@@ -157,18 +157,27 @@
 		</div>
 	</div>
 {:else}
-	<div class="py-6 sm:py-8 max-w-6xl mx-auto">
+	<div class="relative -mx-4 overflow-hidden bg-[radial-gradient(circle_at_15%_8%,rgba(255,107,157,0.14),transparent_34%),radial-gradient(circle_at_88%_18%,rgba(196,181,253,0.20),transparent_32%),radial-gradient(circle_at_10%_78%,rgba(110,231,183,0.12),transparent_30%)] px-4 py-6 sm:py-8 md:-mt-24 md:pt-32">
+		<div class="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-coral/15 blur-3xl"></div>
+		<div class="pointer-events-none absolute right-0 top-20 h-64 w-64 rounded-full bg-lavender/20 blur-3xl animate-float"></div>
+		<div class="pointer-events-none absolute bottom-20 left-0 h-56 w-56 rounded-full bg-mint/15 blur-3xl animate-float-delayed"></div>
+		<div class="relative mx-auto max-w-6xl">
+
 		<!-- Back button -->
-		<a href="/series" class="inline-flex items-center gap-2 text-plum-light hover:text-coral-dark transition-colors mb-6 sm:mb-8 touch-target text-sm sm:text-base">
+		<a href="/series" class="relative z-10 mb-6 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-coral/30 hover:bg-white/80 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
 			<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-			<span class="font-medium">กลับหน้ารายการซีรีส์</span>
+			<span>กลับหน้ารายการซีรีส์</span>
 		</a>
 
 		<!-- Hero -->
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12">
+		<div class="relative z-10 mb-10 grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-3 sm:mb-12">
 			<div class="relative z-20 md:col-span-1">
-				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl shadow-lavender/10 max-w-xs sm:max-w-none mx-auto">
-					<img src={series.poster} alt={series.titleEn} width={400} height={600} class="w-full aspect-[2/3] object-cover" loading="eager" decoding="async" fetchpriority="high" />
+				<div class="relative mx-auto max-w-xs sm:max-w-none">
+					<div class="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-coral/30 via-lavender/25 to-mint/20 blur-xl"></div>
+					<div class="glass-card group relative overflow-hidden rounded-2xl shadow-2xl shadow-lavender/20 sm:rounded-3xl">
+						<img src={series.poster} alt={series.titleEn} width={400} height={600} class="w-full aspect-[2/3] object-cover transition-transform duration-700 group-hover:scale-105" loading="eager" decoding="async" fetchpriority="high" />
+						<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-plum/45 via-transparent to-white/10"></div>
+					</div>
 				</div>
 				<div class="relative z-30 mt-4 overflow-visible rounded-[1.75rem] border border-white/70 bg-white/55 p-2.5 shadow-xl shadow-lavender/15 backdrop-blur-2xl">
 					<div class="pointer-events-none absolute inset-0 rounded-[1.75rem] bg-[radial-gradient(circle_at_20%_0%,rgba(255,107,157,0.16),transparent_42%),radial-gradient(circle_at_90%_95%,rgba(110,231,183,0.18),transparent_38%)]"></div>
@@ -189,18 +198,19 @@
 				</div>
 			</div>
 
-			<div class="relative z-0 md:col-span-2 space-y-4 sm:space-y-6">
-				<div>
-					<div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-						<span class="px-2.5 sm:px-3 py-1 rounded-full {s?.bg} {s?.class} text-xs sm:text-sm font-semibold">{s?.text}</span>
-						<span class="text-xs sm:text-sm text-plum-light">{series.studio}{#if series.year} • {series.year}{/if}</span>
+			<div class="glass-card-strong relative z-0 space-y-4 rounded-[2rem] p-5 shadow-2xl shadow-lavender/10 sm:space-y-6 sm:p-7 md:col-span-2">
+				<div class="pointer-events-none absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/50 via-transparent to-lavender/10"></div>
+				<div class="relative">
+					<div class="mb-3 flex flex-wrap items-center gap-2 sm:gap-3">
+						<span class="rounded-full px-3 py-1.5 text-xs font-bold shadow-sm backdrop-blur-md sm:text-sm {s?.bg} {s?.class}">{s?.text}</span>
+						<span class="rounded-full border border-white/70 bg-white/60 px-3 py-1.5 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/5 backdrop-blur-md sm:text-sm">{series.studio}{#if series.year} • {series.year}{/if}</span>
 					</div>
-					<h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum mb-1 sm:mb-2">{series.titleEn}</h1>
-					<p class="text-base sm:text-xl text-plum-light">{series.titleTh}</p>
+					<h1 class="font-[family-name:var(--font-display)] text-3xl font-extrabold leading-tight text-gradient sm:text-4xl md:text-5xl">{series.titleEn}</h1>
+					<p class="mt-2 text-base font-medium text-plum-light sm:text-xl">{series.titleTh}</p>
 				</div>
 
 				{#if series.description}
-					<p class="text-sm sm:text-base text-plum-light leading-relaxed">{series.description}</p>
+					<p class="relative rounded-2xl border border-white/60 bg-white/45 p-4 text-sm leading-relaxed text-plum-light shadow-sm shadow-lavender/5 sm:text-base">{series.description}</p>
 				{/if}
 
 				{#if series.genres.length > 0}
@@ -217,20 +227,20 @@
 					</div>
 				{/if}
 
-				<div class="grid grid-cols-3 gap-2 sm:gap-4">
-					<div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center">
-						<div class="text-xl sm:text-2xl font-bold text-coral-dark">{series.episodes}</div>
-						<div class="text-[10px] sm:text-xs text-plum-light mt-1">ตอน</div>
+				<div class="relative grid grid-cols-3 gap-2 sm:gap-4">
+					<div class="rounded-2xl border border-coral/15 bg-gradient-to-br from-white/70 to-coral/10 p-3 text-center shadow-sm shadow-coral/10 sm:p-4">
+						<div class="text-2xl font-extrabold text-coral-dark sm:text-3xl">{series.episodes}</div>
+						<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">ตอน</div>
 					</div>
 					{#if series.year}
-						<div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center">
-							<div class="text-xl sm:text-2xl font-bold text-lavender-dark">{series.year}</div>
-							<div class="text-[10px] sm:text-xs text-plum-light mt-1">ปีฉาย</div>
+						<div class="rounded-2xl border border-lavender/20 bg-gradient-to-br from-white/70 to-lavender/15 p-3 text-center shadow-sm shadow-lavender/10 sm:p-4">
+							<div class="text-2xl font-extrabold text-lavender-dark sm:text-3xl">{series.year}</div>
+							<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">ปีฉาย</div>
 						</div>
 					{/if}
-					<div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center">
-						<div class="text-xl sm:text-2xl font-bold text-mint-dark">{series.artists.length}</div>
-						<div class="text-[10px] sm:text-xs text-plum-light mt-1">นักแสดง</div>
+					<div class="rounded-2xl border border-mint/20 bg-gradient-to-br from-white/70 to-mint/10 p-3 text-center shadow-sm shadow-mint/10 sm:p-4">
+						<div class="text-2xl font-extrabold text-mint-dark sm:text-3xl">{series.artists.length}</div>
+						<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">นักแสดง</div>
 					</div>
 				</div>
 
@@ -251,18 +261,27 @@
 
 		<!-- Artists -->
 		{#if series.artists.length > 0}
-			<section class="mb-10 sm:mb-12">
-				<h2 class="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-bold text-plum mb-4 sm:mb-6">นักแสดง</h2>
-				<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+			<section class="relative z-10 mb-10 sm:mb-12">
+				<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
+					<div>
+						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark/70">Cast constellation</p>
+						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">นักแสดง</h2>
+					</div>
+					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{series.artists.length} คน</span>
+				</div>
+				<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
 					{#each series.artists as artist}
 						<a
 							href={`/artists/${artist.id}`}
-							class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-coral"
+							class="group glass-card relative overflow-hidden rounded-2xl p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-lavender/20 focus-visible:outline-2 focus-visible:outline-coral sm:p-4"
 						>
-							<img src={artist.image} alt={artist.name} width={56} height={56} loading="lazy" decoding="async" class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover flex-shrink-0" />
-							<div class="min-w-0">
-								<div class="font-semibold text-plum text-sm sm:text-base truncate">{artist.name}</div>
-								<div class="text-xs sm:text-sm text-plum-light">{artist.role}</div>
+							<div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-coral/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+							<div class="relative flex items-center gap-3 sm:gap-4">
+								<img src={artist.image} alt={artist.name} width={56} height={56} loading="lazy" decoding="async" class="h-12 w-12 flex-shrink-0 rounded-2xl border border-white/70 object-cover shadow-sm shadow-lavender/15 transition-transform duration-300 group-hover:rotate-[-2deg] group-hover:scale-105 sm:h-14 sm:w-14" />
+								<div class="min-w-0">
+									<div class="truncate text-sm font-bold text-plum sm:text-base">{artist.name}</div>
+									<div class="text-xs font-medium text-plum-light sm:text-sm">{artist.role}</div>
+								</div>
 							</div>
 						</a>
 					{/each}
@@ -272,16 +291,22 @@
 
 		<!-- Schedule with collapsible rows -->
 		{#if series.schedule.length > 0}
-			<section>
-				<h2 class="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-bold text-plum mb-4 sm:mb-6">ตารางฉาย</h2>
-				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+			<section class="relative z-10">
+				<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
+					<div>
+						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-lavender-dark/70">Episode orbit</p>
+						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">ตารางฉาย</h2>
+					</div>
+					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{series.schedule.length} episodes</span>
+				</div>
+				<div class="glass-card-strong overflow-hidden rounded-[1.75rem] shadow-xl shadow-lavender/10 sm:rounded-[2rem]">
 					<div class="divide-y divide-lavender/10">
 						{#each series.schedule as item}
 							{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA')}
 							{@const hasEpisodeMedia = Boolean(item.trailerUrl)}
 							{@const hasEpisodeContent = hasSchedules || hasEpisodeMedia}
 							{@const trailerEmbedUrl = youtubeEmbedUrl(item.trailerUrl)}
-							<div class="transition-colors {hasEpisodeContent ? 'hover:bg-white/40 cursor-pointer' : ''}"
+							<div class="transition-all duration-300 {hasEpisodeContent ? 'hover:bg-white/45 cursor-pointer' : ''}"
 								role="button"
 								tabindex={hasEpisodeContent ? 0 : undefined}
 								onclick={hasEpisodeContent ? () => toggleEpisode(item.episode) : undefined}
@@ -289,23 +314,23 @@
 								aria-expanded={hasEpisodeContent ? expandedEpisodes.has(item.episode) : undefined}
 							>
 								<!-- Collapsed row -->
-								<div class="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+								<div class="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
 									<div class="flex items-center gap-3 sm:gap-4 min-w-0">
 										{#if item.coverUrl}
-											<div class="relative h-12 w-16 sm:h-14 sm:w-20 overflow-hidden rounded-xl border border-white/70 bg-lavender/10 shadow-sm shadow-lavender/10 flex-shrink-0">
+											<div class="relative h-12 w-16 flex-shrink-0 overflow-hidden rounded-2xl border border-white/70 bg-lavender/10 shadow-sm shadow-lavender/10 sm:h-14 sm:w-20">
 												<img src={item.coverUrl} alt={`ภาพปกตอนที่ ${item.episode}`} width={160} height={90} loading="lazy" decoding="async" class="h-full w-full object-cover" />
 												<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/70 to-transparent px-2 py-1">
 													<span class="text-[10px] font-bold text-white">EP {item.episode}</span>
 												</div>
 											</div>
 										{:else}
-											<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center flex-shrink-0">
+											<div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-coral/20 to-lavender/20 shadow-sm shadow-lavender/10 sm:h-12 sm:w-12">
 												<span class="text-xs sm:text-sm font-bold text-coral-dark">{item.episode}</span>
 											</div>
 										{/if}
 										<div class="min-w-0">
-											<div class="font-semibold text-plum text-sm sm:text-base truncate">{item.title}</div>
-											<div class="text-xs sm:text-sm text-plum-light truncate">{scheduleSummary(item)}</div>
+											<div class="truncate text-sm font-bold text-plum sm:text-base">{item.title}</div>
+											<div class="mt-0.5 truncate text-xs font-medium text-plum-light sm:text-sm">{scheduleSummary(item)}</div>
 										</div>
 									</div>
 									<div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -383,5 +408,6 @@
 				</div>
 			</section>
 		{/if}
+		</div>
 	</div>
 {/if}

@@ -69,12 +69,12 @@
 	}
 
 	function goBack() {
-		const ref = typeof document !== 'undefined' ? document.referrer : '';
-		if (ref && (() => { try { return new URL(ref).origin === window.location.origin; } catch { return false; } })()) {
-			history.back();
-		} else {
-			goto('/series');
+		if (typeof window !== 'undefined' && window.history.length > 1) {
+			window.history.back();
+			return;
 		}
+
+		goto('/series');
 	}
 </script>
 
@@ -95,13 +95,17 @@
 	{@html jsonLdScript(jsonLd)}
 </svelte:head>
 
-<div class="py-4 sm:py-6 pb-10">
-	<div class="max-w-lg mx-auto px-1 sm:px-2">
+<div class="relative -mx-4 overflow-hidden bg-[radial-gradient(circle_at_18%_6%,rgba(255,107,157,0.14),transparent_34%),radial-gradient(circle_at_86%_14%,rgba(196,181,253,0.22),transparent_34%),radial-gradient(circle_at_14%_82%,rgba(110,231,183,0.12),transparent_30%)] px-4 pb-12 pt-4 sm:pt-6 md:-mt-24 md:pt-32">
+	<div class="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-coral/15 blur-3xl"></div>
+	<div class="pointer-events-none absolute right-0 top-20 h-64 w-64 rounded-full bg-lavender/20 blur-3xl animate-float"></div>
+	<div class="pointer-events-none absolute bottom-24 left-0 h-56 w-56 rounded-full bg-mint/15 blur-3xl animate-float-delayed"></div>
+
+	<div class="relative mx-auto max-w-5xl">
 		<!-- Header: back + share -->
-		<div class="flex items-center justify-between mb-4">
+		<div class="mb-5 flex items-center justify-between gap-3 sm:mb-7">
 			<button
 				onclick={goBack}
-				class="inline-flex items-center gap-2 text-plum-light hover:text-coral-dark transition-colors touch-target text-sm sm:text-base"
+				class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-coral/30 hover:bg-white/80 hover:text-coral-dark sm:text-base touch-target"
 			>
 				<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
 				<span class="font-medium">กลับ</span>
@@ -116,20 +120,21 @@
 		</div>
 
 		<!-- ============ PROFILE CARD ============ -->
-		<div class="glass-card rounded-3xl overflow-hidden animate-slide-up">
+		<div class="glass-card-strong relative overflow-hidden rounded-[2rem] shadow-2xl shadow-lavender/15 animate-slide-up">
+			<div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/55 via-transparent to-lavender/10"></div>
 			<!-- Cover -->
-			<div class="relative h-28 sm:h-36 bg-gradient-to-br from-coral/30 via-lavender/30 to-mint/25 overflow-hidden">
+			<div class="relative h-36 overflow-hidden bg-gradient-to-br from-coral/30 via-lavender/30 to-mint/25 sm:h-44">
 				<div class="absolute inset-0 bg-gradient-mesh"></div>
 				<div class="absolute inset-0 noise-overlay"></div>
-				<div class="absolute top-4 left-8 w-20 h-20 rounded-full bg-coral/20 blur-2xl animate-float"></div>
-				<div class="absolute bottom-2 right-10 w-24 h-24 rounded-full bg-lavender/20 blur-3xl animate-float-delayed"></div>
-				<div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white/60 to-transparent pointer-events-none"></div>
+				<div class="absolute top-4 left-8 h-24 w-24 rounded-full bg-coral/25 blur-2xl animate-float"></div>
+				<div class="absolute bottom-2 right-10 h-28 w-28 rounded-full bg-lavender/25 blur-3xl animate-float-delayed"></div>
+				<div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/75 to-transparent pointer-events-none"></div>
 			</div>
 
 			<!-- Avatar + name (Linktree-style centered) -->
-			<div class="px-5 sm:px-6 pb-5 sm:pb-6 -mt-14 sm:-mt-16 flex flex-col items-center text-center">
+			<div class="relative -mt-16 flex flex-col items-center px-5 pb-6 text-center sm:-mt-20 sm:px-7 sm:pb-8">
 				<div class="relative">
-					<div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full p-1.5 sm:p-2 bg-cream shadow-xl shadow-lavender/20">
+					<div class="h-32 w-32 rounded-full bg-gradient-to-br from-coral/40 via-cream to-lavender/40 p-1.5 shadow-2xl shadow-lavender/25 sm:h-40 sm:w-40 sm:p-2">
 						<img
 							src={artist.profileImageUrl}
 							alt={artist.nickname}
@@ -141,18 +146,20 @@
 						/>
 					</div>
 					<!-- sparkle accent -->
-					<span class="absolute -top-1 -right-1 text-coral text-xl">✦</span>
+					<span class="absolute -right-1 top-2 text-2xl text-coral drop-shadow-sm">✦</span>
+					<span class="absolute -bottom-1 left-3 h-4 w-4 rounded-full bg-mint shadow-lg shadow-mint/40"></span>
 				</div>
 
-				<h1 class="mt-3 font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum">
+				<p class="mt-4 text-[10px] font-bold uppercase tracking-[0.28em] text-coral-dark/75">Artist orbit</p>
+				<h1 class="mt-1 px-1 py-2 font-[family-name:var(--font-display)] text-4xl font-extrabold leading-[1.5] text-gradient sm:text-5xl sm:leading-[1.45]">
 					{artist.nickname}
 				</h1>
 				{#if artist.fullName}
-					<p class="text-sm sm:text-base text-plum-light mt-0.5">{artist.fullName}</p>
+					<p class="mt-1 text-sm font-medium text-plum-light sm:text-base">{artist.fullName}</p>
 				{/if}
 
 				<!-- meta chips -->
-				<div class="flex flex-wrap items-center justify-center gap-2 mt-3">
+				<div class="mt-4 flex flex-wrap items-center justify-center gap-2">
 					<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-card-strong text-xs sm:text-sm font-medium text-coral-dark">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
 						นักแสดง
@@ -173,20 +180,27 @@
 
 		<!-- ============ SOCIAL LINKS (Linktree-style pills) ============ -->
 		{#if artist.socials.length > 0}
-			<section class="mt-5">
-				<h2 class="text-xs font-semibold text-plum-light uppercase tracking-wider mb-3 px-1">โซเชียลมีเดีย</h2>
-				<div class="space-y-3">
+			<section class="mt-7">
+				<div class="mb-4 flex items-end justify-between gap-4">
+					<div>
+						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-mint-dark/70">Social signals</p>
+						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">โซเชียลมีเดีย</h2>
+					</div>
+					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{artist.socials.length} ช่องทาง</span>
+				</div>
+				<div class="grid gap-3 sm:grid-cols-2">
 					{#each artist.socials as social (social.url)}
 						{@const meta = socialMeta(social.platform)}
 						<a
 							href={social.url}
 							target="_blank"
 							rel="noopener noreferrer"
-							class="group relative flex items-center gap-3 sm:gap-4 w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-2xl bg-white/80 backdrop-blur-md border border-white/60 shadow-md shadow-lavender/10 hover:shadow-xl hover:shadow-lavender/20 hover:-translate-y-0.5 transition-all duration-200 touch-target focus-visible:outline-2 focus-visible:outline-coral"
+							class="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-white/70 bg-white/65 px-3 py-3 shadow-md shadow-lavender/10 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-coral/25 hover:bg-white/85 hover:shadow-xl hover:shadow-lavender/20 focus-visible:outline-2 focus-visible:outline-coral sm:gap-4 sm:px-4 sm:py-3.5 touch-target"
 						>
+							<span class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-lavender/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
 							<!-- Brand badge -->
 							<span
-								class="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center shadow-sm"
+								class="relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl shadow-sm transition-transform duration-300 group-hover:rotate-[-4deg] group-hover:scale-105"
 								style="background:{meta.bg}"
 							>
 								{#if social.iconUrl}
@@ -198,7 +212,7 @@
 								{/if}
 							</span>
 							<!-- Label -->
-							<span class="flex-1 min-w-0 text-left">
+							<span class="relative min-w-0 flex-1 text-left">
 								<span class="block font-semibold text-plum text-sm sm:text-base truncate">{meta.label}</span>
 								<span class="block text-xs text-plum-light truncate">{social.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
 							</span>
@@ -214,17 +228,20 @@
 
 		<!-- ============ WORKS (ผลงาน) ============ -->
 		{#if artist.series.length > 0}
-			<section class="mt-6">
-				<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum mb-3 px-1 flex items-center gap-2">
-					<svg class="w-5 h-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>
-					ผลงาน
-				</h2>
-				<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+			<section class="mt-8">
+				<div class="mb-4 flex items-end justify-between gap-4">
+					<div>
+						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark/70">Filmography</p>
+						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">ผลงาน</h2>
+					</div>
+					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{artist.series.length} เรื่อง</span>
+				</div>
+				<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
 					{#each artist.series as s (s.id)}
 						{@const st = statusConfig[s.status]}
 						<a
 							href="/series/{s.id}"
-							class="group glass-card rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-lavender/20 hover:-translate-y-1 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-coral"
+							class="group glass-card overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-lavender/20 focus-visible:outline-2 focus-visible:outline-coral"
 						>
 							<div class="relative aspect-[2/3] overflow-hidden">
 								<img
@@ -255,10 +272,11 @@
 				</div>
 			</section>
 		{:else}
-			<section class="mt-6">
-				<div class="glass-card rounded-2xl p-6 text-center">
-					<p class="text-sm text-plum-light">ยังไม่มีผลงานในระบบ</p>
-					<a href="/series" class="inline-flex mt-3 px-5 py-2 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold text-sm shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-[1.02] transition-all touch-target">
+			<section class="mt-8">
+				<div class="glass-card-strong rounded-[2rem] p-8 text-center shadow-xl shadow-lavender/10">
+					<p class="font-[family-name:var(--font-display)] text-xl font-bold text-plum">ยังไม่มีผลงานในระบบ</p>
+					<p class="mt-1 text-sm text-plum-light">ลองสำรวจซีรีส์อื่นในจักรวาล GL-Orbit</p>
+					<a href="/series" class="mt-4 inline-flex rounded-full bg-gradient-to-r from-coral to-coral-dark px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-coral/25 transition-all hover:scale-[1.02] hover:shadow-xl touch-target">
 						ดูซีรีส์ทั้งหมด
 					</a>
 				</div>
