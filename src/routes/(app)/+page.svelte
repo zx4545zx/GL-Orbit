@@ -179,7 +179,7 @@
 </section>
 
 <!-- Upcoming Schedule -->
-<section class="pt-12 sm:pt-20 pb-4 sm:pb-6 -mx-4 px-4 relative">
+<section class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] px-4 pb-[calc(1.5rem+var(--bottom-nav-reserved-space))] pt-12 sm:pt-20 sm:pb-[calc(2rem+var(--bottom-nav-reserved-space))] md:mb-0 md:pb-6">
 	<div class="absolute inset-0 bg-gradient-to-b from-lavender/5 to-coral/5 pointer-events-none"></div>
 	
 	<div class="relative max-w-6xl mx-auto">
