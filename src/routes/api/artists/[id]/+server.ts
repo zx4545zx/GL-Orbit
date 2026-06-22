@@ -31,6 +31,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
 	const socialsResult = await db
 		.select({
+			id: artistSocials.id,
 			platform: artistSocials.platform,
 			url: artistSocials.url,
 			iconUrl: artistSocials.iconUrl
@@ -62,6 +63,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			profileImageUrl: artistResult.profileImageUrl ?? '/placeholders/avatar.svg'
 		},
 		socials: socialsResult.map((s) => ({
+			id: s.id,
 			platform: s.platform,
 			url: s.url,
 			iconUrl: s.iconUrl ?? null

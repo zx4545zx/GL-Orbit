@@ -17,7 +17,7 @@ export type ArtistDetail = {
 	fullNameTh: string | null;
 	fullNameEn: string;
 	profileImageUrl: string;
-	socials: { platform: string; url: string; iconUrl: string | null }[];
+	socials: { id: string; platform: string; url: string; iconUrl: string | null }[];
 	series: {
 		id: string;
 		titleEn: string;
@@ -60,6 +60,7 @@ export async function getArtistDetail(id: string): Promise<ArtistDetail | null> 
 
 	const socialsPromise = db
 		.select({
+			id: artistSocials.id,
 			platform: artistSocials.platform,
 			url: artistSocials.url,
 			iconUrl: artistSocials.iconUrl
@@ -99,6 +100,7 @@ export async function getArtistDetail(id: string): Promise<ArtistDetail | null> 
 		fullNameEn: artistResult.fullNameEn,
 		profileImageUrl: artistResult.profileImageUrl ?? FALLBACK_AVATAR,
 		socials: socialsResult.map((s) => ({
+			id: s.id,
 			platform: s.platform,
 			url: s.url,
 			iconUrl: s.iconUrl ?? null

@@ -193,7 +193,7 @@
 					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{artist.socials.length} ช่องทาง</span>
 				</div>
 				<div class="grid gap-3 sm:grid-cols-2">
-					{#each artist.socials as social (social.url)}
+					{#each artist.socials as social (social.id)}
 						{@const meta = socialMeta(social.platform)}
 						<a
 							href={social.url}
