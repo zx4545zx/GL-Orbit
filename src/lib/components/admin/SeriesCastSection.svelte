@@ -104,7 +104,7 @@
 		</div>
 
 		<div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2.5">
-			<SearchableSelect bind:value={pickedArtistId} options={available.map((a) => ({ id: a.id, label: a.fullNameEn ? `${a.nickname} (${a.fullNameEn})` : a.nickname }))} placeholder="ค้นหานักแสดง..." emptyText="ไม่พบนักแสดง" />
+			<SearchableSelect bind:value={pickedArtistId} options={available.map((a) => ({ id: a.id, label: a.fullNameEn ? `${a.nickname} (${a.fullNameEn}${a.fullNameTh ? ` · ${a.fullNameTh}` : ''})` : a.nickname }))} placeholder="ค้นหาชื่อเล่น / ชื่อ EN / ชื่อ TH..." emptyText="ไม่พบนักแสดง" />
 			<input type="text" bind:value={roleName} placeholder="ชื่อตัวละคร (ถ้ามี)" class="w-full px-3 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
 			<button type="button" onclick={add} disabled={busy || !pickedArtistId} class="px-4 py-2.5 rounded-xl bg-coral text-white font-medium hover:bg-coral-dark transition-colors text-sm touch-target disabled:opacity-50 whitespace-nowrap">
 				เพิ่ม
@@ -160,8 +160,8 @@
 	title="สร้างนักแสดงใหม่"
 	fields={[
 		{ key: 'nickname', label: 'ชื่อเล่น', placeholder: 'เช่น Engfa', required: true },
-		{ key: 'fullNameEn', label: 'ชื่อเต็ม (EN)', placeholder: 'Full name (EN)', required: true },
-		{ key: 'fullNameTh', label: 'ชื่อเต็ม (TH)', placeholder: 'ชื่อเต็ม (TH) (ถ้ามี)' },
+		{ key: 'fullNameEn', label: 'ชื่อเต็มภาษาอังกฤษ', placeholder: 'Full name in English', required: true },
+		{ key: 'fullNameTh', label: 'ชื่อเต็มภาษาไทย', placeholder: 'ชื่อเต็มภาษาไทย (ถ้ามี)' },
 		{ key: 'profileImageUrl', label: 'URL รูปโปรไฟล์', type: 'url', placeholder: 'https://...' }
 	]}
 	onsubmit={handleCreate}

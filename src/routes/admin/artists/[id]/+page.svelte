@@ -169,7 +169,10 @@
 		</button>
 		<div class="min-w-0 flex-1">
 			<h1 class="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-bold text-plum truncate">{data.artist.nickname}</h1>
-			{#if data.artist.fullNameEn}<p class="text-sm text-plum-light truncate">{data.artist.fullNameEn}</p>{/if}
+			<div class="mt-1 flex flex-wrap gap-1.5">
+				{#if data.artist.fullNameEn}<span class="inline-flex max-w-full items-center rounded-full bg-lavender/12 px-2 py-0.5 text-xs font-medium text-plum-light"><span class="mr-1 text-coral-dark/70">EN</span><span class="truncate">{data.artist.fullNameEn}</span></span>{/if}
+				{#if data.artist.fullNameTh}<span class="inline-flex max-w-full items-center rounded-full bg-mint/12 px-2 py-0.5 text-xs font-medium text-plum-light"><span class="mr-1 text-mint-dark/80">TH</span><span class="truncate">{data.artist.fullNameTh}</span></span>{/if}
+			</div>
 		</div>
 	</div>
 
@@ -191,6 +194,9 @@
 			<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg shadow-lavender/5">
 				{#if activeTab === 'profile'}
 					<div class="space-y-5">
+						<div class="rounded-2xl border border-lavender/15 bg-white/45 px-4 py-3 text-sm text-plum-light">
+							ชื่ออังกฤษจำเป็นสำหรับ SEO / schema ส่วนชื่อไทยใช้แสดงบนหน้า public และช่วยค้นหาในระบบจัดการ
+						</div>
 						<div class="flex flex-col sm:flex-row gap-5">
 							<div class="sm:w-36 flex-shrink-0">
 								<span class="block text-sm font-medium text-plum mb-1.5">รูปโปรไฟล์</span>
@@ -205,12 +211,12 @@
 								</div>
 								<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 									<div>
-										<label for="artist-fullname-en" class="block text-sm font-medium text-plum mb-1.5">ชื่อเต็ม (EN) <span class="text-coral">*</span></label>
-										<input id="artist-fullname-en" bind:value={fullNameEn} required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+										<label for="artist-fullname-en" class="block text-sm font-medium text-plum mb-1.5">ชื่อเต็มภาษาอังกฤษ <span class="text-coral">*</span></label>
+										<input id="artist-fullname-en" bind:value={fullNameEn} required placeholder="Full name in English" class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
 									</div>
 									<div>
-										<label for="artist-fullname-th" class="block text-sm font-medium text-plum mb-1.5">ชื่อเต็ม (TH)</label>
-										<input id="artist-fullname-th" bind:value={fullNameTh} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+										<label for="artist-fullname-th" class="block text-sm font-medium text-plum mb-1.5">ชื่อเต็มภาษาไทย</label>
+										<input id="artist-fullname-th" bind:value={fullNameTh} placeholder="ชื่อเต็มภาษาไทย (ถ้ามี)" class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
 									</div>
 								</div>
 								<div>

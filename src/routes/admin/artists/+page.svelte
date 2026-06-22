@@ -108,27 +108,30 @@
 	<form class="mb-4 sm:mb-6" onsubmit={(e) => e.preventDefault()}>
 		<div class="relative">
 			<svg class="w-5 h-5 text-plum-light/60 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-			<input type="text" bind:value={search} placeholder="ค้นหานักแสดง..." class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-lavender/30 bg-white/70 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
+			<input type="text" bind:value={search} placeholder="ค้นหาชื่อเล่น / ชื่อ EN / ชื่อ TH..." class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-lavender/30 bg-white/70 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
 		</div>
 	</form>
 
 	{#if showCreate}
 		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 shadow-lg shadow-lavender/5">
-			<h2 class="text-lg font-semibold text-plum mb-4">เพิ่มนักแสดง</h2>
+			<div class="mb-4">
+				<h2 class="text-lg font-semibold text-plum">เพิ่มนักแสดง</h2>
+				<p class="mt-1 text-sm text-plum-light">เก็บชื่อเต็มแยกภาษาเพื่อให้หน้า public และตัวเลือกนักแสดงแสดงผลได้ถูกต้อง</p>
+			</div>
 			<form onsubmit={createArtist} class="space-y-4">
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="artist-create-nickname" class="block text-sm font-medium text-plum mb-1">ชื่อเล่น <span class="text-coral">*</span></label>
-						<input id="artist-create-nickname" name="nickname" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+						<input id="artist-create-nickname" name="nickname" required placeholder="เช่น Freen" class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
 					</div>
 					<div>
-						<label for="artist-create-fullname-en" class="block text-sm font-medium text-plum mb-1">ชื่อเต็ม (EN) <span class="text-coral">*</span></label>
-						<input id="artist-create-fullname-en" name="fullNameEn" required class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+						<label for="artist-create-fullname-en" class="block text-sm font-medium text-plum mb-1">ชื่อเต็มภาษาอังกฤษ <span class="text-coral">*</span></label>
+						<input id="artist-create-fullname-en" name="fullNameEn" required placeholder="Full name in English" class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
 					</div>
 				</div>
 				<div>
-					<label for="artist-create-fullname-th" class="block text-sm font-medium text-plum mb-1">ชื่อเต็ม (TH)</label>
-					<input id="artist-create-fullname-th" name="fullNameTh" class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+					<label for="artist-create-fullname-th" class="block text-sm font-medium text-plum mb-1">ชื่อเต็มภาษาไทย</label>
+					<input id="artist-create-fullname-th" name="fullNameTh" placeholder="ชื่อเต็มภาษาไทย (ถ้ามี)" class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
 				</div>
 				<div>
 					<label for="artist-create-image" class="block text-sm font-medium text-plum mb-1">URL รูปโปรไฟล์</label>
@@ -161,7 +164,21 @@
 						{:else}
 							<div class="w-12 h-12 rounded-full bg-lavender/10 flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-lavender-dark/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>
 						{/if}
-						<div class="flex-1 min-w-0"><h3 class="font-semibold text-plum text-sm sm:text-base truncate">{artist.nickname}</h3><p class="text-xs sm:text-sm text-plum-light truncate mt-0.5">{artist.fullNameEn}{artist.fullNameTh ? ` · ${artist.fullNameTh}` : ''}</p></div>
+						<div class="flex-1 min-w-0">
+							<h3 class="font-semibold text-plum text-sm sm:text-base truncate">{artist.nickname}</h3>
+							<div class="mt-1 flex flex-wrap gap-1.5">
+								<span class="inline-flex max-w-full items-center rounded-full bg-lavender/12 px-2 py-0.5 text-[11px] font-medium text-plum-light sm:text-xs">
+									<span class="mr-1 text-coral-dark/70">EN</span><span class="truncate">{artist.fullNameEn}</span>
+								</span>
+								{#if artist.fullNameTh}
+									<span class="inline-flex max-w-full items-center rounded-full bg-mint/12 px-2 py-0.5 text-[11px] font-medium text-plum-light sm:text-xs">
+										<span class="mr-1 text-mint-dark/80">TH</span><span class="truncate">{artist.fullNameTh}</span>
+									</span>
+								{:else}
+									<span class="inline-flex items-center rounded-full bg-white/55 px-2 py-0.5 text-[11px] font-medium text-plum-light/70 sm:text-xs">ยังไม่มีชื่อไทย</span>
+								{/if}
+							</div>
+						</div>
 						<button type="button" onclick={(e) => { e.stopPropagation(); deleteTarget = artist; showConfirm = true; }} aria-label="ลบ" class="p-2 rounded-lg hover:bg-coral/10 text-plum-light/60 hover:text-coral-dark transition-colors touch-target flex-shrink-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
 						<svg class="w-5 h-5 text-plum-light/40 group-hover:text-coral-dark group-hover:translate-x-0.5 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
 					</div>
