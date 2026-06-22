@@ -46,7 +46,8 @@
 
 <nav class="fixed top-[var(--pwa-safe-top)] left-0 right-0 z-50 hidden md:block transition-transform duration-300 ease-out {navHidden ? '-translate-y-full' : 'translate-y-0'}">
 	<div class="glass-card-strong mx-2 sm:mx-4 mt-2 sm:mt-4 rounded-2xl px-4 sm:px-6 py-3 sm:py-4">
-		<div class="flex items-center justify-between">
+		<div class="max-w-5xl mx-auto">
+			<div class="flex items-center justify-between">
 			<!-- Logo -->
 			<a href="/" class="flex items-center gap-2 group touch-target">
 				<div class="relative w-8 h-8 sm:w-10 sm:h-10">
@@ -116,6 +117,7 @@
 						</a>
 					</div>
 				{/if}
+			</div>
 			</div>
 		</div>
 	</div>
