@@ -46,10 +46,9 @@
 
 <nav class="fixed top-[var(--pwa-safe-top)] left-0 right-0 z-50 hidden md:block transition-transform duration-300 ease-out {navHidden ? '-translate-y-full' : 'translate-y-0'}">
 	<div class="glass-card-strong mx-2 sm:mx-4 mt-2 sm:mt-4 rounded-2xl px-4 sm:px-6 py-3 sm:py-4">
-		<div class="max-w-5xl mx-auto">
-			<div class="flex items-center justify-between">
+		<div class="grid grid-cols-3 items-center">
 			<!-- Logo -->
-			<a href="/" class="flex items-center gap-2 group touch-target">
+			<a href="/" class="justify-self-start flex items-center gap-2 group touch-target">
 				<div class="relative w-8 h-8 sm:w-10 sm:h-10">
 					<div class="absolute inset-0 bg-gradient-to-br from-coral to-lavender rounded-xl rotate-3 group-hover:rotate-6 transition-transform duration-300"></div>
 					<div class="absolute inset-0 bg-white rounded-xl flex items-center justify-center">
@@ -62,7 +61,7 @@
 			</a>
 
 			<!-- Desktop Navigation -->
-			<div class="flex items-center gap-1">
+			<div class="justify-self-center flex items-center gap-1">
 				{#each navLinks as link}
 					<a
 						href={link.href}
@@ -74,7 +73,7 @@
 			</div>
 
 			<!-- Auth Section -->
-			<div class="flex items-center gap-3">
+			<div class="justify-self-end flex items-center gap-3">
 				{#if currentUser}
 					{#if currentUser.role === 'ADMIN'}
 						<a
@@ -117,8 +116,6 @@
 						</a>
 					</div>
 				{/if}
-			</div>
-			</div>
 		</div>
 	</div>
 </nav>
