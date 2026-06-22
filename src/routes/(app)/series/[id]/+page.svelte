@@ -53,7 +53,8 @@
 			const nextExpanded = new Set<number>();
 			for (const item of series.schedule) {
 				const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA');
-				if (hasSchedules) {
+				const hasMedia = Boolean(item.trailerUrl);
+				if (hasSchedules || hasMedia) {
 					nextExpanded.add(item.episode);
 				}
 			}
@@ -83,6 +84,34 @@
 		if (item.schedules.length === 0) return 'TBA';
 		const first = item.schedules[0];
 		return first.airDate;
+	}
+
+	function youtubeEmbedUrl(rawUrl: string | null): string | null {
+		if (!rawUrl) return null;
+
+		try {
+			const parsed = new URL(rawUrl);
+			const host = parsed.hostname.replace(/^www\.|^m\./, '');
+			let videoId: string | null = null;
+
+			if (host === 'youtu.be') {
+				videoId = parsed.pathname.split('/').filter(Boolean)[0] ?? null;
+			} else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+				if (parsed.pathname === '/watch') {
+					videoId = parsed.searchParams.get('v');
+				} else {
+					const parts = parsed.pathname.split('/').filter(Boolean);
+					if (['embed', 'shorts', 'live'].includes(parts[0])) {
+						videoId = parts[1] ?? null;
+					}
+				}
+			}
+
+			if (!videoId || !/^[\w-]{6,}$/.test(videoId)) return null;
+			return `https://www.youtube-nocookie.com/embed/${videoId}`;
+		} catch {
+			return null;
+		}
 	}
 </script>
 
@@ -137,28 +166,30 @@
 
 		<!-- Hero -->
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12">
-			<div class="md:col-span-1">
+			<div class="relative z-20 md:col-span-1">
 				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl shadow-lavender/10 max-w-xs sm:max-w-none mx-auto">
 					<img src={series.poster} alt={series.titleEn} width={400} height={600} class="w-full aspect-[2/3] object-cover" loading="eager" decoding="async" fetchpriority="high" />
 				</div>
-				<div class="border border-lavender/15 rounded-2xl p-2 mt-3">
-					<div class="flex gap-2">
-						<FavoriteButton seriesId={series.id} className="flex-1 justify-center" />
-						<WatchedButton seriesId={series.id} className="flex-1 justify-center" />
-					</div>
-					<div class="mt-2">
-						<ShareButton
-							title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`}
-							text={`ดู «${series.titleEn}» บน GL-Orbit — ข้อมูลนักแสดง ตารางฉาย แพลตฟอร์มรับชม`}
-							url={canonicalUrl}
-							ariaLabel="แชร์ซีรีส์นี้"
-							className="justify-center w-full"
-						/>
+				<div class="relative z-30 mt-4 overflow-visible rounded-[1.75rem] border border-white/70 bg-white/55 p-2.5 shadow-xl shadow-lavender/15 backdrop-blur-2xl">
+					<div class="pointer-events-none absolute inset-0 rounded-[1.75rem] bg-[radial-gradient(circle_at_20%_0%,rgba(255,107,157,0.16),transparent_42%),radial-gradient(circle_at_90%_95%,rgba(110,231,183,0.18),transparent_38%)]"></div>
+					<div class="relative grid grid-cols-2 gap-2">
+						<FavoriteButton seriesId={series.id} className="w-full justify-start" />
+						<WatchedButton seriesId={series.id} className="w-full justify-start" />
+						<div class="col-span-2">
+							<ShareButton
+								title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`}
+								text={`ดู «${series.titleEn}» บน GL-Orbit — ข้อมูลนักแสดง ตารางฉาย แพลตฟอร์มรับชม`}
+								url={canonicalUrl}
+								ariaLabel="แชร์ซีรีส์นี้"
+								variant="command"
+								className="w-full justify-start"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="md:col-span-2 space-y-4 sm:space-y-6">
+			<div class="relative z-0 md:col-span-2 space-y-4 sm:space-y-6">
 				<div>
 					<div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
 						<span class="px-2.5 sm:px-3 py-1 rounded-full {s?.bg} {s?.class} text-xs sm:text-sm font-semibold">{s?.text}</span>
@@ -173,10 +204,16 @@
 				{/if}
 
 				{#if series.genres.length > 0}
-					<div class="flex flex-wrap gap-2">
-						{#each series.genres as genre}
-							<span class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-lavender/10 text-lavender-dark text-xs sm:text-sm font-medium">{genre}</span>
-						{/each}
+					<div class="rounded-2xl border border-white/70 bg-white/50 p-3 shadow-sm shadow-lavender/10 backdrop-blur-xl">
+						<div class="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-plum-light">
+							<span class="h-2 w-2 rounded-full bg-coral shadow-sm shadow-coral/40"></span>
+							ประเภทซีรีส์
+						</div>
+						<div class="flex flex-wrap gap-2">
+							{#each series.genres as genre}
+								<span class="rounded-full border border-lavender/20 bg-gradient-to-r from-lavender/15 to-coral/10 px-3 py-1.5 text-xs font-semibold text-plum shadow-sm shadow-lavender/5 sm:text-sm">{genre}</span>
+							{/each}
+						</div>
 					</div>
 				{/if}
 
@@ -241,19 +278,31 @@
 					<div class="divide-y divide-lavender/10">
 						{#each series.schedule as item}
 							{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA')}
-							<div class="transition-colors {hasSchedules ? 'hover:bg-white/40 cursor-pointer' : ''}"
+							{@const hasEpisodeMedia = Boolean(item.trailerUrl)}
+							{@const hasEpisodeContent = hasSchedules || hasEpisodeMedia}
+							{@const trailerEmbedUrl = youtubeEmbedUrl(item.trailerUrl)}
+							<div class="transition-colors {hasEpisodeContent ? 'hover:bg-white/40 cursor-pointer' : ''}"
 								role="button"
-								tabindex={hasSchedules ? 0 : undefined}
-								onclick={hasSchedules ? () => toggleEpisode(item.episode) : undefined}
-								onkeydown={hasSchedules ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleEpisode(item.episode); } } : undefined}
-								aria-expanded={hasSchedules ? expandedEpisodes.has(item.episode) : undefined}
+								tabindex={hasEpisodeContent ? 0 : undefined}
+								onclick={hasEpisodeContent ? () => toggleEpisode(item.episode) : undefined}
+								onkeydown={hasEpisodeContent ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleEpisode(item.episode); } } : undefined}
+								aria-expanded={hasEpisodeContent ? expandedEpisodes.has(item.episode) : undefined}
 							>
 								<!-- Collapsed row -->
 								<div class="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
 									<div class="flex items-center gap-3 sm:gap-4 min-w-0">
-										<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center flex-shrink-0">
-											<span class="text-xs sm:text-sm font-bold text-coral-dark">{item.episode}</span>
-										</div>
+										{#if item.coverUrl}
+											<div class="relative h-12 w-16 sm:h-14 sm:w-20 overflow-hidden rounded-xl border border-white/70 bg-lavender/10 shadow-sm shadow-lavender/10 flex-shrink-0">
+												<img src={item.coverUrl} alt={`ภาพปกตอนที่ ${item.episode}`} width={160} height={90} loading="lazy" decoding="async" class="h-full w-full object-cover" />
+												<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/70 to-transparent px-2 py-1">
+													<span class="text-[10px] font-bold text-white">EP {item.episode}</span>
+												</div>
+											</div>
+										{:else}
+											<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center flex-shrink-0">
+												<span class="text-xs sm:text-sm font-bold text-coral-dark">{item.episode}</span>
+											</div>
+										{/if}
 										<div class="min-w-0">
 											<div class="font-semibold text-plum text-sm sm:text-base truncate">{item.title}</div>
 											<div class="text-xs sm:text-sm text-plum-light truncate">{scheduleSummary(item)}</div>
@@ -261,7 +310,7 @@
 									</div>
 									<div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
 										<span class="text-xs sm:text-sm font-medium text-coral-dark whitespace-nowrap">{firstAirDate(item)}</span>
-										{#if hasSchedules}
+										{#if hasEpisodeContent}
 											<!-- Chevron icon -->
 											<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum-light transition-transform duration-200 {expandedEpisodes.has(item.episode) ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -270,8 +319,32 @@
 									</div>
 								</div>
 								<!-- Expanded sub-list -->
-								{#if hasSchedules && expandedEpisodes.has(item.episode)}
-									<div class="px-4 sm:px-6 pb-3 sm:pb-4 space-y-2 animate-fade-in">
+								{#if hasEpisodeContent && expandedEpisodes.has(item.episode)}
+									<div class="px-4 sm:px-6 pb-3 sm:pb-4 space-y-3 animate-fade-in">
+										{#if item.trailerUrl}
+											{#if trailerEmbedUrl}
+												<div class="overflow-hidden rounded-2xl border border-lavender/20 bg-plum/5 shadow-sm shadow-lavender/10">
+													<iframe
+														src={trailerEmbedUrl}
+														title={`Trailer ${item.title}`}
+														class="aspect-video w-full"
+														loading="lazy"
+														allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+														allowfullscreen
+													></iframe>
+												</div>
+											{:else}
+												<div class="rounded-2xl border border-lavender/20 bg-gradient-to-br from-white/70 to-lavender/10 p-4 shadow-sm shadow-lavender/10">
+													<p class="text-xs font-bold uppercase tracking-[0.22em] text-lavender-dark/75">Trailer</p>
+													<p class="mt-1 text-sm text-plum-light">ลิงก์นี้ไม่ใช่ YouTube เปิดดูในแท็บใหม่</p>
+													<a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 rounded-full bg-plum px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-plum/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-coral-dark touch-target">
+														เปิด Trailer
+														<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+													</a>
+												</div>
+											{/if}
+										{/if}
+
 										{#each item.schedules as sch}
 											{@const hasStreamLink = sch.streamLink && sch.streamLink.length > 0}
 											<div class="flex items-center justify-between gap-3 py-2 px-3 sm:px-4 rounded-xl bg-white/50">

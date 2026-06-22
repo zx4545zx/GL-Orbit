@@ -1,6 +1,6 @@
 import { eq, and, isNull, asc, inArray } from 'drizzle-orm';
 import { getDb } from '$lib/server/db/index.js';
-import { series, studios, artists, seriesArtists, episodes, episodeSchedules, platforms } from '$lib/server/db/schema.js';
+import { series, studios, artists, seriesArtists, episodes, episodeSchedules, platforms, genres, seriesGenres } from '$lib/server/db/schema.js';
 import { getCached, setCached } from '$lib/server/cache.js';
 
 const CACHE_TTL = 30_000;
@@ -21,6 +21,8 @@ export type SeriesDetail = {
 	schedule: {
 		episode: number;
 		title: string;
+		coverUrl: string | null;
+		trailerUrl: string | null;
 		schedules: { airDate: string; platform: string; platformLogo: string | null; streamLink: string | null }[];
 	}[];
 };
@@ -75,13 +77,21 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		.innerJoin(artists, eq(seriesArtists.artistId, artists.id))
 		.where(eq(seriesArtists.seriesId, id));
 
+	const genresPromise = db
+		.select({ name: genres.name })
+		.from(seriesGenres)
+		.innerJoin(genres, eq(seriesGenres.genreId, genres.id))
+		.where(eq(seriesGenres.seriesId, id))
+		.orderBy(asc(genres.name));
+
 	const episodesWithSchedulePromise = (async () => {
 		const episodesResult = await db
 			.select({
 				id: episodes.id,
 				episodeNumber: episodes.episodeNumber,
 				title: episodes.title,
-				coverUrl: episodes.coverUrl
+				coverUrl: episodes.coverUrl,
+				trailerUrl: episodes.trailerUrl
 			})
 			.from(episodes)
 			.where(and(eq(episodes.seriesId, id), isNull(episodes.deletedAt)))
@@ -110,9 +120,10 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		return { episodes: episodesResult, schedule: scheduleResult };
 	})();
 
-	const [seriesResult, artistsResult, episodesWithSchedule] = await Promise.all([
+	const [seriesResult, artistsResult, genresResult, episodesWithSchedule] = await Promise.all([
 		seriesPromise,
 		artistsPromise,
+		genresPromise,
 		episodesWithSchedulePromise
 	]);
 
@@ -136,6 +147,8 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		return {
 			episode: ep.episodeNumber,
 			title: ep.title ?? `ตอนที่ ${ep.episodeNumber}`,
+			coverUrl: ep.coverUrl ?? null,
+			trailerUrl: ep.trailerUrl ?? null,
 			schedules: rows.map((sch) => ({
 				airDate: sch.airDate ? sch.airDate.toISOString().split('T')[0] : 'TBA',
 				platform: sch.platformName ?? 'TBA',
@@ -157,7 +170,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		studio: seriesResult.studioName ?? 'ไม่ระบุสตูดิโอ',
 		poster: seriesResult.posterUrl ?? '/placeholders/poster.svg',
 		description: '',
-		genres: [],
+		genres: genresResult.map((g) => g.name),
 		episodes: episodesResult.length,
 		year: firstAirDate,
 		platforms: [...new Map(scheduleResult.filter((s) => s.platformId).map((s) => [s.platformId, { name: s.platformName!, logo: s.platformLogo }])).values()],

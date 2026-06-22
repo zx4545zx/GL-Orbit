@@ -68,26 +68,25 @@
 	disabled={isLoading}
 	aria-label={isLoading ? 'กำลังโหลด' : watched ? 'เลิก mark ดูแล้ว' : 'mark ว่าดูแล้ว'}
 	aria-pressed={isLoading ? undefined : watched}
-	class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 touch-target active:scale-[0.97] {isLoading ? 'border border-plum/5 text-plum-light/50 cursor-wait' : watched ? 'border border-mint/25 text-mint-dark shadow-sm shadow-mint/5' : 'border border-plum/10 text-plum-light hover:shadow-sm hover:-translate-y-0.5 hover:border-mint/20 hover:text-mint-dark'} {className}"
+	class="group relative isolate inline-flex min-h-[3.35rem] items-center gap-3 overflow-hidden rounded-2xl px-3 py-3 text-left text-sm transition-all duration-300 touch-target active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint disabled:pointer-events-none {isLoading ? 'border border-plum/5 bg-white/35 text-plum-light/45 shadow-inner cursor-wait' : watched ? 'border border-mint/35 bg-mint/10 text-mint-dark shadow-lg shadow-mint/15 hover:-translate-y-0.5' : 'border border-white/70 bg-white/60 text-plum hover:-translate-y-0.5 hover:rotate-[0.35deg] hover:border-mint/30 hover:bg-mint/5 hover:shadow-lg hover:shadow-mint/10'} {className}"
 >
-	{#if isLoading}
-		<svg class="w-4 h-4 animate-spin text-plum-light/60" fill="none" viewBox="0 0 24 24">
-			<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-			<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-		</svg>
-	{:else if watched}
-		<div class="w-7 h-7 rounded-full bg-mint/10 flex items-center justify-center shrink-0 ring-1 ring-mint/20">
-			<svg class="w-3.5 h-3.5 text-mint-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+	<span class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_85%_0%,rgba(110,231,183,0.22),transparent_45%),linear-gradient(135deg,rgba(255,255,255,0.65),rgba(255,255,255,0.25))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+
+	<span class="grid h-9 w-9 shrink-0 place-items-center rounded-2xl transition-all duration-300 {watched ? 'bg-mint text-white shadow-md shadow-mint/25 rotate-[6deg]' : 'bg-plum/5 text-plum-light ring-1 ring-plum/5 group-hover:bg-mint group-hover:text-white group-hover:rotate-[6deg]'}">
+		{#if isLoading}
+			<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+				<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
 			</svg>
-		</div>
-		<span class="font-semibold">ดูแล้ว</span>
-	{:else}
-		<div class="w-7 h-7 rounded-full bg-plum/5 flex items-center justify-center shrink-0 ring-1 ring-plum/5 group-hover:ring-mint/15 transition-all duration-300">
-			<svg class="w-3.5 h-3.5 text-plum-light/70 group-hover:text-mint-dark transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 13l4 4L19 7" />
+		{:else}
+			<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width={watched ? '3' : '1.9'} d="M5 13l4 4L19 7" />
 			</svg>
-		</div>
-		<span>ดูแล้ว</span>
-	{/if}
+		{/if}
+	</span>
+
+	<span class="min-w-0 leading-none">
+		<span class="block text-[10px] font-bold uppercase tracking-[0.22em] opacity-55">WATCH</span>
+		<span class="mt-1 block truncate text-xs font-bold sm:text-sm">{isLoading ? 'กำลังเช็ก' : watched ? 'ดูแล้ว' : 'มาร์กว่าดูแล้ว'}</span>
+	</span>
 </button>

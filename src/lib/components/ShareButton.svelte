@@ -4,13 +4,15 @@
 		text,
 		url,
 		className = '',
-		ariaLabel = 'แชร์'
+		ariaLabel = 'แชร์',
+		variant = 'compact'
 	}: {
 		title: string;
 		text: string;
 		url: string;
 		className?: string;
 		ariaLabel?: string;
+		variant?: 'compact' | 'command';
 	} = $props();
 
 	let menuOpen = $state(false);
@@ -26,6 +28,11 @@
 	);
 	const xUrl = $derived(
 		`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`
+	);
+	const buttonClass = $derived(
+		variant === 'command'
+			? `group relative isolate inline-flex min-h-[3.35rem] items-center gap-3 overflow-hidden rounded-2xl px-3 py-3 text-left text-sm transition-all duration-300 touch-target active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/35 bg-lavender/10 text-lavender-dark shadow-lg shadow-lavender/15' : 'border border-white/70 bg-white/60 text-plum hover:-translate-y-0.5 hover:border-lavender/35 hover:bg-lavender/5 hover:shadow-lg hover:shadow-lavender/10'} ${className}`
+			: `group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 touch-target active:scale-[0.97] border border-plum/10 text-plum-light hover:shadow-sm hover:-translate-y-0.5 hover:border-lavender/30 hover:text-lavender-dark ${menuOpen ? 'border-lavender/30 text-lavender-dark shadow-sm' : ''} ${className}`
 	);
 
 	const LINE_PATH =
@@ -96,19 +103,39 @@
 		aria-label={ariaLabel}
 		aria-haspopup="menu"
 		aria-expanded={menuOpen}
-		class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 touch-target active:scale-[0.97] border border-plum/10 text-plum-light hover:shadow-sm hover:-translate-y-0.5 hover:border-lavender/30 hover:text-lavender-dark {menuOpen ? 'border-lavender/30 text-lavender-dark shadow-sm' : ''} {className}"
+		class={buttonClass}
 	>
-		<div class="w-7 h-7 rounded-full bg-plum/5 flex items-center justify-center shrink-0 ring-1 ring-plum/5 group-hover:ring-lavender/20 transition-all duration-300">
-			<svg class="w-3.5 h-3.5 text-plum-light/70 group-hover:text-lavender-dark transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="1.8"
-					d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-2.684-4.684M5.342 8.684a3 3 0 104.026 4.026m-4.026-4.026L18.058 5.5M5.342 15.316L18.058 18.5"
-				/>
-			</svg>
-		</div>
-		<span>แชร์</span>
+		{#if variant === 'command'}
+			<span class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_100%,rgba(196,181,253,0.26),transparent_45%),linear-gradient(135deg,rgba(255,255,255,0.68),rgba(255,255,255,0.26))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+
+			<span class="grid h-9 w-9 shrink-0 place-items-center rounded-2xl transition-all duration-300 {menuOpen ? 'bg-lavender text-white shadow-md shadow-lavender/25' : 'bg-plum/5 text-plum-light ring-1 ring-plum/5 group-hover:bg-lavender group-hover:text-white group-hover:rotate-[-4deg]'}">
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="1.9"
+						d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-2.684-4.684M5.342 8.684a3 3 0 104.026 4.026m-4.026-4.026L18.058 5.5M5.342 15.316L18.058 18.5"
+					/>
+				</svg>
+			</span>
+
+			<span class="min-w-0 leading-none">
+				<span class="block text-[10px] font-bold uppercase tracking-[0.22em] opacity-55">SHARE</span>
+				<span class="mt-1 block truncate text-xs font-bold sm:text-sm">ส่งต่อให้เพื่อน</span>
+			</span>
+		{:else}
+			<div class="w-7 h-7 rounded-full bg-plum/5 flex items-center justify-center shrink-0 ring-1 ring-plum/5 group-hover:ring-lavender/20 transition-all duration-300">
+				<svg class="w-3.5 h-3.5 text-plum-light/70 group-hover:text-lavender-dark transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="1.8"
+						d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-2.684-4.684M5.342 8.684a3 3 0 104.026 4.026m-4.026-4.026L18.058 5.5M5.342 15.316L18.058 18.5"
+					/>
+				</svg>
+			</div>
+			<span>แชร์</span>
+		{/if}
 	</button>
 
 	{#if menuOpen}
@@ -116,9 +143,9 @@
 		<div
 			role="menu"
 			aria-label="ตัวเลือกแชร์"
-			class="absolute right-0 top-full mt-2 z-50 w-60 bg-white border border-lavender/20 rounded-2xl p-2 shadow-xl shadow-lavender/25 animate-fade-in"
+			class="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-3xl border border-white/70 bg-white/90 p-2 shadow-2xl shadow-lavender/25 backdrop-blur-xl animate-fade-in"
 		>
-			<p class="px-3 pt-1.5 pb-2 text-xs font-semibold text-plum-light uppercase tracking-wider">แชร์ไปยัง</p>
+			<p class="px-3 pb-2 pt-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-plum-light">แชร์ไปยัง</p>
 
 			<a
 				href={lineUrl}
