@@ -113,7 +113,7 @@
 		aria-label={ariaLabel}
 		aria-haspopup="menu"
 		aria-expanded={menuOpen}
-		class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 touch-target bg-white text-plum-light shadow-md shadow-lavender/10 hover:text-coral-dark hover:bg-coral/5 {className}"
+		class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 touch-target bg-white border border-plum/10 text-plum-light shadow-sm hover:text-coral-dark hover:border-coral/20 hover:bg-coral/5 {className}"
 	>
 		<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path
