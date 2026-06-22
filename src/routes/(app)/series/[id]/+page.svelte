@@ -157,7 +157,7 @@
 		</div>
 	</div>
 {:else}
-	<div class="relative -mx-4 overflow-hidden bg-[radial-gradient(circle_at_15%_8%,rgba(255,107,157,0.14),transparent_34%),radial-gradient(circle_at_88%_18%,rgba(196,181,253,0.20),transparent_32%),radial-gradient(circle_at_10%_78%,rgba(110,231,183,0.12),transparent_30%)] px-4 py-6 sm:py-8 md:-mt-24 md:pt-32">
+	<div class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[radial-gradient(circle_at_15%_8%,rgba(255,107,157,0.14),transparent_34%),radial-gradient(circle_at_88%_18%,rgba(196,181,253,0.20),transparent_32%),radial-gradient(circle_at_10%_78%,rgba(110,231,183,0.12),transparent_30%)] px-4 pb-[calc(1.5rem+var(--bottom-nav-reserved-space))] pt-6 sm:pb-[calc(2rem+var(--bottom-nav-reserved-space))] sm:pt-8 md:mb-0 md:-mt-24 md:pb-8 md:pt-32">
 		<div class="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-coral/15 blur-3xl"></div>
 		<div class="pointer-events-none absolute right-0 top-20 h-64 w-64 rounded-full bg-lavender/20 blur-3xl animate-float"></div>
 		<div class="pointer-events-none absolute bottom-20 left-0 h-56 w-56 rounded-full bg-mint/15 blur-3xl animate-float-delayed"></div>

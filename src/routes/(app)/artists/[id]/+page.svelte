@@ -95,7 +95,7 @@
 	{@html jsonLdScript(jsonLd)}
 </svelte:head>
 
-<div class="relative -mx-4 overflow-hidden bg-[radial-gradient(circle_at_18%_6%,rgba(255,107,157,0.14),transparent_34%),radial-gradient(circle_at_86%_14%,rgba(196,181,253,0.22),transparent_34%),radial-gradient(circle_at_14%_82%,rgba(110,231,183,0.12),transparent_30%)] px-4 pb-12 pt-4 sm:pt-6 md:-mt-24 md:pt-32">
+<div class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[radial-gradient(circle_at_18%_6%,rgba(255,107,157,0.14),transparent_34%),radial-gradient(circle_at_86%_14%,rgba(196,181,253,0.22),transparent_34%),radial-gradient(circle_at_14%_82%,rgba(110,231,183,0.12),transparent_30%)] px-4 pb-[calc(3rem+var(--bottom-nav-reserved-space))] pt-4 sm:pt-6 md:mb-0 md:-mt-24 md:pb-12 md:pt-32">
 	<div class="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-coral/15 blur-3xl"></div>
 	<div class="pointer-events-none absolute right-0 top-20 h-64 w-64 rounded-full bg-lavender/20 blur-3xl animate-float"></div>
 	<div class="pointer-events-none absolute bottom-24 left-0 h-56 w-56 rounded-full bg-mint/15 blur-3xl animate-float-delayed"></div>
