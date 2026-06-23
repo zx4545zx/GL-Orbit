@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 	import type { FeaturedSeriesItem, UpcomingScheduleItem } from '$lib/types/home.js';
 
@@ -26,6 +26,15 @@
 				'query-input': 'required name=search_term_string'
 			}
 		},
+		{
+			'@context': 'https://schema.org',
+			'@type': 'Organization',
+			name: SITE_NAME,
+			url: canonicalUrl,
+			logo: absoluteUrl(page.url.origin, '/icons/gl-orbit-icon.png'),
+			description: DEFAULT_SEO_DESCRIPTION,
+			inLanguage: 'th-TH'
+		},
 		buildBreadcrumbJsonLd(page.url.origin, [{ name: 'หน้าแรก', path: '/' }])
 	]));
 
@@ -46,6 +55,9 @@
 	<meta property="og:description" content={DEFAULT_SEO_DESCRIPTION} />
 	<meta property="og:url" content={canonicalUrl} />
 	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+	<meta property="og:image:width" content={OG_IMAGE_WIDTH} />
+	<meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
+	<meta property="og:image:type" content={OG_IMAGE_TYPE} />
 	<meta name="twitter:title" content={DEFAULT_SEO_TITLE} />
 	<meta name="twitter:description" content={DEFAULT_SEO_DESCRIPTION} />
 	{@html jsonLdScript(homeJsonLd)}

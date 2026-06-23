@@ -2,7 +2,7 @@
 	import '../app.css';
 	import { navigating, page } from '$app/state';
 	import { onMount } from 'svelte';
-	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, SITE_LOCALE, SITE_NAME, absoluteUrl } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_LOCALE, SITE_NAME, absoluteUrl } from '$lib/seo.js';
 
 	let { children } = $props();
 
@@ -53,6 +53,9 @@
 	<meta property="og:site_name" content={SITE_NAME} />
 	<meta property="og:locale" content={SITE_LOCALE} />
 	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+	<meta property="og:image:width" content={OG_IMAGE_WIDTH} />
+	<meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
+	<meta property="og:image:type" content={OG_IMAGE_TYPE} />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={DEFAULT_SEO_TITLE} />
 	<meta name="twitter:description" content={DEFAULT_SEO_DESCRIPTION} />

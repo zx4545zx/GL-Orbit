@@ -46,6 +46,7 @@
 
 <svelte:head>
 	<title>สมัครสมาชิก | GL-Orbit</title>
+	<meta name="description" content="สมัครสมาชิก GL-Orbit เพื่อติดตามซีรีส์ GL ที่คุณชื่นชอบ รับการแจ้งเตือนตอนใหม่ และจัดการตารางฉายส่วนตัว" />
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 

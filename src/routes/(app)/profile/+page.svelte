@@ -133,6 +133,7 @@
 
 <svelte:head>
 	<title>โปรไฟล์ของฉัน | GL-Orbit</title>
+	<meta name="description" content="จัดการโปรไฟล์ GL-Orbit ของคุณ — ดูรายการซีรีส์ที่ชอบและรับชม เปลี่ยนรหัสผ่าน และแก้ไขข้อมูลส่วนตัว" />
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 

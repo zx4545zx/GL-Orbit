@@ -1,6 +1,6 @@
 import { asc, isNull } from 'drizzle-orm';
 import { getDb } from '$lib/server/db/index.js';
-import { series } from '$lib/server/db/schema.js';
+import { artists, series } from '$lib/server/db/schema.js';
 import type { RequestHandler } from './$types.js';
 
 function escapeXml(value: string): string {
@@ -25,17 +25,26 @@ function urlEntry(origin: string, path: string, changefreq: string, priority: st
 export const GET: RequestHandler = async ({ url }) => {
 	const origin = url.origin;
 	const db = await getDb();
-	const publishedSeries = await db
-		.select({ id: series.id })
-		.from(series)
-		.where(isNull(series.deletedAt))
-		.orderBy(asc(series.titleEn));
+
+	const [publishedSeries, publishedArtists] = await Promise.all([
+		db
+			.select({ id: series.id })
+			.from(series)
+			.where(isNull(series.deletedAt))
+			.orderBy(asc(series.titleEn)),
+		db
+			.select({ id: artists.id })
+			.from(artists)
+			.where(isNull(artists.deletedAt))
+			.orderBy(asc(artists.fullNameEn))
+	]);
 
 	const urls = [
 		urlEntry(origin, '/', 'daily', '1.0'),
 		urlEntry(origin, '/series', 'daily', '0.9'),
 		urlEntry(origin, '/calendar', 'hourly', '0.9'),
-		...publishedSeries.map((item) => urlEntry(origin, `/series/${item.id}`, 'weekly', '0.8'))
+		...publishedSeries.map((item) => urlEntry(origin, `/series/${item.id}`, 'weekly', '0.8')),
+		...publishedArtists.map((item) => urlEntry(origin, `/artists/${item.id}`, 'weekly', '0.6'))
 	];
 
 	const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join('')}</urlset>`;

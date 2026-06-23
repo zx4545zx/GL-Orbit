@@ -96,6 +96,7 @@
 
 <svelte:head>
 	<title>การแจ้งเตือน | GL-Orbit</title>
+	<meta name="description" content="การแจ้งเตือน GL-Orbit — ติดตามตอนใหม่ของซีรีส์ GL ที่คุณชื่นชอบได้ที่นี่" />
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 

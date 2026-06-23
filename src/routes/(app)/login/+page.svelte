@@ -39,6 +39,7 @@
 
 <svelte:head>
 	<title>เข้าสู่ระบบ | GL-Orbit</title>
+	<meta name="description" content="เข้าสู่ระบบ GL-Orbit เพื่อจัดการโปรไฟล์ บันทึกซีรีส์ที่ชอบ และรับการแจ้งเตือนตารางฉาย" />
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 

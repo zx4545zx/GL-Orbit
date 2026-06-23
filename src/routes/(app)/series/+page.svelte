@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { DEFAULT_OG_IMAGE, absoluteUrl, jsonLdScript } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, jsonLdScript } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 	import type { FilterKey, SeriesApiResponseItem } from './series.js';
 
@@ -157,6 +157,9 @@
 	<meta property="og:description" content={data.seo.ogDescription} />
 	<meta property="og:url" content={`${page.url.origin}${data.seo.canonicalPath}`} />
 	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+	<meta property="og:image:width" content={OG_IMAGE_WIDTH} />
+	<meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
+	<meta property="og:image:type" content={OG_IMAGE_TYPE} />
 	<meta name="twitter:title" content={data.seo.ogTitle} />
 	<meta name="twitter:description" content={data.seo.ogDescription} />
 	{@html jsonLdScript(data.seo.jsonLd)}
