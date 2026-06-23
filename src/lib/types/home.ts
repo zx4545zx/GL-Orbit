@@ -11,6 +11,7 @@ export interface UpcomingScheduleItem {
 	day: string;
 	time: string;
 	series: string;
+	seriesId: string;
 	isUncut: boolean;
 	episode: string;
 	platform: string;

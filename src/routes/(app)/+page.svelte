@@ -227,30 +227,32 @@
 		{:else}
 			<div class="max-w-2xl mx-auto space-y-3 sm:space-y-4">
 				{#each upcomingSchedule as item, i}
-					<div class="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex items-center gap-3 sm:gap-5 hover:shadow-lg hover:shadow-lavender/10 transition-all duration-300 group">
-						<div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coral/20 to-lavender/20 flex flex-col items-center justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-coral-dark">{item.day}</span>
-							<span class="text-xs sm:text-sm font-bold text-plum">{item.time}</span>
-						</div>
-						<div class="flex-1 min-w-0">
-							<div class="flex items-center gap-2 mb-1">
-								<h3 class="font-semibold text-plum text-sm sm:text-base truncate">{item.series}</h3>
-								{#if item.isUncut}
-									<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] sm:text-xs font-medium flex-shrink-0">Uncut</span>
-								{/if}
+					<a href="/series/{item.seriesId}" class="block group">
+						<div class="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex items-center gap-3 sm:gap-5 hover:shadow-lg hover:shadow-lavender/10 transition-all duration-300 group-hover:-translate-y-0.5">
+							<div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coral/20 to-lavender/20 flex flex-col items-center justify-center">
+								<span class="text-[10px] sm:text-xs font-bold text-coral-dark">{item.day}</span>
+								<span class="text-xs sm:text-sm font-bold text-plum">{item.time}</span>
 							</div>
-							<div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-plum-light">
-								<span>{item.episode}</span>
-								<span class="w-1 h-1 rounded-full bg-lavender"></span>
-								<span>{item.platform}</span>
+							<div class="flex-1 min-w-0">
+								<div class="flex items-center gap-2 mb-1">
+									<h3 class="font-semibold text-plum text-sm sm:text-base truncate group-hover:text-coral-dark transition-colors">{item.series}</h3>
+									{#if item.isUncut}
+										<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] sm:text-xs font-medium flex-shrink-0">Uncut</span>
+									{/if}
+								</div>
+								<div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-plum-light">
+									<span>{item.episode}</span>
+									<span class="w-1 h-1 rounded-full bg-lavender"></span>
+									<span>{item.platform}</span>
+								</div>
+							</div>
+							<div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+								<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-coral/10 flex items-center justify-center">
+									<svg class="w-4 h-4 sm:w-5 sm:h-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+								</div>
 							</div>
 						</div>
-						<div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-							<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-coral/10 flex items-center justify-center">
-								<svg class="w-4 h-4 sm:w-5 sm:h-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-							</div>
-						</div>
-					</div>
+					</a>
 				{/each}
 			</div>
 		{/if}
