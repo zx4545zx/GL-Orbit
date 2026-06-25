@@ -167,10 +167,10 @@
 		<div class="relative mx-auto max-w-6xl">
 
 		<!-- Back button -->
-		<a href="/series" class="relative z-10 mb-6 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-coral/30 hover:bg-white/80 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
+		<button onclick={() => history.back()} class="relative z-10 mb-6 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-coral/30 hover:bg-white/80 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
 			<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-			<span>กลับหน้ารายการซีรีส์</span>
-		</a>
+			<span>ย้อนกลับ</span>
+		</button>
 
 		<!-- Hero -->
 		<div class="relative z-10 mb-10 grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-3 sm:mb-12">

@@ -114,10 +114,10 @@
 	</div>
 
 	<div class="relative z-10 max-w-3xl mx-auto">
-		<a href="/" class="flex w-fit items-center gap-1.5 text-sm font-medium text-plum-light hover:text-coral-dark transition-colors mb-6 sm:mb-8 glass-card rounded-full pl-3 pr-4 py-2 touch-target">
+		<button onclick={() => history.back()} class="flex w-fit items-center gap-1.5 text-sm font-medium text-plum-light hover:text-coral-dark transition-colors mb-6 sm:mb-8 glass-card rounded-full pl-3 pr-4 py-2 touch-target">
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-			กลับหน้าแรก
-		</a>
+			ย้อนกลับ
+		</button>
 
 		<div class="inline-flex items-center gap-2 mb-4 animate-slide-up">
 			<span class="relative flex h-2.5 w-2.5">
