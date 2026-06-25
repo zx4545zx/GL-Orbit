@@ -335,9 +335,14 @@
 						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">ตารางฉาย</h2>
 					</div>
 					<div class="flex items-center gap-2">
-						<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{series.schedule.length} episodes</span>
-						<button onclick={toggleAll} class="rounded-full border border-coral/30 bg-coral/5 px-3 py-1 text-xs font-semibold text-coral-dark shadow-sm hover:bg-coral/15 hover:border-coral/50 transition-all duration-200 active:scale-95 touch-target whitespace-nowrap" aria-label={allExpanded ? 'ย่อทั้งหมด' : 'ขยายทั้งหมด'}>
-							{allExpanded ? 'ย่อทั้งหมด' : 'ขยายทั้งหมด'}
+						<button onclick={toggleAll} class="rounded-full border border-coral/30 bg-coral/5 pl-2 pr-3 py-1 text-xs font-semibold text-coral-dark shadow-sm hover:bg-coral/15 hover:border-coral/50 transition-all duration-200 active:scale-95 touch-target whitespace-nowrap flex items-center gap-1" aria-label={allExpanded ? 'ย่อทั้งหมด' : 'ขยายทั้งหมด'}>
+							{#if allExpanded}
+								<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 15 12 7 20 15"/><line x1="4" y1="19" x2="20" y2="19"/></svg>
+								<span>ย่อทั้งหมด</span>
+							{:else}
+								<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 9 12 17 20 9"/><line x1="4" y1="5" x2="20" y2="5"/></svg>
+								<span>ขยายทั้งหมด</span>
+							{/if}
 						</button>
 					</div>
 				</div>
