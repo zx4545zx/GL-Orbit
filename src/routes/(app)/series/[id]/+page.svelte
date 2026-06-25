@@ -80,6 +80,15 @@
 		return `${valid.length} แพลตฟอร์ม`;
 	}
 
+	function isToday(schedules: { airDate: string }[]): boolean {
+		const today = new Date().toISOString().split('T')[0];
+		return schedules.some((s) => s.airDate === today);
+	}
+
+	function hasUncut(schedules: { isUncut: boolean }[]): boolean {
+		return schedules.some((s) => s.isUncut);
+	}
+
 	function firstAirDate(item: { schedules: { airDate: string; platform: string }[] }): string {
 		if (item.schedules.length === 0) return 'TBA';
 		const first = item.schedules[0];
@@ -337,6 +346,9 @@
 										</div>
 									</div>
 									<div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+										{#if isToday(item.schedules)}
+											<span class="px-2 py-0.5 rounded-full bg-coral/15 text-coral-dark text-[10px] font-bold border border-coral/20 whitespace-nowrap">วันนี้</span>
+										{/if}
 										<span class="text-xs sm:text-sm font-medium text-coral-dark whitespace-nowrap">{firstAirDate(item)}</span>
 										{#if hasEpisodeContent}
 											<!-- Chevron icon -->
@@ -385,7 +397,12 @@
 														</div>
 													{/if}
 													<div class="min-w-0">
-														<div class="text-sm sm:text-base font-medium text-plum truncate">{sch.platform}</div>
+														<div class="flex items-center gap-1.5">
+															<span class="text-sm sm:text-base font-medium text-plum truncate">{sch.platform}</span>
+															{#if sch.isUncut}
+																<span class="flex-shrink-0 px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[9px] font-bold border border-amber-200">Uncut</span>
+															{/if}
+														</div>
 														<div class="text-xs text-plum-light">{sch.airDate}</div>
 													</div>
 												</div>

@@ -23,7 +23,7 @@ export type SeriesDetail = {
 		title: string;
 		coverUrl: string | null;
 		trailerUrl: string | null;
-		schedules: { airDate: string; platform: string; platformLogo: string | null; streamLink: string | null }[];
+		schedules: { airDate: string; platform: string; platformLogo: string | null; streamLink: string | null; isUncut: boolean }[];
 	}[];
 };
 
@@ -34,6 +34,7 @@ type ScheduleRow = {
 	platformName: string | null;
 	platformLogo: string | null;
 	streamLink: string | null;
+	isUncut: boolean;
 };
 
 export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> {
@@ -108,7 +109,8 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 					platformId: platforms.id,
 					platformName: platforms.name,
 					platformLogo: platforms.logoUrl,
-					streamLink: episodeSchedules.streamLink
+					streamLink: episodeSchedules.streamLink,
+					isUncut: episodeSchedules.isUncut
 				})
 				.from(episodeSchedules)
 				.leftJoin(platforms, eq(episodeSchedules.platformId, platforms.id))
@@ -154,7 +156,8 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 				airDate: sch.airDate ? sch.airDate.toISOString().split('T')[0] : 'TBA',
 				platform: sch.platformName ?? 'TBA',
 				platformLogo: sch.platformLogo ?? null,
-				streamLink: sch.streamLink ?? null
+				streamLink: sch.streamLink ?? null,
+				isUncut: sch.isUncut
 			}))
 		};
 	});
