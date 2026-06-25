@@ -2,12 +2,13 @@
 	import { page } from '$app/state';
 	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
-	import type { FeaturedSeriesItem, UpcomingScheduleItem } from '$lib/types/home.js';
+	import type { CountdownItem, FeaturedSeriesItem, UpcomingScheduleItem } from '$lib/types/home.js';
 
 	let { data }: { data: PageData } = $props();
 
 	const featuredSeries = $derived<FeaturedSeriesItem[]>(data.featuredSeries);
 	const upcomingSchedule = $derived<UpcomingScheduleItem[]>(data.upcomingSchedule);
+	const countdownItems = $derived<CountdownItem[]>(data.countdown);
 	const loadingFeatured = false;
 	const loadingSchedule = false;
 
@@ -43,6 +44,44 @@
 		UPCOMING: { text: ' upcoming', class: 'bg-lavender/20 text-lavender-dark' },
 		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
 	};
+
+	// --- Live countdown clock ---
+	// `now` ticks every second so the HH:MM:SS tiles update in real time.
+	let now = $state(Date.now());
+	$effect(() => {
+		if (countdownItems.length === 0) return;
+		const interval = setInterval(() => {
+			now = Date.now();
+		}, 1000);
+		return () => clearInterval(interval);
+	});
+
+	interface ActiveCountdown extends CountdownItem {
+		diff: number;
+		days: number;
+		hours: number;
+		minutes: number;
+		seconds: number;
+	}
+
+	// Only keep airings still in the future — when `diff <= 0` the card disappears.
+	const activeCountdowns = $derived<ActiveCountdown[]>(
+		countdownItems
+			.map((item) => {
+				const diff = new Date(item.airDate).getTime() - now;
+				return {
+					...item,
+					diff,
+					days: Math.max(0, Math.floor(diff / 86_400_000)),
+					hours: Math.max(0, Math.floor((diff % 86_400_000) / 3_600_000)),
+					minutes: Math.max(0, Math.floor((diff % 3_600_000) / 60_000)),
+					seconds: Math.max(0, Math.floor((diff % 60_000) / 1_000))
+				};
+			})
+			.filter((c) => c.diff > 0)
+	);
+
+	const pad = (n: number) => String(n).padStart(2, '0');
 </script>
 
 <svelte:head>
@@ -63,35 +102,45 @@
 	{@html jsonLdScript(homeJsonLd)}
 </svelte:head>
 
-<!-- Hero Section -->
-<section class="relative min-h-[70vh] sm:min-h-[80vh] flex items-center justify-center overflow-hidden -mx-4 px-4 md:-mt-24">
-	<!-- Background decorations -->
+<!-- Hero Section: Cosmic Observatory (light theme) -->
+<section class="relative min-h-[78vh] sm:min-h-[86vh] flex items-center justify-center overflow-hidden -mx-4 px-4 rounded-b-[2.5rem] sm:rounded-b-[3.5rem] mt-0">
+	<!-- light gradient base (ตาม theme project) -->
 	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
-	<div class="absolute top-16 sm:top-20 left-4 sm:left-10 w-48 h-48 sm:w-72 sm:h-72 bg-coral/20 rounded-full blur-3xl animate-float"></div>
-	<div class="absolute bottom-16 sm:bottom-20 right-4 sm:right-10 w-64 h-64 sm:w-96 sm:h-96 bg-lavender/20 rounded-full blur-3xl animate-float-delayed"></div>
-	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[600px] sm:h-[600px] bg-mint/10 rounded-full blur-3xl"></div>
+	<!-- soft pastel glows -->
+	<div class="absolute -top-10 -left-10 w-72 h-72 sm:w-96 sm:h-96 bg-coral/20 rounded-full blur-[80px] animate-float pointer-events-none"></div>
+	<div class="absolute bottom-0 -right-10 w-80 h-80 sm:w-[28rem] sm:h-[28rem] bg-lavender/20 rounded-full blur-[90px] animate-float-delayed pointer-events-none"></div>
+	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[26rem] h-[26rem] sm:w-[40rem] sm:h-[40rem] bg-mint/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-	<!-- Orbiting elements -->
-	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] sm:w-[400px] sm:h-[400px]">
-		<div class="absolute w-3 h-3 sm:w-4 sm:h-4 bg-coral rounded-full animate-orbit opacity-60"></div>
-		<div class="absolute w-2 h-2 sm:w-3 sm:h-3 bg-lavender rounded-full animate-orbit opacity-40" style="animation-delay: -7s; animation-duration: 15s;"></div>
-		<div class="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 bg-mint rounded-full animate-orbit opacity-50" style="animation-delay: -13s; animation-duration: 25s;"></div>
+	<!-- orbital system centerpiece: concentric rings + orbiting bodies -->
+	<div class="absolute left-1/2 top-1/2 pointer-events-none">
+		<!-- rings (centered on point) -->
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] sm:w-[560px] sm:h-[560px] rounded-full border border-lavender/25"></div>
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[380px] sm:h-[380px] rounded-full border border-dashed border-lavender/35"></div>
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[130px] h-[130px] sm:w-[210px] sm:h-[210px] rounded-full border border-coral/30"></div>
+		<!-- orbit 3: mint, slow -->
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] sm:w-[560px] sm:h-[560px] animate-[spin_26s_linear_infinite]"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-mint shadow-[0_0_12px_rgba(110,231,183,0.7)]"></span></div>
+		<!-- orbit 2: lavender, medium reverse -->
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[380px] sm:h-[380px] animate-[spin_17s_linear_infinite_reverse]"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-lavender-dark shadow-[0_0_12px_rgba(139,92,246,0.6)]"></span></div>
+		<!-- orbit 1: coral, fast -->
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[130px] h-[130px] sm:w-[210px] sm:h-[210px] animate-[spin_9s_linear_infinite]"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-coral shadow-[0_0_14px_rgba(255,107,157,0.85)]"></span></div>
+		<!-- central soft glow behind text -->
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] sm:w-[520px] sm:h-[520px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.7)_0%,transparent_70%)]"></div>
 	</div>
 
-	<div class="relative z-10 text-center max-w-3xl mx-auto px-4 md:pt-24">
+	<div class="relative z-10 text-center max-w-3xl mx-auto px-4 py-20 sm:py-24">
 		<div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/60 backdrop-blur-sm border border-lavender/20 mb-6 sm:mb-8 animate-slide-up">
 			<span class="w-2 h-2 bg-coral rounded-full animate-pulse"></span>
 			<span class="text-xs sm:text-sm font-medium text-plum-light">ยินดีต้อนรับสู่จักรวาล GL</span>
 		</div>
 
-		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-plum mb-4 sm:mb-6 animate-slide-up stagger-1 leading-tight">
+		<h1 class="font-[family-name:var(--font-display)] text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-plum mb-4 sm:mb-6 animate-slide-up stagger-1 leading-[1.05]">
 			ค้นพบซีรีส์
 			<span class="text-gradient">GL</span>
 			<br class="hidden sm:block" />
 			ที่คุณรัก
 		</h1>
 
-		<p class="text-base sm:text-lg md:text-xl text-plum-light max-w-xl mx-auto mb-6 sm:mb-10 leading-relaxed animate-slide-up stagger-2 px-2">
+		<p class="text-base sm:text-lg md:text-xl text-plum-light max-w-xl mx-auto mb-7 sm:mb-10 leading-relaxed animate-slide-up stagger-2 px-2">
 			ติดตามตารางฉาย ข้อมูลซีรีส์ และลิงก์รับชม<br class="hidden md:block" />
 			ที่อัปเดตแบบเรียลไทม์
 		</p>
@@ -99,25 +148,150 @@
 		<div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up stagger-3 px-4 sm:px-0">
 			<a
 				href="/calendar"
-				class="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold text-base sm:text-lg shadow-xl shadow-coral/25 hover:shadow-2xl hover:shadow-coral/30 hover:scale-105 transition-all duration-300 animate-pulse-glow touch-target flex items-center justify-center"
+				class="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold text-base sm:text-lg shadow-xl shadow-coral/25 hover:shadow-2xl hover:shadow-coral/30 hover:scale-105 transition-all duration-300 animate-pulse-glow touch-target flex items-center justify-center gap-2"
 			>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
 				ดูตารางฉาย
 			</a>
 			<a
 				href="/series"
-				class="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl glass-card-strong text-plum font-semibold text-base sm:text-lg hover:bg-white/90 hover:scale-105 transition-all duration-300 touch-target flex items-center justify-center"
+				class="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl glass-card-strong text-plum font-semibold text-base sm:text-lg hover:bg-white/90 hover:scale-105 transition-all duration-300 touch-target flex items-center justify-center gap-2"
 			>
 				สำรวจซีรีส์
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
 			</a>
 		</div>
 	</div>
+
+	<!-- scroll hint -->
+	<div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 hidden sm:flex flex-col items-center gap-1.5 text-plum-light/50 animate-float">
+		<span class="text-[10px] uppercase tracking-[0.25em]">เลื่อนลง</span>
+		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+	</div>
 </section>
 
+<!-- Countdown: ซีรีส์ที่จะฉายภายใน 24 ชั่วโมง (สูงสุด 3 เรื่อง, หายไปเมื่อถึงเวลาฉาย) -->
+{#if activeCountdowns.length > 0}
+	<section class="relative py-10 sm:py-14 -mx-4 px-4 overflow-hidden">
+		<div class="absolute inset-0 bg-gradient-to-b from-coral/5 via-transparent to-lavender/5 pointer-events-none"></div>
+		<div class="absolute top-10 right-0 w-40 h-40 sm:w-56 sm:h-56 bg-mint/10 rounded-full blur-3xl animate-float-delayed pointer-events-none"></div>
+		<div class="relative max-w-6xl mx-auto">
+			<div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 gap-3">
+				<div>
+					<div class="inline-flex items-center gap-2 mb-2">
+						<span class="relative flex h-2.5 w-2.5">
+							<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-coral opacity-75"></span>
+							<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-coral"></span>
+						</span>
+						<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">Live Countdown</span>
+					</div>
+					<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum">
+						ใกล้<span class="text-coral">ฉายแล้ว</span>
+					</h2>
+					<p class="text-sm sm:text-base text-plum-light mt-1">นับถอยหลังสู่ตอนใหม่ · ภายใน 24 ชั่วโมง</p>
+				</div>
+				<a href="/countdown" class="hidden sm:flex items-center gap-2 text-coral-dark font-medium hover:gap-3 transition-all text-sm touch-target">
+					ดูทั้งหมด
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+				</a>
+			</div>
+
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+				{#each activeCountdowns as c, i (c.id)}
+					<a
+						href="/series/{c.seriesId}"
+						class="group block animate-slide-up"
+						style="animation-delay: {i * 80}ms; animation-fill-mode: both;"
+					>
+						<article class="glass-card-strong rounded-[1.75rem] p-5 sm:p-6 relative overflow-hidden hover:-translate-y-1.5 transition-all duration-500 hover:shadow-2xl hover:shadow-coral/20 h-full flex flex-col">
+							<!-- playful lightning badge: ใกล้ฉายมาก -->
+							<div class="absolute top-3.5 right-3.5 z-10 animate-float">
+								<div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-coral to-coral-dark shadow-lg shadow-coral/50 flex items-center justify-center rotate-[8deg]">
+									<svg class="w-5 h-5 text-white -rotate-[8deg]" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+								</div>
+								<span class="absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full bg-mint shadow-[0_0_6px_rgba(110,231,183,0.95)]"></span>
+							</div>
+							<!-- decorative blobs -->
+							<div class="absolute -top-10 -right-10 w-32 h-32 bg-coral/15 rounded-full blur-2xl pointer-events-none"></div>
+							<div class="absolute -bottom-10 -left-10 w-32 h-32 bg-lavender/15 rounded-full blur-2xl pointer-events-none"></div>
+
+							<!-- header: poster + meta -->
+							<div class="relative flex items-center gap-3 mb-3 pr-12">
+								<div class="flex-shrink-0 w-11 h-14 sm:w-12 sm:h-16 rounded-xl overflow-hidden bg-lavender/10 ring-1 ring-white/60">
+									<img
+										src={c.poster}
+										alt={c.title}
+										class="w-full h-full object-cover"
+										loading="lazy"
+										decoding="async"
+									/>
+								</div>
+								<div class="min-w-0 flex-1">
+									<div class="flex items-center gap-1.5 mb-0.5">
+										<h3 class="font-semibold text-plum text-sm sm:text-base truncate group-hover:text-coral-dark transition-colors">{c.title}</h3>
+										{#if c.isUncut}
+											<span class="flex-shrink-0 px-1.5 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[9px] font-bold border border-coral/20">Uncut</span>
+										{/if}
+									</div>
+									<p class="text-xs text-plum-light truncate">{c.episode} · {c.platform}</p>
+								</div>
+							</div>
+
+							<!-- orbital halo + HH:MM:SS (จอแสดงผลหลัก — ไม่มีวัน เพราะใกล้ฉายภายใน 24 ชม.) -->
+							<div class="relative flex-1 flex items-center justify-center py-5">
+								<!-- วงแหวนโคจร + ดาวเทียม (สัญลักษณ์ของ GL-Orbit) อยู่หลัง tiles -->
+								<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-44 sm:h-44 pointer-events-none">
+									<div class="absolute inset-0 rounded-full border-2 border-dashed border-lavender/25"></div>
+									<div class="absolute inset-0 animate-[spin_10s_linear_infinite]">
+										<span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-coral shadow-[0_0_10px_rgba(255,107,157,0.8)]"></span>
+									</div>
+								</div>
+
+								<div class="relative text-center">
+									<p class="text-[11px] font-semibold uppercase tracking-wider text-plum-light/70 mb-2">ออกอากาศในอีก</p>
+									<div class="flex items-start justify-center gap-1.5 sm:gap-2 font-[family-name:var(--font-display)]">
+										{@render timeUnit(pad(c.hours), 'ชม.')}
+										<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-3xl sm:text-4xl font-bold text-coral/60 animate-pulse">:</span>
+										{@render timeUnit(pad(c.minutes), 'นาที')}
+										<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-3xl sm:text-4xl font-bold text-coral/60 animate-pulse" style="animation-delay: 0.5s;">:</span>
+										{@render timeUnit(pad(c.seconds), 'วิ')}
+									</div>
+								</div>
+							</div>
+						</article>
+					</a>
+				{/each}
+			</div>
+
+			<div class="text-center mt-7 sm:mt-9 sm:hidden">
+				<a href="/countdown" class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold hover:shadow-xl hover:shadow-coral/25 hover:scale-105 transition-all text-sm sm:text-base touch-target">
+					ดูเพิ่มเติม
+					<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+				</a>
+			</div>
+		</div>
+	</section>
+{/if}
+
+{#snippet timeUnit(value: string, label: string)}
+	<div class="flex flex-col items-center gap-1.5">
+		<span class="min-w-[3rem] sm:min-w-[3.75rem] text-center rounded-2xl bg-white/80 backdrop-blur-sm text-plum px-2.5 py-2 text-3xl sm:text-4xl font-bold tabular-nums shadow-lg shadow-lavender/15 ring-1 ring-white/70 border border-lavender/20">
+			{value}
+		</span>
+		<span class="text-[11px] font-semibold text-plum-light/80">{label}</span>
+	</div>
+{/snippet}
+
 <!-- Featured Series -->
-<section class="py-12 sm:py-20 -mx-4 px-4">
+<!-- Featured Series: Celestial Bodies -->
+<section class="relative py-12 sm:py-20 -mx-4 px-4">
 	<div class="max-w-6xl mx-auto">
 		<div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-10 gap-4">
 			<div>
+				<div class="inline-flex items-center gap-2 mb-2">
+					<svg class="w-4 h-4 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+					<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">กำลังฉาย</span>
+				</div>
 				<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum mb-2">
 					ซีรีส์<span class="text-coral">แนะนำ</span>
 				</h2>
@@ -146,10 +320,11 @@
 			</div>
 		{:else if featuredSeries.length === 0}
 			<div class="text-center py-16">
-				<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
-					<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-					</svg>
+				<div class="relative w-20 h-20 mx-auto mb-4">
+					<div class="absolute inset-0 rounded-full border-2 border-dashed border-lavender/30"></div>
+					<div class="absolute inset-0 flex items-center justify-center">
+						<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+					</div>
 				</div>
 				<h3 class="font-semibold text-plum mb-1">ยังไม่มีซีรีส์</h3>
 				<p class="text-sm text-plum-light">ซีรีส์จะปรากฏที่นี่เมื่อมีข้อมูลในระบบ</p>
@@ -158,8 +333,10 @@
 			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
 				{#each featuredSeries as series, i (series.id)}
 					<a href="/series/{series.id}" class="group">
-						<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/20 transition-all duration-500 hover:-translate-y-2">
-							<div class="relative aspect-[3/4] overflow-hidden">
+						<div class="relative rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/30 transition-all duration-500 hover:-translate-y-2">
+							<!-- glow halo behind poster -->
+							<div class="absolute -inset-2 bg-gradient-to-br from-coral/20 via-lavender/15 to-mint/15 rounded-[1.75rem] blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+							<div class="relative aspect-[3/4] overflow-hidden ring-1 ring-white/40">
 								<img
 									src={series.poster}
 									alt={series.title}
@@ -170,7 +347,8 @@
 									decoding="async"
 									fetchpriority={i === 0 ? 'high' : 'auto'}
 								/>
-								<div class="absolute inset-0 bg-gradient-to-t from-plum/80 via-plum/20 to-transparent"></div>
+								<div class="absolute inset-0 bg-gradient-to-t from-plum via-plum/20 to-transparent"></div>
+
 								<div class="absolute top-3 sm:top-4 left-3 sm:left-4">
 									<span class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-semibold backdrop-blur-md {statusConfig[series.status].class}">
 										{statusConfig[series.status].text}
@@ -178,8 +356,8 @@
 								</div>
 								<div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
 									<p class="text-white/70 text-xs sm:text-sm mb-1">{series.studio}</p>
-									<h3 class="text-white font-bold text-lg sm:text-xl mb-1">{series.title}</h3>
-									<p class="text-white/80 text-xs sm:text-sm">{series.subtitle}</p>
+									<h3 class="text-white font-bold text-lg sm:text-xl mb-1 group-hover:text-coral-light transition-colors">{series.title}</h3>
+									<p class="text-white/80 text-xs sm:text-sm truncate">{series.subtitle}</p>
 								</div>
 							</div>
 						</div>
@@ -190,24 +368,29 @@
 	</div>
 </section>
 
-<!-- Upcoming Schedule -->
-<section class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] px-4 pb-[calc(1.5rem+var(--bottom-nav-reserved-space))] pt-12 sm:pt-20 sm:pb-[calc(2rem+var(--bottom-nav-reserved-space))] md:mb-0 md:pb-6">
-	<div class="absolute inset-0 bg-gradient-to-b from-lavender/5 to-coral/5 pointer-events-none"></div>
-	
-	<div class="relative max-w-6xl mx-auto">
+<!-- Upcoming Schedule: Orbital Timeline -->
+<section class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] px-4 pb-[calc(1.5rem+var(--bottom-nav-reserved-space))] pt-12 sm:pt-20 sm:pb-[calc(2rem+var(--bottom-nav-reserved-space))] md:mb-0 md:pb-6 overflow-hidden">
+	<div class="absolute inset-0 bg-gradient-to-b from-lavender/5 via-transparent to-coral/5 pointer-events-none"></div>
+	<div class="absolute top-10 right-4 w-40 h-40 sm:w-56 sm:h-56 bg-mint/10 rounded-full blur-3xl animate-float-delayed pointer-events-none"></div>
+
+	<div class="relative max-w-2xl mx-auto">
 		<div class="text-center mb-8 sm:mb-12">
-			<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum mb-3">
+			<div class="inline-flex items-center gap-2 mb-3">
+				<svg class="w-4 h-4 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+				<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">Upcoming</span>
+			</div>
+			<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum mb-2">
 				ตารางฉาย<span class="text-coral">เร็วๆ นี้</span>
 			</h2>
 			<p class="text-sm sm:text-base text-plum-light">ไม่พลาดทุกตอนสำคัญ</p>
 		</div>
 
 		{#if loadingSchedule}
-			<div class="max-w-2xl mx-auto space-y-3 sm:space-y-4">
+			<div class="space-y-4">
 				{#each Array(3) as _, i}
-					<div class="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex items-center gap-3 sm:gap-5">
-						<div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-lavender/10 animate-pulse"></div>
-						<div class="flex-1 min-w-0 space-y-2">
+					<div class="flex gap-4 sm:gap-5">
+						<div class="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-lavender/10 animate-pulse"></div>
+						<div class="flex-1 glass-card rounded-2xl p-4 sm:p-5 space-y-2">
 							<div class="h-4 w-3/4 bg-lavender/10 rounded animate-pulse"></div>
 							<div class="h-3 w-1/2 bg-lavender/10 rounded animate-pulse"></div>
 						</div>
@@ -216,50 +399,55 @@
 			</div>
 		{:else if upcomingSchedule.length === 0}
 			<div class="text-center py-16">
-				<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
-					<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-					</svg>
+				<div class="relative w-20 h-20 mx-auto mb-4">
+					<div class="absolute inset-0 rounded-full border-2 border-dashed border-lavender/30"></div>
+					<div class="absolute inset-0 flex items-center justify-center">
+						<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+					</div>
 				</div>
 				<h3 class="font-semibold text-plum mb-1">ไม่มีตารางฉายเร็วๆ นี้</h3>
 				<p class="text-sm text-plum-light">ตารางฉายจะปรากฏเมื่อมีซีรีส์ที่กำหนดฉาย</p>
 			</div>
 		{:else}
-			<div class="max-w-2xl mx-auto space-y-3 sm:space-y-4">
-				{#each upcomingSchedule as item, i}
-					<a href="/series/{item.seriesId}" class="block group">
-						<div class="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex items-center gap-3 sm:gap-5 hover:shadow-lg hover:shadow-lavender/10 transition-all duration-300 group-hover:-translate-y-0.5">
-							<div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coral/20 to-lavender/20 flex flex-col items-center justify-center">
-								<span class="text-[10px] sm:text-xs font-bold text-coral-dark">{item.day}</span>
-								<span class="text-xs sm:text-sm font-bold text-plum">{item.time}</span>
+			<div class="relative">
+				<!-- gradient spine (coral → lavender → mint) -->
+				<div class="absolute left-7 sm:left-8 top-2 bottom-2 w-0.5 bg-gradient-to-b from-coral via-lavender to-mint opacity-40"></div>
+
+				<div class="space-y-4 sm:space-y-5">
+					{#each upcomingSchedule as item, i (item.seriesId + '-' + i)}
+						<a href="/series/{item.seriesId}" class="relative flex items-center gap-4 sm:gap-5 group">
+							<!-- planet node -->
+							<div class="relative flex-shrink-0 z-10">
+								<div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-coral-light to-lavender-light text-plum flex flex-col items-center justify-center ring-4 ring-cream group-hover:ring-coral/40 group-hover:scale-110 transition-all shadow-lg shadow-lavender/30 border border-white/80">
+									<span class="text-[10px] font-bold text-coral-dark leading-none">{item.day}</span>
+									<span class="text-xs sm:text-sm font-extrabold tabular-nums leading-tight">{item.time}</span>
+								</div>
 							</div>
-							<div class="flex-1 min-w-0">
+
+							<!-- content card -->
+							<div class="flex-1 min-w-0 glass-card rounded-2xl p-4 sm:p-5 group-hover:shadow-lg group-hover:shadow-lavender/15 group-hover:-translate-y-0.5 transition-all duration-300">
 								<div class="flex items-center gap-2 mb-1">
 									<h3 class="font-semibold text-plum text-sm sm:text-base truncate group-hover:text-coral-dark transition-colors">{item.series}</h3>
 									{#if item.isUncut}
-										<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] sm:text-xs font-medium flex-shrink-0">Uncut</span>
+										<span class="flex-shrink-0 px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] sm:text-xs font-bold border border-coral/20">Uncut</span>
 									{/if}
 								</div>
 								<div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-plum-light">
-									<span>{item.episode}</span>
-									<span class="w-1 h-1 rounded-full bg-lavender"></span>
-									<span>{item.platform}</span>
+									<span class="truncate">{item.episode}</span>
+									<span class="w-1 h-1 rounded-full bg-lavender flex-shrink-0"></span>
+									<span class="truncate">{item.platform}</span>
 								</div>
 							</div>
-							<div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-								<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-coral/10 flex items-center justify-center">
-									<svg class="w-4 h-4 sm:w-5 sm:h-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-								</div>
-							</div>
-						</div>
-					</a>
-				{/each}
+
+						</a>
+					{/each}
+				</div>
 			</div>
 		{/if}
 
-		<div class="text-center mt-6 sm:mt-8">
-			<a href="/calendar" class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl glass-card-strong text-plum font-medium hover:bg-white/90 transition-all text-sm sm:text-base touch-target">
-				<svg class="w-4 h-4 sm:w-5 sm:h-5 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+		<div class="text-center mt-8 sm:mt-10">
+			<a href="/calendar" class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold hover:shadow-xl hover:shadow-coral/25 hover:scale-105 transition-all text-sm sm:text-base touch-target">
+				<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
 				ดูตารางฉายทั้งหมด
 			</a>
 		</div>

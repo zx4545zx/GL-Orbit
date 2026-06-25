@@ -263,7 +263,8 @@ input[type='time'] {
   background-clip: text;
   display: inline-block;
   vertical-align: middle;
-  line-height: 1;
+  /* line-height สูงเพื่อให้วรรณยุกต์และสระภาษาไทย (ี, ้, ์) ไม่ถูก clip โดย background-clip:text */
+  line-height: 1.8;
   overflow: visible;
 }
 
@@ -274,7 +275,7 @@ input[type='time'] {
   background-clip: text;
   display: inline-block;
   vertical-align: middle;
-  line-height: 1;
+  line-height: 1.8;
   overflow: visible;
 }
 

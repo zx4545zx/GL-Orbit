@@ -125,7 +125,7 @@
 	class="fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300 {bottomNavHidden ? 'translate-y-full' : 'translate-y-0'}"
 >
 	<div
-		class="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+		class="bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(196,181,253,0.3)] overflow-hidden border-t border-lavender/15"
 		style="padding-bottom: env(safe-area-inset-bottom, 0px);"
 	>
 		<div class="flex items-center justify-around px-2">
@@ -140,7 +140,7 @@
 					<div class="relative flex items-center justify-center">
 						{#if active}
 							<div
-								class="absolute inset-0 -m-1 bg-coral/10 rounded-xl transition-all duration-300"
+								class="absolute inset-0 -m-1 bg-gradient-to-br from-coral/15 to-lavender/15 rounded-xl transition-all duration-300"
 							></div>
 						{/if}
 						<div class="relative">

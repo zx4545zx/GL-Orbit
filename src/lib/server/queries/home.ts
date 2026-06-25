@@ -1,7 +1,8 @@
-import { eq, and, isNull, gte, asc } from 'drizzle-orm';
+import { eq, and, isNull, gte, lte, asc, inArray } from 'drizzle-orm';
 import { getDb } from '$lib/server/db/index.js';
 import { series, studios, episodes, episodeSchedules, platforms } from '$lib/server/db/schema.js';
 import { getCached, setCached } from '$lib/server/cache.js';
+import { dedupeCountdownRows } from './countdown.js';
 import type { HomeApiResponse } from '$lib/types/home.js';
 
 const CACHE_KEY = 'query:home';
@@ -21,7 +22,7 @@ export async function getHomeData(): Promise<HomeApiResponse> {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	const [featuredSeries, upcomingSchedules] = await Promise.all([
+	const [featuredSeries, upcomingSchedules, countdownSchedules] = await Promise.all([
 		db
 			.select({
 				id: series.id,
@@ -58,7 +59,34 @@ export async function getHomeData(): Promise<HomeApiResponse> {
 				isNull(series.deletedAt)
 			))
 			.orderBy(asc(episodeSchedules.airDate))
-			.limit(5)
+			.limit(5),
+		db
+			.select({
+				id: episodeSchedules.id,
+				airDate: episodeSchedules.airDate,
+				isUncut: episodeSchedules.isUncut,
+				episodeNumber: episodes.episodeNumber,
+				episodeTitle: episodes.title,
+				seriesId: series.id,
+				seriesTitleEn: series.titleEn,
+				seriesTitleTh: series.titleTh,
+				posterUrl: series.posterUrl,
+				platformName: platforms.name
+			})
+			.from(episodeSchedules)
+			.innerJoin(episodes, eq(episodeSchedules.episodeId, episodes.id))
+			.innerJoin(series, eq(episodes.seriesId, series.id))
+			.innerJoin(platforms, eq(episodeSchedules.platformId, platforms.id))
+			.where(and(
+				gte(episodeSchedules.airDate, new Date()),
+				lte(episodeSchedules.airDate, new Date(Date.now() + 24 * 60 * 60 * 1000)),
+				inArray(series.status, ['ONGOING', 'UPCOMING']),
+				isNull(episodeSchedules.deletedAt),
+				isNull(episodes.deletedAt),
+				isNull(series.deletedAt)
+			))
+			.orderBy(asc(episodeSchedules.airDate))
+			.limit(20)
 	]);
 
 	const dayShortNames = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
@@ -87,7 +115,20 @@ export async function getHomeData(): Promise<HomeApiResponse> {
 				platform: s.platformName,
 				isUncut: s.isUncut
 			};
-		})
+		}),
+		countdown: dedupeCountdownRows(countdownSchedules)
+			.slice(0, 3)
+			.map((s) => ({
+				id: s.id,
+				seriesId: s.seriesId,
+				title: s.seriesTitleEn,
+				subtitle: s.seriesTitleTh ?? '',
+				poster: s.posterUrl ?? '/placeholders/poster.svg',
+				episode: s.episodeTitle ?? `EP.${s.episodeNumber}`,
+				platform: s.platformName,
+				airDate: s.airDate.toISOString(),
+				isUncut: s.isUncut
+			}))
 	};
 
 	setCached(CACHE_KEY, result, CACHE_TTL);
