@@ -667,6 +667,18 @@
 		{/if}
 	{/if}
 
+	<!-- Countdown CTA -->
+	<a href="/countdown" class="group flex items-center gap-4 sm:gap-5 mt-6 sm:mt-10 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-lg hover:shadow-lavender/20 transition-all duration-300">
+		<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coral to-lavender flex items-center justify-center flex-shrink-0 shadow-lg shadow-coral/30">
+			<svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-3 4-4 7-4 10v2l-1 2h10l-1-2v-2c0-3-1-6-4-10z"/><circle cx="12" cy="10" r="1.5" fill="white" opacity="0.6"/><path d="M10 17c0 1.5 2 2.5 2 2.5s2-1 2-2.5" fill="currentColor" opacity="0.4"/></svg>
+		</div>
+		<div class="flex-1 min-w-0">
+			<h3 class="font-[family-name:var(--font-display)] text-sm sm:text-base font-bold text-plum group-hover:text-coral-dark transition-colors">นับถอยหลัง · ซีรีส์ใกล้ฉาย</h3>
+			<p class="text-xs sm:text-sm text-plum-light">ติดตามซีรีส์ที่กำลังจะออกอากาศภายใน 7 วันนี้</p>
+		</div>
+		<svg class="w-5 h-5 sm:w-6 sm:h-6 text-coral-dark group-hover:translate-x-1 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+	</a>
+
 	<!-- Notes section (always visible, independent of contentLoading) -->
 	<div class="mt-6 sm:mt-10 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 flex items-start gap-3 sm:gap-4">
 		<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-lavender/20 flex items-center justify-center flex-shrink-0">
