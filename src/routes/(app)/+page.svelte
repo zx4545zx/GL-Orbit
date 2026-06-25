@@ -12,6 +12,12 @@
 	const loadingFeatured = false;
 	const loadingSchedule = false;
 
+	const schedulePalette = [
+		{ from: 'from-lavender to-mint', dot: 'bg-coral', b1: 'bg-lavender/15', b2: 'bg-mint/15' },
+		{ from: 'from-coral to-lavender', dot: 'bg-mint', b1: 'bg-coral/15', b2: 'bg-lavender/15' },
+		{ from: 'from-mint to-coral', dot: 'bg-lavender', b1: 'bg-mint/15', b2: 'bg-coral/15' },
+	] as const;
+
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/'));
 	const homeJsonLd = $derived(safeJsonLd([
 		buildWebPageJsonLd(page.url.origin, '/', DEFAULT_SEO_TITLE, DEFAULT_SEO_DESCRIPTION),
@@ -415,30 +421,52 @@
 
 				<div class="space-y-4 sm:space-y-5">
 					{#each upcomingSchedule as item, i (item.seriesId + '-' + i)}
-						<a href="/series/{item.seriesId}" class="relative flex items-center gap-4 sm:gap-5 group">
-							<!-- planet node -->
+						<a
+							href="/series/{item.seriesId}"
+							class="relative flex items-center gap-4 sm:gap-5 group animate-slide-up"
+							style="animation-delay: {i * 80}ms; animation-fill-mode: both;"
+						>
+							<!-- planet node with orbital ring -->
 							<div class="relative flex-shrink-0 z-10">
+								<div class="absolute inset-0 pointer-events-none">
+									<div class="absolute -inset-2.5 rounded-full border border-dashed border-lavender/25 animate-[spin_12s_linear_infinite]"></div>
+									<div class="absolute -inset-2.5 animate-[spin_12s_linear_infinite]" style="animation-delay:-4s;">
+										<span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-coral/70 shadow-[0_0_6px_rgba(255,107,157,0.7)]"></span>
+									</div>
+								</div>
 								<div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-coral-light to-lavender-light text-plum flex flex-col items-center justify-center ring-4 ring-cream group-hover:ring-coral/40 group-hover:scale-110 transition-all shadow-lg shadow-lavender/30 border border-white/80">
 									<span class="text-[10px] font-bold text-coral-dark leading-none">{item.day}</span>
 									<span class="text-xs sm:text-sm font-extrabold tabular-nums leading-tight">{item.time}</span>
 								</div>
 							</div>
 
-							<!-- content card -->
-							<div class="flex-1 min-w-0 glass-card rounded-2xl p-4 sm:p-5 group-hover:shadow-lg group-hover:shadow-lavender/15 group-hover:-translate-y-0.5 transition-all duration-300">
-								<div class="flex items-center gap-2 mb-1">
+							<!-- content card with playful rocket badge -->
+							<div class="flex-1 min-w-0 relative glass-card rounded-2xl p-4 sm:p-5 pr-10 sm:pr-12 overflow-hidden group-hover:shadow-lg group-hover:shadow-lavender/15 group-hover:-translate-y-0.5 transition-all duration-300">
+								<!-- decorative blobs -->
+								<div class="absolute -top-10 -right-10 w-28 h-28 {schedulePalette[i % 3].b1} rounded-full blur-2xl pointer-events-none"></div>
+								<div class="absolute -bottom-8 -left-8 w-24 h-24 {schedulePalette[i % 3].b2} rounded-full blur-2xl pointer-events-none"></div>
+
+								<!-- playful rocket badge -->
+								<div class="absolute top-2.5 right-2.5 z-10 animate-float" style="animation-delay: {i * -0.5}s;">
+									<div class="w-9 h-9 rounded-2xl bg-gradient-to-br {schedulePalette[i % 3].from} shadow-lg shadow-lavender/40 flex items-center justify-center rotate-[6deg]">
+										<svg class="w-4 h-4 text-white -rotate-[6deg]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-3 4-4 7-4 10v2l-1 2h10l-1-2v-2c0-3-1-6-4-10z"/><circle cx="12" cy="10" r="1.5" fill="white" opacity="0.6"/><path d="M10 17c0 1.5 2 2.5 2 2.5s2-1 2-2.5" fill="currentColor" opacity="0.4"/></svg>
+									</div>
+									<span class="absolute -bottom-1 -right-1 w-2 h-2 rounded-full {schedulePalette[i % 3].dot} shadow-[0_0_5px_rgba(196,181,253,0.8)]"></span>
+								</div>
+
+								<!-- card info -->
+								<div class="flex items-center gap-2 mb-1 relative">
 									<h3 class="font-semibold text-plum text-sm sm:text-base truncate group-hover:text-coral-dark transition-colors">{item.series}</h3>
 									{#if item.isUncut}
 										<span class="flex-shrink-0 px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] sm:text-xs font-bold border border-coral/20">Uncut</span>
 									{/if}
 								</div>
-								<div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-plum-light">
+								<div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-plum-light relative">
 									<span class="truncate">{item.episode}</span>
 									<span class="w-1 h-1 rounded-full bg-lavender flex-shrink-0"></span>
 									<span class="truncate">{item.platform}</span>
 								</div>
 							</div>
-
 						</a>
 					{/each}
 				</div>
