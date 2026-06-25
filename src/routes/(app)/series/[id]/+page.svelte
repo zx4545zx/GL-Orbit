@@ -48,6 +48,41 @@
 	let expandedEpisodes = $state(new Set<number>());
 	let initializedSeriesId = $state<string | null>(null);
 
+	const episodeHasContent = $derived(
+		series
+			? new Set(
+					series.schedule
+						.filter((item) => {
+							const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA');
+							return hasSchedules || Boolean(item.trailerUrl);
+						})
+						.map((item) => item.episode)
+				)
+			: new Set<number>()
+	);
+
+	const allExpanded = $derived(
+		episodeHasContent.size > 0 && episodeHasContent.size === expandedEpisodes.size
+	);
+
+	function toggleAll() {
+		if (allExpanded) {
+			expandedEpisodes = new Set();
+		} else {
+			expandedEpisodes = new Set(episodeHasContent);
+		}
+	}
+
+	function toggleEpisode(ep: number) {
+		if (expandedEpisodes.has(ep)) {
+			expandedEpisodes.delete(ep);
+		} else {
+			expandedEpisodes.add(ep);
+		}
+		// Trigger reactivity by reassigning
+		expandedEpisodes = new Set(expandedEpisodes);
+	}
+
 	$effect(() => {
 		if (series && initializedSeriesId !== series.id) {
 			const nextExpanded = new Set<number>();
@@ -62,16 +97,6 @@
 			initializedSeriesId = series.id;
 		}
 	});
-
-	function toggleEpisode(ep: number) {
-		if (expandedEpisodes.has(ep)) {
-			expandedEpisodes.delete(ep);
-		} else {
-			expandedEpisodes.add(ep);
-		}
-		// Trigger reactivity by reassigning
-		expandedEpisodes = new Set(expandedEpisodes);
-	}
 
 	function scheduleSummary(item: { schedules: { platform: string; airDate: string }[] }): string {
 		const valid = item.schedules.filter((s) => s.platform !== 'TBA');
@@ -309,7 +334,12 @@
 						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-lavender-dark/70">Episode orbit</p>
 						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">ตารางฉาย</h2>
 					</div>
-					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{series.schedule.length} episodes</span>
+					<div class="flex items-center gap-2">
+						<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{series.schedule.length} episodes</span>
+						<button onclick={toggleAll} class="rounded-full border border-coral/30 bg-coral/5 px-3 py-1 text-xs font-semibold text-coral-dark shadow-sm hover:bg-coral/15 hover:border-coral/50 transition-all duration-200 active:scale-95 touch-target whitespace-nowrap" aria-label={allExpanded ? 'ย่อทั้งหมด' : 'ขยายทั้งหมด'}>
+							{allExpanded ? 'ย่อทั้งหมด' : 'ขยายทั้งหมด'}
+						</button>
+					</div>
 				</div>
 				<div class="glass-card-strong overflow-hidden rounded-[1.75rem] shadow-xl shadow-lavender/10 sm:rounded-[2rem]">
 					<div class="divide-y divide-lavender/10">
