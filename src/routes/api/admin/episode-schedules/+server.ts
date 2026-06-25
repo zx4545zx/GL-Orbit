@@ -43,7 +43,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 	const data = result.map((r) => ({
 		...r,
-		airDate: r.airDate ? new Date(r.airDate).toISOString().slice(0, 16) : ''
+		airDate: r.airDate ? r.airDate.toISOString() : ''
 	}));
 
 	return json({ data, page, limit, total: count, totalPages: Math.ceil(count / limit) });
@@ -68,7 +68,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		.values({
 			episodeId,
 			platformId,
-			airDate: new Date(airDate),
+			airDate: new Date(airDate + '+07:00'),
 			streamLink: streamLink ?? null,
 			isUncut: isUncut ?? false
 		})

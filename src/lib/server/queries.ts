@@ -104,7 +104,7 @@ export async function getSeriesFull(db: Db, id: string) {
 				episodeId: es.episodeId,
 				platformId: es.platformId,
 				platformName: es.platformName,
-				airDate: es.airDate ? new Date(es.airDate).toISOString().slice(0, 16) : '',
+				airDate: es.airDate ? es.airDate.toISOString() : '',
 				streamLink: es.streamLink,
 				isUncut: es.isUncut
 			}))

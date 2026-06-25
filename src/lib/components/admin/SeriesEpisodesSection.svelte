@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { editorApi } from '$lib/admin/editor-api.js';
 	import SearchableSelect from './SearchableSelect.svelte';
-	import type { Episode, ReferenceData } from '$lib/admin/editor-types.js';
+	import type { Episode, EpisodeSchedule, ReferenceData } from '$lib/admin/editor-types.js';
 
 	let {
 		seriesId,
@@ -32,6 +32,13 @@
 	let schedStreamLink = $state('');
 	let schedIsUncut = $state(false);
 
+// schedule editing state
+let scheduleEditId = $state<string | null>(null);
+let schedEditPlatformId = $state('');
+let schedEditAirDate = $state('');
+let schedEditStreamLink = $state('');
+let schedEditIsUncut = $state(false);
+
 	function toggle(id: string) {
 		if (expandedId === id) {
 			expandedId = null;
@@ -43,6 +50,7 @@
 
 	function resetForms() {
 		editing = false;
+		scheduleEditId = null;
 		schedPlatformId = '';
 		schedAirDate = '';
 		schedStreamLink = '';
@@ -154,6 +162,51 @@
 		await onrefresh();
 	}
 
+	function startEditSchedule(sched: EpisodeSchedule) {
+		scheduleEditId = sched.id;
+		schedEditPlatformId = sched.platformId;
+		schedEditAirDate = formatDateForEdit(sched.airDate);
+		schedEditStreamLink = sched.streamLink ?? '';
+		schedEditIsUncut = sched.isUncut;
+	}
+
+	function cancelEditSchedule() {
+		scheduleEditId = null;
+	}
+
+	async function saveEditSchedule(sched: EpisodeSchedule) {
+		if (!schedEditPlatformId || !schedEditAirDate) {
+			error = 'กรุณาเลือกช่องทางและวันที่ฉาย';
+			return;
+		}
+		busy = true;
+		busyText = 'กำลังบันทึกช่องทาง...';
+		error = '';
+		const res = await editorApi.updateEpisodeSchedule(sched.id, {
+			episodeId: sched.episodeId,
+			platformId: schedEditPlatformId,
+			airDate: schedEditAirDate,
+			streamLink: schedEditStreamLink.trim() || null,
+			isUncut: schedEditIsUncut
+		});
+		busy = false;
+		busyText = '';
+		if (!res.ok) {
+			error = res.error ?? 'บันทึกช่องทางไม่สำเร็จ';
+			return;
+		}
+		scheduleEditId = null;
+		await onrefresh();
+	}
+
+	function formatDateForEdit(s: string) {
+		if (!s) return '';
+		const d = new Date(s);
+		const tzo = d.getTimezoneOffset();
+		const local = new Date(d.getTime() - tzo * 60000);
+		return local.toISOString().slice(0, 16);
+	}
+
 	function formatAirDate(s: string) {
 		if (!s) return 'ไม่ระบุ';
 		const d = new Date(s);
@@ -257,23 +310,48 @@
 								{#if ep.schedules.length > 0}
 									<div class="space-y-1.5 mb-3">
 										{#each ep.schedules as sched (sched.id)}
-											<div class="flex items-start gap-2 bg-lavender/5 rounded-xl p-2.5">
-												<div class="flex-1 min-w-0">
-													<div class="flex items-center gap-1.5 flex-wrap">
-														<span class="text-sm font-medium text-plum">{sched.platformName}</span>
-														{#if sched.isUncut}
-															<span class="px-1.5 py-0.5 rounded-md bg-coral/15 text-coral-dark text-[10px] font-semibold">Uncut</span>
+											{#if scheduleEditId === sched.id}
+												<div class="flex flex-col gap-2 bg-white/60 rounded-xl p-2.5 border border-lavender/15">
+													<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+														<SearchableSelect bind:value={schedEditPlatformId} options={reference.platforms.map((p) => ({ id: p.id, label: p.name }))} placeholder="ค้นหาช่องทาง..." emptyText="ไม่พบช่องทาง" />
+														<input type="datetime-local" bind:value={schedEditAirDate} class="w-full px-3 py-2 rounded-lg border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
+													</div>
+													<input type="url" bind:value={schedEditStreamLink} placeholder="ลิงก์สตรีม (ถ้ามี)" class="w-full px-3 py-2 rounded-lg border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
+													<div class="flex items-center justify-between gap-2">
+														<label class="flex items-center gap-2 text-sm text-plum cursor-pointer select-none">
+															<input type="checkbox" bind:checked={schedEditIsUncut} class="w-4 h-4 rounded accent-coral" />
+															Uncut version
+														</label>
+														<div class="flex gap-1.5">
+															<button type="button" onclick={() => saveEditSchedule(sched)} disabled={busy} class="px-3 py-1.5 rounded-lg bg-coral text-white font-medium text-xs hover:bg-coral-dark touch-target disabled:opacity-50">บันทึก</button>
+															<button type="button" onclick={cancelEditSchedule} class="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 font-medium text-xs touch-target">ยกเลิก</button>
+														</div>
+													</div>
+												</div>
+											{:else}
+												<div class="flex items-start gap-2 bg-lavender/5 rounded-xl p-2.5">
+													<div class="flex-1 min-w-0">
+														<div class="flex items-center gap-1.5 flex-wrap">
+															<span class="text-sm font-medium text-plum">{sched.platformName}</span>
+															{#if sched.isUncut}
+																<span class="px-1.5 py-0.5 rounded-md bg-coral/15 text-coral-dark text-[10px] font-semibold">Uncut</span>
+															{/if}
+														</div>
+														<div class="text-xs text-plum-light mt-0.5">{formatAirDate(sched.airDate)}</div>
+														{#if sched.streamLink}
+															<a href={sched.streamLink} target="_blank" rel="noopener" class="text-xs text-lavender-dark hover:underline truncate block mt-0.5">🔗 {sched.streamLink}</a>
 														{/if}
 													</div>
-													<div class="text-xs text-plum-light mt-0.5">{formatAirDate(sched.airDate)}</div>
-													{#if sched.streamLink}
-														<a href={sched.streamLink} target="_blank" rel="noopener" class="text-xs text-lavender-dark hover:underline truncate block mt-0.5">🔗 {sched.streamLink}</a>
-													{/if}
+													<div class="flex gap-1 flex-shrink-0">
+														<button type="button" onclick={() => startEditSchedule(sched)} aria-label="แก้ไขช่องทาง" class="p-1.5 rounded-lg hover:bg-lavender/10 text-plum-light hover:text-lavender-dark transition-colors touch-target">
+															<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+														</button>
+														<button type="button" onclick={() => removeSchedule(sched.id)} disabled={busy} aria-label="ลบช่องทาง" class="p-1.5 rounded-lg hover:bg-coral/10 text-plum-light hover:text-coral-dark transition-colors touch-target disabled:opacity-50">
+															<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+														</button>
+													</div>
 												</div>
-												<button type="button" onclick={() => removeSchedule(sched.id)} disabled={busy} aria-label="ลบช่องทาง" class="p-1.5 rounded-lg hover:bg-coral/10 text-plum-light hover:text-coral-dark transition-colors touch-target disabled:opacity-50 flex-shrink-0">
-													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-												</button>
-											</div>
+											{/if}
 										{/each}
 									</div>
 								{/if}

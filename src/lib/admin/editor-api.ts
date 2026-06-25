@@ -56,9 +56,14 @@ export const editorApi = {
 		streamLink: string | null;
 		isUncut: boolean;
 	}) => req('/api/admin/episode-schedules', { method: 'POST', body: JSON.stringify(body) }),
+	updateEpisodeSchedule: (id: string, body: {
+		episodeId: string;
+		platformId: string;
+		airDate: string;
+		streamLink: string | null;
+		isUncut: boolean;
+	}) => req(`/api/admin/episode-schedules/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
 	removeEpisodeSchedule: (id: string) => req(`/api/admin/episode-schedules/${id}`, { method: 'DELETE' }),
-
-	// ── ตารางฉายรายสัปดาห์ ──────────────────────────────
 	addSchedule: (body: {
 		seriesId: string;
 		platformId: string;

@@ -28,7 +28,7 @@ export const PUT: RequestHandler = async ({ locals, params, request }) => {
 		.set({
 			episodeId,
 			platformId,
-			airDate: new Date(airDate),
+			airDate: new Date(airDate + '+07:00'),
 			streamLink: streamLink ?? null,
 			isUncut: isUncut ?? false
 		})
