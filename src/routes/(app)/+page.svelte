@@ -51,15 +51,22 @@
 		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
 	};
 
-	// --- Live countdown clock ---
-	// `now` ticks every second so the HH:MM:SS tiles update in real time.
+	// --- Live countdown clock (requestAnimationFrame) ---
+	// Synced to browser paint cycle for jank-free updates.
 	let now = $state(Date.now());
 	$effect(() => {
 		if (countdownItems.length === 0) return;
-		const interval = setInterval(() => {
-			now = Date.now();
-		}, 1000);
-		return () => clearInterval(interval);
+		let rafId: number;
+		let lastUpdate = performance.now();
+		function tick(ts: number) {
+			if (ts - lastUpdate >= 1000) {
+				now = Date.now();
+				lastUpdate = ts;
+			}
+			rafId = requestAnimationFrame(tick);
+		}
+		rafId = requestAnimationFrame(tick);
+		return () => cancelAnimationFrame(rafId);
 	});
 
 	interface ActiveCountdown extends CountdownItem {
@@ -109,13 +116,13 @@
 </svelte:head>
 
 <!-- Hero Section: Cosmic Observatory (light theme) -->
-<section class="relative min-h-[78vh] sm:min-h-[86vh] flex items-center justify-center overflow-hidden -mx-4 px-4 rounded-b-[2.5rem] sm:rounded-b-[3.5rem] mt-0">
+<section class="relative min-h-[78vh] sm:min-h-[86vh] flex items-center justify-center overflow-hidden -mx-4 px-4 mt-0">
 	<!-- light gradient base (ตาม theme project) -->
 	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
 	<!-- soft pastel glows -->
-	<div class="absolute -top-10 -left-10 w-72 h-72 sm:w-96 sm:h-96 bg-coral/20 rounded-full blur-[80px] animate-float pointer-events-none"></div>
-	<div class="absolute bottom-0 -right-10 w-80 h-80 sm:w-[28rem] sm:h-[28rem] bg-lavender/20 rounded-full blur-[90px] animate-float-delayed pointer-events-none"></div>
-	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[26rem] h-[26rem] sm:w-[40rem] sm:h-[40rem] bg-mint/10 rounded-full blur-[100px] pointer-events-none"></div>
+	<div class="absolute -top-10 -left-10 w-72 h-72 sm:w-96 sm:h-96 bg-coral/20 rounded-full blur-[40px] sm:blur-[80px] animate-float pointer-events-none" style="will-change: transform"></div>
+	<div class="absolute bottom-0 -right-10 w-80 h-80 sm:w-[28rem] sm:h-[28rem] bg-lavender/20 rounded-full blur-[40px] sm:blur-[90px] animate-float-delayed pointer-events-none" style="will-change: transform"></div>
+	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[26rem] h-[26rem] sm:w-[40rem] sm:h-[40rem] bg-mint/10 rounded-full blur-[50px] sm:blur-[100px] pointer-events-none" style="will-change: transform"></div>
 
 	<!-- orbital system centerpiece: concentric rings + orbiting bodies -->
 	<div class="absolute left-1/2 top-1/2 pointer-events-none">
@@ -124,18 +131,18 @@
 		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[380px] sm:h-[380px] rounded-full border border-dashed border-lavender/35"></div>
 		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[130px] h-[130px] sm:w-[210px] sm:h-[210px] rounded-full border border-coral/30"></div>
 		<!-- orbit 3: mint, slow -->
-		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] sm:w-[560px] sm:h-[560px] animate-[spin_26s_linear_infinite]"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-mint shadow-[0_0_12px_rgba(110,231,183,0.7)]"></span></div>
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] sm:w-[560px] sm:h-[560px] animate-[spin_26s_linear_infinite]" style="will-change: transform"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-mint shadow-[0_0_12px_rgba(110,231,183,0.7)]"></span></div>
 		<!-- orbit 2: lavender, medium reverse -->
-		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[380px] sm:h-[380px] animate-[spin_17s_linear_infinite_reverse]"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-lavender-dark shadow-[0_0_12px_rgba(139,92,246,0.6)]"></span></div>
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[380px] sm:h-[380px] animate-[spin_17s_linear_infinite_reverse]" style="will-change: transform"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-lavender-dark shadow-[0_0_12px_rgba(139,92,246,0.6)]"></span></div>
 		<!-- orbit 1: coral, fast -->
-		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[130px] h-[130px] sm:w-[210px] sm:h-[210px] animate-[spin_9s_linear_infinite]"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-coral shadow-[0_0_14px_rgba(255,107,157,0.85)]"></span></div>
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[130px] h-[130px] sm:w-[210px] sm:h-[210px] animate-[spin_9s_linear_infinite]" style="will-change: transform"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-coral shadow-[0_0_14px_rgba(255,107,157,0.85)]"></span></div>
 		<!-- central soft glow behind text -->
 		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] sm:w-[520px] sm:h-[520px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.7)_0%,transparent_70%)]"></div>
 	</div>
 
 	<div class="relative z-10 text-center max-w-3xl mx-auto px-4 py-20 sm:py-24">
 		<div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/60 backdrop-blur-sm border border-lavender/20 mb-6 sm:mb-8 animate-slide-up">
-			<span class="w-2 h-2 bg-coral rounded-full animate-pulse"></span>
+			<span class="w-2 h-2 bg-coral rounded-full"></span>
 			<span class="text-xs sm:text-sm font-medium text-plum-light">ยินดีต้อนรับสู่จักรวาล GL</span>
 		</div>
 
@@ -154,7 +161,7 @@
 		<div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up stagger-3 px-4 sm:px-0">
 			<a
 				href="/calendar"
-				class="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold text-base sm:text-lg shadow-xl shadow-coral/25 hover:shadow-2xl hover:shadow-coral/30 hover:scale-105 transition-all duration-300 animate-pulse-glow touch-target flex items-center justify-center gap-2"
+				class="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold text-base sm:text-lg shadow-xl shadow-coral/25 hover:shadow-2xl hover:shadow-coral/30 hover:scale-105 transition-all duration-300 touch-target flex items-center justify-center gap-2"
 			>
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
 				ดูตารางฉาย
@@ -186,7 +193,7 @@
 				<div>
 					<div class="inline-flex items-center gap-2 mb-2">
 						<span class="relative flex h-2.5 w-2.5">
-							<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-coral opacity-75"></span>
+							<span class="absolute inline-flex h-full w-full rounded-full bg-coral/40"></span>
 							<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-coral"></span>
 						</span>
 						<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">Live Countdown</span>
@@ -211,7 +218,7 @@
 					>
 						<article class="glass-card-strong rounded-[1.75rem] p-5 sm:p-6 relative overflow-hidden hover:-translate-y-1.5 transition-all duration-500 hover:shadow-2xl hover:shadow-coral/20 h-full flex flex-col">
 							<!-- playful lightning badge: ใกล้ฉายมาก -->
-							<div class="absolute top-3.5 right-3.5 z-10 animate-float">
+							<div class="absolute top-3.5 right-3.5 z-10">
 								<div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-coral to-coral-dark shadow-lg shadow-coral/50 flex items-center justify-center rotate-[8deg]">
 									<svg class="w-5 h-5 text-white -rotate-[8deg]" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
 								</div>
@@ -245,21 +252,18 @@
 
 							<!-- orbital halo + HH:MM:SS (จอแสดงผลหลัก — ไม่มีวัน เพราะใกล้ฉายภายใน 24 ชม.) -->
 							<div class="relative flex-1 flex items-center justify-center py-5">
-								<!-- วงแหวนโคจร + ดาวเทียม (สัญลักษณ์ของ GL-Orbit) อยู่หลัง tiles -->
+								<!-- วงแหวนโคจร + ดาวเทียม (สัญลักษณ์ของ GL-Orbit) — static เท่านั้น, ไม่ spin เพื่อลด GPU load -->
 								<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-44 sm:h-44 pointer-events-none">
 									<div class="absolute inset-0 rounded-full border-2 border-dashed border-lavender/25"></div>
-									<div class="absolute inset-0 animate-[spin_10s_linear_infinite]">
-										<span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-coral shadow-[0_0_10px_rgba(255,107,157,0.8)]"></span>
-									</div>
 								</div>
 
 								<div class="relative text-center">
 									<p class="text-[11px] font-semibold uppercase tracking-wider text-plum-light/70 mb-2">ออกอากาศในอีก</p>
 									<div class="flex items-start justify-center gap-1.5 sm:gap-2 font-[family-name:var(--font-display)]">
 										{@render timeUnit(pad(c.hours), 'ชม.')}
-										<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-3xl sm:text-4xl font-bold text-coral/60 animate-pulse">:</span>
+										<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-3xl sm:text-4xl font-bold text-coral/60">:</span>
 										{@render timeUnit(pad(c.minutes), 'นาที')}
-										<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-3xl sm:text-4xl font-bold text-coral/60 animate-pulse" style="animation-delay: 0.5s;">:</span>
+										<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-3xl sm:text-4xl font-bold text-coral/60">:</span>
 										{@render timeUnit(pad(c.seconds), 'วิ')}
 									</div>
 								</div>
@@ -290,7 +294,7 @@
 
 <!-- Featured Series -->
 <!-- Featured Series: Celestial Bodies -->
-<section class="relative py-12 sm:py-20 -mx-4 px-4">
+<section class="relative py-12 sm:py-20 -mx-4 px-4" style="content-visibility: auto">
 	<div class="max-w-6xl mx-auto">
 		<div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-10 gap-4">
 			<div>
@@ -375,7 +379,7 @@
 </section>
 
 <!-- Upcoming Schedule: Orbital Timeline -->
-<section class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] px-4 pb-[calc(1.5rem+var(--bottom-nav-reserved-space))] pt-12 sm:pt-20 sm:pb-[calc(2rem+var(--bottom-nav-reserved-space))] md:mb-0 md:pb-6 overflow-hidden">
+<section class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] px-4 pb-[calc(1.5rem+var(--bottom-nav-reserved-space))] pt-12 sm:pt-20 sm:pb-[calc(2rem+var(--bottom-nav-reserved-space))] md:mb-0 md:pb-6 overflow-hidden" style="content-visibility: auto">
 	<div class="absolute inset-0 bg-gradient-to-b from-lavender/5 via-transparent to-coral/5 pointer-events-none"></div>
 	<div class="absolute top-10 right-4 w-40 h-40 sm:w-56 sm:h-56 bg-mint/10 rounded-full blur-3xl animate-float-delayed pointer-events-none"></div>
 
