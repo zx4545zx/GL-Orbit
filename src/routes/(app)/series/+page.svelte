@@ -177,8 +177,8 @@
 					type="text"
 					bind:value={searchQuery}
 					oninput={scheduleSearchUpdate}
-					placeholder="ค้นหาซีรีส์, สตูดิโอ..."
-					aria-label="ค้นหาซีรีส์หรือสตูดิโอ"
+					placeholder="ค้นหาชื่อซีรีส์..."
+					aria-label="ค้นหาซีรีส์"
 					class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base"
 				/>
 				{#if searchQuery}

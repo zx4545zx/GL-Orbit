@@ -116,7 +116,7 @@
 </svelte:head>
 
 <!-- Hero Section: Cosmic Observatory (light theme) -->
-<section class="relative min-h-[78vh] sm:min-h-[86vh] flex items-center justify-center overflow-hidden -mx-4 px-4 mt-0">
+<section class="relative -mx-4 min-h-dvh overflow-hidden px-4 md:-mt-24 md:pt-24 flex items-center justify-center">
 	<!-- light gradient base (ตาม theme project) -->
 	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
 	<!-- soft pastel glows -->

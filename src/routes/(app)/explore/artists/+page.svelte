@@ -7,11 +7,11 @@
 	let { data }: { data: PageData } = $props();
 
 	// Accent rotation — full literal class strings so Tailwind's scanner can detect them.
-	// Each artist card cycles coral → lavender → mint, giving the grid a vibrant mosaic feel.
+	// Compact profile cards keep photos medium-sized while the card itself carries the color.
 	const accents = [
-		{ frame: 'from-coral via-coral/60 to-lavender', chip: 'bg-white/85 text-coral-dark', glow: 'group-hover:shadow-coral/40' },
-		{ frame: 'from-lavender via-lavender/60 to-mint', chip: 'bg-white/85 text-lavender-dark', glow: 'group-hover:shadow-lavender/40' },
-		{ frame: 'from-mint via-mint/60 to-coral', chip: 'bg-white/85 text-mint-dark', glow: 'group-hover:shadow-mint/40' }
+		{ frame: 'from-coral via-coral/60 to-lavender', border: 'border-coral/20', orb: 'bg-coral/25', chip: 'bg-coral/10 text-coral-dark', dot: 'bg-mint', glow: 'group-hover:shadow-coral/25' },
+		{ frame: 'from-lavender via-lavender/60 to-mint', border: 'border-lavender/25', orb: 'bg-lavender/30', chip: 'bg-lavender/15 text-lavender-dark', dot: 'bg-coral', glow: 'group-hover:shadow-lavender/30' },
+		{ frame: 'from-mint via-mint/60 to-coral', border: 'border-mint/25', orb: 'bg-mint/30', chip: 'bg-mint/15 text-mint-dark', dot: 'bg-lavender-dark', glow: 'group-hover:shadow-mint/30' }
 	] as const;
 
 	let extraArtists = $state<ArtistListItem[]>([]);
@@ -106,40 +106,58 @@
 	</div>
 </div>
 
-<!-- Artist Grid — square spotlight cards with rotating gradient frames -->
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5" aria-busy={loading}>
+<!-- Artist Grid — compact colorful profile cards (not full-bleed photos) -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4" aria-busy={loading}>
 	{#if loading}
-		{#each Array(8) as _, i (i)}
-			<div class="relative aspect-square rounded-3xl bg-lavender/10 animate-pulse"></div>
+		{#each Array(9) as _, i (i)}
+			<div class="glass-card rounded-3xl p-3 sm:p-4 animate-pulse">
+				<div class="flex items-center gap-3 sm:gap-4">
+					<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-lavender/10 shrink-0"></div>
+					<div class="flex-1 min-w-0 space-y-2">
+						<div class="h-4 w-2/3 bg-lavender/10 rounded"></div>
+						<div class="h-3 w-1/2 bg-lavender/10 rounded"></div>
+						<div class="h-5 w-20 bg-lavender/10 rounded-full"></div>
+					</div>
+				</div>
+			</div>
 		{/each}
 	{:else}
 		{#each allArtists as a, i (a.id)}
 			{@const accent = accents[i % accents.length]}
 			<a href="/artists/{a.id}" class="group block">
-				<div class="relative aspect-square rounded-3xl p-[3px] bg-gradient-to-br {accent.frame} shadow-lg shadow-lavender/10 transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl {accent.glow}">
-					<div class="relative w-full h-full rounded-[1.35rem] overflow-hidden bg-white">
-						<img
-							src={a.profileImageUrl}
-							alt={a.nickname}
-							class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-							loading="lazy"
-							decoding="async"
-						/>
-						<!-- gradient veil for text contrast -->
-						<div class="absolute inset-0 bg-gradient-to-t from-plum/85 via-plum/15 to-transparent"></div>
+				<div class="glass-card-strong relative overflow-hidden rounded-3xl border {accent.border} bg-white/76 p-3 sm:p-4 shadow-lg shadow-lavender/10 transition-all duration-500 group-hover:-translate-y-1.5 group-hover:shadow-2xl {accent.glow}">
+					<div class="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full blur-2xl opacity-80 {accent.orb}"></div>
+					<div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/75 via-cream/45 to-transparent"></div>
 
-						<!-- works chip -->
-						{#if a.seriesCount > 0}
-							<div class="absolute top-2.5 right-2.5">
-								<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-md {accent.chip}">{a.seriesCount} ผลงาน</span>
-							</div>
-						{/if}
-
-						<!-- name -->
-						<div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 text-center">
-							<h3 class="text-white font-bold text-base sm:text-lg leading-tight line-clamp-1 drop-shadow-sm">{a.nickname}</h3>
-							{#if a.fullNameEn}<p class="text-white/80 text-[11px] sm:text-xs line-clamp-1 mt-0.5">{a.fullNameEn}</p>{/if}
+					<div class="relative flex items-center gap-3 sm:gap-4">
+						<div class="relative shrink-0 rotate-[4deg] transition-transform duration-500 group-hover:rotate-0">
+							<div class="absolute -inset-1 rounded-[1.35rem] bg-gradient-to-br {accent.frame} opacity-65 blur-lg transition-opacity duration-500 group-hover:opacity-100"></div>
+							<img
+								src={a.profileImageUrl}
+								alt={a.nickname}
+								width="96"
+								height="96"
+								class="relative h-20 w-20 rotate-[-3deg] rounded-2xl object-cover bg-gray-100 shadow-lg shadow-lavender/20 ring-2 ring-white/85 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-0 sm:h-24 sm:w-24"
+								loading="lazy"
+								decoding="async"
+							/>
+							<span class="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full {accent.dot} shadow-[0_0_7px_rgba(255,107,157,0.65)] ring-2 ring-white/80"></span>
 						</div>
+
+						<div class="min-w-0 flex-1">
+							<h3 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold leading-tight text-plum line-clamp-1">{a.nickname}</h3>
+							{#if a.fullNameEn}<p class="mt-0.5 text-xs sm:text-sm text-plum-light line-clamp-1">{a.fullNameEn}</p>{/if}
+							<div class="mt-2 flex flex-wrap items-center gap-1.5">
+								{#if a.seriesCount > 0}
+									<span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold {accent.chip}">{a.seriesCount} ผลงาน</span>
+								{:else}
+									<span class="inline-flex items-center rounded-full bg-lavender/10 px-2.5 py-1 text-[11px] font-medium text-plum-light/75">ยังไม่มีผลงาน</span>
+								{/if}
+								<span class="hidden rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-medium text-plum-light/80 sm:inline-flex">ดูโปรไฟล์</span>
+							</div>
+						</div>
+
+						<svg class="hidden h-5 w-5 shrink-0 text-plum-light/35 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-coral-dark sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
 					</div>
 				</div>
 			</a>
