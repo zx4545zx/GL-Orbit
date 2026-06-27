@@ -56,11 +56,11 @@
 			`
 		},
 		{
-			href: '/series',
-			label: 'ซีรีส์',
+			href: '/explore/series',
+			label: 'สำรวจ',
 			icon: (active: boolean) => `
 				<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h1.5C5.496 19.5 6 18.996 6 18.375m-2.625 0v-11.25c0-1.036.84-1.875 1.875-1.875h13.5c1.035 0 1.875.84 1.875 1.875v11.25m-18 0a1.125 1.125 0 0 0 1.125 1.125M18.75 19.5v-2.625a.375.375 0 0 0-.375-.375h-1.5a.375.375 0 0 0-.375.375v2.625m0 0h1.5m-1.5 0c-.621 0-1.125-.504-1.125-1.125M21 19.5v-2.625a.375.375 0 0 0-.375-.375h-1.5a.375.375 0 0 0-.375.375v2.625m0 0h1.5m-1.5 0c-.621 0-1.125-.504-1.125-1.125M9.75 9.75v2.625m3-.375v2.625m3-.375v2.625" />
+					<path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm.93-13.43 1.5 5.26c.12.4.44.72.84.84l5.26 1.5a.75.75 0 0 0 .92-.92l-1.5-5.26a1.27 1.27 0 0 0-.84-.84l-5.26-1.5a.75.75 0 0 0-.92.92Zm.3 4.2-2.5 2.5" />
 				</svg>
 			`
 		}
@@ -116,6 +116,10 @@
 	function isActive(href: string) {
 		if (href === '/') {
 			return activePathname === '/';
+		}
+		// "สำรวจ" ครอบทั้ง /explore/series และ /explore/artists
+		if (href.startsWith('/explore')) {
+			return activePathname.startsWith('/explore');
 		}
 		return activePathname.startsWith(href);
 	}

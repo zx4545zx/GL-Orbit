@@ -6,9 +6,12 @@
 
 	let { children } = $props();
 
-	// Show the floating back-to-top button on the series list page, but NOT on the detail page
+	// Show the floating back-to-top button on long list pages, but NOT on detail pages.
 	const showBackToTop = $derived(
-		page.url.pathname === '/series' || page.url.pathname.startsWith('/series?')
+		page.url.pathname === '/series' ||
+		page.url.pathname === '/artists' ||
+		page.url.pathname.startsWith('/explore/series') ||
+		page.url.pathname.startsWith('/explore/artists')
 	);
 
 	// Shared scroll state — drives both the auto-hide nav bars and the floating button position.

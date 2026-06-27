@@ -1,0 +1,266 @@
+<script lang="ts">
+	import { goto, invalidateAll } from '$app/navigation';
+	import { adminFetch } from '$lib/admin/action-feedback.js';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
+	import type { PageData } from './$types.js';
+
+	let { data }: { data: PageData } = $props();
+
+	let loadedStudioId = $state(data.studio.id);
+	let name = $state(data.studio.name);
+	let logoUrl = $state(data.studio.logoUrl ?? '');
+	let officialSite = $state(data.studio.officialSite ?? '');
+	let savingStudio = $state(false);
+	let studioError = $state('');
+	let studioSaved = $state(false);
+
+	let socialPlatform = $state('');
+	let socialUrl = $state('');
+	let socialIconUrl = $state('');
+	let socialEditingId = $state<string | null>(null);
+	let socialLoading = $state(false);
+	let socialError = $state('');
+	let deleteSocialId = $state<string | null>(null);
+	let showConfirm = $state(false);
+
+	const platformOptions = [
+		{ value: 'INSTAGRAM', label: 'Instagram' },
+		{ value: 'TWITTER', label: 'Twitter / X' },
+		{ value: 'TIKTOK', label: 'TikTok' },
+		{ value: 'YOUTUBE', label: 'YouTube' },
+		{ value: 'FACEBOOK', label: 'Facebook' },
+		{ value: 'WEIBO', label: 'Weibo' },
+		{ value: 'XIAOHONGSHU', label: 'Xiaohongshu' },
+		{ value: 'OTHER', label: 'อื่น ๆ' }
+	];
+
+	const tabs = [
+		{ id: 'profile', label: 'ข้อมูลสตูดิโอ', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5' },
+		{ id: 'socials', label: 'ช่องทาง', icon: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1' }
+	] as const;
+
+	let activeTab = $state<'profile' | 'socials'>('profile');
+
+	$effect(() => {
+		if (data.studio.id !== loadedStudioId) {
+			loadedStudioId = data.studio.id;
+			name = data.studio.name;
+			logoUrl = data.studio.logoUrl ?? '';
+			officialSite = data.studio.officialSite ?? '';
+			activeTab = 'profile';
+			studioError = '';
+			studioSaved = false;
+			resetSocialForm();
+		}
+	});
+
+	async function saveStudio() {
+		savingStudio = true;
+		studioError = '';
+		const res = await adminFetch(`/api/admin/studios/${data.studio.id}`, {
+			method: 'PUT',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				name: name.trim(),
+				logoUrl: logoUrl.trim() || null,
+				officialSite: officialSite.trim() || null
+			})
+		});
+		savingStudio = false;
+		if (!res.ok) {
+			const json = await res.json().catch(() => ({}));
+			studioError = json.error ?? 'บันทึกไม่สำเร็จ';
+			return;
+		}
+		studioSaved = true;
+		setTimeout(() => (studioSaved = false), 1800);
+		await invalidateAll();
+	}
+
+	function resetSocialForm() {
+		socialEditingId = null;
+		socialPlatform = '';
+		socialUrl = '';
+		socialIconUrl = '';
+		socialError = '';
+	}
+
+	function editSocial(s: PageData['socials'][number]) {
+		activeTab = 'socials';
+		socialEditingId = s.id;
+		socialPlatform = s.platform;
+		socialUrl = s.url;
+		socialIconUrl = s.iconUrl ?? '';
+		socialError = '';
+	}
+
+	async function saveSocial() {
+		if (!socialPlatform || !socialUrl.trim()) {
+			socialError = 'กรุณาเลือกแพลตฟอร์มและกรอก URL';
+			return;
+		}
+		socialLoading = true;
+		socialError = '';
+		const url = socialEditingId ? `/api/admin/studio-socials/${socialEditingId}` : '/api/admin/studio-socials';
+		const res = await adminFetch(url, {
+			method: socialEditingId ? 'PUT' : 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				studioId: data.studio.id,
+				platform: socialPlatform,
+				url: socialUrl.trim(),
+				iconUrl: socialIconUrl.trim() || null
+			})
+		});
+		socialLoading = false;
+		if (!res.ok) {
+			const json = await res.json().catch(() => ({}));
+			socialError = json.error ?? 'บันทึกไม่สำเร็จ';
+			return;
+		}
+		resetSocialForm();
+		await invalidateAll();
+	}
+
+	function askDeleteSocial(id: string) {
+		deleteSocialId = id;
+		showConfirm = true;
+	}
+
+	async function deleteSocial() {
+		if (!deleteSocialId) return;
+		await adminFetch(`/api/admin/studio-socials/${deleteSocialId}`, { method: 'DELETE', credentials: 'include' });
+		deleteSocialId = null;
+		await invalidateAll();
+	}
+
+	function platformLabel(platform: string) {
+		return platformOptions.find((p) => p.value === platform)?.label ?? platform;
+	}
+
+	function platformColor(platform: string) {
+		const colors: Record<string, string> = {
+			INSTAGRAM: 'bg-pink-100 text-pink-700',
+			TWITTER: 'bg-sky-100 text-sky-700',
+			TIKTOK: 'bg-gray-100 text-gray-900',
+			YOUTUBE: 'bg-red-100 text-red-700',
+			FACEBOOK: 'bg-blue-100 text-blue-700',
+			WEIBO: 'bg-orange-100 text-orange-700',
+			XIAOHONGSHU: 'bg-rose-100 text-rose-700',
+			OTHER: 'bg-gray-100 text-gray-600'
+		};
+		return colors[platform] ?? 'bg-lavender/10 text-lavender-dark';
+	}
+</script>
+
+<svelte:head>
+	<title>แก้ไขสตูดิโอ · {data.studio.name} | GL-Orbit</title>
+</svelte:head>
+
+<div class="py-4 sm:py-6">
+	<div class="flex items-center gap-3 mb-5">
+		<button onclick={() => goto('/admin/studios')} class="p-2 -ml-2 rounded-xl hover:bg-lavender/15 text-plum transition-colors touch-target flex-shrink-0" aria-label="กลับ">
+			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+		</button>
+		<div class="min-w-0 flex-1">
+			<h1 class="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-bold text-plum truncate">{data.studio.name}</h1>
+			<div class="mt-1 flex flex-wrap gap-1.5">
+				{#if data.studio.officialSite}
+					<a href={data.studio.officialSite} target="_blank" rel="noopener noreferrer" class="inline-flex max-w-full items-center rounded-full bg-lavender/12 px-2 py-0.5 text-xs font-medium text-plum-light hover:text-coral-dark">
+						<span class="mr-1 text-coral-dark/70">เว็บ</span><span class="truncate">{data.studio.officialSite}</span>
+					</a>
+				{:else}
+					<span class="inline-flex items-center rounded-full bg-white/55 px-2 py-0.5 text-xs font-medium text-plum-light/70">ยังไม่มีเว็บไซต์</span>
+				{/if}
+			</div>
+		</div>
+	</div>
+
+	<div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
+		<nav class="lg:w-48 xl:w-52 flex-shrink-0">
+			<div class="grid grid-cols-2 lg:flex lg:flex-col gap-1.5 lg:sticky lg:top-6">
+				{#each tabs as tab (tab.id)}
+					{@const active = activeTab === tab.id}
+					<button type="button" onclick={() => (activeTab = tab.id)} class="flex items-center justify-center lg:justify-start gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap {active ? 'bg-gradient-to-r from-coral/10 to-lavender/10 text-coral-dark shadow-sm' : 'text-plum-light hover:bg-white/60 hover:text-plum bg-white/40 lg:bg-transparent'}">
+						<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={tab.icon} /></svg>
+						<span>{tab.label}</span>
+						{#if tab.id === 'socials'}<span class="ml-auto px-1.5 py-0.5 rounded-md text-[10px] font-semibold {active ? 'bg-coral/15 text-coral-dark' : 'bg-lavender/15 text-plum-light'}">{data.socials.length}</span>{/if}
+					</button>
+				{/each}
+			</div>
+		</nav>
+
+		<div class="flex-1 min-w-0">
+			<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg shadow-lavender/5">
+				{#if activeTab === 'profile'}
+					<div class="space-y-5">
+						<div class="rounded-2xl border border-lavender/15 bg-white/45 px-4 py-3 text-sm text-plum-light">
+							โลโก้และเว็บไซต์ทางการแสดงบนหน้าค้นหาและรายละเอียดซีรีส์ ส่วนช่องทางอื่น ๆ จัดการได้ในแท็บ "ช่องทาง"
+						</div>
+						<div class="flex flex-col sm:flex-row gap-5">
+							<div class="sm:w-36 flex-shrink-0">
+								<span class="block text-sm font-medium text-plum mb-1.5">โลโก้</span>
+								<div class="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden bg-lavender/10 border border-lavender/20 flex items-center justify-center">
+									{#if logoUrl}<img src={logoUrl} alt={name} class="w-full h-full object-cover" />{:else}<svg class="w-12 h-12 text-lavender-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5" /></svg>{/if}
+								</div>
+							</div>
+							<div class="flex-1 space-y-4">
+								<div>
+									<label for="studio-name" class="block text-sm font-medium text-plum mb-1.5">ชื่อสตูดิโอ <span class="text-coral">*</span></label>
+									<input id="studio-name" bind:value={name} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+								</div>
+								<div>
+									<label for="studio-logo" class="block text-sm font-medium text-plum mb-1.5">URL โลโก้</label>
+									<input id="studio-logo" type="url" bind:value={logoUrl} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+								</div>
+								<div>
+									<label for="studio-site" class="block text-sm font-medium text-plum mb-1.5">เว็บไซต์ทางการ</label>
+									<input id="studio-site" type="url" bind:value={officialSite} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+								</div>
+							</div>
+						</div>
+						{#if studioError}<p class="text-sm text-coral-dark bg-coral/5 px-3 py-2 rounded-lg">{studioError}</p>{/if}
+						<div class="flex items-center gap-3 pt-2"><button onclick={saveStudio} disabled={savingStudio} class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 text-sm sm:text-base touch-target disabled:opacity-60">{savingStudio ? 'กำลังบันทึก...' : 'บันทึกข้อมูลสตูดิโอ'}</button>{#if studioSaved}<span class="text-sm text-mint-dark">บันทึกแล้ว</span>{/if}</div>
+					</div>
+				{:else}
+					<div class="space-y-5">
+						<div class="bg-white/50 rounded-2xl p-4 border border-lavender/15 space-y-3">
+							<h3 class="text-sm font-semibold text-plum">{socialEditingId ? 'แก้ไขช่องทาง' : 'เพิ่มช่องทาง'}</h3>
+							<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+								<select bind:value={socialPlatform} class="w-full px-3 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm"><option value="">— แพลตฟอร์ม —</option>{#each platformOptions as p}<option value={p.value}>{p.label}</option>{/each}</select>
+								<input type="url" bind:value={socialUrl} placeholder="URL ช่องทาง" class="w-full px-3 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
+							</div>
+							<input type="url" bind:value={socialIconUrl} placeholder="URL ไอคอน (ถ้ามี)" class="w-full px-3 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
+							{#if socialError}<p class="text-xs text-coral-dark">{socialError}</p>{/if}
+							<div class="flex gap-2"><button onclick={saveSocial} disabled={socialLoading} class="px-4 py-2 rounded-xl bg-coral text-white font-medium text-sm touch-target disabled:opacity-50">{socialLoading ? 'กำลังบันทึก...' : socialEditingId ? 'บันทึกการแก้ไข' : '+ เพิ่มช่องทาง'}</button>{#if socialEditingId}<button onclick={resetSocialForm} class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 font-medium text-sm touch-target">ยกเลิก</button>{/if}</div>
+						</div>
+
+						{#if data.socials.length === 0}
+							<div class="text-center py-10 text-sm text-plum-light bg-white/40 rounded-2xl border border-dashed border-lavender/30">ยังไม่มีช่องทางของสตูดิโอนี้</div>
+						{:else}
+							<div class="space-y-2.5">
+								{#each data.socials as s (s.id)}
+									<div class="flex items-start gap-3 bg-white/70 rounded-2xl p-3 border border-lavender/15">
+										<div class="flex-1 min-w-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {platformColor(s.platform)}">{platformLabel(s.platform)}</span><a href={s.url} target="_blank" rel="noopener noreferrer" class="block mt-1 text-xs sm:text-sm text-plum-light hover:text-coral-dark hover:underline truncate">{s.url}</a></div>
+										<button onclick={() => editSocial(s)} class="p-2 rounded-lg hover:bg-lavender/20 text-plum-light hover:text-lavender-dark touch-target" aria-label="แก้ไข"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
+										<button onclick={() => askDeleteSocial(s.id)} class="p-2 rounded-lg hover:bg-coral/10 text-plum-light hover:text-coral-dark touch-target" aria-label="ลบ"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+									</div>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+</div>
+
+<ConfirmDialog
+	bind:open={showConfirm}
+	title="ยืนยันการลบช่องทาง"
+	message="คุณแน่ใจหรือไม่ว่าต้องการลบช่องทางนี้?"
+	onconfirm={deleteSocial}
+	oncancel={() => (deleteSocialId = null)}
+/>

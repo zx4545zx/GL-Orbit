@@ -7,8 +7,16 @@
 	const navLinks = [
 		{ href: '/', label: 'หน้าแรก' },
 		{ href: '/calendar', label: 'ตารางฉาย' },
-		{ href: '/series', label: 'ซีรีส์ทั้งหมด' }
+		{ href: '/explore/series', label: 'สำรวจ' }
 	];
+
+	function isActive(href: string) {
+		const p = page.url.pathname;
+		if (href === '/') return p === '/';
+		// "สำรวจ" ครอบทั้ง /explore/series และ /explore/artists
+		if (href.startsWith('/explore')) return p.startsWith('/explore');
+		return p === href || p.startsWith(href + '/');
+	}
 
 	const currentUser = $derived(page.data.user);
 
@@ -69,7 +77,7 @@
 				{#each navLinks as link}
 					<a
 						href={link.href}
-						class="relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 touch-target flex items-center {page.url.pathname === link.href ? 'bg-coral/15 text-coral-dark font-semibold' : 'text-plum-light hover:bg-lavender/20 hover:text-plum'}"
+						class="relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 touch-target flex items-center {isActive(link.href) ? 'bg-coral/15 text-coral-dark font-semibold' : 'text-plum-light hover:bg-lavender/20 hover:text-plum'}"
 					>
 						{link.label}
 					</a>

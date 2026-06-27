@@ -57,6 +57,13 @@
       "when": 1783000000000,
       "tag": "0007_artist_fullname_th_en",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1782576316634,
+      "tag": "0008_outgoing_liz_osborn",
+      "breakpoints": true
     }
   ]
 }

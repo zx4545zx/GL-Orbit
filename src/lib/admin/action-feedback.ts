@@ -25,6 +25,7 @@ function actionLabel(method: string, pathname: string) {
 	if (method === 'DELETE' && pathname.includes('/schedules/')) return 'กำลังลบตารางฉาย';
 	if (pathname.includes('/series-artists')) return method === 'DELETE' ? 'กำลังนำนักแสดงออก' : 'กำลังเพิ่มนักแสดง';
 	if (pathname.includes('/artist-socials')) return method === 'DELETE' ? 'กำลังลบโซเชียล' : 'กำลังบันทึกโซเชียล';
+	if (pathname.includes('/studio-socials')) return method === 'DELETE' ? 'กำลังลบช่องทาง' : 'กำลังบันทึกช่องทาง';
 	if (pathname.includes('/artists')) return method === 'DELETE' ? 'กำลังลบนักแสดง' : 'กำลังบันทึกนักแสดง';
 	if (pathname.includes('/series')) return method === 'DELETE' ? 'กำลังลบซีรีส์' : 'กำลังบันทึกซีรีส์';
 	if (pathname.includes('/studios')) return method === 'DELETE' ? 'กำลังลบสตูดิโอ' : 'กำลังบันทึกสตูดิโอ';

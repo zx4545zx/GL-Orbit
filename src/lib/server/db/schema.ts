@@ -37,6 +37,14 @@ export const studios = pgTable('studios', {
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
 });
 
+export const studioSocials = pgTable('studio_socials', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	studioId: uuid('studio_id').notNull().references(() => studios.id, { onDelete: 'cascade' }),
+	platform: varchar('platform', { length: 255 }).notNull(),
+	url: text('url').notNull(),
+	iconUrl: text('icon_url')
+});
+
 export const platforms = pgTable('platforms', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	name: varchar('name', { length: 255 }).notNull(),

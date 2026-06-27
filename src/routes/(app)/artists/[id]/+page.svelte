@@ -31,7 +31,7 @@
 			},
 			buildBreadcrumbJsonLd(page.url.origin, [
 				{ name: 'หน้าแรก', path: '/' },
-				{ name: 'ซีรีส์', path: '/series' },
+				{ name: 'นักแสดง', path: '/artists' },
 				{ name: artist.nickname, path: `/artists/${artist.id}` }
 			])
 		])
