@@ -95,7 +95,7 @@
 		searchTimer = setTimeout(() => {
 			searchTimer = undefined;
 			updateUrl(searchQuery, filterStatus);
-		}, 300);
+		}, 500);
 	}
 
 	function updateStatus(status: FilterKey) {

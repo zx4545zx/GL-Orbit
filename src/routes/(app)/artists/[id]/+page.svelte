@@ -38,9 +38,9 @@
 	);
 
 	const statusConfig: Record<string, { text: string; cls: string }> = {
-		ONGOING: { text: 'กำลังฉาย', cls: 'bg-mint/25 text-mint-dark' },
-		UPCOMING: { text: 'เร็วๆ นี้', cls: 'bg-lavender/25 text-lavender-dark' },
-		ENDED: { text: 'จบแล้ว', cls: 'bg-coral/15 text-coral-dark' }
+		ONGOING: { text: 'กำลังฉาย', cls: 'bg-mint/20 text-mint-dark' },
+		UPCOMING: { text: 'เร็วๆ นี้', cls: 'bg-lavender/20 text-lavender-dark' },
+		ENDED: { text: 'จบแล้ว', cls: 'bg-coral/10 text-coral-dark' }
 	};
 
 	// Cute icon badges inspired by the home cards: tilted gradient blocks + tiny orbit dot.

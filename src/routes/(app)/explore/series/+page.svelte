@@ -9,7 +9,7 @@
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
 		UPCOMING: { text: 'เร็วๆ นี้', class: 'bg-lavender/20 text-lavender-dark' },
-		ENDED: { text: 'จบแล้ว', class: 'bg-white/30 text-white' }
+		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
 	};
 
 	const filterOptions: { key: SeriesStatusFilter; label: string }[] = [
@@ -71,7 +71,7 @@
 		searchTimer = setTimeout(() => {
 			searchTimer = undefined;
 			updateUrl(searchQuery, filterStatus);
-		}, 300);
+		}, 500);
 	}
 
 	function updateStatus(status: SeriesStatusFilter) {

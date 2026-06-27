@@ -68,7 +68,7 @@
 		searchTimer = setTimeout(() => {
 			searchTimer = undefined;
 			updateUrl(searchQuery);
-		}, 300);
+		}, 500);
 	}
 
 	function clearSearch() {
