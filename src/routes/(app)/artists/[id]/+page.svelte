@@ -43,6 +43,11 @@
 		ENDED: { text: 'จบแล้ว', cls: 'bg-coral/15 text-coral-dark' }
 	};
 
+	// Cute icon badges inspired by the home cards: tilted gradient blocks + tiny orbit dot.
+	const PROFILE_BADGE_ICON = 'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733C11.285 4.876 9.623 3.75 7.688 3.75 5.099 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z';
+	const SOCIAL_BADGE_ICON = 'M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.091-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.091L9 5.25l.813 2.846a4.5 4.5 0 003.091 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.091zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.456-2.456L14.25 6l1.035-.259a3.375 3.375 0 002.456-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z';
+	const WORKS_BADGE_ICON = 'M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4';
+
 	type SocialMeta = {
 		label: string;
 		bg: string;
@@ -75,7 +80,7 @@
 			return;
 		}
 
-		goto('/series');
+		goto('/');
 	}
 </script>
 
@@ -126,6 +131,12 @@
 		<!-- ============ PROFILE CARD ============ -->
 		<div class="glass-card-strong relative overflow-hidden rounded-[2rem] shadow-2xl shadow-lavender/15 animate-slide-up">
 			<div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/55 via-transparent to-lavender/10"></div>
+			<div class="absolute right-5 top-5 z-20 hidden sm:block" aria-hidden="true">
+				<div class="relative flex h-12 w-12 rotate-[8deg] items-center justify-center rounded-2xl bg-gradient-to-br from-coral to-coral-dark text-white shadow-lg shadow-coral/35 transition-all duration-500 hover:rotate-0 hover:scale-110">
+					<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={PROFILE_BADGE_ICON} /></svg>
+					<span class="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-mint shadow-[0_0_7px_rgba(110,231,183,0.9)] ring-2 ring-white/85"></span>
+				</div>
+			</div>
 			<!-- Cover -->
 			<div class="relative h-36 overflow-hidden bg-gradient-to-br from-coral/30 via-lavender/30 to-mint/25 sm:h-44">
 				<div class="absolute inset-0 bg-gradient-mesh"></div>
@@ -189,9 +200,15 @@
 		{#if artist.socials.length > 0}
 			<section class="mt-7">
 				<div class="mb-4 flex items-end justify-between gap-4">
-					<div>
-						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-mint-dark/70">Social signals</p>
-						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">โซเชียลมีเดีย</h2>
+					<div class="flex items-center gap-3">
+						<div class="relative hidden h-11 w-11 rotate-[6deg] items-center justify-center rounded-2xl bg-gradient-to-br from-mint to-lavender text-white shadow-lg shadow-lavender/30 transition-all duration-500 hover:rotate-0 hover:scale-105 sm:flex" aria-hidden="true">
+							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={SOCIAL_BADGE_ICON} /></svg>
+							<span class="absolute -bottom-1 -right-1 h-2 w-2 rounded-full bg-coral shadow-[0_0_6px_rgba(255,107,157,0.85)] ring-2 ring-white/85"></span>
+						</div>
+						<div>
+							<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-mint-dark/70">Social signals</p>
+							<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">โซเชียลมีเดีย</h2>
+						</div>
 					</div>
 					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{artist.socials.length} ช่องทาง</span>
 				</div>
@@ -237,9 +254,15 @@
 		{#if artist.series.length > 0}
 			<section class="mt-8">
 				<div class="mb-4 flex items-end justify-between gap-4">
-					<div>
-						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark/70">Filmography</p>
-						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">ผลงาน</h2>
+					<div class="flex items-center gap-3">
+						<div class="relative hidden h-11 w-11 rotate-[6deg] items-center justify-center rounded-2xl bg-gradient-to-br from-coral to-lavender text-white shadow-lg shadow-coral/25 transition-all duration-500 hover:rotate-0 hover:scale-105 sm:flex" aria-hidden="true">
+							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={WORKS_BADGE_ICON} /></svg>
+							<span class="absolute -bottom-1 -right-1 h-2 w-2 rounded-full bg-mint shadow-[0_0_6px_rgba(110,231,183,0.85)] ring-2 ring-white/85"></span>
+						</div>
+						<div>
+							<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark/70">Filmography</p>
+							<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">ผลงาน</h2>
+						</div>
 					</div>
 					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{artist.series.length} เรื่อง</span>
 				</div>
@@ -282,9 +305,9 @@
 			<section class="mt-8">
 				<div class="glass-card-strong rounded-[2rem] p-8 text-center shadow-xl shadow-lavender/10">
 					<p class="font-[family-name:var(--font-display)] text-xl font-bold text-plum">ยังไม่มีผลงานในระบบ</p>
-					<p class="mt-1 text-sm text-plum-light">ลองสำรวจซีรีส์อื่นในจักรวาล GL-Orbit</p>
-					<a href="/series" class="mt-4 inline-flex rounded-full bg-gradient-to-r from-coral to-coral-dark px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-coral/25 transition-all hover:scale-[1.02] hover:shadow-xl touch-target">
-						ดูซีรีส์ทั้งหมด
+					<p class="mt-1 text-sm text-plum-light">กลับไปเริ่มสำรวจจากหน้าแรกของ GL-Orbit</p>
+					<a href="/" class="mt-4 inline-flex rounded-full bg-gradient-to-r from-coral to-coral-dark px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-coral/25 transition-all hover:scale-[1.02] hover:shadow-xl touch-target">
+						กลับหน้าแรก
 					</a>
 				</div>
 			</section>

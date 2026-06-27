@@ -14,6 +14,12 @@
 		{ frame: 'from-mint via-mint/60 to-coral', border: 'border-mint/25', orb: 'bg-mint/30', chip: 'bg-mint/15 text-mint-dark', dot: 'bg-lavender-dark', glow: 'group-hover:shadow-mint/30' }
 	] as const;
 
+	const cuteIcons = [
+		{ label: 'หัวใจ', path: 'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733C11.285 4.876 9.623 3.75 7.688 3.75 5.099 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z' },
+		{ label: 'ดาว', path: 'M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557L3.04 10.385a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345l2.125-5.111z' },
+		{ label: 'ประกาย', path: 'M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.091-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.091L9 5.25l.813 2.846a4.5 4.5 0 003.091 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.091zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.456-2.456L14.25 6l1.035-.259a3.375 3.375 0 002.456-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z' }
+	] as const;
+
 	let extraArtists = $state<ArtistListItem[]>([]);
 	let searchQuery = $state(data.filters.search);
 	let loading = $state(false);
@@ -124,10 +130,17 @@
 	{:else}
 		{#each allArtists as a, i (a.id)}
 			{@const accent = accents[i % accents.length]}
+			{@const cuteIcon = cuteIcons[i % cuteIcons.length]}
 			<a href="/artists/{a.id}" class="group block">
 				<div class="glass-card-strong relative overflow-hidden rounded-3xl border {accent.border} bg-white/76 p-3 sm:p-4 shadow-lg shadow-lavender/10 transition-all duration-500 group-hover:-translate-y-1.5 group-hover:shadow-2xl {accent.glow}">
 					<div class="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full blur-2xl opacity-80 {accent.orb}"></div>
 					<div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/75 via-cream/45 to-transparent"></div>
+					<div class="pointer-events-none absolute right-3 top-3 z-10">
+						<div class="relative flex h-9 w-9 rotate-[8deg] items-center justify-center rounded-2xl bg-gradient-to-br {accent.frame} text-white shadow-lg shadow-lavender/30 transition-all duration-500 group-hover:rotate-0 group-hover:scale-110" aria-hidden="true">
+							<svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={cuteIcon.path} /></svg>
+							<span class="absolute -bottom-1 -right-1 h-2 w-2 rounded-full {accent.dot} shadow-[0_0_6px_rgba(110,231,183,0.85)] ring-2 ring-white/85"></span>
+						</div>
+					</div>
 
 					<div class="relative flex items-center gap-3 sm:gap-4">
 						<div class="relative shrink-0 rotate-[4deg] transition-transform duration-500 group-hover:rotate-0">
@@ -144,7 +157,7 @@
 							<span class="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full {accent.dot} shadow-[0_0_7px_rgba(255,107,157,0.65)] ring-2 ring-white/80"></span>
 						</div>
 
-						<div class="min-w-0 flex-1">
+						<div class="min-w-0 flex-1 pr-10">
 							<h3 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold leading-tight text-plum line-clamp-1">{a.nickname}</h3>
 							{#if a.fullNameEn}<p class="mt-0.5 text-xs sm:text-sm text-plum-light line-clamp-1">{a.fullNameEn}</p>{/if}
 							<div class="mt-2 flex flex-wrap items-center gap-1.5">
@@ -157,7 +170,6 @@
 							</div>
 						</div>
 
-						<svg class="hidden h-5 w-5 shrink-0 text-plum-light/35 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-coral-dark sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
 					</div>
 				</div>
 			</a>
