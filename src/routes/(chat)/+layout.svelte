@@ -35,12 +35,12 @@
 	});
 </script>
 
-<!-- Flex column เต็ม viewport ด้วย CSS ล้วน (100dvh ลดลงตอนมี keyboard ในเบราว์เซอร์ที่รองรับ
-     interactive-widget=resizes-content) — header/shrink-0 + list/flex-1 scroll + composer/shrink-0
+<!-- Fixed inset shell เต็ม viewport โดยไม่ผูกกับ 100dvh ที่ iOS PWA อาจคืนค่าไม่ครบหลัง keyboard ปิด
+     header/shrink-0 + list/flex-1 scroll + composer/absolute overlay
      overflow-hidden ที่ shell → มีแค่ list ข้อความตัวเดียวที่เลื่อนได้ -->
 <div
 	data-chat-shell
-	class="flex h-[100dvh] w-full flex-col overflow-hidden bg-[#f7f7f8] pt-[var(--pwa-safe-top)] text-plum"
+	class="fixed inset-0 flex w-full flex-col overflow-hidden bg-[#f7f7f8] pt-[var(--pwa-safe-top)] text-plum"
 >
 	{@render children()}
 </div>
