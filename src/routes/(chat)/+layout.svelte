@@ -12,6 +12,7 @@
 			htmlOverflow: html.style.overflow,
 			htmlOverscrollBehavior: html.style.overscrollBehavior,
 			htmlHeight: html.style.height,
+			bodyPaddingTop: body.style.paddingTop,
 			bodyOverflow: body.style.overflow,
 			bodyOverscrollBehavior: body.style.overscrollBehavior,
 			bodyPosition: body.style.position,
@@ -23,6 +24,7 @@
 		html.style.overflow = 'hidden';
 		html.style.overscrollBehavior = 'none';
 		html.style.height = '100%';
+		body.style.paddingTop = '0px';
 		body.style.overflow = 'hidden';
 		body.style.overscrollBehavior = 'none';
 		body.style.position = 'fixed';
@@ -34,6 +36,7 @@
 			html.style.overflow = previous.htmlOverflow;
 			html.style.overscrollBehavior = previous.htmlOverscrollBehavior;
 			html.style.height = previous.htmlHeight;
+			body.style.paddingTop = previous.bodyPaddingTop;
 			body.style.overflow = previous.bodyOverflow;
 			body.style.overscrollBehavior = previous.bodyOverscrollBehavior;
 			body.style.position = previous.bodyPosition;
@@ -49,7 +52,7 @@
      overflow-hidden ที่ shell → มีแค่ list ข้อความตัวเดียวที่เลื่อนได้ -->
 <div
 	data-chat-shell
-	class="flex h-[calc(100dvh-var(--pwa-safe-top))] w-full flex-col overflow-hidden bg-[#f7f7f8] text-plum"
+	class="flex h-[100dvh] w-full flex-col overflow-hidden bg-[#f7f7f8] pt-[var(--pwa-safe-top)] text-plum"
 >
 	{@render children()}
 </div>
