@@ -167,27 +167,6 @@
 		void sendMessage();
 	}
 
-	function resetIOSKeyboardGap() {
-		// Evidence จาก iOS จริง: หลัง keyboard ปิด ถ้า scroll body ลง gap จะหาย
-		// ดังนั้น reset ต้องดัน window/body ไปที่ท้าย document ไม่ใช่กลับ top
-		// ไม่แตะ scroll container ของข้อความ เพื่อไม่ให้แชทเด้งขึ้นบน
-		const reset = () => {
-			const doc = document.documentElement;
-			const body = document.body;
-			const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
-			const scrollHeight = Math.max(body.scrollHeight, doc.scrollHeight, body.offsetHeight, doc.offsetHeight);
-			const y = Math.max(0, scrollHeight - viewportHeight);
-
-			window.scrollTo(0, y);
-			body.scrollTop = y;
-			doc.scrollTop = y;
-		};
-
-		requestAnimationFrame(reset);
-		setTimeout(reset, 80);
-		setTimeout(reset, 250);
-		setTimeout(reset, 450);
-	}
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
@@ -409,7 +388,6 @@
 						<textarea
 							bind:value={input}
 							onkeydown={handleKeydown}
-							onblur={resetIOSKeyboardGap}
 							rows="1"
 							maxlength="500"
 							placeholder="ถาม GL-Orbit AI..."
