@@ -14,11 +14,7 @@
 			htmlHeight: html.style.height,
 			bodyPaddingTop: body.style.paddingTop,
 			bodyOverflow: body.style.overflow,
-			bodyOverscrollBehavior: body.style.overscrollBehavior,
-			bodyPosition: body.style.position,
-			bodyInset: body.style.inset,
-			bodyWidth: body.style.width,
-			bodyHeight: body.style.height
+			bodyOverscrollBehavior: body.style.overscrollBehavior
 		};
 
 		html.style.overflow = 'hidden';
@@ -27,10 +23,6 @@
 		body.style.paddingTop = '0px';
 		body.style.overflow = 'hidden';
 		body.style.overscrollBehavior = 'none';
-		body.style.position = 'fixed';
-		body.style.inset = '0';
-		body.style.width = '100%';
-		body.style.height = '100%';
 
 		return () => {
 			html.style.overflow = previous.htmlOverflow;
@@ -39,10 +31,6 @@
 			body.style.paddingTop = previous.bodyPaddingTop;
 			body.style.overflow = previous.bodyOverflow;
 			body.style.overscrollBehavior = previous.bodyOverscrollBehavior;
-			body.style.position = previous.bodyPosition;
-			body.style.inset = previous.bodyInset;
-			body.style.width = previous.bodyWidth;
-			body.style.height = previous.bodyHeight;
 		};
 	});
 </script>
