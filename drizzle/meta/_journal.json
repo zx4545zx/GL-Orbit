@@ -64,6 +64,20 @@
       "when": 1782576316634,
       "tag": "0008_outgoing_liz_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1782649440008,
+      "tag": "0009_lyrical_shinko_yamashiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1782652089471,
+      "tag": "0010_supreme_toad",
+      "breakpoints": true
     }
   ]
 }

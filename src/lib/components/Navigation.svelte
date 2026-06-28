@@ -7,7 +7,8 @@
 	const navLinks = [
 		{ href: '/', label: 'หน้าแรก' },
 		{ href: '/calendar', label: 'ตารางฉาย' },
-		{ href: '/explore/series', label: 'สำรวจ' }
+		{ href: '/explore/series', label: 'สำรวจ' },
+		{ href: '/chat', label: 'AI Chat' }
 	];
 
 	function isActive(href: string) {
@@ -128,6 +129,7 @@
 						</a>
 					</div>
 				{/if}
+			</div>
 		</div>
 	</div>
 </nav>

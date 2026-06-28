@@ -155,3 +155,29 @@ export const notifications = pgTable('notifications', {
 	isRead: boolean('is_read').notNull().default(false),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });
+
+export const chatConversations = pgTable('chat_conversations', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	title: varchar('title', { length: 120 }).notNull().default('New chat'),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+	expiresAt: timestamp('expires_at', { withTimezone: true }).notNull()
+});
+
+export const chatMessages = pgTable('chat_messages', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	question: text('question').notNull(),
+	reply: text('reply').notNull(),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	expiresAt: timestamp('expires_at', { withTimezone: true }).notNull()
+});
+
+export const chatConversationMessages = pgTable('chat_conversation_messages', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	conversationId: uuid('conversation_id').notNull().references(() => chatConversations.id, { onDelete: 'cascade' }),
+	role: varchar('role', { length: 20 }).notNull(),
+	content: text('content').notNull(),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+});
