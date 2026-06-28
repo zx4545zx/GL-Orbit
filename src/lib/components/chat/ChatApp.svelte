@@ -41,28 +41,6 @@
 	let renameTitle = $state('');
 	const currentUser = $derived(page.data.user);
 
-	let textareaEl = $state<HTMLTextAreaElement>();
-	let scrollEl = $state<HTMLDivElement>();
-
-	// Auto-grow: ขยายกล่องพิมพ์ตามข้อความ (สูงสุด 144px = max-h-36) และย่อกลับตอนส่ง/ล้างค่า
-	$effect(() => {
-		void input;
-		const el = textareaEl;
-		if (!el) return;
-		el.style.height = 'auto';
-		el.style.height = `${Math.min(el.scrollHeight, 144)}px`;
-	});
-
-	// Auto-scroll ล่างสุดเสมอ (แบบ Gemini): ตอน mount + ทุกครั้งที่ข้อความเปลี่ยน/สถานะโหลดเปลี่ยน
-	// กัน "เด้งไปด้านบน" ตอน {#key} remount (เข้าแชตเก่า / ส่งข้อความแรก) ที่ list เริ่มที่ข้อความเก่าสุด
-	$effect(() => {
-		void messages.length;
-		void loading;
-		const el = scrollEl;
-		if (!el) return;
-		el.scrollTop = el.scrollHeight;
-	});
-
 	const loadingSteps = [
 		{ delay: 0, status: 'กำลังอ่านคำถามของคุณ', detail: 'กำลังดูว่าคุณอยากรู้เรื่องซีรีส์ นักแสดง หรือตารางฉาย' },
 		{ delay: 2500, status: 'กำลังหาข้อมูลที่เกี่ยวข้อง', detail: 'กำลังค้นจากข้อมูลซีรีส์ที่มีใน GL-Orbit' },
@@ -309,7 +287,7 @@
 			</a>
 		</header>
 
-		<div class="flex-1 overflow-y-auto px-4 py-6 overscroll-y-contain" bind:this={scrollEl}>
+		<div class="flex-1 overflow-y-auto px-4 py-6 overscroll-y-contain">
 			<div class="mx-auto flex max-w-3xl flex-col gap-5">
 				{#if messages.length === 0}
 					<div class="flex min-h-[52dvh] flex-col items-center justify-center text-center">
@@ -353,12 +331,11 @@
 				<div class="flex items-end gap-2 rounded-2xl border border-lavender/25 bg-white p-2 shadow-sm">
 					<textarea
 						bind:value={input}
-						bind:this={textareaEl}
 						onkeydown={handleKeydown}
 						rows="1"
 						maxlength="500"
 						placeholder="ถามเกี่ยวกับซีรีส์..."
-						class="max-h-36 min-h-11 flex-1 resize-none overflow-hidden bg-transparent px-3 py-2 text-base leading-6 text-plum outline-none"
+						class="max-h-36 min-h-11 flex-1 resize-none bg-transparent px-3 py-2 text-base leading-6 text-plum outline-none"
 						disabled={loading}
 					></textarea>
 					<button type="button" onclick={sendMessage} disabled={loading || !input.trim()} class="h-11 rounded-xl bg-plum px-5 text-sm font-bold text-white transition hover:bg-coral disabled:cursor-not-allowed disabled:opacity-45">
