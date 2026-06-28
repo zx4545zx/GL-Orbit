@@ -167,6 +167,20 @@
 		void sendMessage();
 	}
 
+	function resetIOSKeyboardGap() {
+		// iOS PWA บางครั้งคืนค่า viewport ช้าหลัง keyboard ปิด ทำให้เกิด gap ขาวด้านล่าง
+		// reset เฉพาะ window/body ไม่แตะ scroll container ของข้อความ เพื่อไม่ให้แชทเด้งขึ้นบน
+		const reset = () => {
+			window.scrollTo(0, 0);
+			document.body.scrollTop = 0;
+			document.documentElement.scrollTop = 0;
+		};
+
+		requestAnimationFrame(reset);
+		setTimeout(reset, 80);
+		setTimeout(reset, 250);
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();
@@ -387,6 +401,7 @@
 						<textarea
 							bind:value={input}
 							onkeydown={handleKeydown}
+							onblur={resetIOSKeyboardGap}
 							rows="1"
 							maxlength="500"
 							placeholder="ถาม GL-Orbit AI..."
