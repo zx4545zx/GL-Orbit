@@ -324,14 +324,22 @@
 						<p class="mt-1 text-sm leading-5 text-plum-light">{loadingDetail || 'กำลังเตรียมคำถามของคุณ'}</p>
 					</div>
 				{/if}
+
+				{#if error}
+					<div class="flex justify-start">
+						<div class="flex max-w-[90%] items-start gap-2 rounded-2xl rounded-tl-md border border-coral/30 bg-coral/10 px-4 py-3 text-sm leading-6 text-coral-dark">
+							<svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008Zm9-0.75c0 5.385-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12 6.615 2.25 12 2.25 21.75 6.615 21.75 12Z" />
+							</svg>
+							<span>{error}</span>
+						</div>
+					</div>
+				{/if}
 			</div>
 		</div>
 
 		<footer class="shrink-0 border-t border-black/10 bg-white px-4 pt-3" style="padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));">
 			<div class="mx-auto max-w-3xl">
-				{#if error}
-					<p class="mb-2 rounded-xl bg-coral/10 px-3 py-2 text-sm text-coral-dark">{error}</p>
-				{/if}
 				<div class="flex items-end gap-2 rounded-2xl border border-lavender/25 bg-white p-2 shadow-sm">
 					<textarea
 						bind:value={input}
