@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { replaceState } from '$app/navigation';
 	import { page } from '$app/state';
 	import ChatMarkdown from '$lib/components/ChatMarkdown.svelte';
 
@@ -76,7 +76,7 @@
 
 	async function createConversation(title = 'แชตใหม่', options: { resetMessages?: boolean } = {}) {
 		if (current && messages.length === 0) {
-			await goto(`/chat/${current.id}`);
+			await replaceState(`/chat/${current.id}`, page.state);
 			return current;
 		}
 
@@ -92,7 +92,7 @@
 		await refreshHistory();
 		const created = current;
 		if (!created) throw new Error('create failed');
-		await goto(`/chat/${created.id}`);
+		await replaceState(`/chat/${created.id}`, page.state);
 		return created;
 	}
 
@@ -184,7 +184,7 @@
 		if (current?.id === conversationId) {
 			current = null;
 			messages = [];
-			await goto('/chat');
+			await replaceState('/chat', page.state);
 		}
 	}
 </script>
