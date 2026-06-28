@@ -361,7 +361,7 @@
 			</div>
 		</div>
 
-		<footer class="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pt-2 sm:px-4" style="padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));">
+		<footer class="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pt-2 sm:px-4">
 			<div class="pointer-events-auto mx-auto max-w-3xl">
 				{#if !loading && input.trim() === '' && (followupSuggestions.length > 0 || messages.length === 0)}
 					<div class="mb-2 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
