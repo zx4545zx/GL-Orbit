@@ -360,38 +360,46 @@
 			</div>
 		</div>
 
-		<footer class="shrink-0 border-t border-black/10 bg-white px-4 pt-3" style="padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));">
+		<footer class="shrink-0 bg-gradient-to-t from-white via-white/95 to-white/0 px-3 pt-4 sm:px-4" style="padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));">
 			<div class="mx-auto max-w-3xl">
 				{#if !loading && input.trim() === '' && (followupSuggestions.length > 0 || messages.length === 0)}
-					<div class="mb-2 flex gap-2 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+					<div class="mb-2 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 						{#if followupSuggestions.length > 0}
 							{#each followupSuggestions as suggestion (suggestion)}
-								<button type="button" onclick={() => sendSuggestion(suggestion)} class="shrink-0 rounded-full border border-coral/25 bg-coral/5 px-3.5 py-1.5 text-xs font-semibold text-coral-dark transition hover:border-coral hover:bg-coral/10">
+								<button type="button" onclick={() => sendSuggestion(suggestion)} class="shrink-0 rounded-full border border-coral/25 bg-white/85 px-3.5 py-2 text-xs font-bold text-coral-dark shadow-sm shadow-coral/10 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-coral hover:bg-coral/10 hover:shadow-coral/20 active:translate-y-0">
 									{suggestion}
 								</button>
 							{/each}
 						{:else}
 							{#each SUGGESTIONS as suggestion (suggestion.prompt)}
-								<button type="button" onclick={() => sendSuggestion(suggestion.prompt)} class="shrink-0 rounded-full border border-lavender/30 bg-white px-3.5 py-1.5 text-xs font-semibold text-plum transition hover:border-coral hover:text-coral-dark">
+								<button type="button" onclick={() => sendSuggestion(suggestion.prompt)} class="shrink-0 rounded-full border border-lavender/30 bg-white/85 px-3.5 py-2 text-xs font-bold text-plum shadow-sm shadow-lavender/10 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-coral hover:bg-coral/5 hover:text-coral-dark active:translate-y-0">
 									{suggestion.label}
 								</button>
 							{/each}
 						{/if}
 					</div>
 				{/if}
-				<div class="flex items-end gap-2 rounded-2xl border border-lavender/25 bg-white p-2 shadow-sm">
-					<textarea
-						bind:value={input}
-						onkeydown={handleKeydown}
-						rows="1"
-						maxlength="500"
-						placeholder="ถามเกี่ยวกับซีรีส์..."
-						class="max-h-36 min-h-11 flex-1 resize-none bg-transparent px-3 py-2 text-base leading-6 text-plum outline-none"
-						disabled={loading}
-					></textarea>
-					<button type="button" onclick={sendMessage} disabled={loading || !input.trim()} class="h-11 rounded-xl bg-plum px-5 text-sm font-bold text-white transition hover:bg-coral disabled:cursor-not-allowed disabled:opacity-45">
-						ส่ง
-					</button>
+				<div class="relative overflow-hidden rounded-[1.65rem] border border-white/70 bg-white/75 p-2.5 shadow-2xl shadow-lavender/25 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-[1.65rem] before:bg-gradient-to-r before:from-coral/10 before:via-lavender/10 before:to-mint/10">
+					<div class="relative flex items-end gap-2">
+						<div class="hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-coral/15 to-lavender/20 text-xs font-black text-coral-dark sm:flex">
+							AI
+						</div>
+						<textarea
+							bind:value={input}
+							onkeydown={handleKeydown}
+							rows="1"
+							maxlength="500"
+							placeholder="ถาม GL-Orbit AI..."
+							class="max-h-36 min-h-11 flex-1 resize-none bg-transparent px-2 py-2.5 text-base leading-6 text-plum placeholder:text-plum-light/70 outline-none sm:px-3"
+							disabled={loading}
+						></textarea>
+						<button type="button" onclick={sendMessage} disabled={loading || !input.trim()} class="group flex h-11 shrink-0 items-center gap-2 rounded-2xl bg-gradient-to-br from-plum to-coral px-4 text-sm font-black text-white shadow-lg shadow-coral/20 transition hover:-translate-y-0.5 hover:shadow-coral/35 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-45 sm:px-5">
+							<span class="hidden sm:inline">ส่ง</span>
+							<svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.4">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m0 0-5-5m5 5-5 5" />
+							</svg>
+						</button>
+					</div>
 				</div>
 			</div>
 		</footer>
