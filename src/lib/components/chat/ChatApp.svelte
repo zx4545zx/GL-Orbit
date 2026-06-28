@@ -314,7 +314,11 @@
 				{#if loading}
 					<div class="max-w-[90%] rounded-2xl rounded-tl-md bg-white px-4 py-3 shadow-sm">
 						<div class="flex items-center gap-2 text-sm font-semibold text-plum">
-							<span class="h-2.5 w-2.5 animate-pulse rounded-full bg-coral"></span>
+							<span class="flex items-center gap-1">
+								<span class="h-2 w-2 animate-bounce rounded-full bg-coral" style="animation-delay: 0ms"></span>
+								<span class="h-2 w-2 animate-bounce rounded-full bg-coral" style="animation-delay: 150ms"></span>
+								<span class="h-2 w-2 animate-bounce rounded-full bg-coral" style="animation-delay: 300ms"></span>
+							</span>
 							{loadingStatus || 'กำลังเริ่มทำงาน'}
 						</div>
 						<p class="mt-1 text-sm leading-5 text-plum-light">{loadingDetail || 'กำลังเตรียมคำถามของคุณ'}</p>
