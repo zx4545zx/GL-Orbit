@@ -41,6 +41,17 @@
 	let renameTitle = $state('');
 	const currentUser = $derived(page.data.user);
 
+	let textareaEl = $state<HTMLTextAreaElement>();
+
+	// Auto-grow: ขยายกล่องพิมพ์ตามข้อความ (สูงสุด 144px = max-h-36) และย่อกลับตอนส่ง/ล้างค่า
+	$effect(() => {
+		void input;
+		const el = textareaEl;
+		if (!el) return;
+		el.style.height = 'auto';
+		el.style.height = `${Math.min(el.scrollHeight, 144)}px`;
+	});
+
 	const loadingSteps = [
 		{ delay: 0, status: 'กำลังอ่านคำถามของคุณ', detail: 'กำลังดูว่าคุณอยากรู้เรื่องซีรีส์ นักแสดง หรือตารางฉาย' },
 		{ delay: 2500, status: 'กำลังหาข้อมูลที่เกี่ยวข้อง', detail: 'กำลังค้นจากข้อมูลซีรีส์ที่มีใน GL-Orbit' },
@@ -331,11 +342,12 @@
 				<div class="flex items-end gap-2 rounded-2xl border border-lavender/25 bg-white p-2 shadow-sm">
 					<textarea
 						bind:value={input}
+						bind:this={textareaEl}
 						onkeydown={handleKeydown}
 						rows="1"
 						maxlength="500"
 						placeholder="ถามเกี่ยวกับซีรีส์..."
-						class="max-h-36 min-h-11 flex-1 resize-none bg-transparent px-3 py-2 text-sm leading-6 text-plum outline-none"
+						class="max-h-36 min-h-11 flex-1 resize-none overflow-hidden bg-transparent px-3 py-2 text-base leading-6 text-plum outline-none"
 						disabled={loading}
 					></textarea>
 					<button type="button" onclick={sendMessage} disabled={loading || !input.trim()} class="h-11 rounded-xl bg-plum px-5 text-sm font-bold text-white transition hover:bg-coral disabled:cursor-not-allowed disabled:opacity-45">
