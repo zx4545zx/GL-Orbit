@@ -93,7 +93,7 @@ export const SQL_GENERATION_PROMPT = `
 7. ถ้าผู้ใช้ถามนอกขอบเขตข้อมูลซีรีส์ ให้ตอบ SQL นี้เท่านั้น: SELECT 'OUT_OF_SCOPE' AS status
 8. จำกัดผลลัพธ์ไม่เกิน 20 แถว
 9. ค่า series.status ต้องใช้ตัวพิมพ์ใหญ่เท่านั้น: 'UPCOMING', 'ONGOING', 'ENDED'
-10. timestamptz columns (เช่น episode_schedules.air_date, series.deleted_at) เก็บค่าเป็น UTC ให้ใช้ `AT TIME ZONE 'Asia/Bangkok'` หรือ `AT TIME ZONE '+07:00'` เพื่อแปลงเป็นเวลาไทยก่อนแสดงผล
+10. timestamptz columns (เช่น episode_schedules.air_date, series.deleted_at) เก็บค่าเป็น UTC ให้ใช้ AT TIME ZONE 'Asia/Bangkok' หรือ AT TIME ZONE '+07:00' เพื่อแปลงเป็นเวลาไทยก่อนแสดงผล
 
 DDL:
 ${SERIES_CHAT_SCHEMA}
