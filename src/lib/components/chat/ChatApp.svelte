@@ -193,12 +193,12 @@
 	<title>{current?.title ?? 'AI Chat'} | GL-Orbit</title>
 </svelte:head>
 
-<div class="flex h-screen overflow-hidden">
+<div class="flex h-full overflow-hidden">
 	{#if sidebarOpen}
 		<button class="fixed inset-0 z-30 bg-black/20 md:hidden" type="button" aria-label="ปิดประวัติแชต" onclick={() => sidebarOpen = false}></button>
 	{/if}
 
-	<aside class="fixed inset-y-0 left-0 z-40 flex w-80 max-w-[86vw] flex-col border-r border-black/10 bg-white transition-transform md:static md:translate-x-0 {sidebarOpen ? 'translate-x-0' : '-translate-x-full'}">
+	<aside class="fixed top-[var(--pwa-safe-top)] bottom-0 left-0 z-40 flex w-80 max-w-[86vw] flex-col border-r border-black/10 bg-white transition-transform md:static md:translate-x-0 {sidebarOpen ? 'translate-x-0' : '-translate-x-full'}">
 		<div class="flex h-16 items-center gap-3 border-b border-black/10 px-4">
 			<a href="/" class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-coral to-lavender font-bold text-white">G</a>
 			<div class="min-w-0">
