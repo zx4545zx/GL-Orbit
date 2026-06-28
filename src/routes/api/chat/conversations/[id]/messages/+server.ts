@@ -9,6 +9,7 @@ import { buildAnswerPrompt, buildSqlPrompt } from '$lib/server/chat/schema-conte
 import { callMiniMax, MiniMaxConfigError } from '$lib/server/chat/minimax.js';
 import { runReadOnlyQuery } from '$lib/server/chat/read-only-db.js';
 import { makeSafeReadSql } from '$lib/server/chat/sql-safety.js';
+import { getSeriesCatalogText } from '$lib/server/chat/catalog.js';
 import type { RequestHandler } from './$types.js';
 
 const MAX_MESSAGE_LENGTH = 500;
@@ -48,9 +49,10 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 
 	try {
 		const contextPrompt = buildConversationContextPrompt(recentContext);
+		const catalog = await getSeriesCatalogText();
 		const generatedSql = await callMiniMax([
 			{ role: 'system', content: 'You convert user questions into safe PostgreSQL SELECT queries. Return SQL only.' },
-			{ role: 'user', content: `${contextPrompt}\n\n${buildSqlPrompt(message)}`.trim() }
+			{ role: 'user', content: `${contextPrompt}\n\n${buildSqlPrompt(message, catalog)}`.trim() }
 		]);
 		const safeSql = makeSafeReadSql(generatedSql);
 
