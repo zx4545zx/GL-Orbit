@@ -3,14 +3,11 @@ import { getDb } from '$lib/server/db/index.js';
 import { series, studios, episodes, episodeSchedules, platforms } from '$lib/server/db/schema.js';
 import { getCached, setCached } from '$lib/server/cache.js';
 import { dedupeCountdownRows } from './countdown.js';
+import { toThailandTime } from '$lib/server/timezone.js';
 import type { HomeApiResponse } from '$lib/types/home.js';
 
 const CACHE_KEY = 'query:home';
 const CACHE_TTL = 30_000;
-
-function toThailandTime(date: Date): Date {
-	return new Date(date.getTime() + 7 * 60 * 60 * 1000);
-}
 
 export async function getHomeData(): Promise<HomeApiResponse> {
 	const cached = getCached<HomeApiResponse>(CACHE_KEY, CACHE_TTL);

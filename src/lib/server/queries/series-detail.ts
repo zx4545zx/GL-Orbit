@@ -2,6 +2,7 @@ import { eq, and, isNull, asc, inArray } from 'drizzle-orm';
 import { getDb } from '$lib/server/db/index.js';
 import { series, studios, artists, seriesArtists, episodes, episodeSchedules, platforms, genres, seriesGenres } from '$lib/server/db/schema.js';
 import { getCached, setCached } from '$lib/server/cache.js';
+import { formatThailandDate } from '$lib/server/timezone.js';
 
 const CACHE_TTL = 30_000;
 
@@ -153,7 +154,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 			coverUrl: ep.coverUrl ?? null,
 			trailerUrl: ep.trailerUrl ?? null,
 			schedules: rows.map((sch) => ({
-				airDate: sch.airDate ? sch.airDate.toISOString().split('T')[0] : 'TBA',
+				airDate: sch.airDate ? formatThailandDate(sch.airDate) : 'TBA',
 				platform: sch.platformName ?? 'TBA',
 				platformLogo: sch.platformLogo ?? null,
 				streamLink: sch.streamLink ?? null,

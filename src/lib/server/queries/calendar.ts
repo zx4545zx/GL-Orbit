@@ -2,6 +2,7 @@ import { eq, and, isNull, asc, gte, lt } from 'drizzle-orm';
 import { getDb } from '$lib/server/db/index.js';
 import { series, episodes, episodeSchedules, platforms } from '$lib/server/db/schema.js';
 import { getCached, setCached } from '$lib/server/cache.js';
+import { formatThailandDate, formatThailandTime, getThailandDayOfWeek } from '$lib/server/timezone.js';
 import type { CalendarApiResponse } from '$lib/types/calendar.js';
 
 const CACHE_TTL = 30_000;
@@ -14,30 +15,6 @@ export type CalendarQuery =
 export type CalendarValidation =
 	| { ok: true; query: CalendarQuery }
 	| { ok: false; error: string };
-
-// Convert UTC date to Thailand time (UTC+7)
-function toThailandTime(date: Date): Date {
-	return new Date(date.getTime() + 7 * 60 * 60 * 1000);
-}
-
-function formatThailandDate(date: Date): string {
-	const thailandDate = toThailandTime(date);
-	const year = thailandDate.getUTCFullYear();
-	const month = String(thailandDate.getUTCMonth() + 1).padStart(2, '0');
-	const day = String(thailandDate.getUTCDate()).padStart(2, '0');
-	return `${year}-${month}-${day}`;
-}
-
-function formatThailandTime(date: Date): string {
-	const thailandDate = toThailandTime(date);
-	const hours = String(thailandDate.getUTCHours()).padStart(2, '0');
-	const minutes = String(thailandDate.getUTCMinutes()).padStart(2, '0');
-	return `${hours}:${minutes}`;
-}
-
-function getThailandDayOfWeek(date: Date): number {
-	return toThailandTime(date).getUTCDay();
-}
 
 /**
  * Validate raw search params into a structured calendar query.

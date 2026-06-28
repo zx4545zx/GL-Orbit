@@ -12,6 +12,7 @@ import {
 	platforms
 } from './db/schema.js';
 import type { Db } from './db/index.js';
+import { formatThailandDateTime } from './timezone.js';
 
 /**
  * ดึงข้อมูลซีรีส์ทั้งหมดในครั้งเดียว พร้อมความสัมพันธ์ทุกอย่าง
@@ -104,7 +105,7 @@ export async function getSeriesFull(db: Db, id: string) {
 				episodeId: es.episodeId,
 				platformId: es.platformId,
 				platformName: es.platformName,
-				airDate: es.airDate ? es.airDate.toISOString() : '',
+				airDate: es.airDate ? formatThailandDateTime(es.airDate) : '',
 				streamLink: es.streamLink,
 				isUncut: es.isUncut
 			}))

@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db/index.js';
 import { episodeSchedules, episodes, series, platforms } from '$lib/server/db/schema.js';
 import { eq, and, isNull, asc, sql } from 'drizzle-orm';
+import { formatThailandDateTime } from '$lib/server/timezone.js';
 import type { RequestHandler } from './$types.js';
 
 export const GET: RequestHandler = async ({ locals, url }) => {
@@ -43,7 +44,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 	const data = result.map((r) => ({
 		...r,
-		airDate: r.airDate ? r.airDate.toISOString() : ''
+		airDate: r.airDate ? formatThailandDateTime(r.airDate) : ''
 	}));
 
 	return json({ data, page, limit, total: count, totalPages: Math.ceil(count / limit) });
