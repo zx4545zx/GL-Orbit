@@ -10,6 +10,19 @@ import {
 } from '$lib/server/chat/history.js';
 import type { RequestHandler } from './$types.js';
 
+const THAILAND_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+const UTC_ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
+function convertUtcTimestamps<T>(rows: T[]): T[] {
+	return JSON.parse(JSON.stringify(rows, (_key, value) => {
+		if (typeof value === 'string' && UTC_ISO_RE.test(value)) {
+			return new Date(new Date(value).getTime() + THAILAND_OFFSET_MS).toISOString().replace('Z', '+07:00');
+		}
+		return value;
+	}));
+}
+
 const MAX_MESSAGE_LENGTH = 500;
 const OUT_OF_SCOPE_REPLY = 'ตอนนี้ฉันช่วยตอบได้เฉพาะคำถามเกี่ยวกับข้อมูลซีรีส์ใน GL-Orbit เท่านั้นค่ะ';
 
@@ -56,7 +69,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			return json({ reply: OUT_OF_SCOPE_REPLY, conversationId: conversation.id });
 		}
 
-		const rows = await runReadOnlyQuery(safeSql.sql);
+		const rows = convertUtcTimestamps(await runReadOnlyQuery(safeSql.sql));
 		const reply = await callMiniMax([
 			{
 				role: 'system',

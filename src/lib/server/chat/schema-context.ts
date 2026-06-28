@@ -93,6 +93,7 @@ export const SQL_GENERATION_PROMPT = `
 7. ถ้าผู้ใช้ถามนอกขอบเขตข้อมูลซีรีส์ ให้ตอบ SQL นี้เท่านั้น: SELECT 'OUT_OF_SCOPE' AS status
 8. จำกัดผลลัพธ์ไม่เกิน 20 แถว
 9. ค่า series.status ต้องใช้ตัวพิมพ์ใหญ่เท่านั้น: 'UPCOMING', 'ONGOING', 'ENDED'
+10. timestamptz columns (เช่น episode_schedules.air_date, series.deleted_at) เก็บค่าเป็น UTC ให้ใช้ `AT TIME ZONE 'Asia/Bangkok'` หรือ `AT TIME ZONE '+07:00'` เพื่อแปลงเป็นเวลาไทยก่อนแสดงผล
 
 DDL:
 ${SERIES_CHAT_SCHEMA}
@@ -112,6 +113,7 @@ export function buildAnswerPrompt(question: string, rows: unknown[]) {
 ถ้ามีหลายเรื่อง ให้สรุปเป็นรายการสั้น ๆ พร้อมชื่อเรื่องที่ผู้ใช้อ่านเข้าใจ
 ถ้าข้อมูลว่าง ให้บอกว่ายังไม่พบข้อมูลที่ตรงกับคำถาม และชวนลองถามด้วยคำอื่น
 ตอบโดยอิงจากข้อมูลที่ให้มาเท่านั้น ห้ามแต่งข้อมูลเพิ่ม
+เวลาทั้งหมดในข้อมูลที่ให้มาเป็นเวลาไทย (UTC+7) แล้ว ตอบโดยใช้เวลาตามที่เห็น ไม่ต้องแปลงอีก
 
 คำถามผู้ใช้:
 ${question}
