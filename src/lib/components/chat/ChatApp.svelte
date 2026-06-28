@@ -221,7 +221,7 @@
 			</button>
 		</div>
 
-		<nav class="flex-1 space-y-1 overflow-y-auto px-2 pb-4">
+		<nav class="flex-1 space-y-1 overflow-y-auto px-2 pb-4 overscroll-y-contain">
 			{#each history as conversation (conversation.id)}
 				<div class="group flex items-center gap-1 rounded-xl {current?.id === conversation.id ? 'bg-coral/10' : 'hover:bg-lavender/10'}">
 					{#if renamingId === conversation.id}
@@ -287,7 +287,7 @@
 			</a>
 		</header>
 
-		<div class="flex-1 overflow-y-auto px-4 py-6">
+		<div class="flex-1 overflow-y-auto px-4 py-6 overscroll-y-contain">
 			<div class="mx-auto flex max-w-3xl flex-col gap-5">
 				{#if messages.length === 0}
 					<div class="flex min-h-[52dvh] flex-col items-center justify-center text-center">
