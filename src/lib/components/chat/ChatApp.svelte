@@ -306,7 +306,7 @@
 			</a>
 		</header>
 
-		<div class="flex-1 overflow-y-auto px-4 pt-6 pb-6 overscroll-y-contain">
+		<div class="flex-1 overflow-y-auto px-4 pt-6 pb-40 overscroll-y-contain sm:pb-44">
 			<div class="mx-auto flex max-w-3xl flex-col gap-5">
 				{#if messages.length === 0}
 					<div class="flex min-h-[52dvh] flex-col items-center justify-center text-center">
