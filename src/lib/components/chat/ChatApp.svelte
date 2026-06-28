@@ -42,6 +42,7 @@
 	const currentUser = $derived(page.data.user);
 
 	let textareaEl = $state<HTMLTextAreaElement>();
+	let scrollEl = $state<HTMLDivElement>();
 
 	// Auto-grow: ขยายกล่องพิมพ์ตามข้อความ (สูงสุด 144px = max-h-36) และย่อกลับตอนส่ง/ล้างค่า
 	$effect(() => {
@@ -50,6 +51,16 @@
 		if (!el) return;
 		el.style.height = 'auto';
 		el.style.height = `${Math.min(el.scrollHeight, 144)}px`;
+	});
+
+	// Auto-scroll ล่างสุดเสมอ (แบบ Gemini): ตอน mount + ทุกครั้งที่ข้อความเปลี่ยน/สถานะโหลดเปลี่ยน
+	// กัน "เด้งไปด้านบน" ตอน {#key} remount (เข้าแชตเก่า / ส่งข้อความแรก) ที่ list เริ่มที่ข้อความเก่าสุด
+	$effect(() => {
+		void messages.length;
+		void loading;
+		const el = scrollEl;
+		if (!el) return;
+		el.scrollTop = el.scrollHeight;
 	});
 
 	const loadingSteps = [
@@ -298,7 +309,7 @@
 			</a>
 		</header>
 
-		<div class="flex-1 overflow-y-auto px-4 py-6 overscroll-y-contain">
+		<div class="flex-1 overflow-y-auto px-4 py-6 overscroll-y-contain" bind:this={scrollEl}>
 			<div class="mx-auto flex max-w-3xl flex-col gap-5">
 				{#if messages.length === 0}
 					<div class="flex min-h-[52dvh] flex-col items-center justify-center text-center">
