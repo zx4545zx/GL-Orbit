@@ -149,6 +149,19 @@
 		}
 	}
 
+	const SUGGESTIONS = [
+		{ label: 'ตารางฉายวันนี้', prompt: 'ตารางฉายวันนี้มีอะไรบ้าง?' },
+		{ label: 'กำลังฉายอยู่', prompt: 'ตอนนี้มีซีรีส์เรื่องไหนกำลังฉายอยู่บ้าง?' },
+		{ label: 'รอฉายใหม่', prompt: 'ซีรีส์ที่กำลังจะฉายมีเรื่องอะไรบ้าง?' },
+		{ label: 'แนะนำแนวโรแมนติก', prompt: 'มีซีรีส์แนวโรแมนติกเรื่องอะไรบ้าง?' }
+	];
+
+	function sendSuggestion(text: string) {
+		if (loading) return;
+		input = text;
+		void sendMessage();
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();
@@ -293,9 +306,13 @@
 					<div class="flex min-h-[52dvh] flex-col items-center justify-center text-center">
 						<div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-coral/15 text-lg font-black text-coral-dark">AI</div>
 						<h2 class="text-2xl font-black text-plum">อยากรู้เรื่องซีรีส์อะไร?</h2>
-						<p class="mt-3 max-w-lg text-sm leading-6 text-plum-light">
-							ลองถามเช่น “ซีรีส์ที่กำลังฉายมีเรื่องอะไรบ้าง” หรือ “นักแสดงคนนี้อยู่เรื่องไหน”
-						</p>
+						<div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+							{#each SUGGESTIONS as suggestion (suggestion.prompt)}
+								<button type="button" onclick={() => sendSuggestion(suggestion.prompt)} class="rounded-full border border-lavender/30 bg-white px-4 py-2 text-sm font-semibold text-plum shadow-sm transition hover:border-coral hover:bg-coral/5 hover:text-coral-dark">
+									{suggestion.label}
+								</button>
+							{/each}
+						</div>
 					</div>
 				{:else}
 					{#each messages as message (message.id)}
@@ -340,6 +357,15 @@
 
 		<footer class="shrink-0 border-t border-black/10 bg-white px-4 pt-3" style="padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));">
 			<div class="mx-auto max-w-3xl">
+				{#if !loading && input.trim() === ''}
+					<div class="mb-2 flex gap-2 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+						{#each SUGGESTIONS as suggestion (suggestion.prompt)}
+							<button type="button" onclick={() => sendSuggestion(suggestion.prompt)} class="shrink-0 rounded-full border border-lavender/30 bg-white px-3.5 py-1.5 text-xs font-semibold text-plum transition hover:border-coral hover:text-coral-dark">
+								{suggestion.label}
+							</button>
+						{/each}
+					</div>
+				{/if}
 				<div class="flex items-end gap-2 rounded-2xl border border-lavender/25 bg-white p-2 shadow-sm">
 					<textarea
 						bind:value={input}
