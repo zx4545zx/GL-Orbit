@@ -11,7 +11,18 @@
 	}
 
 	function inlineMarkdown(value: string) {
-		return escapeHtml(value).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+		let text = escapeHtml(value);
+		// เก็บ inline code (`...`) ไว้ก่อน กันเครื่องหมาย * ข้างในโดนแปลงเป็น em/strong
+		const codes: string[] = [];
+		text = text.replace(/`([^`]+)`/g, (_, code) => {
+			codes.push(code);
+			return `\u0000${codes.length - 1}\u0000`;
+		});
+		text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+		// *italic* — กัน false positive เช่น `2 * 3 * 4` โดยห้ามมีช่องว่างติดหลัง/หน้า *
+		text = text.replace(/\*(?!\s)([^*]+?)(?<!\s)\*/g, '<em>$1</em>');
+		text = text.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[Number(i)]}</code>`);
+		return text;
 	}
 
 	function isTableSeparator(line: string) {
@@ -59,7 +70,10 @@
 				continue;
 			}
 
-			if (line.startsWith('## ')) {
+			if (/^([-*_])(\s*\1){2,}\s*$/.test(line)) {
+				// horizontal rule: --- / *** / ___ (อย่างน้อย 3 ตัวเหมือนกัน)
+				html.push('<hr />');
+			} else if (line.startsWith('## ')) {
 				html.push(`<h3>${inlineMarkdown(line.slice(3))}</h3>`);
 			} else if (/^\d+\.\s+/.test(line)) {
 				const items: string[] = [];
@@ -115,6 +129,24 @@
 	.chat-md :global(strong) {
 		color: rgb(45 27 46);
 		font-weight: 800;
+	}
+
+	.chat-md :global(em) {
+		font-style: italic;
+	}
+
+	.chat-md :global(hr) {
+		margin: 0.75rem 0;
+		border: 0;
+		border-top: 1px solid rgba(196, 181, 253, 0.45);
+	}
+
+	.chat-md :global(code) {
+		font-family: 'DM Sans', ui-monospace, monospace;
+		background: rgba(196, 181, 253, 0.2);
+		padding: 0.1rem 0.35rem;
+		border-radius: 0.35rem;
+		font-size: 0.85em;
 	}
 
 	.chat-md :global(.chat-md-table-wrap) {
