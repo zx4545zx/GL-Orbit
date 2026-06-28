@@ -273,7 +273,7 @@
 		</div>
 	</aside>
 
-	<section class="flex min-w-0 flex-1 flex-col">
+	<section class="relative flex min-w-0 flex-1 flex-col overflow-hidden">
 		<header class="flex h-16 shrink-0 items-center justify-between border-b border-black/10 bg-white px-4">
 			<div class="flex min-w-0 items-center gap-3">
 				<button
@@ -305,7 +305,7 @@
 			</a>
 		</header>
 
-		<div class="flex-1 overflow-y-auto px-4 py-6 overscroll-y-contain">
+		<div class="flex-1 overflow-y-auto px-4 pt-6 pb-40 overscroll-y-contain sm:pb-44">
 			<div class="mx-auto flex max-w-3xl flex-col gap-5">
 				{#if messages.length === 0}
 					<div class="flex min-h-[52dvh] flex-col items-center justify-center text-center">
@@ -360,8 +360,8 @@
 			</div>
 		</div>
 
-		<footer class="shrink-0 bg-gradient-to-t from-white via-white/95 to-white/0 px-3 pt-4 sm:px-4" style="padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));">
-			<div class="mx-auto max-w-3xl">
+		<footer class="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-white via-white/90 to-white/0 px-3 pt-8 sm:px-4" style="padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));">
+			<div class="pointer-events-auto mx-auto max-w-3xl">
 				{#if !loading && input.trim() === '' && (followupSuggestions.length > 0 || messages.length === 0)}
 					<div class="mb-2 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 						{#if followupSuggestions.length > 0}
