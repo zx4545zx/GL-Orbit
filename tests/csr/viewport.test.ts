@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 const appHtml = readFileSync('src/app.html', 'utf-8');
 
 describe('viewport keyboard behavior', () => {
-	it('does not globally opt into interactive-widget viewport resizing', () => {
-		expect(appHtml).not.toContain('interactive-widget=resizes-content');
+	it('opts into interactive-widget viewport resizing', () => {
+		expect(appHtml).toContain('interactive-widget=resizes-content');
 	});
 });
