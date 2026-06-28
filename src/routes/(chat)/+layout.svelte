@@ -3,22 +3,19 @@
 
 	let { children } = $props();
 
-	// iOS Safari ไม่ย่อ layout viewport ตอนเปิด keyboard (มันไม่สน `interactive-widget`
-	// = resizes-content) แต่จะ scroll หน้าเพื่อโชว์ input ที่ focus อยู่ ซึ่งพา
-	// `position: fixed` element ขึ้นไปด้วย — นั่นคือบั๊ก "ดันทั้งหน้าขึ้น"
-	// แก้: ขับ top/height ของ shell ตาม visual viewport แทน layout viewport ให้ shell
-	// หดลงไปนั่งเหนือ keyboard และไม่ถูก drag
-	// Android (หลัง deploy) ย่อ layout viewport เองอยู่แล้ว สังเกตได้ว่า visualViewport
-	// .height ≈ innerHeight และ offsetTop ≈ 0 จึงกลายเป็น no-op ไม่กระทบ
-	// null จนกว่าจะ sync ฝั่ง client → SSR/initial paint ใช้ CSS fallback (bottom-0)
-	let vvHeight = $state<number | null>(null);
-	let vvTop = $state<number | null>(null);
+	// ตอนเปิด keyboard บน iOS Safari: layout viewport (innerHeight) ไม่ย่อ แต่
+	// visualViewport.height ย่อลงเหลือพื้นที่มองเห็นจริงเหนือ keyboard → ผลต่างคือ
+	// ความสูง keyboard เอาค่านี้ไปยก `bottom` ของ shell ขึ้น input ที่ท้าย shell จะ
+	// โผล่เหนือ keyboard อยู่แล้ว → iOS ไม่ต้อง scroll เพื่อ reveal = ไม่ drag หน้า
+	// ไม่สลับด้าน ฟังแค่ resize (ไม่ฟัง scroll) เพื่อกัน feedback loop
+	// บน Android (หลัง deploy) interactive-widget=resizes-content ย่อ innerHeight ไป
+	// เท่า vv.height อยู่แล้ว → kb = 0 → no-op ไม่กระทบ
+	let kb = $state(0);
 
 	function sync() {
 		const vv = window.visualViewport;
 		if (!vv) return;
-		vvHeight = vv.height;
-		vvTop = vv.offsetTop;
+		kb = Math.max(0, window.innerHeight - vv.height);
 	}
 
 	onMount(() => {
@@ -26,22 +23,15 @@
 		if (!vv) return;
 		sync();
 		vv.addEventListener('resize', sync);
-		vv.addEventListener('scroll', sync);
-		return () => {
-			vv.removeEventListener('resize', sync);
-			vv.removeEventListener('scroll', sync);
-		};
+		return () => vv.removeEventListener('resize', sync);
 	});
 </script>
 
-<!-- top/height ตาม visual viewport (ส่วนที่มองเห็นจริง) ตอนเปิด keyboard บน iOS shell จะ
-     หดลงเหนือ keyboard แทนที่จะถูก scroll ไปกับหน้า padding-top เคลียร์ status bar
-     ของ iOS PWA (ย้ายมาจาก `top` ตอนใช้ vvTop ขับตำแหน่ง) bottom-0 เป็น fallback
-     ก่อน client sync -->
+<!-- เหมือน shell เดิม (fixed top/bottom) ต่างแค่ยก bottom ขึ้นตามความสูง keyboard
+     ตอนเปิด input — ใช้ inline style ชนะ class bottom-0 -->
 <div
-	class="fixed bottom-0 left-0 right-0 overflow-hidden bg-[#f7f7f8] text-plum pt-[var(--pwa-safe-top)]"
-	style:top={vvTop == null ? '0px' : `${vvTop}px`}
-	style:height={vvHeight == null ? null : `${vvHeight}px`}
+	class="fixed inset-x-0 bottom-0 top-[var(--pwa-safe-top)] overflow-hidden bg-[#f7f7f8] text-plum"
+	style:bottom="{kb}px"
 >
 	{@render children()}
 </div>
