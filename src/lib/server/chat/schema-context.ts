@@ -127,3 +127,42 @@ ${question}
 ${JSON.stringify(rows).slice(0, 12000)}
 `.trim();
 }
+
+export function buildFollowupPrompt(question: string, reply: string) {
+	return `
+จากคำถามและคำตอบนี้เกี่ยวกับซีรีส์ GL ใน GL-Orbit แนะนำคำถามต่อยอด 3 ข้อที่ผู้ใช้อาจอยากรู้ต่อ
+กฎ:
+- ใช้ภาษาเดียวกับคำถามผู้ใช้ (ถามไทยให้ไทย)
+- แต่ละข้อต้องเป็นคำถามที่ตอบได้จากข้อมูลซีรีส์ (ตารางฉาย/นักแสดง/สตูดิโอ/แพลตฟอร์ม/แนว/ตอน)
+- สั้น กระชับ เป็นธรรมชาติ ไม่เกิน 40 ตัวอักษรต่อข้อ
+- ห้ามซ้ำคำถามปัจจุบัน
+- คืนค่าเป็น JSON array ของ string เท่านั้น เช่น ["...", "...", "..."] ห้าม markdown ห้ามอธิบาย
+
+คำถามผู้ใช้:
+${question}
+
+คำตอบก่อนหน้า:
+${reply}
+`.trim();
+}
+
+export function parseFollowupSuggestions(content: string): string[] {
+	const cleaned = content
+		.replace(/<think>[\s\S]*?<\/think>/gi, '')
+		.trim()
+		.replace(/^```(?:json)?\s*/i, '')
+		.replace(/```$/i, '')
+		.trim();
+	const match = cleaned.match(/\[[\s\S]*\]/);
+	if (!match) return [];
+	try {
+		const parsed = JSON.parse(match[0]);
+		if (!Array.isArray(parsed)) return [];
+		return parsed
+			.map((item) => (typeof item === 'string' ? item.trim() : ''))
+			.filter((item) => item.length > 0)
+			.slice(0, 4);
+	} catch {
+		return [];
+	}
+}

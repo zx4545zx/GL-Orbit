@@ -32,6 +32,7 @@
 	let current = $state<Conversation | null>(activeConversation);
 	let messages = $state<Message[]>(initialMessages);
 	let input = $state('');
+	let followupSuggestions = $state<string[]>([]);
 	let loading = $state(false);
 	let error = $state('');
 	let loadingStatus = $state('');
@@ -101,6 +102,7 @@
 		if (!text || loading) return;
 
 		error = '';
+		followupSuggestions = [];
 		loading = true;
 		input = '';
 		startLoadingStatus();
@@ -138,6 +140,9 @@
 					createdAt: new Date().toISOString()
 				}
 			];
+			followupSuggestions = Array.isArray(body.suggestions)
+				? body.suggestions.filter((suggestion: unknown): suggestion is string => typeof suggestion === 'string' && suggestion.trim().length > 0).slice(0, 4)
+				: [];
 			await refreshHistory();
 		} catch {
 			error = 'เชื่อมต่อแชตไม่ได้ ลองใหม่อีกครั้งนะคะ';
@@ -357,13 +362,21 @@
 
 		<footer class="shrink-0 border-t border-black/10 bg-white px-4 pt-3" style="padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));">
 			<div class="mx-auto max-w-3xl">
-				{#if !loading && input.trim() === ''}
+				{#if !loading && input.trim() === '' && (followupSuggestions.length > 0 || messages.length === 0)}
 					<div class="mb-2 flex gap-2 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-						{#each SUGGESTIONS as suggestion (suggestion.prompt)}
-							<button type="button" onclick={() => sendSuggestion(suggestion.prompt)} class="shrink-0 rounded-full border border-lavender/30 bg-white px-3.5 py-1.5 text-xs font-semibold text-plum transition hover:border-coral hover:text-coral-dark">
-								{suggestion.label}
-							</button>
-						{/each}
+						{#if followupSuggestions.length > 0}
+							{#each followupSuggestions as suggestion (suggestion)}
+								<button type="button" onclick={() => sendSuggestion(suggestion)} class="shrink-0 rounded-full border border-coral/25 bg-coral/5 px-3.5 py-1.5 text-xs font-semibold text-coral-dark transition hover:border-coral hover:bg-coral/10">
+									{suggestion}
+								</button>
+							{/each}
+						{:else}
+							{#each SUGGESTIONS as suggestion (suggestion.prompt)}
+								<button type="button" onclick={() => sendSuggestion(suggestion.prompt)} class="shrink-0 rounded-full border border-lavender/30 bg-white px-3.5 py-1.5 text-xs font-semibold text-plum transition hover:border-coral hover:text-coral-dark">
+									{suggestion.label}
+								</button>
+							{/each}
+						{/if}
 					</div>
 				{/if}
 				<div class="flex items-end gap-2 rounded-2xl border border-lavender/25 bg-white p-2 shadow-sm">

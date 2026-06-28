@@ -5,7 +5,7 @@ import {
 	getChatMessages,
 	getRecentChatContext
 } from '$lib/server/chat/history.js';
-import { buildAnswerPrompt, buildSqlPrompt } from '$lib/server/chat/schema-context.js';
+import { buildAnswerPrompt, buildFollowupPrompt, buildSqlPrompt, parseFollowupSuggestions } from '$lib/server/chat/schema-context.js';
 import { callMiniMax, MiniMaxConfigError } from '$lib/server/chat/minimax.js';
 import { runReadOnlyQuery } from '$lib/server/chat/read-only-db.js';
 import { makeSafeReadSql } from '$lib/server/chat/sql-safety.js';
@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 
 		if (safeSql.outOfScope) {
 			await appendChatExchange(locals.user.id, params.id, message, OUT_OF_SCOPE_REPLY);
-			return json({ reply: OUT_OF_SCOPE_REPLY });
+			return json({ reply: OUT_OF_SCOPE_REPLY, suggestions: [] });
 		}
 
 		const rows = await runReadOnlyQuery(safeSql.sql);
@@ -75,7 +75,20 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		]);
 
 		await appendChatExchange(locals.user.id, params.id, message, reply);
-		return json({ reply });
+
+		// แนะนำคำถามต่อยอดจากบทสนทนา (MiniMax call ที่ 3) — ถ้า fail คืน [] เงียบ ๆ ไม่ให้กระทบ reply
+		let suggestions: string[] = [];
+		try {
+			const followupRaw = await callMiniMax([
+				{ role: 'system', content: 'You suggest short follow-up questions. Return a JSON array of strings only.' },
+				{ role: 'user', content: buildFollowupPrompt(message, reply) }
+			]);
+			suggestions = parseFollowupSuggestions(followupRaw);
+		} catch {
+			suggestions = [];
+		}
+
+		return json({ reply, suggestions });
 	} catch (err) {
 		if (err instanceof MiniMaxConfigError || (err instanceof Error && err.message.includes('READONLY_DATABASE_URL'))) {
 			return json({ error: 'ยังไม่ได้ตั้งค่า AI chat ให้ครบถ้วน' }, { status: 500 });
