@@ -40,7 +40,7 @@ export async function listChatConversations(userId: string, limit = 40): Promise
 		})
 		.from(chatConversations)
 		.where(and(eq(chatConversations.userId, userId), gt(chatConversations.expiresAt, new Date())))
-		.orderBy(desc(chatConversations.updatedAt))
+		.orderBy(desc(chatConversations.createdAt))
 		.limit(limit);
 
 	return rows.map((row) => ({
