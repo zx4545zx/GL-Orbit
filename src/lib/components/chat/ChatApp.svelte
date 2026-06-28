@@ -193,7 +193,7 @@
 	<title>{current?.title ?? 'AI Chat'} | GL-Orbit</title>
 </svelte:head>
 
-<div class="flex h-dvh overflow-hidden">
+<div class="flex h-screen overflow-hidden">
 	{#if sidebarOpen}
 		<button class="fixed inset-0 z-30 bg-black/20 md:hidden" type="button" aria-label="ปิดประวัติแชต" onclick={() => sidebarOpen = false}></button>
 	{/if}
