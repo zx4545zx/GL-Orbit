@@ -360,28 +360,28 @@
 			</div>
 		</div>
 
-		<footer class="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-white via-white/90 to-white/0 px-3 pt-8 sm:px-4" style="padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));">
+		<footer class="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-cream/45 via-white/25 to-transparent px-3 pt-10 backdrop-blur-[2px] sm:px-4" style="padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));">
 			<div class="pointer-events-auto mx-auto max-w-3xl">
 				{#if !loading && input.trim() === '' && (followupSuggestions.length > 0 || messages.length === 0)}
 					<div class="mb-2 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 						{#if followupSuggestions.length > 0}
 							{#each followupSuggestions as suggestion (suggestion)}
-								<button type="button" onclick={() => sendSuggestion(suggestion)} class="shrink-0 rounded-full border border-coral/25 bg-white/85 px-3.5 py-2 text-xs font-bold text-coral-dark shadow-sm shadow-coral/10 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-coral hover:bg-coral/10 hover:shadow-coral/20 active:translate-y-0">
+								<button type="button" onclick={() => sendSuggestion(suggestion)} class="shrink-0 rounded-full border border-coral/25 bg-white/55 px-3.5 py-2 text-xs font-bold text-coral-dark shadow-sm shadow-coral/10 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-coral hover:bg-coral/15 hover:shadow-coral/20 active:translate-y-0">
 									{suggestion}
 								</button>
 							{/each}
 						{:else}
 							{#each SUGGESTIONS as suggestion (suggestion.prompt)}
-								<button type="button" onclick={() => sendSuggestion(suggestion.prompt)} class="shrink-0 rounded-full border border-lavender/30 bg-white/85 px-3.5 py-2 text-xs font-bold text-plum shadow-sm shadow-lavender/10 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-coral hover:bg-coral/5 hover:text-coral-dark active:translate-y-0">
+								<button type="button" onclick={() => sendSuggestion(suggestion.prompt)} class="shrink-0 rounded-full border border-lavender/30 bg-white/55 px-3.5 py-2 text-xs font-bold text-plum shadow-sm shadow-lavender/10 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-coral hover:bg-coral/10 hover:text-coral-dark active:translate-y-0">
 									{suggestion.label}
 								</button>
 							{/each}
 						{/if}
 					</div>
 				{/if}
-				<div class="relative overflow-hidden rounded-[1.65rem] border border-white/70 bg-white/75 p-2.5 shadow-2xl shadow-lavender/25 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-[1.65rem] before:bg-gradient-to-r before:from-coral/10 before:via-lavender/10 before:to-mint/10">
+				<div class="relative overflow-hidden rounded-[1.65rem] border border-white/55 bg-white/45 p-2.5 shadow-2xl shadow-lavender/30 backdrop-blur-2xl ring-1 ring-lavender/10 before:pointer-events-none before:absolute before:inset-0 before:rounded-[1.65rem] before:bg-gradient-to-r before:from-coral/12 before:via-lavender/10 before:to-mint/12">
 					<div class="relative flex items-end gap-2">
-						<div class="hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-coral/15 to-lavender/20 text-xs font-black text-coral-dark sm:flex">
+						<div class="hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-coral/20 to-lavender/25 text-xs font-black text-coral-dark shadow-inner shadow-white/40 sm:flex">
 							AI
 						</div>
 						<textarea
