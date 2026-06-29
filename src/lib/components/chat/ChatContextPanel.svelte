@@ -2,12 +2,14 @@
 	import SeriesPosterCard from '$lib/components/SeriesPosterCard.svelte';
 	import SeriesDetailPanel from '$lib/components/SeriesDetailPanel.svelte';
 	import ArtistDetailPanel from '$lib/components/ArtistDetailPanel.svelte';
+	import ScheduleContextPanel from '$lib/components/ScheduleContextPanel.svelte';
 	import type { ChatContextPayload } from './ChatContext.js';
 
 	// Local type aliases keep this client component from importing server modules at runtime.
 	type SeriesDetail = import('$lib/server/queries/series-detail.js').SeriesDetail;
 	type ArtistDetail = import('$lib/server/queries/artist-detail.js').ArtistDetail;
 	type SeriesListItem = import('$lib/server/series/listing.js').SeriesListItem;
+	type CalendarApiResponse = import('$lib/types/calendar.js').CalendarApiResponse;
 
 	let { context, onClose }: { context: ChatContextPayload; onClose: () => void } = $props();
 
@@ -15,7 +17,8 @@
 	let error = $state('');
 	let seriesItems = $state<SeriesDetail[]>([]);
 	let artistItems = $state<ArtistDetail[]>([]);
-	let view = $state<'list' | 'series-detail' | 'artist-detail'>('list');
+	let scheduleCalendar = $state<CalendarApiResponse | null>(null);
+	let view = $state<'list' | 'series-detail' | 'artist-detail' | 'schedule'>('list');
 	let selectedSeriesId = $state<string | null>(null);
 	let selectedArtistId = $state<string | null>(null);
 
@@ -45,6 +48,7 @@
 		error = '';
 		seriesItems = [];
 		artistItems = [];
+		scheduleCalendar = null;
 		selectedSeriesId = null;
 		selectedArtistId = null;
 		try {
@@ -60,6 +64,9 @@
 				artistItems = body.items ?? [];
 				view = artistItems.length === 1 ? 'artist-detail' : 'list';
 				selectedArtistId = artistItems.length === 1 ? artistItems[0].id : null;
+			} else if (body.type === 'schedule') {
+				scheduleCalendar = body.calendar ?? null;
+				view = 'schedule';
 			} else {
 				seriesItems = body.items ?? [];
 				view = seriesItems.length === 1 ? 'series-detail' : 'list';
@@ -114,6 +121,8 @@
 					<button type="button" class="absolute left-3 top-3 z-10 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-plum shadow-sm" onclick={() => (view = 'list')}>← ย้อนกลับ</button>
 				{/if}
 				<ArtistDetailPanel detail={selectedArtistDetail} />
+			{:else if view === 'schedule' && scheduleCalendar}
+				<ScheduleContextPanel calendar={scheduleCalendar} />
 			{:else if context?.type === 'series'}
 				<div class="h-full overflow-y-auto overscroll-y-contain p-4">
 					<div class="grid grid-cols-2 gap-3">
@@ -142,7 +151,7 @@
 				</div>
 			{:else}
 				<div class="flex h-full items-center justify-center px-6 text-center">
-					<p class="text-sm text-plum-light">ยังไม่รองรับการแสดงผลประเภทนี้ (Phase 2/3)</p>
+					<p class="text-sm text-plum-light">ยังไม่พบข้อมูลที่เกี่ยวข้อง</p>
 				</div>
 			{/if}
 		</div>
