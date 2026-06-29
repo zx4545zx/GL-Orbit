@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, timestamp, boolean, integer, time, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, boolean, integer, time, pgEnum, jsonb } from 'drizzle-orm/pg-core';
 
 export const userRoleEnum = pgEnum('user_role', ['ADMIN', 'USER']);
 export const seriesStatusEnum = pgEnum('series_status', ['UPCOMING', 'ONGOING', 'ENDED']);
@@ -179,5 +179,6 @@ export const chatConversationMessages = pgTable('chat_conversation_messages', {
 	conversationId: uuid('conversation_id').notNull().references(() => chatConversations.id, { onDelete: 'cascade' }),
 	role: varchar('role', { length: 20 }).notNull(),
 	content: text('content').notNull(),
+	context: jsonb('context'),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });

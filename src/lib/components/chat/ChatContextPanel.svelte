@@ -11,7 +11,7 @@
 	type SeriesListItem = import('$lib/server/series/listing.js').SeriesListItem;
 	type CalendarApiResponse = import('$lib/types/calendar.js').CalendarApiResponse;
 
-	let { context, onClose }: { context: ChatContextPayload; onClose: () => void } = $props();
+	let { context, onClose }: { context: ChatContextPayload; onClose?: () => void } = $props();
 
 	let loading = $state(false);
 	let error = $state('');
@@ -94,14 +94,18 @@
 	}
 </script>
 
-<div class="fixed inset-0 z-50 flex justify-end bg-black/20 lg:bg-transparent" role="dialog" aria-modal="true">
-	<div class="flex h-full w-full flex-col bg-[#f7f7f8] shadow-2xl lg:w-[420px]">
-		<header class="flex h-14 shrink-0 items-center justify-between border-b border-black/10 bg-white px-4">
-			<h2 class="text-sm font-bold text-plum">{title}</h2>
+<section class="flex h-full min-h-0 w-full flex-col bg-[#f7f7f8]" aria-label={title}>
+	<header class="flex h-14 shrink-0 items-center justify-between border-b border-black/10 bg-white px-4">
+		<div class="min-w-0">
+			<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-coral-dark/70">Preview</p>
+			<h2 class="truncate text-sm font-bold text-plum">{title}</h2>
+		</div>
+		{#if onClose}
 			<button type="button" class="flex h-9 w-9 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10" aria-label="ปิด" onclick={onClose}>×</button>
-		</header>
+		{/if}
+	</header>
 
-		<div class="relative flex-1 overflow-hidden">
+	<div class="relative min-h-0 flex-1 overflow-hidden">
 			{#if loading}
 				<div class="flex h-full items-center justify-center">
 					<div class="h-7 w-7 animate-spin rounded-full border-2 border-coral/20 border-t-coral"></div>
@@ -154,6 +158,5 @@
 					<p class="text-sm text-plum-light">ยังไม่พบข้อมูลที่เกี่ยวข้อง</p>
 				</div>
 			{/if}
-		</div>
 	</div>
-</div>
+</section>

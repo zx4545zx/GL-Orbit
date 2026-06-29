@@ -1,0 +1,1 @@
+ALTER TABLE "chat_conversation_messages" ADD COLUMN "context" jsonb;

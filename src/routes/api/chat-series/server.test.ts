@@ -5,6 +5,7 @@ const mockRunReadOnlyQuery = vi.fn();
 const mockAppendChatExchange = vi.fn();
 const mockCreateChatConversation = vi.fn();
 const mockListChatConversations = vi.fn();
+const mockGetSeriesCatalogText = vi.fn();
 
 vi.mock('$lib/server/chat/minimax.js', () => ({
 	MiniMaxConfigError: class MiniMaxConfigError extends Error {},
@@ -19,6 +20,10 @@ vi.mock('$lib/server/chat/history.js', () => ({
 	appendChatExchange: mockAppendChatExchange,
 	createChatConversation: mockCreateChatConversation,
 	listChatConversations: mockListChatConversations
+}));
+
+vi.mock('$lib/server/chat/catalog.js', () => ({
+	getSeriesCatalogText: mockGetSeriesCatalogText
 }));
 
 async function jsonBody(response: Response) {
@@ -41,6 +46,8 @@ describe('POST /api/chat-series', () => {
 		vi.clearAllMocks();
 		mockCallMiniMax.mockReset();
 		mockRunReadOnlyQuery.mockReset();
+		mockGetSeriesCatalogText.mockReset();
+		mockGetSeriesCatalogText.mockResolvedValue('');
 		mockCreateChatConversation.mockResolvedValue({ id: 'conversation-1', title: 'test' });
 	});
 
@@ -77,7 +84,7 @@ describe('POST /api/chat-series', () => {
 		const body = await jsonBody(response);
 		expect(body.reply).toContain('GL-Orbit');
 		expect(body.conversationId).toBe('conversation-1');
-		expect(mockAppendChatExchange).toHaveBeenCalledWith('user-1', 'conversation-1', 'weather today', body.reply);
+		expect(mockAppendChatExchange).toHaveBeenCalledWith('user-1', 'conversation-1', 'weather today', body.reply, null);
 	});
 
 	it('runs safe SQL, asks MiniMax for final answer, and stores a conversation exchange', async () => {
@@ -91,8 +98,8 @@ describe('POST /api/chat-series', () => {
 
 		expect(response.status).toBe(200);
 		expect(mockRunReadOnlyQuery).toHaveBeenCalledWith('SELECT title_en FROM series WHERE deleted_at IS NULL LIMIT 20');
-		expect(mockAppendChatExchange).toHaveBeenCalledWith('user-1', 'conversation-1', 'what series are available', 'There is 1 series: Pluto');
-		expect(await jsonBody(response)).toEqual({ reply: 'There is 1 series: Pluto', conversationId: 'conversation-1' });
+		expect(mockAppendChatExchange).toHaveBeenCalledWith('user-1', 'conversation-1', 'what series are available', 'There is 1 series: Pluto', null);
+		expect(await jsonBody(response)).toEqual({ reply: 'There is 1 series: Pluto', conversationId: 'conversation-1', context: null });
 	});
 });
 

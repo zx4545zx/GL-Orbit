@@ -12,10 +12,17 @@ export type ChatConversationSummary = {
 	updatedAt: string;
 };
 
+export type ChatContextPayload =
+	| { type: 'schedule'; seriesIds: string[] }
+	| { type: 'artist'; artistIds: string[] }
+	| { type: 'series'; seriesIds: string[] }
+	| null;
+
 export type ChatMessageItem = {
 	id: string;
 	role: 'USER' | 'ASSISTANT';
 	content: string;
+	context: ChatContextPayload;
 	createdAt: string;
 };
 
@@ -166,6 +173,7 @@ export async function getChatMessages(userId: string, conversationId: string): P
 			id: chatConversationMessages.id,
 			role: chatConversationMessages.role,
 			content: chatConversationMessages.content,
+			context: chatConversationMessages.context,
 			createdAt: chatConversationMessages.createdAt
 		})
 		.from(chatConversationMessages)
@@ -176,6 +184,7 @@ export async function getChatMessages(userId: string, conversationId: string): P
 		id: row.id,
 		role: row.role === 'ASSISTANT' ? 'ASSISTANT' : 'USER',
 		content: row.content,
+		context: row.role === 'ASSISTANT' ? normalizeChatContext(row.context) : null,
 		createdAt: row.createdAt.toISOString()
 	}));
 }
@@ -186,14 +195,32 @@ export async function getRecentChatContext(userId: string, conversationId: strin
 	return messages.slice(-turns * 2);
 }
 
-export async function appendChatExchange(userId: string, conversationId: string, question: string, reply: string) {
+function isUuid(value: unknown): value is string {
+	return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
+function normalizeChatContext(value: unknown): ChatContextPayload {
+	if (!value || typeof value !== 'object') return null;
+	const context = value as { type?: unknown; seriesIds?: unknown; artistIds?: unknown };
+	if (context.type === 'artist' && Array.isArray(context.artistIds)) {
+		const artistIds = context.artistIds.filter(isUuid);
+		return artistIds.length > 0 ? { type: 'artist', artistIds } : null;
+	}
+	if ((context.type === 'series' || context.type === 'schedule') && Array.isArray(context.seriesIds)) {
+		const seriesIds = context.seriesIds.filter(isUuid);
+		return seriesIds.length > 0 ? { type: context.type, seriesIds } : null;
+	}
+	return null;
+}
+
+export async function appendChatExchange(userId: string, conversationId: string, question: string, reply: string, context: ChatContextPayload = null) {
 	const conversation = await getOwnedConversation(userId, conversationId);
 	if (!conversation) return false;
 
 	const db = await getDb();
 	await db.insert(chatConversationMessages).values([
-		{ conversationId, role: 'USER', content: question },
-		{ conversationId, role: 'ASSISTANT', content: reply }
+		{ conversationId, role: 'USER', content: question, context: null },
+		{ conversationId, role: 'ASSISTANT', content: reply, context }
 	]);
 
 	const shouldSetTitle = conversation.title === DEFAULT_TITLE;

@@ -16,6 +16,7 @@
 		id: string;
 		role: 'USER' | 'ASSISTANT';
 		content: string;
+		context: ChatContextPayload;
 		createdAt: string;
 	};
 
@@ -35,8 +36,8 @@
 	let messages = $state<Message[]>(initialMessages);
 	let input = $state('');
 	let followupSuggestions = $state<string[]>([]);
-	let context = $state<ChatContextPayload>(null);
-	let panelOpen = $state(false);
+	let panelContext = $state<ChatContextPayload>(null);
+	let previewHidden = $state(false);
 	let loading = $state(false);
 	let error = $state('');
 	let loadingStatus = $state('');
@@ -45,9 +46,35 @@
 	let renamingId = $state<string | null>(null);
 	let renameTitle = $state('');
 	const currentUser = $derived(page.data.user);
-	const contextCount = $derived(
-		context?.type === 'artist' ? context.artistIds.length : context?.type ? context.seriesIds.length : 0
-	);
+	const latestContext = $derived.by(() => {
+		for (let i = messages.length - 1; i >= 0; i -= 1) {
+			if (messages[i].role === 'ASSISTANT' && messages[i].context) return messages[i].context;
+		}
+		return null;
+	});
+
+	function getContextCount(ctx: ChatContextPayload) {
+		return ctx?.type === 'artist' ? ctx.artistIds.length : ctx?.type ? ctx.seriesIds.length : 0;
+	}
+
+	const previewContext = $derived(previewHidden ? null : (panelContext ?? latestContext));
+	const previewOpen = $derived(previewContext !== null);
+	
+	function selectPreviewContext(ctx: ChatContextPayload) {
+		if (!ctx) return;
+		panelContext = ctx;
+		previewHidden = false;
+	}
+
+	function togglePreviewContext() {
+		if (!latestContext) return;
+		if (previewOpen) {
+			previewHidden = true;
+			return;
+		}
+		panelContext ??= latestContext;
+		previewHidden = false;
+	}
 
 	const loadingSteps = [
 		{ delay: 0, status: 'กำลังอ่านคำถามของคุณ', detail: 'กำลังดูว่าคุณอยากรู้เรื่องซีรีส์ นักแสดง หรือตารางฉาย' },
@@ -96,7 +123,11 @@
 		if (!res.ok) throw new Error('create failed');
 		const body = await res.json();
 		current = body.conversation;
-		if (options.resetMessages ?? true) messages = [];
+		if (options.resetMessages ?? true) {
+			messages = [];
+			panelContext = null;
+			previewHidden = false;
+		}
 		await refreshHistory();
 		const created = current;
 		if (!created) throw new Error('create failed');
@@ -118,6 +149,7 @@
 			id: crypto.randomUUID(),
 			role: 'USER',
 			content: text,
+			context: null,
 			createdAt: new Date().toISOString()
 		};
 		messages = [...messages, optimisticUser];
@@ -138,25 +170,29 @@
 				return;
 			}
 
+			const responseContext: ChatContextPayload = body.context ?? null;
 			messages = [
 				...messages,
 				{
 					id: crypto.randomUUID(),
 					role: 'ASSISTANT',
 					content: body.reply,
+					context: responseContext,
 					createdAt: new Date().toISOString()
 				}
 			];
+			panelContext = responseContext;
+			previewHidden = responseContext === null;
 			followupSuggestions = Array.isArray(body.suggestions)
 				? body.suggestions.filter((suggestion: unknown): suggestion is string => typeof suggestion === 'string' && suggestion.trim().length > 0).slice(0, 4)
 				: [];
-			context = body.context ?? null;
 			await refreshHistory();
 		} catch {
 			error = 'เชื่อมต่อแชตไม่ได้ ลองใหม่อีกครั้งนะคะ';
 			messages = messages.filter((message) => message.id !== optimisticUser.id);
 			input = text;
-			context = null;
+			panelContext = null;
+			previewHidden = true;
 		} finally {
 			loading = false;
 			stopLoadingStatus();
@@ -212,6 +248,8 @@
 		if (current?.id === conversationId) {
 			current = null;
 			messages = [];
+			panelContext = null;
+			previewHidden = false;
 			await replaceState('/chat', page.state);
 		}
 	}
@@ -236,27 +274,22 @@
 						{(currentUser.displayName || currentUser.username || 'U').charAt(0).toUpperCase()}
 					</div>
 				{/if}
-				<div class="min-w-0">
+				<div class="min-w-0 flex-1">
 					<p class="truncate text-sm font-bold text-plum">{currentUser.displayName || currentUser.username}</p>
 					<a href="/profile" class="text-xs text-plum-light hover:text-coral-dark transition">ดูโปรไฟล์</a>
 				</div>
+				<button
+					type="button"
+					class="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10 hover:text-plum md:hidden"
+					aria-label="ปิดเมนู"
+					onclick={() => sidebarOpen = false}
+				>
+					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
 			</div>
 		{/if}
-		<div class="flex h-16 items-center gap-3 border-b border-black/10 px-4">
-			<a href="/" class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-coral to-lavender font-bold text-white">G</a>
-			<div class="min-w-0">
-				<p class="truncate text-sm font-bold text-plum">GL-Orbit AI</p>
-				<p class="text-xs text-plum-light">ผู้ช่วยค้นข้อมูลซีรีส์</p>
-			</div>
-			<button
-				type="button"
-				class="ml-auto flex h-9 w-9 items-center justify-center rounded-xl text-xl font-bold text-plum-light transition hover:bg-lavender/10 hover:text-plum md:hidden"
-				aria-label="ปิดเมนู"
-				onclick={() => sidebarOpen = false}
-			>
-				×
-			</button>
-		</div>
 
 		<div class="p-3">
 			<button type="button" class="flex w-full items-center justify-center rounded-xl border border-lavender/30 bg-white px-4 py-3 text-sm font-bold text-plum shadow-sm transition hover:bg-lavender/10" onclick={() => createConversation('แชตใหม่', { resetMessages: true })}>
@@ -316,13 +349,13 @@
 					<p class="text-xs text-plum-light">ถามต่อได้ในบทสนทนาเดิม</p>
 				</div>
 			</div>
-			{#if context}
-				<button type="button" class="relative flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10" aria-label="ดูข้อมูลที่เกี่ยวข้อง" onclick={() => panelOpen = true}>
+			{#if latestContext}
+				<button type="button" class="relative flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10 {previewOpen ? 'bg-coral/10 text-coral-dark' : ''}" aria-label={previewOpen ? 'ซ่อนข้อมูลที่เกี่ยวข้อง' : 'แสดงข้อมูลที่เกี่ยวข้องล่าสุด'} aria-pressed={previewOpen} onclick={togglePreviewContext}>
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
 					</svg>
 					<span class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-bold text-white">
-						{contextCount}
+						{getContextCount(latestContext)}
 					</span>
 				</button>
 			{/if}
@@ -345,11 +378,19 @@
 				{:else}
 					{#each messages as message (message.id)}
 						<article class="flex {message.role === 'USER' ? 'justify-end' : 'justify-start'}">
-							<div class="{message.role === 'USER' ? 'max-w-[82%] rounded-2xl rounded-tr-md bg-coral px-4 py-3 text-white shadow-lg shadow-coral/15' : 'max-w-[90%] rounded-2xl rounded-tl-md bg-white px-4 py-3 text-plum shadow-sm'} text-sm leading-6">
-								{#if message.role === 'USER'}
-									{message.content}
-								{:else}
-									<ChatMarkdown content={message.content} />
+							<div class="flex {message.role === 'USER' ? 'max-w-[82%] items-end' : 'max-w-[90%] items-start'} flex-col gap-2">
+								<div class="{message.role === 'USER' ? 'rounded-2xl rounded-tr-md bg-coral px-4 py-3 text-white shadow-lg shadow-coral/15' : 'rounded-2xl rounded-tl-md bg-white px-4 py-3 text-plum shadow-sm'} text-sm leading-6">
+									{#if message.role === 'USER'}
+										{message.content}
+									{:else}
+										<ChatMarkdown content={message.content} />
+									{/if}
+								</div>
+								{#if message.role === 'ASSISTANT' && message.context}
+									<button type="button" class="inline-flex items-center gap-1.5 rounded-full border border-lavender/30 bg-white/90 px-3 py-1.5 text-xs font-bold text-plum-light shadow-sm transition hover:border-coral/30 hover:bg-coral/5 hover:text-coral-dark" onclick={() => selectPreviewContext(message.context)}>
+										<span>ดูข้อมูลที่เกี่ยวข้อง</span>
+										<span class="rounded-full bg-coral px-1.5 py-0.5 text-[10px] leading-none text-white">{getContextCount(message.context)}</span>
+									</button>
 								{/if}
 							</div>
 						</article>
@@ -428,7 +469,9 @@
 		</footer>
 	</section>
 
-	{#if panelOpen && context}
-		<ChatContextPanel {context} onClose={() => (panelOpen = false)} />
+	{#if previewContext}
+		<aside class="hidden h-full w-[420px] shrink-0 border-l border-black/10 bg-[#f7f7f8] shadow-[-18px_0_45px_rgba(196,181,253,0.16)] xl:flex">
+			<ChatContextPanel context={previewContext} />
+		</aside>
 	{/if}
 </div>

@@ -68,9 +68,9 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		if (!safeSql.ok) return json({ error: 'ไม่สามารถหาคำตอบที่ปลอดภัยได้' }, { status: 422 });
 
 		if (safeSql.outOfScope) {
-			await appendChatExchange(locals.user.id, conversation.id, message, OUT_OF_SCOPE_REPLY);
 			const rows: Record<string, unknown>[] = [];
 			const context = buildChatContext(safeSql.sql, rows);
+			await appendChatExchange(locals.user.id, conversation.id, message, OUT_OF_SCOPE_REPLY, context);
 			return json({ reply: OUT_OF_SCOPE_REPLY, conversationId: conversation.id, context });
 		}
 
@@ -85,7 +85,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			{ role: 'user', content: buildAnswerPrompt(message, convertedRows) }
 		]);
 
-		await appendChatExchange(locals.user.id, conversation.id, message, reply);
+		await appendChatExchange(locals.user.id, conversation.id, message, reply, context);
 		return json({ reply, conversationId: conversation.id, context });
 	} catch (err) {
 		if (err instanceof MiniMaxConfigError || (err instanceof Error && err.message.includes('READONLY_DATABASE_URL'))) {
