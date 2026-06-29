@@ -13,8 +13,11 @@
 
 - **ตารางฉายแม่นยำ** — รองรับ Timezone พร้อมระบุ Uncut version
 - **ข้อมูลซีรีส์ครบถ้วน** — สตูดิโอ นักแสดง แพลตฟอร์มสตรีมมิ่ง
-- **ระบบสมาชิก** — โปรไฟล์ผู้ใช้ + จัดการบัญชี
-- **แผงผู้ดูแลระบบ** — CRUD ซีรีส์ ตอน ตารางฉาย
+- **Countdown สด** — นับถอยหลังตอนใหม่แบบเรียลไทม์ (24 ชม.)
+- **AI Chat** — ผู้ช่วยตอบคำถามเกี่ยวกับซีรีส์และตารางฉาย
+- **ระบบสมาชิก** — โปรไฟล์ + Favorite/Watched + การแจ้งเตือน
+- **แผงผู้ดูแลระบบ** — CRUD ซีรีส์ ตอน ตารางฉาย นักแสดง สตูดิโอ
+- **SEO & PWA** — robots/sitemap/llms.txt, Open Graph, JSON-LD, ติดตั้งเป็นแอปได้
 - **ดีไซน์โมเดิร์น** — Glassmorphism + สีพาสเทล + อนิเมชั่นลื่นไหล
 - **Pending Shells** — Skeleton UI ระหว่างโหลดหน้า ลด perceived latency
 
@@ -31,6 +34,8 @@
 | ORM | [Drizzle ORM](https://orm.drizzle.team) |
 | Auth | Custom JWT (jose + bcryptjs) |
 | Build | [Vite 6](https://vitejs.dev) |
+| PWA | [@vite-pwa/sveltekit](https://vite-pwa-org.netlify.app/) |
+| Deploy | [Vercel](https://vercel.com) (adapter-auto) |
 
 ---
 
@@ -107,31 +112,50 @@ npm run db:studio     # เปิด Drizzle Studio GUI
 ```
 src/
 ├── routes/
-│   ├── (app)/          # หน้า Public
-│   │   ├── +page.svelte       # หน้าแรก
-│   │   ├── series/
-│   │   ├── calendar/
-│   │   ├── login/
-│   │   └── register/
-│   ├── profile/        # โปรไฟล์ผู้ใช้
-│   ├── admin/          # แผงผู้ดูแลระบบ
-│   └── +error.svelte   # หน้า Error
+│   ├── (app)/                # หน้า Public
+│   │   ├── +page.svelte           # หน้าแรก (Hero + Countdown + Featured + SEO content)
+│   │   ├── series/                # รายการ + รายละเอียดซีรีส์
+│   │   ├── artists/               # รายการ + รายละเอียดนักแสดง
+│   │   ├── calendar/              # ตารางฉายรายเดือน
+│   │   ├── countdown/             # นับถอยหลังตอนใหม่
+│   │   ├── explore/               # สำรวจซีรีส์/นักแสดง
+│   │   ├── notifications/         # การแจ้งเตือน
+│   │   ├── login/ · register/     # ยืนยันตัวตน
+│   │   └── profile/               # โปรไฟล์ + Favorite/Watched
+│   ├── (chat)/chat/             # AI Chat
+│   ├── admin/                  # แผงผู้ดูแลระบบ (CRUD ทุกตาราง)
+│   ├── api/                    # REST API (public + admin + chat)
+│   ├── robots.txt/             # SEO: robots.txt
+│   ├── sitemap.xml/            # SEO: sitemap (ดึงจาก DB)
+│   ├── llms.txt/               # SEO: llms.txt สำหรับ LLM crawler
+│   ├── og-image/               # SEO: dynamic Open Graph image
+│   └── +error.svelte           # หน้า Error
 ├── lib/
-│   ├── components/     # Svelte Components
-│   └── server/
-│       ├── db/         # Schema + Connection
-│       └── auth/       # JWT Session
-├── app.css             # Tailwind Theme + Animations
-└── app.html            # HTML Template
+│   ├── components/             # Svelte Components + Pending Shells
+│   ├── server/
+│   │   ├── db/                     # Schema + Connection (Neon HTTP)
+│   │   └── auth/                   # JWT Session
+│   ├── seo.ts                  # Open Graph + JSON-LD helpers
+│   └── types/                  # TypeScript type definitions
+├── app.css                     # Tailwind Theme + Animations + Utilities
+└── app.html                    # HTML Template
 ```
 
 ---
+
+## 🔍 SEO & PWA
+
+- **Crawler files** — `/robots.txt`, `/sitemap.xml` (ดึงซีรีส์/นักแสดงจาก DB), `/llms.txt`
+- **Open Graph** — ภาพ OG สร้างแบบ dynamic ที่ `/og-image`
+- **JSON-LD** — `WebPage`, `WebSite`, `Organization`, `Person`, `BreadcrumbList`
+- **PWA** — `manifest.webmanifest`, service worker, ติดตั้งเป็นแอป + รองรับ iOS standalone mode
 
 ## 🔐 การยืนยันตัวตน
 
 - **Session** — JWT (HS256, 30 วัน) เก็บใน cookie `httpOnly`
 - **Password** — bcrypt 12 rounds
 - **Token** — เก็บ SHA-256 hash ในฐานข้อมูล (ไม่ใช่ token ดิบ)
+- **Role** — `ADMIN` เข้า `/admin/*` ได้, `USER` เข้าหน้า public + `/profile`
 
 ---
 
