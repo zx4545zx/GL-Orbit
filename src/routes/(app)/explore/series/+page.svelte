@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import type { PageData } from './$types.js';
 	import type { SeriesListItem, SeriesStatusFilter } from '$lib/server/series/listing.js';
+	import SeriesPosterCard from '$lib/components/SeriesPosterCard.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -146,22 +147,7 @@
 		{/each}
 	{:else}
 		{#each allSeries as s (s.id)}
-			<a href="/series/{s.id}" class="group">
-				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/20 transition-all duration-500 hover:-translate-y-2">
-					<div class="relative aspect-[3/4] overflow-hidden">
-						<img src={s.poster} alt={s.title} width={400} height={533} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" decoding="async" />
-						<div class="absolute inset-0 bg-gradient-to-t from-plum/80 via-plum/20 to-transparent"></div>
-						<div class="absolute top-3 sm:top-4 left-3 sm:left-4">
-							<span class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-semibold backdrop-blur-md {statusConfig[s.status].class}">{statusConfig[s.status].text}</span>
-						</div>
-						<div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-							<p class="text-white/70 text-xs sm:text-sm mb-1">{s.studio}</p>
-							<h3 class="text-white font-bold text-lg sm:text-xl mb-1 line-clamp-1">{s.title}</h3>
-							{#if s.subtitle}<p class="text-white/80 text-xs sm:text-sm line-clamp-1">{s.subtitle}</p>{/if}
-						</div>
-					</div>
-				</div>
-			</a>
+			<SeriesPosterCard item={s} />
 		{/each}
 	{/if}
 </div>

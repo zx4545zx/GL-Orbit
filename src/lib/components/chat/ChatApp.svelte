@@ -2,6 +2,8 @@
 	import { replaceState } from '$app/navigation';
 	import { page } from '$app/state';
 	import ChatMarkdown from '$lib/components/ChatMarkdown.svelte';
+	import ChatContextPanel from './ChatContextPanel.svelte';
+	import type { ChatContextPayload } from './ChatContext.js';
 
 	type Conversation = {
 		id: string;
@@ -33,6 +35,8 @@
 	let messages = $state<Message[]>(initialMessages);
 	let input = $state('');
 	let followupSuggestions = $state<string[]>([]);
+	let context = $state<ChatContextPayload>(null);
+	let panelOpen = $state(false);
 	let loading = $state(false);
 	let error = $state('');
 	let loadingStatus = $state('');
@@ -143,11 +147,13 @@
 			followupSuggestions = Array.isArray(body.suggestions)
 				? body.suggestions.filter((suggestion: unknown): suggestion is string => typeof suggestion === 'string' && suggestion.trim().length > 0).slice(0, 4)
 				: [];
+			context = body.context ?? null;
 			await refreshHistory();
 		} catch {
 			error = 'เชื่อมต่อแชตไม่ได้ ลองใหม่อีกครั้งนะคะ';
 			messages = messages.filter((message) => message.id !== optimisticUser.id);
 			input = text;
+			context = null;
 		} finally {
 			loading = false;
 			stopLoadingStatus();
@@ -218,6 +224,21 @@
 	{/if}
 
 	<aside class="fixed top-[var(--pwa-safe-top)] bottom-0 left-0 z-40 flex w-80 max-w-[86vw] flex-col border-r border-black/10 bg-white transition-transform md:static md:translate-x-0 {sidebarOpen ? 'translate-x-0' : '-translate-x-full'}">
+		{#if currentUser}
+			<div class="flex items-center gap-2 border-b border-black/10 px-4 py-3">
+				{#if currentUser.avatarUrl}
+					<img src={currentUser.avatarUrl} alt="" class="h-8 w-8 rounded-full object-cover" />
+				{:else}
+					<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-coral/20 to-lavender/25 text-xs font-black text-coral-dark">
+						{(currentUser.displayName || currentUser.username || 'U').charAt(0).toUpperCase()}
+					</div>
+				{/if}
+				<div class="min-w-0">
+					<p class="truncate text-sm font-bold text-plum">{currentUser.displayName || currentUser.username}</p>
+					<a href="/profile" class="text-xs text-plum-light hover:text-coral-dark transition">ดูโปรไฟล์</a>
+				</div>
+			</div>
+		{/if}
 		<div class="flex h-16 items-center gap-3 border-b border-black/10 px-4">
 			<a href="/" class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-coral to-lavender font-bold text-white">G</a>
 			<div class="min-w-0">
@@ -292,18 +313,16 @@
 					<p class="text-xs text-plum-light">ถามต่อได้ในบทสนทนาเดิม</p>
 				</div>
 			</div>
-			<a href="/profile" class="flex min-w-0 items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-lavender/10">
-				{#if currentUser?.avatarUrl}
-					<img src={currentUser.avatarUrl} alt="" class="h-8 w-8 rounded-full object-cover" />
-				{:else}
-					<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-coral/20 to-lavender/25 text-xs font-black text-coral-dark">
-						{(currentUser?.displayName || currentUser?.username || 'U').charAt(0).toUpperCase()}
-					</div>
-				{/if}
-				<span class="hidden max-w-32 truncate text-sm font-bold text-plum sm:block">
-					{currentUser?.displayName || currentUser?.username || 'โปรไฟล์'}
-				</span>
-			</a>
+			{#if context}
+				<button type="button" class="relative flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10" aria-label="ดูข้อมูลที่เกี่ยวข้อง" onclick={() => panelOpen = true}>
+					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
+					</svg>
+					<span class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-bold text-white">
+						{context.type === 'series' ? context.seriesIds.length : context.type === 'artist' ? context.artistIds.length : 0}
+					</span>
+				</button>
+			{/if}
 		</header>
 
 		<div class="flex-1 overflow-y-auto px-4 pt-6 pb-40 overscroll-y-contain sm:pb-44">
@@ -405,4 +424,8 @@
 			</div>
 		</footer>
 	</section>
+
+	{#if panelOpen && context}
+		<ChatContextPanel {context} onClose={() => (panelOpen = false)} />
+	{/if}
 </div>
