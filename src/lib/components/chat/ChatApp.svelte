@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { replaceState } from '$app/navigation';
 	import { page } from '$app/state';
+	import { browser } from '$app/environment';
 	import ChatMarkdown from '$lib/components/ChatMarkdown.svelte';
 	import ChatContextPanel from './ChatContextPanel.svelte';
 	import type { ChatContextPayload } from './ChatContext.js';
@@ -38,6 +39,15 @@
 	let followupSuggestions = $state<string[]>([]);
 	let panelContext = $state<ChatContextPayload>(null);
 	let previewHidden = $state(false);
+	let isMobile = $state(browser && window.innerWidth < 1024);
+
+	$effect(() => {
+		if (!browser) return;
+		const mq = window.matchMedia('(max-width: 1023px)');
+		const update = () => { isMobile = mq.matches; };
+		mq.addEventListener('change', update);
+		return () => mq.removeEventListener('change', update);
+	});
 	let loading = $state(false);
 	let error = $state('');
 	let loadingStatus = $state('');
@@ -182,7 +192,7 @@
 				}
 			];
 			panelContext = responseContext;
-			previewHidden = responseContext === null;
+			previewHidden = responseContext === null || (responseContext !== null && isMobile);
 			followupSuggestions = Array.isArray(body.suggestions)
 				? body.suggestions.filter((suggestion: unknown): suggestion is string => typeof suggestion === 'string' && suggestion.trim().length > 0).slice(0, 4)
 				: [];
