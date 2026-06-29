@@ -475,11 +475,10 @@
 			<ChatContextPanel context={previewContext} onClose={() => (previewHidden = true)} />
 		</aside>
 
-		<!-- Mobile: overlay from right -->
+		<!-- Mobile: full-screen drawer with close button -->
 		{#if !previewHidden}
-			<div class="fixed inset-0 z-50 flex justify-end lg:hidden">
-				<button class="absolute inset-0 bg-black/20" type="button" aria-label="ปิด" onclick={() => (previewHidden = true)}></button>
-				<aside class="relative h-full w-full max-w-[420px] animate-slide-in-right bg-[#f7f7f8] shadow-2xl">
+			<div class="fixed inset-0 z-50 flex flex-col lg:hidden" style="padding-top: env(safe-area-inset-top, 0px);">
+				<aside class="h-full w-full animate-slide-in-right bg-[#f7f7f8] shadow-2xl">
 					<ChatContextPanel context={previewContext} onClose={() => (previewHidden = true)} />
 				</aside>
 			</div>
