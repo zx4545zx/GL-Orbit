@@ -115,6 +115,20 @@
 	{@html jsonLdScript(homeJsonLd)}
 </svelte:head>
 
+<a
+	href="/chat"
+	data-sveltekit-preload-data="hover"
+	aria-label="เปิด AI Chat"
+	class="fixed right-4 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-plum to-coral text-white shadow-2xl shadow-coral/30 ring-1 ring-white/70 transition active:scale-95 md:hidden"
+	style="bottom: calc(var(--bottom-nav-reserved-space) + max(1rem, env(safe-area-inset-bottom, 0px)) + 0.75rem);"
+>
+	<span class="sr-only">เปิด AI Chat</span>
+	<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+		<path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+		<path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.142-4.03 7.5-9 7.5a10.55 10.55 0 0 1-3.72-.66L3 20.25l1.46-3.98A6.82 6.82 0 0 1 3 12c0-4.142 4.03-7.5 9-7.5s9 3.358 9 7.5Z" />
+	</svg>
+</a>
+
 <!-- Hero Section: Cosmic Observatory (light theme) -->
 <section class="relative -mx-4 min-h-dvh overflow-hidden px-4 md:-mt-24 md:pt-24 flex items-center justify-center">
 	<!-- light gradient base (ตาม theme project) -->

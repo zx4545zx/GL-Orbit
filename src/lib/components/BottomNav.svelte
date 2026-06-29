@@ -46,17 +46,6 @@
 		`
 	};
 
-	const chatItem = {
-		href: '/chat',
-		label: 'AI',
-		icon: (active: boolean) => `
-			<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-				<path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.142-4.03 7.5-9 7.5a10.55 10.55 0 0 1-3.72-.66L3 20.25l1.46-3.98A6.82 6.82 0 0 1 3 12c0-4.142 4.03-7.5 9-7.5s9 3.358 9 7.5Z" />
-			</svg>
-		`
-	};
-
 	const secondaryItems = [
 		{
 			href: '/calendar',
@@ -115,7 +104,7 @@
 	);
 
 	const navItems = $derived.by(() => {
-		const items = [currentUser ? chatItem : homeItem, ...secondaryItems];
+		const items = [homeItem, ...secondaryItems];
 		if (notificationItem) {
 			items.push(notificationItem);
 		}
