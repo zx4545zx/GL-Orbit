@@ -154,13 +154,18 @@
 	href="/chat"
 	data-sveltekit-preload-data="hover"
 	aria-label="เปิด AI Chat"
-	class="fixed right-4 z-40 mobile-chat-fab flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-plum to-coral text-white shadow-2xl shadow-coral/30 ring-1 ring-white/70 transition active:scale-95 md:hidden"
+	class="fixed right-4 z-40 mobile-chat-fab group flex h-16 w-16 items-center justify-center rounded-[1.35rem] border border-white/70 bg-white/72 text-plum shadow-2xl shadow-lavender/30 backdrop-blur-2xl ring-1 ring-lavender/20 transition duration-300 active:scale-95 md:hidden"
 >
 	<span class="sr-only">เปิด AI Chat</span>
-	<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-		<path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-		<path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.142-4.03 7.5-9 7.5a10.55 10.55 0 0 1-3.72-.66L3 20.25l1.46-3.98A6.82 6.82 0 0 1 3 12c0-4.142 4.03-7.5 9-7.5s9 3.358 9 7.5Z" />
-	</svg>
+	<span class="absolute inset-1 rounded-[1.1rem] bg-gradient-to-br from-coral/18 via-lavender/14 to-mint/18 opacity-90"></span>
+	<span class="absolute -inset-1 rounded-[1.55rem] border border-dashed border-lavender/35 opacity-70 transition duration-500 group-active:scale-95" aria-hidden="true"></span>
+	<span class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-mint shadow-[0_0_12px_rgba(110,231,183,0.9)]" aria-hidden="true"></span>
+	<span class="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-white via-coral-light/45 to-lavender-light/70 shadow-inner shadow-white/80 ring-1 ring-white/80">
+		<svg class="h-6 w-6 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+			<path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+			<path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.142-4.03 7.5-9 7.5a10.55 10.55 0 0 1-3.72-.66L3 20.25l1.46-3.98A6.82 6.82 0 0 1 3 12c0-4.142 4.03-7.5 9-7.5s9 3.358 9 7.5Z" />
+		</svg>
+	</span>
 </a>
 
 <!-- Hero Section: Cosmic Observatory (light theme) -->

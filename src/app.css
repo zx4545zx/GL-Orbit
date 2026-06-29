@@ -202,7 +202,11 @@ input[type='time'] {
 }
 
 .mobile-chat-fab {
-  bottom: calc(var(--bottom-nav-reserved-space) + max(1rem, env(safe-area-inset-bottom, 0px)) + 0.75rem);
+  bottom: 6rem;
+}
+
+body:has(nav.translate-y-full) .mobile-chat-fab {
+  bottom: 1.5rem;
 }
 
 .safe-area-bottom {

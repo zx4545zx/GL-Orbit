@@ -112,12 +112,54 @@
 		}
 	] as const;
 
-	const platformPalette = [
-		{ from: 'from-coral to-coral-dark' },
-		{ from: 'from-lavender to-mint' },
-		{ from: 'from-mint to-coral' },
-		{ from: 'from-lavender to-coral' },
-		{ from: 'from-mint to-lavender' }
+
+	const LAST_UPDATED = '2026-06-30';
+	const LAST_UPDATED_LABEL = '30 มิถุนายน 2026';
+
+	const aiAnswerBlocks = [
+		{
+			question: 'GL-Orbit คืออะไร?',
+			answer:
+				'GL-Orbit คือเว็บศูนย์กลางสำหรับแฟนซีรีส์ Girls\' Love ที่รวมตารางฉาย ข้อมูลซีรีส์ นักแสดง สตูดิโอ แพลตฟอร์มรับชม และสถานะ Uncut ไว้ในที่เดียว เพื่อช่วยให้ผู้ชมติดตามตอนใหม่และค้นพบซีรีส์ GL เรื่องถัดไปได้ง่ายขึ้น'
+		},
+		{
+			question: 'GL-Orbit ช่วยติดตามตารางฉายซีรีส์ GL อย่างไร?',
+			answer:
+				'GL-Orbit แสดงข้อมูลตอนใหม่ของซีรีส์ GL ในรูปแบบที่อ่านง่าย เช่น วันฉาย เวลาออกอากาศ แพลตฟอร์มรับชม และป้าย Uncut ผู้ใช้จึงสามารถเช็กเรื่องที่กำลังจะฉาย วางแผนดูตอนใหม่ และกลับมาตรวจสอบตารางได้จากจุดเดียว'
+		},
+		{
+			question: 'ดูซีรีส์ GL ได้ที่ไหน?',
+			answer:
+				'ซีรีส์ GL มักเผยแพร่บนแพลตฟอร์มทางการ เช่น YouTube, iQIYI, GagaOOLala, WeTV และช่องทางของสตูดิโอผู้ผลิตโดยตรง GL-Orbit ช่วยรวบรวมข้อมูลแพลตฟอร์มเหล่านี้ เพื่อให้แฟนคลับเลือกช่องทางรับชมที่ถูกต้องและเป็นปัจจุบัน'
+		},
+		{
+			question: 'Uncut ในซีรีส์ GL หมายถึงอะไร?',
+			answer:
+				'Uncut หมายถึงเวอร์ชันของตอนหรือรอบฉายที่ไม่ตัดทอนเนื้อหา ป้ายนี้ช่วยให้แฟนซีรีส์ GL ตรวจสอบก่อนรับชมว่าแพลตฟอร์มนั้นมีเวอร์ชันเต็มหรือไม่ โดยเฉพาะเมื่อแต่ละช่องทางอาจเผยแพร่เวอร์ชันต่างกัน'
+		}
+	] as const;
+
+	const howToSteps = [
+		{
+			name: 'เช็กตอนที่ใกล้ฉาย',
+			text: 'เริ่มจาก Live Countdown เพื่อดูว่ามีตอนใหม่ของซีรีส์ GL เรื่องใดกำลังจะออกอากาศใน 24 ชั่วโมงข้างหน้า',
+			path: '/countdown'
+		},
+		{
+			name: 'เปิดตารางฉาย',
+			text: 'ไปที่หน้าปฏิทินเพื่อดูภาพรวมรายวัน รายสัปดาห์ และรายการที่มีป้าย Uncut ก่อนเลือกช่องทางรับชม',
+			path: '/calendar'
+		},
+		{
+			name: 'สำรวจเรื่องที่น่าสนใจ',
+			text: 'ใช้หน้าซีรีส์เพื่อค้นหาเรื่องกำลังฉาย เรื่องที่กำลังจะมา และเรื่องที่จบแล้ว พร้อมข้อมูลนักแสดงและสตูดิโอ',
+			path: '/series'
+		},
+		{
+			name: 'กลับมาอัปเดตซ้ำ',
+			text: 'ตาราง streaming platform และเวลาเผยแพร่อาจเปลี่ยนตามประกาศล่าสุด การ bookmark หน้าแรกช่วยให้ตรวจสอบข้อมูลได้เร็วขึ้น',
+			path: '/'
+		}
 	] as const;
 
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/about'));
@@ -150,6 +192,47 @@
 					'@type': 'Answer',
 					text: faq.answer
 				}
+			}))
+		},
+		{
+			'@context': 'https://schema.org',
+			'@type': 'Article',
+			headline: ABOUT_SEO_TITLE,
+			description: ABOUT_SEO_DESCRIPTION,
+			datePublished: LAST_UPDATED,
+			dateModified: LAST_UPDATED,
+			inLanguage: 'th-TH',
+			mainEntityOfPage: canonicalUrl,
+			image: absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE),
+			author: {
+				'@type': 'Organization',
+				name: SITE_NAME,
+				url: absoluteUrl(page.url.origin, '/')
+			},
+			publisher: {
+				'@type': 'Organization',
+				name: SITE_NAME,
+				url: absoluteUrl(page.url.origin, '/'),
+				logo: {
+					'@type': 'ImageObject',
+					url: absoluteUrl(page.url.origin, '/icons/gl-orbit-icon.png')
+				}
+			},
+			articleSection: ['Girls\' Love series', 'ตารางฉายซีรีส์ GL', 'แพลตฟอร์มสตรีมมิ่ง', 'FAQ'],
+			keywords: ['ซีรีส์ GL', 'Girls\' Love', 'ตารางฉายซีรีส์ GL', 'ดูซีรีส์ GL ที่ไหน', 'Uncut GL']
+		},
+		{
+			'@context': 'https://schema.org',
+			'@type': 'HowTo',
+			name: 'วิธีใช้ GL-Orbit เพื่อติดตามซีรีส์ GL',
+			description: 'ขั้นตอนเริ่มต้นสำหรับใช้ GL-Orbit เพื่อตรวจตารางฉาย ค้นหาซีรีส์ และกลับมาเช็กข้อมูลล่าสุด',
+			totalTime: 'PT5M',
+			step: howToSteps.map((step, index) => ({
+				'@type': 'HowToStep',
+				position: index + 1,
+				name: step.name,
+				text: step.text,
+				url: absoluteUrl(page.url.origin, step.path)
 			}))
 		},
 		buildBreadcrumbJsonLd(page.url.origin, [
@@ -194,6 +277,9 @@
 		<p class="mx-auto mt-5 max-w-2xl text-base leading-8 text-plum-light sm:text-lg">
 			รู้จักแนวคิดของ GL-Orbit วิธีใช้ตารางฉาย ข้อมูล Girls' Love series แพลตฟอร์มรับชม และคำถามที่แฟนคลับ GL มักอยากรู้ก่อนเริ่มติดตามเรื่องใหม่
 		</p>
+		<p class="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-plum-light/70">
+			อัปเดตล่าสุด: {LAST_UPDATED_LABEL}
+		</p>
 		<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
 			<a href="/calendar" class="touch-target inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-coral to-coral-dark px-6 py-3 font-semibold text-white shadow-xl shadow-coral/20 transition hover:scale-105">
 				ดูตารางฉาย
@@ -201,6 +287,32 @@
 			<a href="/" class="touch-target inline-flex items-center justify-center rounded-2xl glass-card-strong px-6 py-3 font-semibold text-plum transition hover:scale-105">
 				กลับหน้าแรก
 			</a>
+		</div>
+	</div>
+</section>
+
+<!-- Extractable answer blocks for AI search -->
+<section class="relative -mx-4 px-4 py-12 sm:py-16 content-visibility-auto">
+	<div class="mx-auto max-w-5xl">
+		<div class="mb-7 max-w-2xl">
+			<div class="inline-flex items-center gap-2 rounded-full bg-coral/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">
+				<span class="h-2 w-2 rounded-full bg-coral"></span>
+				AI Search Answers
+			</div>
+			<h2 class="mt-4 font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">
+				คำตอบสั้นที่ AI ดึงไปอ้างอิงได้ง่าย
+			</h2>
+			<p class="mt-3 text-sm leading-7 text-plum-light sm:text-base">
+				สรุปประเด็นสำคัญเกี่ยวกับ GL-Orbit ในรูปแบบคำถาม-คำตอบที่อ่านเข้าใจได้ทันที เหมาะกับทั้งผู้ใช้ใหม่และระบบค้นหาที่ต้องการคำตอบแบบ self-contained
+			</p>
+		</div>
+		<div class="grid gap-4 md:grid-cols-2">
+			{#each aiAnswerBlocks as block}
+				<article class="rounded-3xl border border-lavender/20 bg-white/70 p-5 shadow-sm shadow-lavender/10 backdrop-blur-sm">
+					<h3 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{block.question}</h3>
+					<p class="mt-2 text-sm leading-7 text-plum-light">{block.answer}</p>
+				</article>
+			{/each}
 		</div>
 	</div>
 </section>
@@ -254,34 +366,15 @@
 			<h2 class="edi-title">เริ่มใช้งาน<span class="text-coral">อย่างไร</span></h2>
 		</header>
 		<ol class="edi-steps">
-			<li class="edi-step">
-				<span class="edi-step-num">1</span>
-				<div>
-					<h3>เช็กตอนที่ใกล้ฉาย</h3>
-					<p>เริ่มจาก Live Countdown เพื่อดูว่ามีตอนใหม่ของซีรีส์ GL เรื่องใดกำลังจะออกอากาศใน 24 ชั่วโมงข้างหน้า</p>
-				</div>
-			</li>
-			<li class="edi-step">
-				<span class="edi-step-num">2</span>
-				<div>
-					<h3>เปิดตารางฉาย</h3>
-					<p>ไปที่หน้าปฏิทินเพื่อดูภาพรวมรายวัน รายสัปดาห์ และรายการที่มีป้าย Uncut ก่อนเลือกช่องทางรับชม</p>
-				</div>
-			</li>
-			<li class="edi-step">
-				<span class="edi-step-num">3</span>
-				<div>
-					<h3>สำรวจเรื่องที่น่าสนใจ</h3>
-					<p>ใช้หน้าซีรีส์เพื่อค้นหาเรื่องกำลังฉาย เรื่องที่กำลังจะมา และเรื่องที่จบแล้ว พร้อมข้อมูลนักแสดงและสตูดิโอ</p>
-				</div>
-			</li>
-			<li class="edi-step">
-				<span class="edi-step-num">4</span>
-				<div>
-					<h3>กลับมาอัปเดตซ้ำ</h3>
-					<p>ตาราง streaming platform และเวลาเผยแพร่อาจเปลี่ยนตามประกาศล่าสุด การ bookmark หน้าแรกช่วยให้ตรวจสอบข้อมูลได้เร็วขึ้น</p>
-				</div>
-			</li>
+			{#each howToSteps as step, i}
+				<li class="edi-step">
+					<span class="edi-step-num">{i + 1}</span>
+					<div>
+						<h3>{step.name}</h3>
+						<p>{step.text}</p>
+					</div>
+				</li>
+			{/each}
 		</ol>
 
 		<!-- §03 — GL 101 (numbered entries) -->

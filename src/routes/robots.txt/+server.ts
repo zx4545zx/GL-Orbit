@@ -1,18 +1,44 @@
 import type { RequestHandler } from './$types.js';
 
+const privatePaths = [
+	'/admin/',
+	'/api/',
+	'/login',
+	'/register',
+	'/profile',
+	'/notifications'
+] as const;
+
+const aiCrawlers = [
+	'GPTBot',
+	'ChatGPT-User',
+	'PerplexityBot',
+	'ClaudeBot',
+	'anthropic-ai',
+	'Google-Extended',
+	'Bingbot'
+] as const;
+
+function crawlerGroup(userAgent: string): string[] {
+	return [
+		`User-agent: ${userAgent}`,
+		'Allow: /',
+		...privatePaths.map((path) => `Disallow: ${path}`),
+		''
+	];
+}
+
 export const GET: RequestHandler = async ({ url }) => {
 	const origin = url.origin;
 	const body = [
-		'User-agent: *',
-		'Allow: /',
-		'Disallow: /admin/',
-		'Disallow: /api/',
-		'Disallow: /login',
-		'Disallow: /register',
-		'Disallow: /profile',
-		'Disallow: /notifications',
+		'# GL-Orbit robots.txt',
+		'# Public discovery pages are crawlable. Admin, API, auth, profile, and notification routes are not crawl targets.',
 		'',
+		...crawlerGroup('*'),
+		'# AI search and assistant crawlers: allow public pages for citation and discovery.',
+		...aiCrawlers.flatMap((agent) => crawlerGroup(agent)),
 		`Sitemap: ${new URL('/sitemap.xml', origin).toString()}`,
+		`# LLM context: ${new URL('/llms.txt', origin).toString()}`,
 		''
 	].join('\n');
 

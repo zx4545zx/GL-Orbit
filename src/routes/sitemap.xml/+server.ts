@@ -41,6 +41,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	const urls = [
 		urlEntry(origin, '/', 'daily', '1.0'),
+		urlEntry(origin, '/about', 'monthly', '0.8'),
 		urlEntry(origin, '/series', 'daily', '0.9'),
 		urlEntry(origin, '/calendar', 'hourly', '0.9'),
 		...publishedSeries.map((item) => urlEntry(origin, `/series/${item.id}`, 'weekly', '0.8')),
