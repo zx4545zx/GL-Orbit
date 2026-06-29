@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { getSeriesDetail } from '$lib/server/queries/series-detail.js';
+import { getArtistDetail } from '$lib/server/queries/artist-detail.js';
 import type { RequestHandler } from './$types.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -31,6 +32,11 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	if (parsed.type === 'series') {
 		const items = (await Promise.all(parsed.ids.map((id) => getSeriesDetail(id)))).filter((x): x is NonNullable<typeof x> => x !== null);
 		return json({ type: 'series', items });
+	}
+
+	if (parsed.type === 'artist') {
+		const items = (await Promise.all(parsed.ids.map((id) => getArtistDetail(id)))).filter((x): x is NonNullable<typeof x> => x !== null);
+		return json({ type: 'artist', items });
 	}
 
 	return json({ error: 'ยังไม่รองรับประเภทนี้' }, { status: 400 });
