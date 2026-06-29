@@ -8,8 +8,9 @@ Reduce SEO checker "Inline Styles" warnings on public GL-Orbit pages by removing
 
 ## Current Context
 
-A source scan found 41 `style=` matches. Public-facing matches are concentrated in:
+A source scan found 41 `style=` matches. One global inline style appears in `src/app.html`, so it is emitted on every public page. Public-facing route/component matches are concentrated in:
 
+- `src/app.html`
 - `src/routes/(app)/+page.svelte`
 - `src/routes/(app)/artists/[id]/+page.svelte`
 - `src/routes/(app)/profile/+page.svelte`
@@ -36,6 +37,20 @@ This targets the user-selected scope: all public pages, while avoiding unrelated
 - Do not change route data loading, database access, authentication, or SEO endpoint behavior.
 
 ## Cleanup Patterns
+
+### App shell wrapper
+
+Replace the SvelteKit body wrapper inline style:
+
+```html
+<div style="display: contents">%sveltekit.body%</div>
+```
+
+with the equivalent Tailwind class:
+
+```html
+<div class="contents">%sveltekit.body%</div>
+```
 
 ### Static performance hints
 
@@ -106,7 +121,7 @@ Avoid changing admin dynamic progress widths in this pass. For public profile to
 ## Out of Scope
 
 - Admin-only inline styles.
-- `src/routes/og-image/+server.ts` SVG string styles, unless a public page audit specifically flags the image endpoint HTML/SVG itself.
+- `src/routes/og-image/+server.ts` SVG string styles, unless a public page audit specifically flags the image endpoint SVG itself.
 - Large visual redesigns.
 - Tailwind configuration changes unless a class cannot be expressed locally.
 - Database/schema/auth changes.
@@ -118,7 +133,7 @@ After implementation:
 1. Run a targeted source scan for public inline styles:
 
 ```bash
-rg -n 'style=' 'src/routes/(app)' src/lib/components
+rg -n 'style=' src/app.html 'src/routes/(app)' src/lib/components
 ```
 
 Expected: no remaining `style=` matches in public page/component scope, or only documented exceptions that are not emitted into audited public HTML.
