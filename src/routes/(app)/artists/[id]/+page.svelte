@@ -50,7 +50,7 @@
 
 	type SocialMeta = {
 		label: string;
-		bg: string;
+		bgClass: string;
 		stroke: boolean;
 		icon: string;
 	};
@@ -65,13 +65,13 @@
 
 	function socialMeta(platform: string): SocialMeta {
 		const p = platform.toLowerCase();
-		if (p.includes('instagram')) return { label: 'Instagram', bg: 'linear-gradient(45deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)', stroke: false, icon: IG };
-		if (p.includes('twitter') || p === 'x') return { label: 'X (Twitter)', bg: '#000000', stroke: false, icon: X };
-		if (p.includes('youtube') || p.includes('yt')) return { label: 'YouTube', bg: '#FF0000', stroke: false, icon: YT };
-		if (p.includes('tiktok')) return { label: 'TikTok', bg: '#010101', stroke: false, icon: TT };
-		if (p.includes('facebook') || p.includes('fb')) return { label: 'Facebook', bg: '#1877F2', stroke: false, icon: FB };
-		if (p.includes('line')) return { label: 'LINE', bg: '#06C755', stroke: false, icon: LINE };
-		return { label: platform, bg: 'linear-gradient(135deg,#FF6B9D 0%,#C4B5FD 100%)', stroke: true, icon: GLOBE };
+		if (p.includes('instagram')) return { label: 'Instagram', bgClass: 'social-bg-instagram', stroke: false, icon: IG };
+		if (p.includes('twitter') || p === 'x') return { label: 'X (Twitter)', bgClass: 'social-bg-x', stroke: false, icon: X };
+		if (p.includes('youtube') || p.includes('yt')) return { label: 'YouTube', bgClass: 'social-bg-youtube', stroke: false, icon: YT };
+		if (p.includes('tiktok')) return { label: 'TikTok', bgClass: 'social-bg-tiktok', stroke: false, icon: TT };
+		if (p.includes('facebook') || p.includes('fb')) return { label: 'Facebook', bgClass: 'social-bg-facebook', stroke: false, icon: FB };
+		if (p.includes('line')) return { label: 'LINE', bgClass: 'social-bg-line', stroke: false, icon: LINE };
+		return { label: platform, bgClass: 'social-bg-default', stroke: true, icon: GLOBE };
 	}
 
 	function goBack() {
@@ -224,8 +224,7 @@
 							<span class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-lavender/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
 							<!-- Brand badge -->
 							<span
-								class="relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl shadow-sm transition-transform duration-300 group-hover:rotate-[-4deg] group-hover:scale-105"
-								style="background:{meta.bg}"
+								class="relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl shadow-sm transition-transform duration-300 group-hover:rotate-[-4deg] group-hover:scale-105 {meta.bgClass}"
 							>
 								{#if social.iconUrl}
 									<img src={social.iconUrl} alt={meta.label} width={24} height={24} loading="lazy" decoding="async" class="w-6 h-6 rounded-md object-cover" />

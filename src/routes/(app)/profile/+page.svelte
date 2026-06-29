@@ -226,7 +226,7 @@
 						<!-- Floating decorative blobs -->
 						<div class="absolute top-6 left-8 w-24 h-24 rounded-full bg-coral/20 blur-2xl animate-float"></div>
 						<div class="absolute bottom-4 right-12 w-32 h-32 rounded-full bg-lavender/20 blur-3xl animate-float-delayed"></div>
-						<div class="absolute top-1/2 left-1/3 w-20 h-20 rounded-full bg-mint/20 blur-2xl animate-float" style="animation-delay: -1.5s"></div>
+						<div class="absolute top-1/2 left-1/3 w-20 h-20 rounded-full bg-mint/20 blur-2xl animate-float float-delay-profile"></div>
 					{/if}
 					<!-- bottom fade into card -->
 					<div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/50 to-transparent pointer-events-none"></div>
@@ -347,8 +347,7 @@
 						<!-- Sub-toggle: Favorite / Watched -->
 						<div class="relative grid grid-cols-2 p-1 rounded-xl bg-white/50 backdrop-blur-md border border-white/50 mb-5 max-w-xs mx-auto">
 							<div
-								class="absolute top-1 bottom-1 left-1 rounded-lg transition-all duration-300 ease-out {libraryView === 'favorite' ? 'bg-coral/15 shadow-sm' : 'bg-mint/20 shadow-sm'}"
-								style="width: calc(50% - 0.25rem); transform: translateX({libraryView === 'favorite' ? '0%' : '100%'})"
+								class="absolute top-1 bottom-1 left-1 rounded-lg transition-all duration-300 ease-out library-toggle-indicator {libraryView === 'favorite' ? 'bg-coral/15 shadow-sm translate-x-0' : 'bg-mint/20 shadow-sm translate-x-full'}"
 							></div>
 							<button
 								onclick={() => (libraryView = 'favorite')}

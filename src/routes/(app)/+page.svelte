@@ -18,6 +18,41 @@
 		{ from: 'from-mint to-coral', dot: 'bg-lavender', b1: 'bg-mint/15', b2: 'bg-coral/15' },
 	] as const;
 
+	const stagger80Classes = [
+		'stagger-80-0',
+		'stagger-80-1',
+		'stagger-80-2',
+		'stagger-80-3',
+		'stagger-80-4',
+		'stagger-80-5',
+		'stagger-80-6',
+		'stagger-80-7',
+		'stagger-80-8',
+		'stagger-80-9',
+		'stagger-80-10',
+		'stagger-80-11'
+	] as const;
+
+	const floatDelayClasses = [
+		'',
+		'float-delay-neg-1',
+		'float-delay-neg-2',
+		'float-delay-neg-3',
+		'float-delay-neg-4',
+		'float-delay-neg-5',
+		'float-delay-neg-6',
+		'float-delay-neg-7',
+		'float-delay-neg-8'
+	] as const;
+
+	function stagger80Class(index: number): string {
+		return stagger80Classes[Math.min(index, stagger80Classes.length - 1)];
+	}
+
+	function floatDelayClass(index: number): string {
+		return floatDelayClasses[Math.min(index, floatDelayClasses.length - 1)];
+	}
+
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/'));
 	const homeJsonLd = $derived(safeJsonLd([
 		buildWebPageJsonLd(page.url.origin, '/', DEFAULT_SEO_TITLE, DEFAULT_SEO_DESCRIPTION),
@@ -119,8 +154,7 @@
 	href="/chat"
 	data-sveltekit-preload-data="hover"
 	aria-label="เปิด AI Chat"
-	class="fixed right-4 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-plum to-coral text-white shadow-2xl shadow-coral/30 ring-1 ring-white/70 transition active:scale-95 md:hidden"
-	style="bottom: calc(var(--bottom-nav-reserved-space) + max(1rem, env(safe-area-inset-bottom, 0px)) + 0.75rem);"
+	class="fixed right-4 z-40 mobile-chat-fab flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-plum to-coral text-white shadow-2xl shadow-coral/30 ring-1 ring-white/70 transition active:scale-95 md:hidden"
 >
 	<span class="sr-only">เปิด AI Chat</span>
 	<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
@@ -134,9 +168,9 @@
 	<!-- light gradient base (ตาม theme project) -->
 	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
 	<!-- soft pastel glows -->
-	<div class="absolute -top-10 -left-10 w-72 h-72 sm:w-96 sm:h-96 bg-coral/20 rounded-full blur-[40px] sm:blur-[80px] animate-float pointer-events-none" style="will-change: transform"></div>
-	<div class="absolute bottom-0 -right-10 w-80 h-80 sm:w-[28rem] sm:h-[28rem] bg-lavender/20 rounded-full blur-[40px] sm:blur-[90px] animate-float-delayed pointer-events-none" style="will-change: transform"></div>
-	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[26rem] h-[26rem] sm:w-[40rem] sm:h-[40rem] bg-mint/10 rounded-full blur-[50px] sm:blur-[100px] pointer-events-none" style="will-change: transform"></div>
+	<div class="absolute -top-10 -left-10 w-72 h-72 sm:w-96 sm:h-96 bg-coral/20 rounded-full blur-[40px] sm:blur-[80px] animate-float pointer-events-none will-change-transform"></div>
+	<div class="absolute bottom-0 -right-10 w-80 h-80 sm:w-[28rem] sm:h-[28rem] bg-lavender/20 rounded-full blur-[40px] sm:blur-[90px] animate-float-delayed pointer-events-none will-change-transform"></div>
+	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[26rem] h-[26rem] sm:w-[40rem] sm:h-[40rem] bg-mint/10 rounded-full blur-[50px] sm:blur-[100px] pointer-events-none will-change-transform"></div>
 
 	<!-- orbital system centerpiece: concentric rings + orbiting bodies -->
 	<div class="absolute left-1/2 top-1/2 pointer-events-none">
@@ -145,11 +179,11 @@
 		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[380px] sm:h-[380px] rounded-full border border-dashed border-lavender/35"></div>
 		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[130px] h-[130px] sm:w-[210px] sm:h-[210px] rounded-full border border-coral/30"></div>
 		<!-- orbit 3: mint, slow -->
-		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] sm:w-[560px] sm:h-[560px] animate-[spin_26s_linear_infinite]" style="will-change: transform"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-mint shadow-[0_0_12px_rgba(110,231,183,0.7)]"></span></div>
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] sm:w-[560px] sm:h-[560px] animate-[spin_26s_linear_infinite] will-change-transform"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-mint shadow-[0_0_12px_rgba(110,231,183,0.7)]"></span></div>
 		<!-- orbit 2: lavender, medium reverse -->
-		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[380px] sm:h-[380px] animate-[spin_17s_linear_infinite_reverse]" style="will-change: transform"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-lavender-dark shadow-[0_0_12px_rgba(139,92,246,0.6)]"></span></div>
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[380px] sm:h-[380px] animate-[spin_17s_linear_infinite_reverse] will-change-transform"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-lavender-dark shadow-[0_0_12px_rgba(139,92,246,0.6)]"></span></div>
 		<!-- orbit 1: coral, fast -->
-		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[130px] h-[130px] sm:w-[210px] sm:h-[210px] animate-[spin_9s_linear_infinite]" style="will-change: transform"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-coral shadow-[0_0_14px_rgba(255,107,157,0.85)]"></span></div>
+		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[130px] h-[130px] sm:w-[210px] sm:h-[210px] animate-[spin_9s_linear_infinite] will-change-transform"><span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-coral shadow-[0_0_14px_rgba(255,107,157,0.85)]"></span></div>
 		<!-- central soft glow behind text -->
 		<div class="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] sm:w-[520px] sm:h-[520px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.7)_0%,transparent_70%)]"></div>
 	</div>
@@ -227,8 +261,7 @@
 				{#each activeCountdowns as c, i (c.id)}
 					<a
 						href="/series/{c.seriesId}"
-						class="group block animate-slide-up"
-						style="animation-delay: {i * 80}ms; animation-fill-mode: both;"
+						class="group block animate-slide-up fill-mode-both {stagger80Class(i)}"
 					>
 						<article class="glass-card-strong rounded-[1.75rem] p-5 sm:p-6 relative overflow-hidden hover:-translate-y-1.5 transition-all duration-500 hover:shadow-2xl hover:shadow-coral/20 h-full flex flex-col">
 							<!-- playful lightning badge: ใกล้ฉายมาก -->
@@ -308,7 +341,7 @@
 
 <!-- Featured Series -->
 <!-- Featured Series: Celestial Bodies -->
-<section class="relative py-12 sm:py-20 -mx-4 px-4" style="content-visibility: auto">
+<section class="relative py-12 sm:py-20 -mx-4 px-4 content-visibility-auto">
 	<div class="max-w-6xl mx-auto">
 		<div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-10 gap-4">
 			<div>
@@ -393,7 +426,7 @@
 </section>
 
 <!-- Upcoming Schedule: Orbital Timeline -->
-<section class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] px-4 pb-[calc(1.5rem+var(--bottom-nav-reserved-space))] pt-12 sm:pt-20 sm:pb-[calc(2rem+var(--bottom-nav-reserved-space))] md:mb-0 md:pb-6 overflow-hidden" style="content-visibility: auto">
+<section class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] px-4 pb-[calc(1.5rem+var(--bottom-nav-reserved-space))] pt-12 sm:pt-20 sm:pb-[calc(2rem+var(--bottom-nav-reserved-space))] md:mb-0 md:pb-6 overflow-hidden content-visibility-auto">
 	<div class="absolute inset-0 bg-gradient-to-b from-lavender/5 via-transparent to-coral/5 pointer-events-none"></div>
 	<div class="absolute top-10 right-4 w-40 h-40 sm:w-56 sm:h-56 bg-mint/10 rounded-full blur-3xl animate-float-delayed pointer-events-none"></div>
 
@@ -441,14 +474,13 @@
 					{#each upcomingSchedule as item, i (item.seriesId + '-' + i)}
 						<a
 							href="/series/{item.seriesId}"
-							class="relative flex items-center gap-4 sm:gap-5 group animate-slide-up"
-							style="animation-delay: {i * 80}ms; animation-fill-mode: both;"
+							class="relative flex items-center gap-4 sm:gap-5 group animate-slide-up fill-mode-both {stagger80Class(i)}"
 						>
 							<!-- planet node with orbital ring -->
 							<div class="relative flex-shrink-0 z-10">
 								<div class="absolute inset-0 pointer-events-none">
 									<div class="absolute -inset-2.5 rounded-full border border-dashed border-lavender/25 animate-[spin_12s_linear_infinite]"></div>
-									<div class="absolute -inset-2.5 animate-[spin_12s_linear_infinite]" style="animation-delay:-4s;">
+									<div class="absolute -inset-2.5 animate-[spin_12s_linear_infinite] float-delay-spin-satellite">
 										<span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-coral/70 shadow-[0_0_6px_rgba(255,107,157,0.7)]"></span>
 									</div>
 								</div>
@@ -465,7 +497,7 @@
 								<div class="absolute -bottom-8 -left-8 w-24 h-24 {schedulePalette[i % 3].b2} rounded-full blur-2xl pointer-events-none"></div>
 
 								<!-- playful rocket badge -->
-								<div class="absolute top-2.5 right-2.5 z-10 animate-float" style="animation-delay: {i * -0.5}s;">
+								<div class="absolute top-2.5 right-2.5 z-10 animate-float {floatDelayClass(i)}">
 									<div class="w-9 h-9 rounded-2xl bg-gradient-to-br {schedulePalette[i % 3].from} shadow-lg shadow-lavender/40 flex items-center justify-center rotate-[6deg]">
 										<svg class="w-4 h-4 text-white -rotate-[6deg]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-3 4-4 7-4 10v2l-1 2h10l-1-2v-2c0-3-1-6-4-10z"/><circle cx="12" cy="10" r="1.5" fill="white" opacity="0.6"/><path d="M10 17c0 1.5 2 2.5 2 2.5s2-1 2-2.5" fill="currentColor" opacity="0.4"/></svg>
 									</div>

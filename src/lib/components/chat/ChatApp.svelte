@@ -417,9 +417,9 @@
 					<div class="max-w-[90%] rounded-2xl rounded-tl-md bg-white px-4 py-3 shadow-sm">
 						<div class="flex items-center gap-2 text-sm font-semibold text-plum">
 							<span class="flex items-center gap-1">
-								<span class="h-2 w-2 animate-bounce rounded-full bg-coral" style="animation-delay: 0ms"></span>
-								<span class="h-2 w-2 animate-bounce rounded-full bg-coral" style="animation-delay: 150ms"></span>
-								<span class="h-2 w-2 animate-bounce rounded-full bg-coral" style="animation-delay: 300ms"></span>
+								<span class="h-2 w-2 animate-bounce rounded-full bg-coral bounce-delay-0"></span>
+								<span class="h-2 w-2 animate-bounce rounded-full bg-coral bounce-delay-1"></span>
+								<span class="h-2 w-2 animate-bounce rounded-full bg-coral bounce-delay-2"></span>
 							</span>
 							{loadingStatus || 'กำลังเริ่มทำงาน'}
 						</div>
@@ -440,7 +440,7 @@
 			</div>
 		</div>
 
-		<footer class="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pt-2 sm:px-4" style="padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));">
+		<footer class="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pt-2 sm:px-4 chat-composer-safe">
 			<div class="pointer-events-auto mx-auto max-w-3xl">
 				{#if !loading && input.trim() === '' && (followupSuggestions.length > 0 || messages.length === 0)}
 					<div class="mb-2 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -493,7 +493,7 @@
 
 		<!-- Mobile: full-screen drawer with close button -->
 		{#if !previewHidden}
-			<div class="fixed inset-0 z-50 flex flex-col lg:hidden" style="padding-top: env(safe-area-inset-top, 0px);">
+			<div class="fixed inset-0 z-50 flex flex-col lg:hidden chat-preview-safe-top">
 				<aside class="h-full w-full animate-slide-in-right bg-[#f7f7f8] shadow-2xl">
 					<ChatContextPanel context={previewContext} onClose={() => (previewHidden = true)} />
 				</aside>

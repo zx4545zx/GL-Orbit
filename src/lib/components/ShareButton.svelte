@@ -156,8 +156,8 @@
 				onclick={selectOption}
 				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 transition-colors touch-target"
 			>
-				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background:#06C755">
-					<svg class="text-white" style="width:1.1rem;height:1.1rem" fill="currentColor" viewBox="0 0 24 24"><path d={LINE_PATH} /></svg>
+				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center share-brand-line">
+					<svg class="text-white share-icon-line" fill="currentColor" viewBox="0 0 24 24"><path d={LINE_PATH} /></svg>
 				</span>
 				<span class="text-sm font-medium text-plum">LINE</span>
 			</a>
@@ -170,8 +170,8 @@
 				onclick={selectOption}
 				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 transition-colors touch-target"
 			>
-				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background:#1877F2">
-					<svg style="width:1.05rem;height:1.05rem" class="text-white" fill="currentColor" viewBox="0 0 24 24"><path d={FB_PATH} /></svg>
+				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center share-brand-facebook">
+					<svg class="text-white share-icon-facebook" fill="currentColor" viewBox="0 0 24 24"><path d={FB_PATH} /></svg>
 				</span>
 				<span class="text-sm font-medium text-plum">Facebook</span>
 			</a>
@@ -185,7 +185,7 @@
 				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 transition-colors touch-target"
 			>
 				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-black">
-					<svg style="width:0.9rem;height:0.9rem" class="text-white" fill="currentColor" viewBox="0 0 24 24"><path d={X_PATH} /></svg>
+					<svg class="text-white share-icon-x" fill="currentColor" viewBox="0 0 24 24"><path d={X_PATH} /></svg>
 				</span>
 				<span class="text-sm font-medium text-plum">X (Twitter)</span>
 			</a>

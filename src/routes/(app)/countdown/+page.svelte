@@ -20,6 +20,22 @@
 
 	const countdownItems = $derived<CountdownItem[]>(data.countdown);
 
+	const stagger60Classes = [
+		'stagger-60-0',
+		'stagger-60-1',
+		'stagger-60-2',
+		'stagger-60-3',
+		'stagger-60-4',
+		'stagger-60-5',
+		'stagger-60-6',
+		'stagger-60-7',
+		'stagger-60-8'
+	] as const;
+
+	function stagger60Class(index: number): string {
+		return stagger60Classes[Math.min(index, stagger60Classes.length - 1)];
+	}
+
 	const SEO_TITLE = `นับถอยหลังซีรีส์ GL | ${SITE_NAME}`;
 	const SEO_DESCRIPTION = 'นับถอยหลังสู่ตอนใหม่ของซีรีส์ GL ที่กำลังฉายและที่กำลังจะฉาย พร้อมเวลาออกอากาศและแพลตฟอร์มรับชม';
 
@@ -109,8 +125,8 @@
 	<!-- orbiting particles — signature ของ GL-Orbit -->
 	<div class="absolute top-20 right-6 sm:top-24 sm:right-24 w-[170px] h-[170px] sm:w-[230px] sm:h-[230px] pointer-events-none">
 		<div class="absolute w-2.5 h-2.5 bg-coral rounded-full animate-orbit opacity-70"></div>
-		<div class="absolute w-2 h-2 bg-lavender rounded-full animate-orbit opacity-50" style="animation-delay:-6s; animation-duration:14s;"></div>
-		<div class="absolute w-1.5 h-1.5 bg-mint rounded-full animate-orbit opacity-60" style="animation-delay:-11s; animation-duration:22s;"></div>
+		<div class="absolute w-2 h-2 bg-lavender rounded-full animate-orbit opacity-50 orbit-delay-lavender"></div>
+		<div class="absolute w-1.5 h-1.5 bg-mint rounded-full animate-orbit opacity-60 orbit-delay-mint"></div>
 	</div>
 
 	<div class="relative z-10 max-w-3xl mx-auto">
@@ -155,12 +171,11 @@
 				{#each activeCountdowns as c, i (c.id)}
 					<a
 						href="/series/{c.seriesId}"
-						class="group block animate-slide-up"
-						style="animation-delay: {Math.min(i, 8) * 60}ms; animation-fill-mode: both;"
+						class="group block animate-slide-up fill-mode-both {stagger60Class(i)}"
 					>
 						<article class="glass-card-strong rounded-[1.75rem] p-5 sm:p-6 relative overflow-hidden hover:-translate-y-1.5 transition-all duration-500 hover:shadow-2xl hover:shadow-coral/20 h-full flex flex-col">
 							<!-- playful sparkle badge: magic countdown -->
-							<div class="absolute top-3.5 right-3.5 z-10 animate-float" style="animation-delay:-2s;">
+							<div class="absolute top-3.5 right-3.5 z-10 animate-float float-delay-countdown-badge">
 								<div class="w-10 h-10 rounded-full bg-gradient-to-br from-coral to-lavender shadow-lg shadow-lavender/50 flex items-center justify-center">
 									<svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l1.4 6.6L20 10l-6.6 1.4L12 18l-1.4-6.6L4 10l6.6-1.4z"/></svg>
 								</div>
@@ -202,7 +217,7 @@
 								{@render timeUnit(pad(c.hours), 'ชม.')}
 								<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-2xl sm:text-3xl font-bold text-coral/60 animate-pulse">:</span>
 								{@render timeUnit(pad(c.minutes), 'นาที')}
-								<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-2xl sm:text-3xl font-bold text-coral/60 animate-pulse" style="animation-delay: 0.5s;">:</span>
+								<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-2xl sm:text-3xl font-bold text-coral/60 animate-pulse pulse-delay-half">:</span>
 								{@render timeUnit(pad(c.seconds), 'วิ')}
 							</div>
 
