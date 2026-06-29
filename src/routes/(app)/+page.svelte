@@ -201,12 +201,15 @@
 			ที่คุณรัก
 		</h1>
 
-		<p class="text-base sm:text-lg md:text-xl text-plum-light max-w-xl mx-auto mb-7 sm:mb-10 leading-relaxed animate-slide-up stagger-2 px-2">
+		<p class="text-base sm:text-lg md:text-xl text-plum-light max-w-xl mx-auto mb-4 leading-relaxed animate-slide-up stagger-2 px-2">
 			ติดตามตารางฉาย ข้อมูลซีรีส์ และลิงก์รับชม<br class="hidden md:block" />
 			ที่อัปเดตแบบเรียลไทม์
 		</p>
+		<p class="mx-auto mb-7 max-w-2xl px-3 text-sm leading-7 text-plum-light/85 sm:mb-10 sm:text-base animate-slide-up stagger-3">
+			GL-Orbit รวมตารางฉายซีรีส์ Girls' Love จากแพลตฟอร์มยอดนิยม เช่น YouTube, iQIYI, GagaOOLala และ WeTV พร้อมเวลาออกอากาศตาม timezone ไทย ข้อมูลนักแสดง และสถานะ Uncut ในที่เดียว
+		</p>
 
-		<div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up stagger-3 px-4 sm:px-0">
+		<div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up stagger-4 px-4 sm:px-0">
 			<a
 				href="/calendar"
 				class="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold text-base sm:text-lg shadow-xl shadow-coral/25 hover:shadow-2xl hover:shadow-coral/30 hover:scale-105 transition-all duration-300 touch-target flex items-center justify-center gap-2"
