@@ -18,6 +18,52 @@
 		{ from: 'from-mint to-coral', dot: 'bg-lavender', b1: 'bg-mint/15', b2: 'bg-coral/15' },
 	] as const;
 
+	const homepageGuideCards = [
+		{
+			title: 'ติดตามตารางฉาย GL แบบไม่พลาดตอนใหม่',
+			description:
+				'GL-Orbit รวมตารางฉายซีรีส์ GL และ Girls\' Love series ไว้ในที่เดียว พร้อมข้อมูลวัน เวลา แพลตฟอร์ม และสถานะ Uncut เพื่อช่วยให้แฟนคลับวางแผนดูตอนใหม่ได้ง่ายขึ้น'
+		},
+		{
+			title: 'ค้นหาซีรีส์ นักแสดง และสตูดิโอที่เกี่ยวข้อง',
+			description:
+				'หน้าแรกเชื่อมต่อไปยังฐานข้อมูลซีรีส์ รายชื่อนักแสดง และรายละเอียดผลงาน เพื่อให้ผู้ใช้สำรวจจักรวาล GL ได้ต่อเนื่องจากเรื่องที่กำลังฉายไปจนถึงเรื่องที่กำลังจะมา'
+		},
+		{
+			title: 'เช็กลิงก์รับชม แพลตฟอร์ม และเวอร์ชัน Uncut',
+			description:
+				'ข้อมูลของแต่ละตอนออกแบบให้ช่วยตอบคำถามสำคัญของผู้ชม เช่น ฉายที่ไหน เวลาใด มีเวอร์ชัน Uncut หรือไม่ และควรกลับมาเช็กตารางอีกครั้งเมื่อไร'
+		}
+	] as const;
+
+	const homepageFaqs = [
+		{
+			question: 'GL-Orbit เหมาะกับใคร?',
+			answer:
+				'เหมาะกับแฟนซีรีส์ Girls\' Love ทั้งคนที่ติดตามอยู่แล้วและผู้ชมใหม่ที่อยากเริ่มสำรวจซีรีส์ GL ผ่านตารางฉาย รายชื่อซีรีส์ นักแสดง สตูดิโอ และแพลตฟอร์มสตรีมมิ่งที่เกี่ยวข้อง'
+		},
+		{
+			question: 'ตารางฉายใน GL-Orbit ช่วยอะไร?',
+			answer:
+				'ตารางฉายช่วยรวมข้อมูลตอนใหม่ไว้ในรูปแบบที่อ่านง่าย ผู้ใช้สามารถดูซีรีส์ที่กำลังจะออกอากาศ รายการที่ใกล้ฉาย และรายละเอียดเวลาออกอากาศโดยไม่ต้องค้นหาจากหลายแหล่งพร้อมกัน'
+		},
+		{
+			question: 'คำว่า Uncut บนเว็บไซต์หมายถึงอะไร?',
+			answer:
+				'ป้าย Uncut ใช้บอกว่าตอนหรือรอบฉายนั้นมีเวอร์ชันที่ไม่ตัดทอน ซึ่งเป็นข้อมูลที่แฟนซีรีส์ GL มักต้องการตรวจสอบก่อนเลือกช่องทางรับชมบน streaming platform ต่าง ๆ'
+		},
+		{
+			question: 'ทำไมควรกลับมาเช็ก GL-Orbit เป็นประจำ?',
+			answer:
+				'ตารางฉายและข้อมูลแพลตฟอร์มอาจเปลี่ยนได้ตามประกาศของผู้ผลิตหรือผู้ให้บริการสตรีมมิ่ง การกลับมาเช็ก GL-Orbit ช่วยให้ผู้ชมเห็นข้อมูลล่าสุดและไม่พลาดตอนสำคัญ'
+		},
+		{
+			question: 'เว็บไซต์นี้ต่างจากรายการแนะนำซีรีส์ทั่วไปอย่างไร?',
+			answer:
+				'GL-Orbit ไม่ได้เป็นแค่ลิสต์แนะนำ แต่ทำหน้าที่เป็นศูนย์กลางข้อมูลสำหรับการติดตามซีรีส์ GL ทั้งตารางฉาย countdown รายชื่อนักแสดง ลิงก์รับชม และบริบทของแต่ละเรื่องในชุมชนแฟนคลับ'
+		}
+	] as const;
+
 	const stagger80Classes = [
 		'stagger-80-0',
 		'stagger-80-1',
@@ -228,6 +274,74 @@
 	<div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 hidden sm:flex flex-col items-center gap-1.5 text-plum-light/50 animate-float">
 		<span class="text-[10px] uppercase tracking-[0.25em]">เลื่อนลง</span>
 		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+	</div>
+</section>
+
+<!-- About GL-Orbit: SEO-friendly guide content -->
+<section class="relative -mx-4 px-4 py-12 sm:py-16 content-visibility-auto">
+	<div class="absolute inset-0 bg-gradient-to-b from-white/30 via-lavender/5 to-transparent pointer-events-none"></div>
+	<div class="relative mx-auto max-w-6xl">
+		<div class="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+			<div class="glass-card-strong rounded-[2rem] p-6 sm:p-8 lg:p-10">
+				<div class="inline-flex items-center gap-2 mb-4 rounded-full bg-coral/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">
+					<span class="h-2 w-2 rounded-full bg-coral"></span>
+					Guide to GL-Orbit
+				</div>
+				<h2 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum leading-tight">
+					GL-Orbit คืออะไร
+				</h2>
+				<div class="mt-5 space-y-4 text-sm sm:text-base leading-7 text-plum-light">
+					<p>
+						GL-Orbit คือเว็บศูนย์กลางสำหรับแฟนซีรีส์ Girls' Love หรือ GL series ที่ต้องการติดตามข่าวสารแบบเป็นระบบ ตั้งแต่ตารางฉายตอนใหม่ รายละเอียดซีรีส์ นักแสดง สตูดิโอ ไปจนถึงช่องทางรับชมบน streaming platform ต่าง ๆ จุดตั้งต้นของเว็บคือการทำให้การตามซีรีส์ GL ง่ายขึ้นสำหรับผู้ชมไทยและแฟนต่างประเทศที่อยากรู้ว่าเรื่องไหนกำลังฉาย เรื่องไหนกำลังจะมา และควรดูตอนใหม่เมื่อไร
+					</p>
+					<p>
+						หน้าแรกของ GL-Orbit ออกแบบให้เป็นเหมือนแผงควบคุมของจักรวาล GL ผู้ใช้สามารถเริ่มจากตารางฉายประจำวัน ดู countdown ของตอนที่ใกล้ออกอากาศ สำรวจซีรีส์แนะนำ แล้วคลิกต่อไปยังหน้ารายละเอียดเพื่อดูข้อมูลเพิ่มเติม เช่น สถานะเรื่อง จำนวนตอน แพลตฟอร์มรับชม และป้าย Uncut ที่ช่วยบอกว่ารอบนั้นมีเวอร์ชันไม่ตัดทอนหรือไม่
+					</p>
+					<p>
+						เราให้ความสำคัญกับข้อมูลที่อ่านง่ายและเป็นประโยชน์จริง ไม่ใช่แค่รายชื่อเรื่องแบบสั้น ๆ เพราะแฟนคลับมักต้องการบริบทมากกว่านั้น ทั้งชื่อไทย ชื่ออังกฤษ ศิลปินที่เกี่ยวข้อง และเวลาฉายที่สัมพันธ์กับ timezone ของผู้ชม การกลับมาเช็ก GL-Orbit เป็นประจำจึงช่วยลดโอกาสพลาดตอนสำคัญและช่วยให้ค้นพบซีรีส์ GL เรื่องใหม่ได้ต่อเนื่อง
+					</p>
+					<p>
+						สำหรับผู้ชมที่ติดตามหลายเรื่องพร้อมกัน GL-Orbit ช่วยลดความสับสนจากประกาศที่กระจายอยู่บนหลายแพลตฟอร์ม ไม่ว่าจะเป็น YouTube, iQIYI, GagaOOLala, WeTV หรือช่องทางทางการของสตูดิโอ ผู้ใช้สามารถใช้หน้าแรกเป็นจุดเริ่มต้นเพื่อดูภาพรวม แล้วค่อยเจาะลึกไปยังรายละเอียดของแต่ละซีรีส์เมื่อต้องการตรวจสอบวันฉาย รายชื่อตอน นักแสดง หรือสถานะของเรื่องนั้น ๆ
+					</p>
+					<div class="rounded-3xl border border-lavender/20 bg-white/55 p-4 sm:p-5">
+						<h3 class="font-[family-name:var(--font-display)] text-xl font-bold text-plum">เริ่มใช้งานหน้าแรกอย่างไรให้คุ้มที่สุด</h3>
+						<ol class="mt-3 space-y-2 text-sm sm:text-base leading-7 text-plum-light">
+							<li><strong class="text-plum">1. เช็กตอนที่ใกล้ฉาย:</strong> เริ่มจาก Live Countdown เพื่อดูว่ามีตอนใหม่ของซีรีส์ GL เรื่องใดกำลังจะออกอากาศใน 24 ชั่วโมงข้างหน้า</li>
+							<li><strong class="text-plum">2. เปิดตารางฉาย:</strong> ไปที่หน้าปฏิทินเพื่อดูภาพรวมรายวัน รายสัปดาห์ และรายการที่มีป้าย Uncut ก่อนเลือกช่องทางรับชม</li>
+							<li><strong class="text-plum">3. สำรวจเรื่องที่น่าสนใจ:</strong> ใช้หน้าซีรีส์เพื่อค้นหาเรื่องกำลังฉาย เรื่องที่กำลังจะมา และเรื่องที่จบแล้ว พร้อมข้อมูลนักแสดงและสตูดิโอ</li>
+							<li><strong class="text-plum">4. กลับมาอัปเดตซ้ำ:</strong> ตาราง streaming platform และเวลาเผยแพร่อาจเปลี่ยนตามประกาศล่าสุด การ bookmark หน้าแรกช่วยให้ตรวจสอบข้อมูลได้เร็วขึ้น</li>
+						</ol>
+					</div>
+				</div>
+			</div>
+
+			<div class="space-y-4">
+				{#each homepageGuideCards as card}
+					<article class="glass-card rounded-3xl p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-lavender/20">
+						<h3 class="font-[family-name:var(--font-display)] text-xl font-bold text-plum">{card.title}</h3>
+						<p class="mt-2 text-sm sm:text-base leading-7 text-plum-light">{card.description}</p>
+					</article>
+				{/each}
+			</div>
+		</div>
+
+		<div class="mt-8 glass-card rounded-[2rem] p-6 sm:p-8">
+			<div class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+				<div>
+					<p class="text-[11px] font-bold uppercase tracking-[0.2em] text-lavender-dark">FAQ</p>
+					<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum">คำถามที่พบบ่อยเกี่ยวกับ GL-Orbit</h2>
+				</div>
+				<p class="max-w-xl text-sm leading-6 text-plum-light">คำตอบสั้น ๆ สำหรับผู้ใช้ใหม่ที่อยากรู้ว่าเว็บไซต์นี้ช่วยติดตามซีรีส์ GL ได้อย่างไร</p>
+			</div>
+			<div class="grid gap-4 md:grid-cols-2">
+				{#each homepageFaqs as faq}
+					<article class="rounded-2xl border border-white/70 bg-white/60 p-4 sm:p-5 shadow-sm shadow-lavender/10">
+						<h3 class="font-semibold text-plum">{faq.question}</h3>
+						<p class="mt-2 text-sm leading-7 text-plum-light">{faq.answer}</p>
+					</article>
+				{/each}
+			</div>
+		</div>
 	</div>
 </section>
 
