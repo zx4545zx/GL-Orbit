@@ -60,7 +60,7 @@
 	const currentUser = $derived(page.data.user);
 	const latestContext = $derived.by(() => {
 		for (let i = messages.length - 1; i >= 0; i -= 1) {
-			if (messages[i].role === 'ASSISTANT' && messages[i].context) return messages[i].context;
+			if (messages[i].role === 'ASSISTANT' && hasContextItems(messages[i].context)) return messages[i].context;
 		}
 		return null;
 	});
@@ -69,11 +69,15 @@
 		return ctx?.type === 'artist' ? ctx.artistIds.length : ctx?.type ? ctx.seriesIds.length : 0;
 	}
 
-	const previewContext = $derived(previewHidden ? null : (panelContext ?? latestContext));
+	function hasContextItems(ctx: ChatContextPayload) {
+		return getContextCount(ctx) > 0;
+	}
+
+	const previewContext = $derived(previewHidden ? null : (hasContextItems(panelContext) ? panelContext : latestContext));
 	const previewOpen = $derived(previewContext !== null);
 	
 	function selectPreviewContext(ctx: ChatContextPayload) {
-		if (!ctx) return;
+		if (!hasContextItems(ctx)) return;
 		panelContext = ctx;
 		previewHidden = false;
 	}
@@ -182,7 +186,7 @@
 				return;
 			}
 
-			const responseContext: ChatContextPayload = body.context ?? null;
+			const responseContext: ChatContextPayload = hasContextItems(body.context ?? null) ? body.context : null;
 			messages = [
 				...messages,
 				{
@@ -361,7 +365,7 @@
 					<p class="text-xs text-plum-light">ถามต่อได้ในบทสนทนาเดิม</p>
 				</div>
 			</div>
-			{#if latestContext}
+			{#if hasContextItems(latestContext)}
 				<button type="button" class="relative flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10 {previewOpen ? 'bg-coral/10 text-coral-dark' : ''}" aria-label={previewOpen ? 'ซ่อนข้อมูลที่เกี่ยวข้อง' : 'แสดงข้อมูลที่เกี่ยวข้องล่าสุด'} aria-pressed={previewOpen} onclick={togglePreviewContext}>
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
@@ -398,7 +402,7 @@
 										<ChatMarkdown content={message.content} />
 									{/if}
 								</div>
-								{#if message.role === 'ASSISTANT' && message.context}
+								{#if message.role === 'ASSISTANT' && hasContextItems(message.context)}
 									<button type="button" class="inline-flex items-center gap-1.5 rounded-full border border-lavender/30 bg-white/90 px-3 py-1.5 text-xs font-bold text-plum-light shadow-sm transition hover:border-coral/30 hover:bg-coral/5 hover:text-coral-dark" onclick={() => selectPreviewContext(message.context)}>
 										<span>ดูข้อมูลที่เกี่ยวข้อง</span>
 										<span class="rounded-full bg-coral px-1.5 py-0.5 text-[10px] leading-none text-white">{getContextCount(message.context)}</span>

@@ -12,6 +12,11 @@ import { makeSafeReadSql } from '$lib/server/chat/sql-safety.js';
 import { getSeriesCatalogText } from '$lib/server/chat/catalog.js';
 import { getDeterministicChatSql } from '$lib/server/chat/deterministic.js';
 import { buildChatContext } from '$lib/server/chat/context-extract.js';
+import {
+	buildGeneralChatPrompt,
+	classifyChatScope,
+	GENERAL_CHAT_SYSTEM_PROMPT
+} from '$lib/server/chat/scope.js';
 import type { RequestHandler } from './$types.js';
 
 const MAX_MESSAGE_LENGTH = 500;
@@ -101,6 +106,24 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		}
 
 		const contextPrompt = buildConversationContextPrompt(recentContext);
+		const chatScope = classifyChatScope(message);
+		if (chatScope === 'general') {
+			const reply = await timedStep(perfSteps, 'llm:general_chat', () => callMiniMax([
+				{ role: 'system', content: GENERAL_CHAT_SYSTEM_PROMPT },
+				{ role: 'user', content: buildGeneralChatPrompt(message, contextPrompt) }
+			]));
+
+			await timedStep(perfSteps, 'db:append_exchange', () => appendChatExchange(userId, params.id, message, reply, null));
+			logChatPerf({
+				conversationId: params.id,
+				messageLength: message.length,
+				status: 'general_chat',
+				steps: perfSteps,
+				totalMs: Math.round(performance.now() - requestStartedAt)
+			});
+			return json({ reply, suggestions: [], context: null });
+		}
+
 		const deterministicSql = getDeterministicChatSql(message);
 		let sqlSource = deterministicSql?.intent ?? 'llm';
 		let safeSql = deterministicSql

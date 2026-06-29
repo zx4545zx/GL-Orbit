@@ -5,6 +5,10 @@ export type DeterministicChatIntent =
 	| 'schedule_month'
 	| 'schedule_weekday'
 	| 'schedule_next'
+	| 'schedule_yesterday'
+	| 'schedule_last_week'
+	| 'schedule_last_month'
+	| 'schedule_past'
 	| 'series_all'
 	| 'series_ongoing'
 	| 'series_upcoming'
@@ -38,6 +42,7 @@ function scheduleForDateSql(dateExpression: string) {
 	return `
 SELECT
 	s.id AS id,
+	s.id AS series_id,
 	s.title_th,
 	s.title_en,
 	p.name AS platform_name,
@@ -51,12 +56,13 @@ FROM series_schedules ss
 JOIN series s ON s.id = ss.series_id
 LEFT JOIN platforms p ON p.id = ss.platform_id
 WHERE s.deleted_at IS NULL
-	AND s.status = 'ONGOING'
+	AND s.status IN ('ONGOING', 'UPCOMING')
 	AND p.deleted_at IS NULL
 	AND ss.day_of_week = EXTRACT(DOW FROM ${dateExpression})::integer
 UNION ALL
 SELECT
 	s.id AS id,
+	s.id AS series_id,
 	s.title_th,
 	s.title_en,
 	p.name AS platform_name,
@@ -73,7 +79,7 @@ LEFT JOIN platforms p ON p.id = es.platform_id
 WHERE es.deleted_at IS NULL
 	AND e.deleted_at IS NULL
 	AND s.deleted_at IS NULL
-	AND s.status = 'ONGOING'
+	AND s.status IN ('ONGOING', 'UPCOMING')
 	AND p.deleted_at IS NULL
 	AND (es.air_date AT TIME ZONE 'Asia/Bangkok')::date = ${dateExpression}
 ORDER BY air_time, title_en, platform_name
@@ -89,6 +95,7 @@ function scheduleForRangeSql(range: 'week' | 'month') {
 	return `
 SELECT
 	s.id AS id,
+	s.id AS series_id,
 	s.title_th,
 	s.title_en,
 	p.name AS platform_name,
@@ -102,10 +109,12 @@ FROM series_schedules ss
 JOIN series s ON s.id = ss.series_id
 LEFT JOIN platforms p ON p.id = ss.platform_id
 WHERE s.deleted_at IS NULL
+	AND s.status IN ('ONGOING', 'UPCOMING')
 	AND p.deleted_at IS NULL
 UNION ALL
 SELECT
 	s.id AS id,
+	s.id AS series_id,
 	s.title_th,
 	s.title_en,
 	p.name AS platform_name,
@@ -122,6 +131,7 @@ LEFT JOIN platforms p ON p.id = es.platform_id
 WHERE es.deleted_at IS NULL
 	AND e.deleted_at IS NULL
 	AND s.deleted_at IS NULL
+	AND s.status IN ('ONGOING', 'UPCOMING')
 	AND p.deleted_at IS NULL
 	AND (es.air_date AT TIME ZONE 'Asia/Bangkok')::date >= date_trunc('${trunc}', (NOW() AT TIME ZONE 'Asia/Bangkok'))::date
 	AND (es.air_date AT TIME ZONE 'Asia/Bangkok')::date < (date_trunc('${trunc}', (NOW() AT TIME ZONE 'Asia/Bangkok'))::date + INTERVAL '${interval}')::date
@@ -136,6 +146,7 @@ function scheduleForWeekdaySql(dayOfWeek: number) {
 	return `
 SELECT
 	s.id AS id,
+	s.id AS series_id,
 	s.title_th,
 	s.title_en,
 	p.name AS platform_name,
@@ -149,11 +160,13 @@ FROM series_schedules ss
 JOIN series s ON s.id = ss.series_id
 LEFT JOIN platforms p ON p.id = ss.platform_id
 WHERE s.deleted_at IS NULL
+	AND s.status IN ('ONGOING', 'UPCOMING')
 	AND p.deleted_at IS NULL
 	AND ss.day_of_week = ${dayOfWeek}
 UNION ALL
 SELECT
 	s.id AS id,
+	s.id AS series_id,
 	s.title_th,
 	s.title_en,
 	p.name AS platform_name,
@@ -170,6 +183,7 @@ LEFT JOIN platforms p ON p.id = es.platform_id
 WHERE es.deleted_at IS NULL
 	AND e.deleted_at IS NULL
 	AND s.deleted_at IS NULL
+	AND s.status IN ('ONGOING', 'UPCOMING')
 	AND p.deleted_at IS NULL
 	AND EXTRACT(DOW FROM (es.air_date AT TIME ZONE 'Asia/Bangkok'))::integer = ${dayOfWeek}
 	AND (es.air_date AT TIME ZONE 'Asia/Bangkok')::date >= (NOW() AT TIME ZONE 'Asia/Bangkok')::date
@@ -180,6 +194,7 @@ LIMIT 20`.trim();
 const NEXT_SCHEDULE_SQL = `
 SELECT
 	s.id AS id,
+	s.id AS series_id,
 	s.title_th,
 	s.title_en,
 	e.episode_number,
@@ -195,10 +210,45 @@ LEFT JOIN platforms p ON p.id = es.platform_id
 WHERE es.deleted_at IS NULL
 	AND e.deleted_at IS NULL
 	AND s.deleted_at IS NULL
+	AND s.status IN ('ONGOING', 'UPCOMING')
 	AND p.deleted_at IS NULL
 	AND (es.air_date AT TIME ZONE 'Asia/Bangkok') >= (NOW() AT TIME ZONE 'Asia/Bangkok')
 ORDER BY es.air_date, s.title_en, e.episode_number
 LIMIT 20`.trim();
+
+function pastScheduleSelect(whereClause: string) {
+	return `
+SELECT
+	s.id AS id,
+	s.id AS series_id,
+	s.title_th,
+	s.title_en,
+	s.status,
+	e.episode_number,
+	e.title AS episode_title,
+	p.name AS platform_name,
+	(es.air_date AT TIME ZONE 'Asia/Bangkok') AS air_date,
+	(es.air_date AT TIME ZONE 'Asia/Bangkok')::time AS air_time,
+	es.stream_link,
+	es.is_uncut,
+	'episode' AS schedule_type
+FROM episode_schedules es
+JOIN episodes e ON e.id = es.episode_id
+JOIN series s ON s.id = e.series_id
+LEFT JOIN platforms p ON p.id = es.platform_id
+WHERE es.deleted_at IS NULL
+	AND e.deleted_at IS NULL
+	AND s.deleted_at IS NULL
+	AND p.deleted_at IS NULL
+	${whereClause}
+ORDER BY air_date DESC, s.title_en, e.episode_number
+LIMIT 20`.trim();
+}
+
+const YESTERDAY_SCHEDULE_SQL = pastScheduleSelect("AND (es.air_date AT TIME ZONE 'Asia/Bangkok')::date = ((NOW() AT TIME ZONE 'Asia/Bangkok')::date - INTERVAL '1 day')::date");
+const LAST_WEEK_SCHEDULE_SQL = pastScheduleSelect("AND (es.air_date AT TIME ZONE 'Asia/Bangkok')::date >= (date_trunc('week', (NOW() AT TIME ZONE 'Asia/Bangkok'))::date - INTERVAL '7 days')::date\n\tAND (es.air_date AT TIME ZONE 'Asia/Bangkok')::date < date_trunc('week', (NOW() AT TIME ZONE 'Asia/Bangkok'))::date");
+const LAST_MONTH_SCHEDULE_SQL = pastScheduleSelect("AND (es.air_date AT TIME ZONE 'Asia/Bangkok')::date >= (date_trunc('month', (NOW() AT TIME ZONE 'Asia/Bangkok'))::date - INTERVAL '1 month')::date\n\tAND (es.air_date AT TIME ZONE 'Asia/Bangkok')::date < date_trunc('month', (NOW() AT TIME ZONE 'Asia/Bangkok'))::date");
+const PAST_SCHEDULE_SQL = pastScheduleSelect("AND (es.air_date AT TIME ZONE 'Asia/Bangkok') < (NOW() AT TIME ZONE 'Asia/Bangkok')");
 
 function seriesListSql(extraWhere = '', joins = '') {
 	return `
@@ -417,7 +467,7 @@ function asksSeriesArtists(normalized: string) {
 
 export function getDeterministicChatSql(message: string): DeterministicChatSql | null {
 	const normalized = normalizeQuestion(message);
-	const asksSchedule = hasAny(normalized, ['ตารางฉาย', 'ฉายอะไร', 'อะไรฉาย', 'มีอะไรฉาย', 'มีอะไรบ้าง']) || normalized.includes('ฉาย');
+	const asksSchedule = hasAny(normalized, ['ตารางฉาย', 'ฉายอะไร', 'อะไรฉาย', 'มีอะไรฉาย', 'มีอะไรบ้าง', 'ย้อนหลัง', 'ดูย้อนหลัง', 'ที่ผ่านมา', 'ที่แล้ว']) || normalized.includes('ฉาย');
 	const asksSeries = hasAny(normalized, ['ซีรีส์', 'series', 'เรื่อง']);
 
 	if (asksSeriesArtists(normalized)) {
@@ -435,6 +485,22 @@ export function getDeterministicChatSql(message: string): DeterministicChatSql |
 
 	if (hasAny(normalized, ['สตูดิโอ', 'studio']) && hasAny(normalized, ['มี', 'ทั้งหมด', 'อะไรบ้าง'])) {
 		return { intent: 'studios_all', sql: STUDIOS_ALL_SQL };
+	}
+
+	if (asksSchedule && (normalized.includes('เมื่อวาน') || normalized.includes('yesterday'))) {
+		return { intent: 'schedule_yesterday', sql: YESTERDAY_SCHEDULE_SQL };
+	}
+
+	if (asksSchedule && (normalized.includes('สัปดาห์ที่แล้ว') || normalized.includes('อาทิตย์ที่แล้ว') || normalized.includes('last week'))) {
+		return { intent: 'schedule_last_week', sql: LAST_WEEK_SCHEDULE_SQL };
+	}
+
+	if (asksSchedule && (normalized.includes('เดือนที่แล้ว') || normalized.includes('last month'))) {
+		return { intent: 'schedule_last_month', sql: LAST_MONTH_SCHEDULE_SQL };
+	}
+
+	if (asksSchedule && hasAny(normalized, ['ย้อนหลัง', 'ดูย้อนหลัง', 'ฉายไปแล้ว', 'ที่ผ่านมา', 'past episodes', 'previous episodes'])) {
+		return { intent: 'schedule_past', sql: PAST_SCHEDULE_SQL };
 	}
 
 	if (asksSchedule && (normalized.includes('พรุ่งนี้') || normalized.includes('tomorrow'))) {
