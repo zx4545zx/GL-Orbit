@@ -95,13 +95,29 @@
 </script>
 
 <section class="flex h-full min-h-0 w-full flex-col bg-[#f7f7f8]" aria-label={title}>
-	<header class="flex h-14 shrink-0 items-center justify-between border-b border-black/10 bg-white px-4">
-		<div class="min-w-0">
-			<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-coral-dark/70">Preview</p>
-			<h2 class="truncate text-sm font-bold text-plum">{title}</h2>
-		</div>
+	<header class="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-black/10 bg-white px-4">
+		{#if (view === 'series-detail' || view === 'artist-detail') && seriesItems.length > 1 || view === 'artist-detail' && artistItems.length > 1}
+			<button type="button" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10" aria-label="ย้อนกลับ" onclick={() => (view = 'list')}>
+				<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
+			</button>
+			<div class="min-w-0">
+				<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-coral-dark/70">Preview</p>
+				<h2 class="truncate text-sm font-bold text-plum">
+					{#if view === 'series-detail' && selectedSeriesDetail}
+						{selectedSeriesDetail.titleTh || selectedSeriesDetail.titleEn}
+					{:else if view === 'artist-detail' && selectedArtistDetail}
+						{selectedArtistDetail.nickname}
+					{/if}
+				</h2>
+			</div>
+		{:else}
+			<div class="min-w-0">
+				<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-coral-dark/70">Preview</p>
+				<h2 class="truncate text-sm font-bold text-plum">{title}</h2>
+			</div>
+		{/if}
 		{#if onClose}
-			<button type="button" class="flex h-9 w-9 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10" aria-label="ปิด" onclick={onClose}>×</button>
+			<button type="button" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10" aria-label="ปิด" onclick={onClose}>×</button>
 		{/if}
 	</header>
 
@@ -116,14 +132,8 @@
 					<button type="button" class="rounded-full border border-lavender/30 bg-white px-4 py-2 text-xs font-bold text-plum" onclick={() => fetchContext()}>ลองใหม่</button>
 				</div>
 			{:else if view === 'series-detail' && selectedSeriesDetail}
-				{#if seriesItems.length > 1}
-					<button type="button" class="absolute left-3 top-3 z-10 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-plum shadow-sm" onclick={() => (view = 'list')}>← ย้อนกลับ</button>
-				{/if}
 				<SeriesDetailPanel detail={selectedSeriesDetail} />
 			{:else if view === 'artist-detail' && selectedArtistDetail}
-				{#if artistItems.length > 1}
-					<button type="button" class="absolute left-3 top-3 z-10 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-plum shadow-sm" onclick={() => (view = 'list')}>← ย้อนกลับ</button>
-				{/if}
 				<ArtistDetailPanel detail={selectedArtistDetail} />
 			{:else if view === 'schedule' && scheduleCalendar}
 				<ScheduleContextPanel calendar={scheduleCalendar} />
