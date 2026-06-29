@@ -1,7 +1,7 @@
 export const SITE_NAME = 'GL-Orbit';
 export const SITE_LOCALE = 'th_TH';
-export const DEFAULT_SEO_TITLE = 'GL-Orbit | ตารางฉายและข้อมูลซีรีส์ GL';
-export const DEFAULT_SEO_DESCRIPTION = 'ศูนย์กลางข้อมูลซีรีส์ Girls\' Love พร้อมตารางฉาย เวลาออกอากาศ แพลตฟอร์มรับชม และข้อมูลนักแสดงสำหรับแฟนคลับ GL';
+export const DEFAULT_SEO_TITLE = 'GL-Orbit | ตารางฉายซีรีส์ GL ครบทุกแพลตฟอร์ม ข้อมูลนักแสดง';
+export const DEFAULT_SEO_DESCRIPTION = 'ศูนย์กลางข้อมูลซีรีส์ Girls\' Love อัปเดตใหม่ล่าสุด พร้อมตารางฉาย เวลาออกอากาศตามเขตเวลาไทย แพลตฟอร์มรับชม และข้อมูลนักแสดงสำหรับแฟนคลับ GL';
 export const DEFAULT_OG_IMAGE = '/og-image';
 export const OG_IMAGE_WIDTH = '1200';
 export const OG_IMAGE_HEIGHT = '630';
