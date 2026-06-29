@@ -470,8 +470,19 @@
 	</section>
 
 	{#if previewContext}
-		<aside class="hidden h-full w-[420px] shrink-0 border-l border-black/10 bg-[#f7f7f8] shadow-[-18px_0_45px_rgba(196,181,253,0.16)] xl:flex">
-			<ChatContextPanel context={previewContext} />
+		<!-- Desktop: side-by-side -->
+		<aside class="hidden h-full w-[420px] shrink-0 border-l border-black/10 bg-[#f7f7f8] shadow-[-18px_0_45px_rgba(196,181,253,0.16)] lg:flex">
+			<ChatContextPanel context={previewContext} onClose={() => (previewHidden = true)} />
 		</aside>
+
+		<!-- Mobile: overlay from right -->
+		{#if !previewHidden}
+			<div class="fixed inset-0 z-50 flex justify-end lg:hidden">
+				<button class="absolute inset-0 bg-black/20" type="button" aria-label="ปิด" onclick={() => (previewHidden = true)}></button>
+				<aside class="relative h-full w-full max-w-[420px] animate-slide-in-right bg-[#f7f7f8] shadow-2xl">
+					<ChatContextPanel context={previewContext} onClose={() => (previewHidden = true)} />
+				</aside>
+			</div>
+		{/if}
 	{/if}
 </div>
