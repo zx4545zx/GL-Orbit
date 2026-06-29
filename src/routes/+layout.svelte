@@ -11,17 +11,81 @@
 	// Block it here by cancelling any multi-finger touch gesture. This app has no
 	// map/image pinch features, so disabling multi-touch has no downside.
 	// PWA standalone mode is already covered by the viewport meta.
+	//
+	// iOS PWA also has rubber-band overscroll: pulling past the top/bottom of the
+	// document reveals the body background behind the app. The chat route avoids
+	// this by locking body scroll entirely, but public pages need normal window
+	// scrolling. This guard only cancels single-finger moves when the active
+	// scroll container is already at its boundary, preserving normal scroll.
 	onMount(() => {
+		const isIOS =
+			/iP(ad|hone|od)/.test(navigator.userAgent) ||
+			(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+		const isStandalone =
+			window.matchMedia('(display-mode: standalone)').matches ||
+			(navigator as Navigator & { standalone?: boolean }).standalone === true;
+		let lastTouchY: number | null = null;
+
+		function nearestScrollable(target: EventTarget | null): HTMLElement | null {
+			let element = target instanceof Element ? target : null;
+			while (element && element !== document.body) {
+				const style = window.getComputedStyle(element);
+				const canScrollY =
+					/(auto|scroll)/.test(style.overflowY) && element.scrollHeight > element.clientHeight + 1;
+				if (canScrollY) return element as HTMLElement;
+				element = element.parentElement;
+			}
+			return document.scrollingElement as HTMLElement | null;
+		}
+
 		const blockMultiTouch = (e: TouchEvent) => {
 			if (e.touches.length > 1) {
 				e.preventDefault();
 			}
 		};
+
+		const rememberTouchY = (e: TouchEvent) => {
+			if (e.touches.length === 1) {
+				lastTouchY = e.touches[0].clientY;
+			}
+		};
+
+		const blockIOSPwaRubberBand = (e: TouchEvent) => {
+			if (!isIOS || !isStandalone || e.touches.length !== 1 || lastTouchY === null) return;
+
+			const currentY = e.touches[0].clientY;
+			const deltaY = currentY - lastTouchY;
+			const scroller = nearestScrollable(e.target);
+			if (!scroller) return;
+
+			const maxScroll = scroller.scrollHeight - scroller.clientHeight;
+			const atTop = scroller.scrollTop <= 0;
+			const atBottom = scroller.scrollTop >= maxScroll - 1;
+
+			if ((atTop && deltaY > 0) || (atBottom && deltaY < 0)) {
+				e.preventDefault();
+			}
+
+			lastTouchY = currentY;
+		};
+
+		const clearTouchY = () => {
+			lastTouchY = null;
+		};
+
 		window.addEventListener('touchstart', blockMultiTouch, { passive: false });
 		window.addEventListener('touchmove', blockMultiTouch, { passive: false });
+		window.addEventListener('touchstart', rememberTouchY, { passive: true });
+		window.addEventListener('touchmove', blockIOSPwaRubberBand, { passive: false });
+		window.addEventListener('touchend', clearTouchY, { passive: true });
+		window.addEventListener('touchcancel', clearTouchY, { passive: true });
 		return () => {
 			window.removeEventListener('touchstart', blockMultiTouch);
 			window.removeEventListener('touchmove', blockMultiTouch);
+			window.removeEventListener('touchstart', rememberTouchY);
+			window.removeEventListener('touchmove', blockIOSPwaRubberBand);
+			window.removeEventListener('touchend', clearTouchY);
+			window.removeEventListener('touchcancel', clearTouchY);
 		};
 	});
 

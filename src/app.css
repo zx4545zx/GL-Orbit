@@ -82,6 +82,8 @@
 
 :root {
   --bottom-nav-reserved-space: calc(4rem + env(safe-area-inset-bottom, 0px));
+  --floating-action-bottom: calc(var(--bottom-nav-reserved-space) + 2rem);
+  --floating-action-bottom-hidden: max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 1rem));
 }
 
 :root {
@@ -109,6 +111,11 @@ html {
   @media (display-mode: standalone) {
     :root {
       --pwa-safe-top: env(safe-area-inset-top, 0px);
+    }
+
+    html,
+    body {
+      overscroll-behavior-y: none;
     }
 
     /* Offset in-flow content so titles/headers are not hidden behind the status bar. */
@@ -201,12 +208,20 @@ input[type='time'] {
   content-visibility: auto;
 }
 
-.mobile-chat-fab {
-  bottom: 6rem;
+.mobile-chat-fab,
+.floating-action-above-nav {
+  bottom: var(--floating-action-bottom);
 }
 
-body:has(nav.translate-y-full) .mobile-chat-fab {
-  bottom: 1.5rem;
+body:has(nav.translate-y-full) .mobile-chat-fab,
+.floating-action-above-nav.nav-hidden {
+  bottom: var(--floating-action-bottom-hidden);
+}
+
+@media (min-width: 768px) {
+  .floating-action-above-nav {
+    bottom: 1.5rem;
+  }
 }
 
 .safe-area-bottom {
