@@ -9,6 +9,7 @@ import {
 	createChatConversation,
 	listChatConversations
 } from '$lib/server/chat/history.js';
+import { buildChatContext } from '$lib/server/chat/context-extract.js';
 import type { RequestHandler } from './$types.js';
 
 const THAILAND_OFFSET_MS = 7 * 60 * 60 * 1000;
@@ -68,20 +69,24 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 		if (safeSql.outOfScope) {
 			await appendChatExchange(locals.user.id, conversation.id, message, OUT_OF_SCOPE_REPLY);
-			return json({ reply: OUT_OF_SCOPE_REPLY, conversationId: conversation.id });
+			const rows: Record<string, unknown>[] = [];
+			const context = buildChatContext(safeSql.sql, rows);
+			return json({ reply: OUT_OF_SCOPE_REPLY, conversationId: conversation.id, context });
 		}
 
-		const rows = convertUtcTimestamps(await runReadOnlyQuery(safeSql.sql));
+		const rawRows = await runReadOnlyQuery(safeSql.sql);
+		const convertedRows = convertUtcTimestamps(rawRows);
+		const context = buildChatContext(safeSql.sql, rawRows as Record<string, unknown>[]);
 		const reply = await callMiniMax([
 			{
 				role: 'system',
 				content: 'Answer like a friendly series guide. Use the same language as the user. Do not mention SQL, database, rows, schemas, backend, models, or internal process.'
 			},
-			{ role: 'user', content: buildAnswerPrompt(message, rows) }
+			{ role: 'user', content: buildAnswerPrompt(message, convertedRows) }
 		]);
 
 		await appendChatExchange(locals.user.id, conversation.id, message, reply);
-		return json({ reply, conversationId: conversation.id });
+		return json({ reply, conversationId: conversation.id, context });
 	} catch (err) {
 		if (err instanceof MiniMaxConfigError || (err instanceof Error && err.message.includes('READONLY_DATABASE_URL'))) {
 			return json({ error: 'ยังไม่ได้ตั้งค่า AI chat ให้ครบถ้วน' }, { status: 500 });

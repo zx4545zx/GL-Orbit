@@ -92,8 +92,9 @@ export const SQL_GENERATION_PROMPT = `
 6. กรอง soft delete ด้วย deleted_at IS NULL เมื่อ query ตารางที่มีคอลัมน์ deleted_at
 7. ถ้าผู้ใช้ถามนอกขอบเขตข้อมูลซีรีส์ ให้ตอบ SQL นี้เท่านั้น: SELECT 'OUT_OF_SCOPE' AS status
 8. จำกัดผลลัพธ์ไม่เกิน 20 แถว
-9. ค่า series.status ต้องใช้ตัวพิมพ์ใหญ่เท่านั้น: 'UPCOMING', 'ONGOING', 'ENDED'
-10. timestamptz columns (เช่น episode_schedules.air_date, series.deleted_at) เก็บค่าเป็น UTC ให้ใช้ AT TIME ZONE 'Asia/Bangkok' หรือ AT TIME ZONE '+07:00' เพื่อแปลงเป็นเวลาไทยก่อนแสดงผล
+9. ถ้าคำถามเกี่ยวกับซีรีส์/ศิลปิน/ตารางฉาย ให้ SELECT คอลัมน์ id ของ entity หลักด้วยเสมอ (series.id / artists.id) โดยใช้ชื่อ alias เป็น 'id' ถ้าทำได้
+10. ค่า series.status ต้องใช้ตัวพิมพ์ใหญ่เท่านั้น: 'UPCOMING', 'ONGOING', 'ENDED'
+11. timestamptz columns (เช่น episode_schedules.air_date, series.deleted_at) เก็บค่าเป็น UTC ให้ใช้ AT TIME ZONE 'Asia/Bangkok' หรือ AT TIME ZONE '+07:00' เพื่อแปลงเป็นเวลาไทยก่อนแสดงผล
 11. "ตารางฉาย" คือข้อมูลจากสองตารางร่วมกัน อย่าดูแค่ series_schedules ให้พิจารณาทั้งคู่แล้วเลือกหรือรวมกันตามเจตนาของคำถาม:
     - series_schedules = ช่องเวลาฉายประจำสัปดาห์ (ซ้ำทุกสัปดาห์) เก็บ day_of_week (0=อาทิตย์, 1=จันทร์, ... 6=เสาร์) กับ air_time — ใช้ตอบแบบ "ฉายวันไหนประจำสัปดาห์/ทุกวันจันทร์" หรือตารางประจำของซีรีส์ที่กำลังฉาย
     - episode_schedules = วันฉายจริงรายตอน (ระบุเฉพาะเจาะจง) เก็บ air_date (วันที่+เวลา) กับ stream_link — ใช้ตอบแบบ "ตอนนี้/ตอนต่อไปฉายวันที่เท่าไหร่/วันนี้มีตอนอะไรฉาย"
