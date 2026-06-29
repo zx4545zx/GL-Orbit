@@ -35,12 +35,12 @@
 	});
 </script>
 
-<!-- Fixed inset shell เต็ม viewport โดยไม่ผูกกับ 100dvh ที่ iOS PWA อาจคืนค่าไม่ครบหลัง keyboard ปิด
+<!-- 100vh shell ใช้ layout viewport ที่นิ่งกว่า 100dvh/fixed inset บน iOS PWA หลัง keyboard ปิด
      header/shrink-0 + list/flex-1 scroll + composer/absolute overlay
      overflow-hidden ที่ shell → มีแค่ list ข้อความตัวเดียวที่เลื่อนได้ -->
 <div
 	data-chat-shell
-	class="fixed inset-0 flex w-full flex-col overflow-hidden bg-[#f7f7f8] pt-[var(--pwa-safe-top)] text-plum"
+	class="flex h-[100vh] w-full flex-col overflow-hidden bg-[#f7f7f8] pt-[var(--pwa-safe-top)] text-plum"
 >
 	{@render children()}
 </div>

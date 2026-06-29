@@ -13,9 +13,10 @@ describe('chat iOS keyboard gap regression', () => {
 		expect(layoutSource).not.toContain("body.style.height = '100%';");
 	});
 
-	it('uses a fixed inset shell instead of dynamic viewport height', () => {
-		expect(layoutSource).toContain('class="fixed inset-0 flex w-full flex-col overflow-hidden');
+	it('uses stable 100vh instead of dynamic viewport height', () => {
+		expect(layoutSource).toContain('class="flex h-[100vh] w-full flex-col overflow-hidden');
 		expect(layoutSource).not.toContain('h-[100dvh]');
+		expect(layoutSource).not.toContain('class="fixed inset-0');
 	});
 
 	it('does not manually scroll the document on textarea blur', () => {
