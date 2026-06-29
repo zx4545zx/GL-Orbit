@@ -45,6 +45,18 @@
 	let statusTimers: ReturnType<typeof setTimeout>[] = [];
 	let renamingId = $state<string | null>(null);
 	let renameTitle = $state('');
+	let messagesContainer = $state<HTMLDivElement | null>(null);
+
+	$effect(() => {
+		if (!messagesContainer) return;
+		// scroll to bottom whenever messages change (mount, send, receive)
+		const el = messagesContainer as HTMLDivElement;
+		const _messages = messages;
+		const raf = requestAnimationFrame(() => {
+			el.scrollTo({ top: el.scrollHeight, behavior: el.scrollHeight - el.clientHeight > 600 ? 'smooth' : 'instant' });
+		});
+		return () => cancelAnimationFrame(raf);
+	});
 	const currentUser = $derived(page.data.user);
 	const latestContext = $derived.by(() => {
 		for (let i = messages.length - 1; i >= 0; i -= 1) {
@@ -361,7 +373,7 @@
 			{/if}
 		</header>
 
-		<div class="flex-1 overflow-y-auto px-4 pt-6 pb-40 overscroll-y-contain sm:pb-44">
+		<div bind:this={messagesContainer} class="flex-1 overflow-y-auto px-4 pt-6 pb-40 overscroll-y-contain sm:pb-44">
 			<div class="mx-auto flex max-w-3xl flex-col gap-5">
 				{#if messages.length === 0}
 					<div class="flex min-h-[52dvh] flex-col items-center justify-center text-center">
