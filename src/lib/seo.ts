@@ -1,3 +1,5 @@
+import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
+
 export const SITE_NAME = 'GL-Orbit';
 export const SITE_LOCALE = 'th_TH';
 export const DEFAULT_SEO_TITLE = 'GL-Orbit | ตารางฉายซีรีส์ GL ครบทุกแพลตฟอร์ม ข้อมูลนักแสดง';
@@ -53,18 +55,41 @@ export function buildBreadcrumbJsonLd(origin: string, items: Array<{ name: strin
 	};
 }
 
-export function buildWebPageJsonLd(origin: string, path: string, name: string, description: string) {
+export function buildWebPageJsonLd(
+	origin: string,
+	path: string,
+	name: string,
+	description: string,
+	lang: AvailableLanguageTag = 'th'
+) {
 	return {
 		'@context': 'https://schema.org',
 		'@type': 'WebPage',
 		name,
 		description,
 		url: absoluteUrl(origin, path),
-		inLanguage: 'th-TH',
+		inLanguage: `${lang}-${lang.toUpperCase()}`,
 		isPartOf: {
 			'@type': 'WebSite',
 			name: SITE_NAME,
 			url: absoluteUrl(origin, '/')
 		}
 	};
+}
+
+// i18n helpers
+export function siteLocale(lang: AvailableLanguageTag): string {
+	return lang === 'en' ? 'en_US' : 'th_TH';
+}
+
+export function defaultSeoTitle(lang: AvailableLanguageTag): string {
+	return lang === 'en'
+		? 'GL-Orbit | GL Series Schedule, Cast & Streaming Platforms'
+		: DEFAULT_SEO_TITLE;
+}
+
+export function defaultSeoDescription(lang: AvailableLanguageTag): string {
+	return lang === 'en'
+		? 'Your hub for Girls\' Love series schedules, cast info, airing times, and streaming platforms for GL fans worldwide.'
+		: DEFAULT_SEO_DESCRIPTION;
 }
