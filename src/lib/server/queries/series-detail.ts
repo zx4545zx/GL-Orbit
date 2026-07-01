@@ -57,6 +57,8 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 				titleEn: series.titleEn,
 				titleTh: series.titleTh,
 				posterUrl: series.posterUrl,
+				descriptionTh: series.descriptionTh,
+				descriptionEn: series.descriptionEn,
 				status: series.status,
 				studioId: series.studioId,
 				studioName: studios.name
@@ -174,7 +176,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		status: seriesResult.status as SeriesDetail['status'],
 		studio: seriesResult.studioName ?? 'ไม่ระบุสตูดิโอ',
 		poster: seriesResult.posterUrl ?? '/placeholders/poster.svg',
-		description: '',
+		description: seriesResult.descriptionTh ?? seriesResult.descriptionEn ?? '',
 		genres: genresResult.map((g) => g.name),
 		episodes: episodesResult.length,
 		year: firstAirDate,
