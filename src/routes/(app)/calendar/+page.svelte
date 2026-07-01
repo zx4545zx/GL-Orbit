@@ -286,6 +286,56 @@
 	</div>
 {/snippet}
 
+{#snippet monthHeader()}
+	<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-5 mb-4 sm:mb-6">
+		<div class="flex items-center gap-3">
+			<button
+				aria-label="เดือนก่อนหน้า"
+				onclick={prevMonth}
+				class="w-11 h-11 rounded-2xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:-translate-x-0.5 touch-target flex-shrink-0"
+			>
+				<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+			</button>
+
+			<div class="flex-1 min-w-0 text-center">
+				<div class="text-[11px] sm:text-xs font-bold text-coral-dark uppercase tracking-wide mb-0.5">
+					{viewMode === 'grid' ? 'ตารางเดือน' : 'ปฏิทินเดือน'}
+				</div>
+				<h2 class="font-[family-name:var(--font-display)] text-base sm:text-2xl md:text-3xl font-bold text-plum truncate">
+					<span class="sm:hidden">{thaiMonthsShort[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
+					<span class="hidden sm:inline">{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
+				</h2>
+			</div>
+
+			<div class="flex items-center gap-2 flex-shrink-0">
+				<button
+					onclick={goToToday}
+					aria-label="เดือนนี้"
+					class="hidden sm:inline-flex h-11 px-5 rounded-2xl items-center justify-center bg-gradient-to-r from-coral to-coral-dark text-white text-sm font-bold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
+				>
+					เดือนนี้
+				</button>
+				<button
+					onclick={goToToday}
+					aria-label="เดือนนี้"
+					class="sm:hidden w-11 h-11 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white flex items-center justify-center shadow-lg shadow-coral/25 touch-target"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+					</svg>
+				</button>
+				<button
+					aria-label="เดือนถัดไป"
+					onclick={nextMonth}
+					class="w-11 h-11 rounded-2xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:translate-x-0.5 touch-target"
+				>
+					<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+				</button>
+			</div>
+		</div>
+	</div>
+{/snippet}
+
 <div class="py-6 sm:py-8 max-w-6xl mx-auto">
 	<!-- Today / This Week Hero -->
 	<section class="relative overflow-hidden glass-card rounded-3xl p-5 sm:p-8 mb-5 sm:mb-7">
@@ -345,45 +395,8 @@
 
 	<!-- Grid View -->
 	{#if viewMode === 'grid'}
+		{@render monthHeader()}
 		<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
-			<!-- Controls (always visible, independent of contentLoading) -->
-			<div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-lavender/20">
-				<div class="flex flex-wrap items-center justify-center gap-2 md:flex-nowrap md:justify-between">
-					<button
-						aria-label="เดือนก่อนหน้า"
-						onclick={prevMonth}
-						class="order-2 md:order-1 w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-					>
-						<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-					</button>
-					<h2 class="w-full text-center order-1 md:w-auto md:order-2 font-[family-name:var(--font-display)] text-base sm:text-2xl md:text-3xl font-bold text-plum">
-						<span class="sm:hidden">{thaiMonthsShort[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
-						<span class="hidden sm:inline">{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
-					</h2>
-					<div class="flex items-center gap-2 order-2 md:order-3">
-						<button
-							onclick={goToToday}
-							aria-label="วันนี้"
-							class="w-9 h-9 sm:h-10 sm:w-auto sm:px-5 rounded-xl flex items-center justify-center bg-gradient-to-r from-coral to-coral-dark text-white text-xs sm:text-sm font-bold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:scale-110 transition-all touch-target"
-						>
-							<span class="sm:hidden">
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-								</svg>
-							</span>
-							<span class="hidden sm:inline">วันนี้</span>
-						</button>
-						<button
-							aria-label="เดือนถัดไป"
-							onclick={nextMonth}
-							class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-						>
-							<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-						</button>
-					</div>
-				</div>
-			</div>
-
 			{#if contentLoading}
 				<div class="grid-loading-skeleton p-4 sm:p-6">
 					<div class="overflow-x-auto">
@@ -513,45 +526,10 @@
 		</div>
 
 	{:else if viewMode === 'calendar'}
+		{@render monthHeader()}
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 			<div class="lg:col-span-2">
 				<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
-					<!-- Controls (always visible, independent of contentLoading) -->
-					<div class="flex flex-wrap items-center justify-center gap-2 md:flex-nowrap md:justify-between mb-4 sm:mb-6">
-						<button
-							aria-label="เดือนก่อนหน้า"
-							onclick={prevMonth}
-							class="order-2 md:order-1 w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-						>
-							<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-						</button>
-						<h2 class="w-full text-center order-1 md:w-auto md:order-2 font-[family-name:var(--font-display)] text-base sm:text-2xl md:text-3xl font-bold text-plum">
-							<span class="sm:hidden">{thaiMonthsShort[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
-							<span class="hidden sm:inline">{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
-						</h2>
-						<div class="flex items-center gap-2 order-2 md:order-3">
-							<button
-								onclick={goToToday}
-								aria-label="วันนี้"
-								class="w-9 h-9 sm:h-10 sm:w-auto sm:px-5 rounded-xl flex items-center justify-center bg-gradient-to-r from-coral to-coral-dark text-white text-xs sm:text-sm font-bold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:scale-110 transition-all touch-target"
-							>
-								<span class="sm:hidden">
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-									</svg>
-								</span>
-								<span class="hidden sm:inline">วันนี้</span>
-							</button>
-							<button
-								aria-label="เดือนถัดไป"
-								onclick={nextMonth}
-								class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-							>
-								<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-							</button>
-						</div>
-					</div>
-
 					{#if contentLoading}
 						<div class="calendar-loading-skeleton">
 							<div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
