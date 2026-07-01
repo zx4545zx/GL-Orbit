@@ -75,6 +75,8 @@ export const series = pgTable('series', {
 	studioId: uuid('studio_id').references(() => studios.id),
 	titleTh: varchar('title_th', { length: 255 }),
 	titleEn: varchar('title_en', { length: 255 }).notNull(),
+	descriptionTh: text('description_th'),
+	descriptionEn: text('description_en'),
 	posterUrl: text('poster_url'),
 	status: seriesStatusEnum('status').notNull().default('UPCOMING'),
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
