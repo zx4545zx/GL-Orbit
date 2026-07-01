@@ -19,6 +19,8 @@
 	// local form state (init from props)
 	let titleEn = $state(series.titleEn);
 	let titleTh = $state(series.titleTh ?? '');
+	let descriptionTh = $state(series.descriptionTh ?? '');
+	let descriptionEn = $state(series.descriptionEn ?? '');
 	let posterUrl = $state(series.posterUrl ?? '');
 	let status = $state<SeriesStatus>(series.status);
 	let studioId = $state(series.studioId ?? '');
@@ -41,6 +43,8 @@
 		const res = await editorApi.updateSeries(series.id, {
 			titleEn: titleEn.trim(),
 			titleTh: titleTh.trim() || null,
+			descriptionTh: descriptionTh.trim() || null,
+			descriptionEn: descriptionEn.trim() || null,
 			posterUrl: posterUrl.trim() || null,
 			status,
 			studioId: studioId || null,
@@ -128,6 +132,29 @@
 			<div>
 				<label for="title-th" class="block text-sm font-medium text-plum mb-1.5">ชื่อซีรีส์ (TH)</label>
 				<input id="title-th" type="text" bind:value={titleTh} class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+			</div>
+		</div>
+
+		<div class="space-y-4">
+			<div>
+				<label for="description-th" class="block text-sm font-medium text-plum mb-1.5">เนื้อเรื่องย่อ (ไทย)</label>
+				<textarea
+					id="description-th"
+					bind:value={descriptionTh}
+					rows="4"
+					placeholder="พิมพ์เนื้อเรื่องย่อภาษาไทย"
+					class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base resize-y"
+				></textarea>
+			</div>
+			<div>
+				<label for="description-en" class="block text-sm font-medium text-plum mb-1.5">Synopsis (English)</label>
+				<textarea
+					id="description-en"
+					bind:value={descriptionEn}
+					rows="4"
+					placeholder="Type English synopsis"
+					class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base resize-y"
+				></textarea>
 			</div>
 		</div>
 	</div>
