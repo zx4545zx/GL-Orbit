@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { navigating, page } from '$app/state';
 	import NotificationBadge from './NotificationBadge.svelte';
+	import LanguageSwitcher from './LanguageSwitcher.svelte';
 
 	let { bottomNavHidden = false }: { bottomNavHidden?: boolean } = $props();
 
@@ -37,7 +38,7 @@
 	});
 
 	const homeItem = {
-		href: '/',
+		href: `/${page.data.lang}/`,
 		label: 'หน้าแรก',
 		icon: (active: boolean) => `
 			<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
@@ -48,7 +49,7 @@
 
 	const secondaryItems = [
 		{
-			href: '/calendar',
+			href: `/${page.data.lang}/calendar`,
 			label: 'ตารางฉาย',
 			icon: (active: boolean) => `
 				<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
@@ -57,7 +58,7 @@
 				`
 			},
 			{
-				href: '/explore/series',
+				href: `/${page.data.lang}/explore/series`,
 				label: 'สำรวจ',
 				icon: (active: boolean) => `
 					<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
@@ -70,7 +71,7 @@
 	const authItem = $derived(
 		currentUser
 			? {
-					href: '/profile',
+					href: `/${page.data.lang}/profile`,
 					label: 'โปรไฟล์',
 					icon: (active: boolean) => `
 						<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
@@ -79,7 +80,7 @@
 					`
 				}
 			: {
-					href: '/login',
+					href: `/${page.data.lang}/login`,
 					label: 'เข้าสู่ระบบ',
 					icon: (active: boolean) => `
 						<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
@@ -92,7 +93,7 @@
 	const notificationItem = $derived(
 		currentUser
 			? {
-					href: '/notifications',
+					href: `/${page.data.lang}/notifications`,
 					label: 'แจ้งเตือน',
 					icon: (active: boolean) => `
 						<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
@@ -115,12 +116,13 @@
 	const activePathname = $derived(navigating.to?.url.pathname ?? page.url.pathname);
 
 	function isActive(href: string) {
-		if (href === '/') {
-			return activePathname === '/';
+		const langPrefix = `/${page.data.lang}`;
+		if (href === `${langPrefix}/`) {
+			return activePathname === `${langPrefix}/`;
 		}
-		// "สำรวจ" ครอบทั้ง /explore/series และ /explore/artists
-		if (href.startsWith('/explore')) {
-			return activePathname.startsWith('/explore');
+		// "สำรวจ" ครอบทั้ง /th/explore/series และ /th/explore/artists
+		if (href.startsWith(`${langPrefix}/explore`)) {
+			return activePathname.startsWith(`${langPrefix}/explore`);
 		}
 		return activePathname.startsWith(href);
 	}
@@ -131,6 +133,7 @@
 >
 	<div class="bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(196,181,253,0.3)] overflow-hidden border-t border-lavender/15 safe-area-bottom">
 		<div class="flex items-center justify-around px-2">
+			<LanguageSwitcher className="hidden" />
 			{#each navItems as item}
 				{@const active = isActive(item.href)}
 				<a
@@ -147,7 +150,7 @@
 						{/if}
 						<div class="relative">
 							{@html item.icon(active)}
-							{#if item.href === '/notifications'}
+							{#if item.href === `/${page.data.lang}/notifications`}
 								<NotificationBadge count={unreadCount} />
 							{/if}
 						</div>

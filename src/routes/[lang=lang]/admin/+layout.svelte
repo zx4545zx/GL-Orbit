@@ -7,29 +7,31 @@
 	let mobileOpen = $state(false);
 
 	type NavItem = { href: string; label: string; hint?: string; icon: string };
-	const navSections: { title: string; items: NavItem[] }[] = [
+	const navSections: { title: string; items: NavItem[] }[] = $derived([
 		{
 			title: 'จัดการซีรีส์',
 			items: [
-				{ href: '/admin/series', label: 'ซีรีส์', hint: 'จัดการครบในที่เดียว', icon: 'M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z' }
+				{ href: `/${page.data.lang}/admin/series`, label: 'ซีรีส์', hint: 'จัดการครบในที่เดียว', icon: 'M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z' }
 			]
 		},
 		{
 			title: 'ข้อมูลพื้นฐาน',
 			items: [
-				{ href: '/admin/artists', label: 'นักแสดง', hint: 'ข้อมูล + โซเชียล', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-				{ href: '/admin/studios', label: 'สตูดิโอ', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5' },
-				{ href: '/admin/platforms', label: 'แพลตฟอร์ม', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
-				{ href: '/admin/genres', label: 'ประเภทซีรีส์', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' }
+				{ href: `/${page.data.lang}/admin/artists`, label: 'นักแสดง', hint: 'ข้อมูล + โซเชียล', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+				{ href: `/${page.data.lang}/admin/studios`, label: 'สตูดิโอ', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5' },
+				{ href: `/${page.data.lang}/admin/platforms`, label: 'แพลตฟอร์ม', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
+				{ href: `/${page.data.lang}/admin/genres`, label: 'ประเภทซีรีส์', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' }
 			]
 		}
-	];
+	]);
 
 	// active เมื่อ path ตรง หรืออยู่ใต้ path นั้น (เช่น /admin/series/[id])
 	function isActive(href: string) {
 		const p = page.url.pathname;
 		return p === href || p.startsWith(href + '/');
 	}
+
+	const adminHome = $derived(`/${page.data.lang}/admin/series`);
 
 	function closeMobile() {
 		mobileOpen = false;
@@ -45,7 +47,7 @@
 	<!-- Desktop Sidebar -->
 	<aside class="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-30">
 		<div class="h-16 flex items-center px-6 border-b border-gray-100">
-			<a href="/{page.data.lang}/admin/series" class="text-lg font-bold text-plum tracking-tight">GL-Orbit</a>
+			<a href={adminHome} class="text-lg font-bold text-plum tracking-tight">GL-Orbit</a>
 			<span class="ml-2 px-2 py-0.5 rounded-md bg-coral/10 text-coral-dark text-xs font-semibold">Admin</span>
 		</div>
 
