@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';
 	let { seriesId, className = '' }: { seriesId: string; className?: string } = $props();
@@ -66,7 +67,7 @@
 <button
 	onclick={handleToggle}
 	disabled={isLoading}
-	aria-label={isLoading ? 'กำลังโหลด' : favorited ? 'เลิก Favorite' : 'เพิ่ม Favorite'}
+	aria-label={isLoading ? m.favorite_loading_aria() : favorited ? m.favorite_unmark_aria() : m.favorite_mark_aria()}
 	aria-pressed={isLoading ? undefined : favorited}
 	class="group relative isolate inline-flex min-h-[3.35rem] items-center gap-3 overflow-hidden rounded-2xl px-3 py-3 text-left text-sm transition-all duration-300 touch-target active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:pointer-events-none {isLoading ? 'border border-plum/5 bg-white/35 text-plum-light/45 shadow-inner cursor-wait' : favorited ? 'border border-coral/30 bg-coral/10 text-coral-dark shadow-lg shadow-coral/15 hover:-translate-y-0.5' : 'border border-white/70 bg-white/60 text-plum hover:-translate-y-0.5 hover:-rotate-[0.35deg] hover:border-coral/25 hover:bg-coral/5 hover:shadow-lg hover:shadow-coral/10'} {className}"
 >
@@ -87,6 +88,6 @@
 
 	<span class="min-w-0 leading-none">
 		<span class="block text-[10px] font-bold uppercase tracking-[0.22em] opacity-55">FAV</span>
-		<span class="mt-1 block truncate text-xs font-bold sm:text-sm">{isLoading ? 'กำลังเช็ก' : favorited ? 'อยู่ในลิสต์' : 'เก็บเข้าลิสต์'}</span>
+		<span class="mt-1 block truncate text-xs font-bold sm:text-sm">{isLoading ? m.favorite_loading_label() : favorited ? m.favorite_favorited_label() : m.favorite_unfavorited_label()}</span>
 	</span>
 </button>

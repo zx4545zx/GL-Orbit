@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 	import type { SeriesListItem } from '$lib/server/series/listing.js';
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
-		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
-		UPCOMING: { text: 'เร็วๆ นี้', class: 'bg-lavender/20 text-lavender-dark' },
-		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
+		ONGOING: { text: m.status_ongoing(), class: 'bg-mint/20 text-mint-dark' },
+		UPCOMING: { text: m.status_upcoming(), class: 'bg-lavender/20 text-lavender-dark' },
+		ENDED: { text: m.status_ended(), class: 'bg-coral/10 text-coral-dark' }
 	};
 
 	let { item, href = `/series/${item.id}` }: { item: SeriesListItem; href?: string } = $props();

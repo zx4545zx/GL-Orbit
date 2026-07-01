@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
 
-	const ABOUT_SEO_TITLE = 'เกี่ยวกับ GL-Orbit | คู่มือติดตามซีรีส์ GL สำหรับแฟนคลับ';
+	const ABOUT_SEO_TITLE = m.about_hero_title();
 	const ABOUT_SEO_DESCRIPTION = 'รู้จัก GL-Orbit ศูนย์รวมตารางฉายซีรีส์ Girls\' Love ข้อมูลนักแสดง แพลตฟอร์มรับชม เวอร์ชัน Uncut และคำแนะนำสำหรับแฟนคลับ GL';
 
 	const homepageGuideCards = [
@@ -118,7 +119,7 @@
 
 	const aiAnswerBlocks = [
 		{
-			question: 'GL-Orbit คืออะไร?',
+			question: '{m.about_guide_title()}?',
 			answer:
 				'GL-Orbit คือเว็บศูนย์กลางสำหรับแฟนซีรีส์ Girls\' Love ที่รวมตารางฉาย ข้อมูลซีรีส์ นักแสดง สตูดิโอ แพลตฟอร์มรับชม และสถานะ Uncut ไว้ในที่เดียว เพื่อช่วยให้ผู้ชมติดตามตอนใหม่และค้นพบซีรีส์ GL เรื่องถัดไปได้ง่ายขึ้น'
 		},
@@ -236,15 +237,15 @@
 			}))
 		},
 		buildBreadcrumbJsonLd(page.url.origin, [
-			{ name: 'หน้าแรก', path: '/' },
-			{ name: 'เกี่ยวกับ GL-Orbit', path: '/about' }
+			{ name: m.about_breadcrumb_home(), path: '/' },
+			{ name: m.about_breadcrumb_about(), path: '/about' }
 		])
 	]));
 </script>
 
 <svelte:head>
-	<title>{ABOUT_SEO_TITLE}</title>
-	<meta name="description" content={ABOUT_SEO_DESCRIPTION} />
+	<title>{m.about_hero_title()}</title>
+	<meta name="description" content={m.about_hero_subtitle()} />
 	<meta name="robots" content="index, follow" />
 	<link rel="canonical" href={canonicalUrl} />
 	<meta property="og:type" content="website" />
@@ -269,16 +270,16 @@
 	<div class="relative mx-auto max-w-4xl text-center">
 		<div class="inline-flex items-center gap-2 rounded-full border border-lavender/20 bg-white/65 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-coral-dark backdrop-blur-md">
 			<span class="h-2 w-2 rounded-full bg-coral"></span>
-			About GL-Orbit
+			{m.about_hero_badge()}
 		</div>
 		<h1 class="mt-6 font-[family-name:var(--font-display)] text-4xl font-bold leading-tight text-plum sm:text-6xl">
-			คู่มือติดตาม<span class="text-gradient">ซีรีส์ GL</span>
+			{m.about_hero_title()}
 		</h1>
 		<p class="mx-auto mt-5 max-w-2xl text-base leading-8 text-plum-light sm:text-lg">
-			รู้จักแนวคิดของ GL-Orbit วิธีใช้ตารางฉาย ข้อมูล Girls' Love series แพลตฟอร์มรับชม และคำถามที่แฟนคลับ GL มักอยากรู้ก่อนเริ่มติดตามเรื่องใหม่
+			{m.about_hero_subtitle()}
 		</p>
 		<p class="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-plum-light/70">
-			อัปเดตล่าสุด: {LAST_UPDATED_LABEL}
+			{m.about_last_updated({ date: LAST_UPDATED_LABEL })}
 		</p>
 		<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
 			<a href="/{page.data.lang}/calendar" class="touch-target inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-coral to-coral-dark px-6 py-3 font-semibold text-white shadow-xl shadow-coral/20 transition hover:scale-105">
@@ -297,13 +298,13 @@
 		<div class="mb-7 max-w-2xl">
 			<div class="inline-flex items-center gap-2 rounded-full bg-coral/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">
 				<span class="h-2 w-2 rounded-full bg-coral"></span>
-				AI Search Answers
+				{m.about_ai_section_badge()}
 			</div>
 			<h2 class="mt-4 font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">
-				คำตอบสั้นที่ AI ดึงไปอ้างอิงได้ง่าย
+				{m.about_ai_section_title()}
 			</h2>
 			<p class="mt-3 text-sm leading-7 text-plum-light sm:text-base">
-				สรุปประเด็นสำคัญเกี่ยวกับ GL-Orbit ในรูปแบบคำถาม-คำตอบที่อ่านเข้าใจได้ทันที เหมาะกับทั้งผู้ใช้ใหม่และระบบค้นหาที่ต้องการคำตอบแบบ self-contained
+				{m.about_ai_section_desc()}
 			</p>
 		</div>
 		<div class="grid gap-4 md:grid-cols-2">
@@ -328,8 +329,8 @@
 
 		<!-- §01 — Lede: what is GL-Orbit -->
 		<header class="edi-head">
-			<span class="edi-eyebrow"><span class="edi-dot bg-coral"></span>§ 01 · Guide</span>
-			<h2 class="edi-title">GL-Orbit คืออะไร</h2>
+			<span class="edi-eyebrow"><span class="edi-dot bg-coral"></span>§ 01 · {m.about_guide_badge()}</span>
+			<h2 class="edi-title">{m.about_guide_title()}</h2>
 		</header>
 		<div class="edi-lede">
 			<p class="edi-prose dropcap">
@@ -362,8 +363,8 @@
 
 		<!-- §02 — How to use (stepper) -->
 		<header class="edi-head edi-spacer">
-			<span class="edi-eyebrow"><span class="edi-dot bg-lavender-dark"></span>§ 02 · How to use</span>
-			<h2 class="edi-title">เริ่มใช้งาน<span class="text-coral">อย่างไร</span></h2>
+			<span class="edi-eyebrow"><span class="edi-dot bg-lavender-dark"></span>§ 02 · {m.about_howto_badge()}</span>
+			<h2 class="edi-title">{m.about_howto_title()}</h2>
 		</header>
 		<ol class="edi-steps">
 			{#each howToSteps as step, i}
@@ -379,11 +380,11 @@
 
 		<!-- §03 — GL 101 (numbered entries) -->
 		<header class="edi-head edi-spacer">
-			<span class="edi-eyebrow"><span class="edi-dot bg-mint"></span>§ 03 · GL 101</span>
-			<h2 class="edi-title">ทำความรู้จัก<span class="text-coral">ซีรีส์ GL</span></h2>
+			<span class="edi-eyebrow"><span class="edi-dot bg-mint"></span>§ 03 · {m.about_gl101_badge()}</span>
+			<h2 class="edi-title">{m.about_gl101_title()}</h2>
 		</header>
 		<p class="edi-lead">
-			สำหรับผู้ชมใหม่และแฟนคลับที่อยากเข้าใจจักรวาลซีรีส์ Girls' Love ให้ลึกซึ้งยิ่งขึ้น GL-Orbit สรุปประเด็นสำคัญที่ช่วยให้เริ่มต้นติดตามซีรีส์ GL ได้ง่ายและไม่พลาดบริบทของแต่ละเรื่อง
+			{m.about_lead()}
 		</p>
 		<div class="edi-know">
 			{#each glKnowledgeCards as card, i}
@@ -397,8 +398,8 @@
 
 		<!-- §04 — Where to watch (directory list) -->
 		<header class="edi-head edi-spacer">
-			<span class="edi-eyebrow"><span class="edi-dot bg-coral"></span>§ 04 · Streaming</span>
-			<h2 class="edi-title">รับชมได้<span class="text-coral">ที่ไหน</span></h2>
+			<span class="edi-eyebrow"><span class="edi-dot bg-coral"></span>§ 04 · {m.about_streaming_badge()}</span>
+			<h2 class="edi-title">{m.about_streaming_title()}</h2>
 		</header>
 		<ul class="edi-dir">
 			{#each platformCards as card}
@@ -411,8 +412,8 @@
 
 		<!-- §05 — FAQ (Q&A editorial) -->
 		<header class="edi-head edi-spacer">
-			<span class="edi-eyebrow"><span class="edi-dot bg-lavender-dark"></span>§ 05 · FAQ</span>
-			<h2 class="edi-title">คำถามที่พบบ่อย</h2>
+			<span class="edi-eyebrow"><span class="edi-dot bg-lavender-dark"></span>§ 05 · {m.about_faq_badge()}</span>
+			<h2 class="edi-title">{m.about_faq_title()}</h2>
 		</header>
 		<div class="edi-faq">
 			{#each homepageFaqs as faq}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';
 	import { localizedHref } from '$lib/i18n/link.js';	import { goto, invalidateAll } from '$app/navigation';
@@ -88,7 +89,7 @@
 			if (res.status === 401) { goto(localizedHref('/login', page.data.lang)); return; }
 			if (!res.ok) {
 				const data = await res.json() as ApiErrorResponse;
-				errorMessage = data.error || 'ไม่สามารถอัปเดตโปรไฟล์ได้';
+				errorMessage = data.error || m.profile_update_error();
 				return;
 			}
 			const data: ProfileUpdateResponse = await res.json();
@@ -96,7 +97,7 @@
 			successMessage = data.message;
 			await invalidateAll();
 		} catch {
-			errorMessage = 'ไม่สามารถอัปเดตโปรไฟล์ได้';
+			errorMessage = m.profile_update_error();
 		} finally {
 			isLoadingProfile = false;
 		}
@@ -117,7 +118,7 @@
 			if (res.status === 401) { goto(localizedHref('/login', page.data.lang)); return; }
 			if (!res.ok) {
 				const data = await res.json() as ApiErrorResponse;
-				errorMessage = data.error || 'ไม่สามารถเปลี่ยนรหัสผ่านได้';
+				errorMessage = data.error || m.profile_password_error();
 				return;
 			}
 			const data = await res.json() as { success: true; message: string };
@@ -126,7 +127,7 @@
 			newPassword = '';
 			confirmNewPassword = '';
 		} catch {
-			errorMessage = 'ไม่สามารถเปลี่ยนรหัสผ่านได้';
+			errorMessage = m.profile_password_error();
 		} finally {
 			isLoadingPassword = false;
 		}
@@ -134,8 +135,8 @@
 </script>
 
 <svelte:head>
-	<title>โปรไฟล์ของฉัน | GL-Orbit</title>
-	<meta name="description" content="จัดการโปรไฟล์ GL-Orbit ของคุณ — ดูรายการซีรีส์ที่ชอบและรับชม เปลี่ยนรหัสผ่าน และแก้ไขข้อมูลส่วนตัว" />
+	<title>{m.profile_seo_title()}</title>
+	<meta name="description" content={m.profile_seo_description()} />
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
@@ -155,7 +156,7 @@
 				<div class="absolute inset-0 bg-gradient-to-t from-plum/90 via-plum/10 to-transparent"></div>
 				<div class="absolute top-2.5 left-2.5">
 					<span class="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold backdrop-blur-md {s.status === 'ONGOING' ? 'bg-mint/25 text-mint-dark' : s.status === 'UPCOMING' ? 'bg-lavender/25 text-lavender-dark' : 'bg-coral/15 text-coral-dark'}">
-						{s.status === 'ONGOING' ? 'กำลังฉาย' : s.status === 'UPCOMING' ? 'เร็วๆ นี้' : 'จบแล้ว'}
+						{s.status === 'ONGOING' ? m.status_ongoing() : s.status === 'UPCOMING' ? m.status_upcoming() : m.status_ended()}
 					</span>
 				</div>
 				<div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
@@ -273,7 +274,7 @@
 								{profileUser.displayName || profileUser.username}
 							</h1>
 							{#if profileUser.role === 'ADMIN'}
-								<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-coral text-white shrink-0" title="ผู้ดูแลระบบ">
+								<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-coral text-white shrink-0" title={m.profile_admin_badge()}>
 									<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
 								</span>
 							{/if}

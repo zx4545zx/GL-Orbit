@@ -254,12 +254,12 @@ import { m } from '$lib/i18n/paraglide.js';
 							<span class="absolute inline-flex h-full w-full rounded-full bg-coral/40"></span>
 							<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-coral"></span>
 						</span>
-						<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">Live Countdown</span>
+						<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">{m.home_countdown_badge()}</span>
 					</div>
 					<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum">
 						<span>{m.home_countdown_title_plain()}</span><span class="text-coral">{m.home_countdown_title_accent()}</span>
 					</h2>
-					<p class="text-sm sm:text-base text-plum-light mt-1">นับถอยหลังสู่ตอนใหม่ · ภายใน 24 ชั่วโมง</p>
+					<p class="text-sm sm:text-base text-plum-light mt-1">{m.home_countdown_subtitle()}</p>
 				</div>
 				<a href="/{page.data.lang}/countdown" class="hidden sm:flex items-center gap-2 text-coral-dark font-medium hover:gap-3 transition-all text-sm touch-target">
 					{m.common_see_all()}
@@ -357,12 +357,12 @@ import { m } from '$lib/i18n/paraglide.js';
 			<div>
 				<div class="inline-flex items-center gap-2 mb-2">
 					<svg class="w-4 h-4 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-					<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">กำลังฉาย</span>
+					<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">{m.home_section_status_ongoing()}</span>
 				</div>
 				<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum mb-2">
 					<span>{m.home_featured_title_plain()}</span><span class="text-coral">{m.home_featured_title_accent()}</span>
 				</h2>
-				<p class="text-sm sm:text-base text-plum-light">ซีรีส์ GL ที่น่าติดตามในตอนนี้</p>
+				<p class="text-sm sm:text-base text-plum-light">{m.home_featured_subtitle()}</p>
 			</div>
 			<a href="/{page.data.lang}/series" class="flex items-center gap-2 text-coral-dark font-medium hover:gap-3 transition-all text-sm sm:text-base touch-target">
 				ดูทั้งหมด
@@ -444,12 +444,12 @@ import { m } from '$lib/i18n/paraglide.js';
 		<div class="text-center mb-8 sm:mb-12">
 			<div class="inline-flex items-center gap-2 mb-3">
 				<svg class="w-4 h-4 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-				<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">Upcoming</span>
+				<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">{m.home_schedule_badge()}</span>
 			</div>
 			<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum mb-2">
-				ตารางฉาย<span class="text-coral">เร็วๆ นี้</span>
+				{m.home_schedule_title_plain()}<span class="text-coral">{m.home_schedule_title_accent()}</span>
 			</h2>
-			<p class="text-sm sm:text-base text-plum-light">ไม่พลาดทุกตอนสำคัญ</p>
+			<p class="text-sm sm:text-base text-plum-light">{m.home_schedule_subtitle()}</p>
 		</div>
 
 		{#if loadingSchedule}

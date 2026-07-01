@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
 	import type { PageData } from './$types.js';
@@ -8,16 +9,16 @@
 	let { data }: { data: PageData } = $props();
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
-		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
-		UPCOMING: { text: 'เร็วๆ นี้', class: 'bg-lavender/20 text-lavender-dark' },
-		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
+		ONGOING: { text: m.status_ongoing(), class: 'bg-mint/20 text-mint-dark' },
+		UPCOMING: { text: m.status_upcoming(), class: 'bg-lavender/20 text-lavender-dark' },
+		ENDED: { text: m.status_ended(), class: 'bg-coral/10 text-coral-dark' }
 	};
 
 	const filterOptions: { key: SeriesStatusFilter; label: string }[] = [
-		{ key: 'ALL', label: 'ทั้งหมด' },
-		{ key: 'ONGOING', label: 'กำลังฉาย' },
-		{ key: 'UPCOMING', label: 'เร็วๆ นี้' },
-		{ key: 'ENDED', label: 'จบแล้ว' }
+		{ key: 'ALL', label: m.filter_all() },
+		{ key: 'ONGOING', label: m.status_ongoing() },
+		{ key: 'UPCOMING', label: m.status_upcoming() },
+		{ key: 'ENDED', label: m.status_ended() }
 	];
 
 	let extraSeries = $state<SeriesListItem[]>([]);
@@ -99,7 +100,7 @@
 			const result: { items: SeriesListItem[] } = await res.json();
 			extraSeries = [...extraSeries, ...result.items];
 		} catch {
-			loadMoreError = 'โหลดเพิ่มไม่สำเร็จ ลองอีกครั้ง';
+			loadMoreError = m.load_more_error();
 		} finally {
 			loadMoreLoading = false;
 		}
@@ -107,17 +108,17 @@
 </script>
 
 <svelte:head>
-	<title>สำรวจซีรีส์ GL | GL-Orbit</title>
-	<meta name="description" content="สำรวจซีรีส์ Girls' Love ทั้งหมด พร้อมตารางฉายและข้อมูลครบถ้วน" />
+	<title>{m.explore_series_seo_title()}</title>
+	<meta name="description" content={m.explore_series_seo_description()} />
 </svelte:head>
 
 <!-- Search + Filter -->
 <div class="flex flex-col gap-3 max-w-xl mx-auto mb-6 sm:mb-8">
 	<div class="glass-card-strong rounded-2xl flex items-center px-4 py-3 gap-3 transition-all duration-300 focus-within:ring-2 focus-within:ring-coral/30 focus-within:border-coral/30">
 		<svg class="w-5 h-5 text-plum-light flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
-		<input type="text" bind:value={searchQuery} oninput={scheduleSearchUpdate} placeholder="ค้นหาชื่อซีรีส์..." aria-label="ค้นหาซีรีส์" class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base" />
+		<input type="text" bind:value={searchQuery} oninput={scheduleSearchUpdate} placeholder={m.series_search_placeholder()} aria-label={m.series_search_label()} class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base" />
 		{#if searchQuery}
-			<button onclick={clearSearch} class="p-1 rounded-lg hover:bg-lavender/20 transition-colors flex-shrink-0" aria-label="ล้างการค้นหา"><svg class="w-4 h-4 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" /></svg></button>
+			<button onclick={clearSearch} class="p-1 rounded-lg hover:bg-lavender/20 transition-colors flex-shrink-0" aria-label={m.common_search_clear()}><svg class="w-4 h-4 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" /></svg></button>
 		{/if}
 	</div>
 
@@ -173,7 +174,7 @@
 		<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
 			<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
 		</div>
-		<h3 class="font-semibold text-plum mb-1">ไม่พบซีรีส์</h3>
+		<h3 class="font-semibold text-plum mb-1">{m.series_empty_title()}</h3>
 		<p class="text-sm text-plum-light">{#if searchQuery}ลองค้นหาด้วยคำอื่น หรือ <button onclick={clearSearch} class="text-coral-dark font-medium hover:underline">ล้างการค้นหา</button>{:else}ไม่พบซีรีส์ในหมวดหมู่นี้{/if}</p>
 	</div>
 {/if}

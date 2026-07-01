@@ -280,7 +280,7 @@ import { m } from '$lib/i18n/paraglide.js';
 					{/if}
 					<div class="rounded-2xl border border-mint/20 bg-gradient-to-br from-white/70 to-mint/10 p-3 text-center shadow-sm shadow-mint/10 sm:p-4">
 						<div class="text-2xl font-extrabold text-mint-dark sm:text-3xl">{series.artists.length}</div>
-						<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">นักแสดง</div>
+						<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">{m.common_cast()}</div>
 					</div>
 				</div>
 
