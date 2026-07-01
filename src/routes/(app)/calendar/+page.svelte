@@ -5,10 +5,12 @@
 	import type { PageData } from './$types.js';
 	import type { CalendarEvent, CalendarApiResponse } from '$lib/types/calendar.js';
 	import { getViewUrl } from './calendar.js';
+	import CalendarWeekHeader from './CalendarWeekHeader.svelte';
+	import CardScheduleBoard from './CardScheduleBoard.svelte';
 
 	let { data }: { data: PageData } = $props();
 
-	let viewMode = $state<'grid' | 'calendar' | 'list'>('grid');
+	let viewMode = $state<'grid' | 'calendar' | 'list' | 'card'>('grid');
 	let selectedDate = $state<string | null>(null);
 
 	const calendar = $derived<CalendarApiResponse>(data.calendar);
@@ -27,10 +29,10 @@
 			? new Date(params_sd)
 			: new Date()
 	);
-
 	// Calendar data from load function
 	const monthEvents = $derived(calendar.events);
 	const monthAllSeries = $derived(calendar.allSeries);
+	const monthSeriesPosters = $derived(calendar.seriesPosters);
 	const monthPlatforms = $derived(calendar.platforms);
 	const weekScheduleByDay = $derived(calendar.scheduleByDay);
 
@@ -38,6 +40,10 @@
 	const thaiMonths = [
 		'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
 		'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+	];
+	const thaiMonthsShort = [
+		'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+		'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
 	];
 
 	function formatDateLocal(date: Date): string {
@@ -93,22 +99,6 @@
 		const start = getStartOfWeek(today);
 		const end = getEndOfWeek(today);
 		goto(`/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
-	}
-
-	function getWeekRangeText(): string {
-		const start = getStartOfWeek(currentWeek);
-		const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
-		const startDay = start.getDate();
-		const endDay = end.getDate();
-		const startMonth = thaiMonths[start.getMonth()];
-		const endMonth = thaiMonths[end.getMonth()];
-		const year = start.getFullYear() + 543;
-
-		if (start.getMonth() === end.getMonth()) {
-			return `${startDay} - ${endDay} ${startMonth} ${year}`;
-		} else {
-			return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${year}`;
-		}
 	}
 
 	function isToday(fullDate: string) {
@@ -215,9 +205,10 @@
 	]));
 
 	const viewButtons = [
+		{ key: 'card' as const, label: 'การ์ด', short: 'การ์ด', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>' },
+		{ key: 'list' as const, label: 'รายการ', short: 'รายการ', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>' },
 		{ key: 'grid' as const, label: 'ตาราง', short: 'ตาราง', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>' },
-		{ key: 'calendar' as const, label: 'ปฏิทิน', short: 'ปฏิทิน', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
-		{ key: 'list' as const, label: 'รายการ', short: 'รายการ', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>' }
+		{ key: 'calendar' as const, label: 'ปฏิทิน', short: 'ปฏิทิน', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' }
 	];
 </script>
 
@@ -278,45 +269,54 @@
 	{#if viewMode === 'grid'}
 		<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
 			<!-- Controls (always visible, independent of contentLoading) -->
-			<div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-lavender/20">
-				<button
-					aria-label="เดือนก่อนหน้า"
-					onclick={prevMonth}
-					class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-				>
-					<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-				</button>
-				<div class="flex items-center gap-2 sm:gap-3">
-					<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
-						{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
-					</h2>
+			<div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-lavender/20">
+				<div class="flex flex-wrap items-center justify-center gap-2 md:flex-nowrap md:justify-between">
 					<button
-						onclick={goToToday}
-						class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
+						aria-label="เดือนก่อนหน้า"
+						onclick={prevMonth}
+						class="order-2 md:order-1 w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
 					>
-						วันนี้
+						<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
 					</button>
+					<h2 class="w-full text-center order-1 md:w-auto md:order-2 font-[family-name:var(--font-display)] text-base sm:text-2xl md:text-3xl font-bold text-plum">
+						<span class="sm:hidden">{thaiMonthsShort[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
+						<span class="hidden sm:inline">{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
+					</h2>
+					<div class="flex items-center gap-2 order-2 md:order-3">
+						<button
+							onclick={goToToday}
+							aria-label="วันนี้"
+							class="w-9 h-9 sm:h-10 sm:w-auto sm:px-5 rounded-xl flex items-center justify-center bg-gradient-to-r from-coral to-coral-dark text-white text-xs sm:text-sm font-bold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:scale-110 transition-all touch-target"
+						>
+							<span class="sm:hidden">
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+								</svg>
+							</span>
+							<span class="hidden sm:inline">วันนี้</span>
+						</button>
+						<button
+							aria-label="เดือนถัดไป"
+							onclick={nextMonth}
+							class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+						>
+							<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+						</button>
+					</div>
 				</div>
-				<button
-					aria-label="เดือนถัดไป"
-					onclick={nextMonth}
-					class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-				>
-					<svg class="w-4 h-4 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-				</button>
 			</div>
 
 			{#if contentLoading}
 				<div class="grid-loading-skeleton p-4 sm:p-6">
 					<div class="overflow-x-auto">
-						<table class="w-full min-w-[800px]">
+						<table class="w-full min-w-[640px]">
 							<thead>
 								<tr class="border-b border-lavender/10">
-									<th class="px-3 sm:px-4 py-3 text-left w-32 sm:w-40 border-r border-lavender/10">
+									<th class="px-2 sm:px-3 py-3 text-left w-28 sm:w-32 md:w-44 lg:w-52 border-r border-lavender/10">
 										<div class="h-4 w-16 bg-lavender/10 rounded animate-pulse"></div>
 									</th>
 									{#each Array(7) as _, i}
-										<th class="px-1 sm:px-2 py-3 text-center min-w-[36px] sm:min-w-[48px]">
+										<th class="px-1 sm:px-2 py-3 text-center min-w-[32px] sm:min-w-[44px]">
 											<div class="h-3 w-5 mx-auto bg-lavender/10 rounded animate-pulse mb-1"></div>
 											<div class="h-2 w-3 mx-auto bg-lavender/5 rounded animate-pulse"></div>
 										</th>
@@ -326,8 +326,12 @@
 							<tbody>
 								{#each Array(5) as _, row}
 									<tr class="border-b border-lavender/5 {row % 2 === 0 ? 'bg-white/20' : ''}">
-										<td class="px-3 sm:px-4 py-3 border-r border-lavender/10">
-											<div class="h-4 w-24 bg-lavender/10 rounded animate-pulse"></div>
+										<td class="px-2 sm:px-3 py-3 border-r border-lavender/10 w-28 sm:w-32 md:w-44 lg:w-52">
+											<div class="flex flex-col items-center gap-1.5 md:gap-2">
+												<div class="w-14 h-20 sm:w-16 sm:h-22 md:w-20 md:h-28 bg-lavender/10 rounded-lg animate-pulse"></div>
+												<div class="h-2.5 w-20 md:w-32 bg-lavender/10 rounded animate-pulse"></div>
+												<div class="h-2.5 w-14 md:w-24 bg-lavender/5 rounded animate-pulse"></div>
+											</div>
 										</td>
 										{#each Array(7) as _, col}
 											<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center">
@@ -346,17 +350,17 @@
 				</div>
 			{:else}
 				<div class="overflow-x-auto">
-					<table class="w-full min-w-[800px]">
+					<table class="w-full min-w-[640px]">
 						<thead>
 							<tr class="border-b border-lavender/10">
-								<th class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-plum-light w-32 sm:w-40 border-r border-lavender/10">
+								<th class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-semibold text-plum-light w-28 sm:w-32 md:w-44 lg:w-52 border-r border-lavender/10 align-top">
 									ซีรีส์
 								</th>
 								{#each monthDays as day}
 									{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
 									{@const isTodayDate = formatDateLocal(dateObj) === formatDateLocal(new Date())}
 									{@const dayOfWeek = dateObj.getDay()}
-									<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[36px] sm:min-w-[48px] {isTodayDate ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
+									<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[32px] sm:min-w-[44px] {isTodayDate ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
 										<div class="font-bold">{day}</div>
 										<div class="text-[8px] sm:text-[10px] opacity-70">
 											{#if dayOfWeek === 0}อา
@@ -375,8 +379,16 @@
 						<tbody>
 							{#each monthAllSeries as seriesName, seriesIndex}
 								<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
-									<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 border-r border-lavender/10">
-										<div class="font-semibold text-plum text-xs sm:text-sm truncate">{seriesName}</div>
+									<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-2 sm:px-3 py-2 sm:py-3 border-r border-lavender/10 align-top w-28 sm:w-32 md:w-44 lg:w-52">
+										<div class="flex flex-col items-center gap-1.5 md:gap-2">
+											<img
+												src={monthSeriesPosters[seriesName] ?? '/placeholders/poster.svg'}
+												alt=""
+												class="w-14 h-20 sm:w-16 sm:h-22 md:w-20 md:h-28 rounded-lg object-cover shadow-md flex-shrink-0 bg-white/50"
+												loading="lazy"
+											/>
+											<div class="font-semibold text-plum text-[10px] sm:text-xs md:text-sm leading-snug line-clamp-2 md:line-clamp-none text-center min-w-0" title={seriesName}>{seriesName}</div>
+										</div>
 									</td>
 									{#each monthDays as day}
 										{@const dayEvents = getEventsForSeriesAndDay(seriesName, day)}
@@ -427,32 +439,39 @@
 			<div class="lg:col-span-2">
 				<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
 					<!-- Controls (always visible, independent of contentLoading) -->
-					<div class="flex items-center justify-between mb-4 sm:mb-6">
+					<div class="flex flex-wrap items-center justify-center gap-2 md:flex-nowrap md:justify-between mb-4 sm:mb-6">
 						<button
 							aria-label="เดือนก่อนหน้า"
 							onclick={prevMonth}
-							class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+							class="order-2 md:order-1 w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
 						>
 							<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
 						</button>
-						<div class="flex items-center gap-2 sm:gap-3">
-							<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-2xl font-bold text-plum">
-								{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}
-							</h2>
+						<h2 class="w-full text-center order-1 md:w-auto md:order-2 font-[family-name:var(--font-display)] text-base sm:text-2xl md:text-3xl font-bold text-plum">
+							<span class="sm:hidden">{thaiMonthsShort[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
+							<span class="hidden sm:inline">{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
+						</h2>
+						<div class="flex items-center gap-2 order-2 md:order-3">
 							<button
 								onclick={goToToday}
-								class="px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
+								aria-label="วันนี้"
+								class="w-9 h-9 sm:h-10 sm:w-auto sm:px-5 rounded-xl flex items-center justify-center bg-gradient-to-r from-coral to-coral-dark text-white text-xs sm:text-sm font-bold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:scale-110 transition-all touch-target"
 							>
-								วันนี้
+								<span class="sm:hidden">
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+									</svg>
+								</span>
+								<span class="hidden sm:inline">วันนี้</span>
+							</button>
+							<button
+								aria-label="เดือนถัดไป"
+								onclick={nextMonth}
+								class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
+							>
+								<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
 							</button>
 						</div>
-						<button
-							aria-label="เดือนถัดไป"
-							onclick={nextMonth}
-							class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-						>
-							<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-						</button>
 					</div>
 
 					{#if contentLoading}
@@ -528,17 +547,31 @@
 						<div class="space-y-2 sm:space-y-3">
 							{#each selectedEvents as event}
 								<div class="glass-card-strong rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:shadow-lg transition-all">
-									<div class="flex items-center gap-2 mb-1.5 sm:mb-2">
-										<span class="px-2 py-0.5 rounded-lg bg-coral/10 text-coral-dark text-xs font-bold">{event.time}</span>
-										{#if event.isUncut}
-											<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-xs font-medium">Uncut</span>
-										{/if}
-									</div>
-									<h4 class="font-semibold text-plum text-sm mb-0.5 sm:mb-1">{event.series}</h4>
-									<div class="flex items-center gap-2 text-xs text-plum-light">
-										<span>{event.episode}</span>
-										<span>•</span>
-										<span>{event.platforms.join(', ')}</span>
+									<div class="flex gap-3 sm:gap-4">
+										<img
+											src={event.posterUrl}
+											alt="{event.series}"
+											class="w-14 h-20 sm:w-20 sm:h-28 rounded-lg sm:rounded-xl object-cover shadow-sm flex-shrink-0 bg-white/50"
+											loading="lazy"
+										/>
+										<div class="flex-1 min-w-0">
+											<div class="flex items-center gap-2 mb-1.5 sm:mb-2">
+												<span class="px-2 py-0.5 rounded-lg bg-coral/10 text-coral-dark text-xs font-bold">{event.time}</span>
+												{#if event.isUncut}
+													<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-xs font-medium">Uncut</span>
+												{/if}
+											</div>
+											<h4 class="font-semibold text-plum text-sm mb-0.5 sm:mb-1 truncate">{event.series}</h4>
+											<div class="flex items-center gap-2 text-xs text-plum-light">
+												<span class="truncate">{event.episode}</span>
+												<span class="flex-shrink-0">•</span>
+												<span class="truncate">{event.platforms.join(', ')}</span>
+											</div>
+											<a href="/series/{event.seriesId}" class="mt-2 sm:mt-3 inline-flex items-center gap-1 text-xs font-medium text-coral-dark hover:text-coral transition-colors">
+												ดูรายละเอียด
+												<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+											</a>
+										</div>
 									</div>
 								</div>
 							{/each}
@@ -563,38 +596,14 @@
 			</div>
 		</div>
 
-	{:else}
+	{:else if viewMode === 'list'}
 		<!-- List View -->
-		<!-- Controls (always visible, independent of contentLoading) -->
-		<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6">
-			<div class="flex items-center justify-between">
-				<button
-					aria-label="สัปดาห์ก่อนหน้า"
-					onclick={prevWeek}
-					class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-				>
-					<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-				</button>
-				<div class="flex items-center gap-2 sm:gap-3">
-					<h2 class="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-plum">
-						{getWeekRangeText()}
-					</h2>
-					<button
-						onclick={goToThisWeek}
-						class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium bg-coral/10 text-coral-dark hover:bg-coral/20 transition-colors"
-					>
-						สัปดาห์นี้
-					</button>
-				</div>
-				<button
-					aria-label="สัปดาห์ถัดไป"
-					onclick={nextWeek}
-					class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:scale-110 touch-target"
-				>
-					<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-				</button>
-			</div>
-		</div>
+		<CalendarWeekHeader
+			currentWeek={currentWeek}
+			onPrevWeek={prevWeek}
+			onNextWeek={nextWeek}
+			onThisWeek={goToThisWeek}
+		/>
 
 		{#if contentLoading}
 			<div class="list-loading-skeleton space-y-4 sm:space-y-6">
@@ -633,6 +642,12 @@
 						<div class="divide-y divide-lavender/10">
 							{#each day.items as item}
 								<div class="px-4 sm:px-6 py-4 sm:py-5 flex items-center gap-3 sm:gap-5 hover:bg-white/40 transition-colors group">
+									<img
+										src={item.posterUrl}
+										alt="{item.series}"
+										class="w-10 h-14 sm:w-12 sm:h-16 rounded-lg object-cover shadow-sm flex-shrink-0 bg-white/50"
+										loading="lazy"
+									/>
 									<div class="flex-shrink-0 w-12 sm:w-16 text-center">
 										<div class="text-base sm:text-lg font-bold text-coral-dark">{item.time}</div>
 									</div>
@@ -664,6 +679,29 @@
 					</div>
 				{/each}
 			</div>
+		{/if}
+	{:else if viewMode === 'card'}
+		<!-- Card View -->
+		<CalendarWeekHeader
+			currentWeek={currentWeek}
+			onPrevWeek={prevWeek}
+			onNextWeek={nextWeek}
+			onThisWeek={goToThisWeek}
+		/>
+
+		{#if contentLoading}
+			<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+				{#each Array(7) as _, i}
+					<div class="glass-card rounded-2xl p-3 space-y-3 animate-pulse">
+						<div class="h-4 w-16 bg-lavender/10 rounded mx-auto"></div>
+						<div class="aspect-[2/3] bg-lavender/10 rounded-lg"></div>
+						<div class="h-3 w-full bg-lavender/10 rounded"></div>
+						<div class="h-3 w-2/3 bg-lavender/5 rounded"></div>
+					</div>
+				{/each}
+			</div>
+		{:else}
+			<CardScheduleBoard scheduleByDay={weekScheduleByDay} weekStart={getStartOfWeek(currentWeek)} />
 		{/if}
 	{/if}
 

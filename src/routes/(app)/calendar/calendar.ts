@@ -71,7 +71,7 @@ export function getEndOfWeek(date: Date): Date {
  *   calculating the current week if no week params exist.
  */
 export function getViewUrl(
-	view: 'grid' | 'calendar' | 'list',
+	view: 'grid' | 'calendar' | 'list' | 'card',
 	currentYear: number | undefined,
 	currentMonth: number | undefined,
 	currentStartDate: string | null,
@@ -83,8 +83,10 @@ export function getViewUrl(
 		return `/calendar?year=${y}&month=${m}`;
 	}
 
-	if (currentStartDate && currentEndDate) {
-		return `/calendar?startDate=${currentStartDate}&endDate=${currentEndDate}`;
+	if (view === 'list' || view === 'card') {
+		if (currentStartDate && currentEndDate) {
+			return `/calendar?startDate=${currentStartDate}&endDate=${currentEndDate}`;
+		}
 	}
 	const today = new Date();
 	const start = getStartOfWeek(today);

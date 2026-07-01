@@ -5,6 +5,7 @@ import { getCached, setCached } from '$lib/server/cache.js';
 import { formatThailandDate, formatThailandTime, getThailandDayOfWeek } from '$lib/server/timezone.js';
 import type { CalendarApiResponse } from '$lib/types/calendar.js';
 
+const DEFAULT_POSTER = '/placeholders/poster.svg';
 const CACHE_TTL = 30_000;
 
 export type CalendarQuery =
@@ -144,6 +145,7 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 			seriesId: series.id,
 			seriesTitleEn: series.titleEn,
 			seriesTitleTh: series.titleTh,
+			seriesPosterUrl: series.posterUrl,
 			platformName: platforms.name
 		})
 		.from(episodeSchedules)
@@ -157,18 +159,20 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 		time: string;
 		series: string;
 		seriesId: string;
+		posterUrl: string;
 		episode: string;
 		platforms: string[];
 		isUncut: boolean;
 	}>> = {};
 
-	const allSeriesSet = new Set<string>();
+	const allSeriesMap = new Map<string, string>();
 	const platformSet = new Set<string>();
 
 	const eventsMap = new Map<string, {
 		time: string;
 		series: string;
 		seriesId: string;
+		posterUrl: string;
 		episodes: string[];
 		platforms: string[];
 		isUncut: boolean;
@@ -184,6 +188,7 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 				time: timeStr,
 				series: s.seriesTitleEn,
 				seriesId: s.seriesId,
+				posterUrl: s.seriesPosterUrl ?? DEFAULT_POSTER,
 				episodes: [],
 				platforms: [],
 				isUncut: s.isUncut
@@ -200,7 +205,7 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 			event.platforms.push(s.platformName);
 		}
 
-		allSeriesSet.add(s.seriesTitleEn);
+		allSeriesMap.set(s.seriesTitleEn, s.seriesPosterUrl ?? DEFAULT_POSTER);
 		platformSet.add(s.platformName);
 	}
 
@@ -219,6 +224,7 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 			time: event.time,
 			series: event.series,
 			seriesId: event.seriesId,
+			posterUrl: event.posterUrl,
 			episode: episodeText,
 			platforms: event.platforms,
 			isUncut: event.isUncut
@@ -230,6 +236,7 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 		time: string;
 		series: string;
 		seriesId: string;
+		posterUrl: string;
 		episodes: string[];
 		platforms: string[];
 		isUncut: boolean;
@@ -250,6 +257,7 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 				time: timeStr,
 				series: s.seriesTitleEn,
 				seriesId: s.seriesId,
+				posterUrl: s.seriesPosterUrl ?? DEFAULT_POSTER,
 				episodes: [],
 				platforms: [],
 				isUncut: s.isUncut
@@ -265,6 +273,8 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 		if (!item.platforms.includes(s.platformName)) {
 			item.platforms.push(s.platformName);
 		}
+		allSeriesMap.set(s.seriesTitleEn, s.seriesPosterUrl ?? DEFAULT_POSTER);
+		platformSet.add(s.platformName);
 	}
 
 	const scheduleByDay = Array.from(scheduleByDayMap.entries()).map(([day, itemsMap]) => ({
@@ -273,6 +283,7 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 			time: item.time,
 			series: item.series,
 			seriesId: item.seriesId,
+			posterUrl: item.posterUrl,
 			episode: item.episodes.length > 1 ? item.episodes.join(', ') : item.episodes[0],
 			platforms: item.platforms,
 			isUncut: item.isUncut
@@ -284,7 +295,8 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 
 	const result: CalendarApiResponse = {
 		events: eventsByDate,
-		allSeries: Array.from(allSeriesSet),
+		allSeries: Array.from(allSeriesMap.keys()),
+		seriesPosters: Object.fromEntries(allSeriesMap),
 		platforms: Array.from(platformSet),
 		scheduleByDay
 	};

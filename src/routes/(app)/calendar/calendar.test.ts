@@ -90,6 +90,16 @@ describe('getViewUrl', () => {
 		const url = getViewUrl('calendar', 2026, 6, '2026-06-01', '2026-06-07');
 		expect(url).toBe('/calendar?year=2026&month=6');
 	});
+
+	it('returns week URL for card view', () => {
+		const url = getViewUrl('card', 2026, 6, '2026-06-01', '2026-06-07');
+		expect(url).toBe('/calendar?startDate=2026-06-01&endDate=2026-06-07');
+	});
+
+	it('generates week URL for card view when no week params exist', () => {
+		const url = getViewUrl('card', 2026, 6, null, null);
+		expect(url).toMatch(/^\/calendar\?startDate=\d{4}-\d{2}-\d{2}&endDate=\d{4}-\d{2}-\d{2}$/);
+	});
 });
 
 describe('calendar page loading structure — source-level regression', () => {
@@ -123,29 +133,28 @@ describe('calendar page loading structure — source-level regression', () => {
 		expect(nextPos).toBeLessThan(loadingPos);
 	});
 
-	it('week prev/next controls appear outside contentLoading block (list view)', () => {
+	it('week prev/next controls are delegated to shared CalendarWeekHeader component', () => {
 		const source = readFileSync(pagePath, 'utf-8');
-		const prevPos = source.indexOf('onclick={prevWeek}');
-		const nextPos = source.indexOf('onclick={nextWeek}');
-		// Find the contentLoading block that comes AFTER prevWeek (in list view)
-		const loadingPos = source.indexOf('{#if contentLoading}', prevPos);
-		expect(prevPos).toBeGreaterThan(0);
-		expect(nextPos).toBeGreaterThan(0);
-		expect(prevPos).toBeLessThan(loadingPos);
-		expect(nextPos).toBeLessThan(loadingPos);
+		const headerImportPos = source.indexOf("import CalendarWeekHeader from './CalendarWeekHeader.svelte'");
+		const prevPropPos = source.indexOf('onPrevWeek={prevWeek}');
+		const nextPropPos = source.indexOf('onNextWeek={nextWeek}');
+		expect(headerImportPos).toBeGreaterThan(0);
+		expect(prevPropPos).toBeGreaterThan(0);
+		expect(nextPropPos).toBeGreaterThan(0);
 	});
 
-	it('goToToday and goToThisWeek appear outside contentLoading block', () => {
+	it('goToToday appears outside contentLoading block', () => {
 		const source = readFileSync(pagePath, 'utf-8');
 		const todayPos = source.indexOf('onclick={goToToday}');
-		const thisWeekPos = source.indexOf('onclick={goToThisWeek}');
-		// Each control should be before the contentLoading block that's nearest in its view
 		const todayLoadingPos = source.indexOf('{#if contentLoading}', todayPos);
-		const thisWeekLoadingPos = source.indexOf('{#if contentLoading}', thisWeekPos);
 		expect(todayPos).toBeGreaterThan(0);
-		expect(thisWeekPos).toBeGreaterThan(0);
 		expect(todayPos).toBeLessThan(todayLoadingPos);
-		expect(thisWeekPos).toBeLessThan(thisWeekLoadingPos);
+	});
+
+	it('goToThisWeek is delegated to shared CalendarWeekHeader component', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		const thisWeekPropPos = source.indexOf('onThisWeek={goToThisWeek}');
+		expect(thisWeekPropPos).toBeGreaterThan(0);
 	});
 
 	it('removes text-based loading indicator กำลังโหลดตารางฉาย', () => {
@@ -172,6 +181,16 @@ describe('calendar page loading structure — source-level regression', () => {
 		const source = readFileSync(pagePath, 'utf-8');
 		const listSkeletonPos = source.indexOf('list-loading-skeleton');
 		expect(listSkeletonPos).toBeGreaterThan(0);
+	});
+
+	it('card view uses CardScheduleBoard component', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		const cardImportPos = source.indexOf("import CardScheduleBoard from './CardScheduleBoard.svelte'");
+		const cardViewPos = source.indexOf("{:else if viewMode === 'card'}");
+		const cardComponentPos = source.indexOf('<CardScheduleBoard');
+		expect(cardImportPos).toBeGreaterThan(0);
+		expect(cardViewPos).toBeGreaterThan(0);
+		expect(cardComponentPos).toBeGreaterThan(0);
 	});
 
 	it('notes section (หมายเหตุ) appears outside any contentLoading block', () => {
