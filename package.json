@@ -33,6 +33,7 @@
     "vitest": "^4.1.8"
   },
   "dependencies": {
+    "@inlang/paraglide-sveltekit": "^0.16.1",
     "@neondatabase/serverless": "^1.0.0",
     "bcryptjs": "^3.0.3",
     "dotenv": "^16.5.0",

@@ -1,0 +1,11 @@
+{
+  "site_name": "GL-Orbit",
+  "nav_series": "Series",
+  "nav_calendar": "Schedule",
+  "nav_artists": "Artists",
+  "nav_login": "Login",
+  "nav_logout": "Logout",
+  "footer_copyright": "© {year} GL-Orbit. All rights reserved.",
+  "language_th": "ไทย",
+  "language_en": "English"
+}
