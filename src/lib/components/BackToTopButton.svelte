@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 	import { fly } from 'svelte/transition';
 
 	let { bottomNavHidden = false }: { bottomNavHidden?: boolean } = $props();
@@ -22,7 +23,7 @@
 {#if visible}
 	<button
 		onclick={scrollTop}
-		aria-label="กลับขึ้นบนสุด"
+		aria-label={m.back_to_top_aria()}
 		class="group fixed right-4 sm:right-6 z-[55] floating-action-above-nav {bottomNavHidden ? 'nav-hidden' : ''} w-12 h-12 rounded-full bg-gradient-to-br from-coral to-coral-dark text-white shadow-xl shadow-coral/40 hover:shadow-2xl hover:shadow-coral/50 hover:scale-110 active:scale-95 transition-all duration-300 touch-target flex items-center justify-center"
 		in:fly={{ y: 20, duration: 250 }}
 		out:fly={{ y: 20, duration: 200 }}

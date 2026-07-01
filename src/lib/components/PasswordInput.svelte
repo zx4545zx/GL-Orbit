@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 	interface Props {
 		id?: string;
 		name?: string;
@@ -16,7 +17,7 @@
 		placeholder = '••••••••',
 		required = true,
 		minlength,
-		label = 'รหัสผ่าน'
+		label = m.password_input_default_label()
 	}: Props = $props();
 
 	let show = $state(false);
@@ -43,7 +44,7 @@
 			type="button"
 			onclick={toggle}
 			class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-lavender/20 transition-colors text-plum-light"
-			aria-label={show ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+			aria-label={show ? m.password_input_hide_aria() : m.password_input_show_aria()}
 		>
 			{#if show}
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

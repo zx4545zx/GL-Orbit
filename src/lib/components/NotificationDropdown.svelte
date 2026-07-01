@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
 	import type { NotificationItem } from '$lib/types.js';
@@ -25,12 +26,12 @@
 		const diffMinutes = Math.floor(diffSeconds / 60);
 		const diffHours = Math.floor(diffMinutes / 60);
 		const diffDays = Math.floor(diffHours / 24);
-
-		if (diffSeconds < 60) return 'เมื่อสักครู่';
-		if (diffMinutes < 60) return `${diffMinutes} นาทีที่แล้ว`;
-		if (diffHours < 24) return `${diffHours} ชั่วโมงที่แล้ว`;
-		if (diffDays < 7) return `${diffDays} วันที่แล้ว`;
-		return new Date(dateStr).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
+		const rtf = new Intl.RelativeTimeFormat(page.data.lang, { numeric: 'auto' });
+		if (diffSeconds < 60) return rtf.format(-diffSeconds, 'second');
+		if (diffMinutes < 60) return rtf.format(-diffMinutes, 'minute');
+		if (diffHours < 24) return rtf.format(-diffHours, 'hour');
+		if (diffDays < 7) return rtf.format(-diffDays, 'day');
+		return new Date(dateStr).toLocaleDateString(page.data.lang, { day: 'numeric', month: 'short' });
 	}
 
 	function getTypeIcon(type: string): string {
@@ -51,11 +52,11 @@
 		error = '';
 		try {
 			const res = await fetch('/api/notifications?limit=5');
-			if (!res.ok) throw new Error('ไม่สามารถโหลดการแจ้งเตือนได้');
+			if (!res.ok) throw new Error(m.notifications_load_error());
 			const data = await res.json();
 			notifications = data.notifications ?? [];
 		} catch (e) {
-			error = 'ไม่สามารถโหลดการแจ้งเตือนได้';
+			error = m.notifications_load_error();
 			notifications = [];
 		} finally {
 			loading = false;
@@ -111,7 +112,7 @@
 	<button
 		onclick={openDropdown}
 		class="relative p-2 rounded-xl hover:bg-lavender/20 transition-all touch-target flex items-center justify-center"
-		aria-label="การแจ้งเตือน"
+		aria-label={m.notifications_aria_label()}
 		aria-expanded={isOpen}
 	>
 		<svg class="w-5 h-5 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -129,13 +130,13 @@
 		<div class="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl shadow-lavender/20 border border-white/50 overflow-hidden z-50 animate-fade-in">
 			<!-- Header -->
 			<div class="flex items-center justify-between px-4 py-3 border-b border-lavender/10">
-				<h3 class="text-sm font-semibold text-plum">การแจ้งเตือน</h3>
+				<h3 class="text-sm font-semibold text-plum">{m.notifications_title()}</h3>
 				{#if notifications.length > 0}
 					<button
 						onclick={markAllRead}
 						class="text-xs text-coral hover:text-coral-dark font-medium transition-colors touch-target px-2 py-1"
 					>
-						อ่านทั้งหมด
+						{m.notifications_mark_all()}
 					</button>
 				{/if}
 			</div>
@@ -155,7 +156,7 @@
 						<svg class="w-10 h-10 mx-auto text-lavender/40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
 						</svg>
-						<p class="text-sm text-plum-light/60">ไม่มีการแจ้งเตือน</p>
+						<p class="text-sm text-plum-light/60">{m.notifications_empty()}</p>
 					</div>
 				{:else}
 					{#each notifications as n}
@@ -185,7 +186,7 @@
 					onclick={() => { isOpen = false; }}
 					class="flex items-center justify-center gap-1.5 px-4 py-3 text-sm text-plum-light hover:text-coral transition-colors touch-target"
 				>
-					ดูเพิ่มเติม
+					{m.notifications_view_more()}
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
 					</svg>

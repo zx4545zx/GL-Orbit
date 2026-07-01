@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';
 	const currentUser = $derived(page.data.user);
@@ -21,7 +22,7 @@
 					<span class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">GL-Orbit</span>
 				</div>
 				<p class="text-sm text-plum-light leading-relaxed max-w-xs">
-					ศูนย์กลางข้อมูลและตารางฉายสำหรับแฟนคลับซีรีส์ GL
+					{m.footer_tagline()}
 				</p>
 				<div class="flex gap-3">
 					{#each ['twitter', 'instagram', 'github'] as social}
@@ -42,34 +43,34 @@
 
 			<!-- Quick Links -->
 			<div>
-				<h3 class="font-[family-name:var(--font-display)] font-semibold text-plum mb-4">ลิงก์ด่วน</h3>
+				<h3 class="font-[family-name:var(--font-display)] font-semibold text-plum mb-4">{m.footer_quick_links()}</h3>
 				<ul class="space-y-3">
-					<li><a href="/{page.data.lang}/" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">หน้าแรก</a></li>
-					<li><a href="/{page.data.lang}/calendar" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">ตารางฉาย</a></li>
-					<li><a href="/{page.data.lang}/series" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">ซีรีส์ทั้งหมด</a></li>
+					<li><a href="/{page.data.lang}/" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.nav_home()}</a></li>
+					<li><a href="/{page.data.lang}/calendar" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.nav_calendar()}</a></li>
+					<li><a href="/{page.data.lang}/series" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.footer_all_series()}</a></li>
 					{#if currentUser}
-						<li><a href="/{page.data.lang}/profile" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">โปรไฟล์</a></li>
+						<li><a href="/{page.data.lang}/profile" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.nav_profile()}</a></li>
 					{:else}
-						<li><a href="/{page.data.lang}/login" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">เข้าสู่ระบบ</a></li>
-						<li><a href="/{page.data.lang}/register" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">สมัครสมาชิก</a></li>
+						<li><a href="/{page.data.lang}/login" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.nav_login()}</a></li>
+						<li><a href="/{page.data.lang}/register" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.nav_register()}</a></li>
 					{/if}
 				</ul>
 			</div>
 
 			<!-- About -->
 			<div>
-				<h3 class="font-[family-name:var(--font-display)] font-semibold text-plum mb-4">เกี่ยวกับเรา</h3>
+				<h3 class="font-[family-name:var(--font-display)] font-semibold text-plum mb-4">{m.footer_about()}</h3>
 				<ul class="space-y-3">
-					<li><span class="text-sm text-plum-light">ข้อมูลเวลาฉายแม่นยำ</span></li>
-					<li><span class="text-sm text-plum-light">รองรับ Uncut version</span></li>
-					<li><span class="text-sm text-plum-light">ออกแบบมาเพื่อติ่งโดยเฉพาะ</span></li>
+					<li><span class="text-sm text-plum-light">{m.footer_about_1()}</span></li>
+					<li><span class="text-sm text-plum-light">{m.footer_about_2()}</span></li>
+					<li><span class="text-sm text-plum-light">{m.footer_about_3()}</span></li>
 				</ul>
 			</div>
 		</div>
 
 		<div class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-lavender/20 text-center">
 			<p class="text-xs text-plum-light/60">
-				© 2026 GL-Orbit. สร้างด้วย 💖 สำหรับชุมชนแฟนคลับ GL
+				{m.footer_copyright({ year: new Date().getFullYear() })} {m.footer_made_with()}
 			</p>
 		</div>
 	</div>

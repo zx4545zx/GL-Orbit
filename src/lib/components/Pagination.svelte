@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 	interface Props {
 		page: number;
 		totalPages: number;
@@ -41,15 +42,14 @@
 
 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 px-2">
 	<p class="text-sm text-plum-light">
-		แสดง <span class="font-medium text-plum">{startItem}</span> – <span class="font-medium text-plum">{endItem}</span>
-		จาก <span class="font-medium text-plum">{total}</span> รายการ
+		{@html m.pagination_showing({ start: startItem, end: endItem, total })}
 	</p>
 
 	<div class="flex items-center gap-1.5">
 		<button
 			onclick={() => goTo(page - 1)}
 			disabled={page <= 1}
-			aria-label="หน้าก่อนหน้า"
+			aria-label={m.pagination_prev_aria()}
 			class="px-3 py-2 rounded-lg text-sm font-medium transition-all touch-target disabled:opacity-40 disabled:cursor-not-allowed {page <= 1 ? 'text-plum-light/50' : 'text-plum hover:bg-lavender/20'}"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
@@ -71,7 +71,7 @@
 		<button
 			onclick={() => goTo(page + 1)}
 			disabled={page >= totalPages}
-			aria-label="หน้าถัดไป"
+			aria-label={m.pagination_next_aria()}
 			class="px-3 py-2 rounded-lg text-sm font-medium transition-all touch-target disabled:opacity-40 disabled:cursor-not-allowed {page >= totalPages ? 'text-plum-light/50' : 'text-plum hover:bg-lavender/20'}"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>

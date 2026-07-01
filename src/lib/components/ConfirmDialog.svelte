@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 	interface Props {
 		open: boolean;
 		title?: string;
@@ -12,10 +13,10 @@
 
 	let {
 		open = $bindable(false),
-		title = 'ยืนยันการลบ',
-		message = 'คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้? การกระทำนี้ไม่สามารถย้อนกลับได้',
-		confirmLabel = 'ลบ',
-		cancelLabel = 'ยกเลิก',
+		title = m.confirm_default_title(),
+		message = m.confirm_default_message(),
+		confirmLabel = m.confirm_default_confirm(),
+		cancelLabel = m.confirm_default_cancel(),
 		danger = true,
 		onconfirm,
 		oncancel
@@ -63,7 +64,7 @@
 		type="button"
 		class="fixed inset-0 z-50 bg-plum/35 backdrop-blur-sm transition-opacity duration-200"
 		onclick={handleCancel}
-		aria-label="ปิด"
+		aria-label={m.common_close()}
 	></button>
 
 	<!-- Dialog -->
