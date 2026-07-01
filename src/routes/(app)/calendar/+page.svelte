@@ -258,12 +258,12 @@
 </svelte:head>
 
 {#snippet viewToggle()}
-	<div class="w-full sm:w-auto sm:flex sm:justify-center">
-		<div class="glass-card rounded-2xl p-1.5 grid grid-cols-4 gap-1 sm:flex sm:items-center sm:min-w-max">
+	<div class="w-full lg:w-auto lg:flex lg:justify-center">
+		<div class="glass-card rounded-2xl p-1.5 grid grid-cols-4 gap-1 lg:flex lg:items-center lg:min-w-max">
 			{#each viewButtons as btn, index}
 				{#if index === 2}
-					<div class="hidden sm:block mx-1 h-7 w-px bg-lavender/25" aria-hidden="true"></div>
-					<span class="hidden sm:inline px-1 text-[10px] font-bold uppercase tracking-wide text-plum-light/60">เดือน</span>
+					<div class="hidden lg:block mx-1 h-7 w-px bg-lavender/25" aria-hidden="true"></div>
+					<span class="hidden lg:inline px-1 text-[10px] font-bold uppercase tracking-wide text-plum-light/60">เดือน</span>
 				{/if}
 				{@const active = viewMode === btn.key}
 				<button
@@ -273,10 +273,10 @@
 						viewMode = btn.key;
 						goto(getViewUrl(btn.key, params_y, params_m, params_sd, params_ed));
 					}}
-					class="min-w-0 justify-center px-2 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 sm:gap-2 touch-target {active ? 'bg-white text-coral-dark shadow-md shadow-lavender/20 ring-1 ring-coral/10' : btn.group === 'monthly' ? 'text-plum-light/80 hover:bg-lavender/10 hover:text-plum' : 'text-plum-light hover:bg-white/60'}"
+					class="min-w-0 justify-center px-2 lg:px-4 py-2.5 lg:py-2 rounded-xl text-xs lg:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 lg:gap-2 touch-target {active ? 'bg-white text-coral-dark shadow-md shadow-lavender/20 ring-1 ring-coral/10' : btn.group === 'monthly' ? 'text-plum-light/80 hover:bg-lavender/10 hover:text-plum' : 'text-plum-light hover:bg-white/60'}"
 				>
-					<svg class="w-5 h-5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">{@html btn.icon}</svg>
-					<span class="hidden sm:inline">{btn.label}</span>
+					<svg class="w-5 h-5 lg:w-4 lg:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">{@html btn.icon}</svg>
+					<span class="hidden lg:inline">{btn.label}</span>
 				</button>
 			{/each}
 		</div>
@@ -326,15 +326,15 @@
 			</div>
 		</div>
 
-		<div class="relative mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+		<div class="relative mt-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 			<button
 				onclick={goToThisWeek}
-				class="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-coral to-coral-dark px-5 py-3 text-sm font-bold text-white shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
+				class="inline-flex w-full lg:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-coral to-coral-dark px-5 py-3 text-sm font-bold text-white shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
 			>
 				ดูสัปดาห์นี้
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
 			</button>
-			<div class="sm:max-w-max">
+			<div class="w-full lg:max-w-max">
 				{@render viewToggle()}
 			</div>
 		</div>
