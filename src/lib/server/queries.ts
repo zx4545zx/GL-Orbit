@@ -131,6 +131,8 @@ export async function getSeriesFull(db: Db, id: string) {
 			id: s.id,
 			titleEn: s.titleEn,
 			titleTh: s.titleTh,
+			descriptionTh: s.descriptionTh,
+			descriptionEn: s.descriptionEn,
 			posterUrl: s.posterUrl,
 			status: s.status,
 			studioId: s.studioId

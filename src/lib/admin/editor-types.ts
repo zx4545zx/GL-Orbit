@@ -33,6 +33,8 @@ export interface SeriesCore {
 	id: string;
 	titleEn: string;
 	titleTh: string | null;
+	descriptionTh: string | null;
+	descriptionEn: string | null;
 	posterUrl: string | null;
 	status: SeriesStatus;
 	studioId: string | null;
