@@ -96,5 +96,19 @@
   "artist_works_count_label": "titles",
   "artist_detail_empty_title": "No works in the system yet",
   "artist_detail_empty_desc": "Back to explore from the GL-Orbit home page",
-  "artist_detail_empty_back_home": "Back to home"
+  "artist_detail_empty_back_home": "Back to home",
+  "countdown_seo_title": "GL Series Countdown | GL-Orbit",
+  "countdown_seo_description": "Countdown to new episodes of GL series currently airing and upcoming, with air times and streaming platforms",
+  "countdown_breadcrumb": "Countdown",
+  "countdown_title_plain": "Countdown",
+  "countdown_title_accent": "GL Series",
+  "countdown_subtitle": "Track every upcoming episode — airing and not-yet-aired series within the next 7 days",
+  "countdown_tracking_label": "Tracking",
+  "countdown_tracking_suffix": "upcoming episodes · within 7 days",
+  "common_days": "days",
+  "common_hours_short": "hr",
+  "common_minutes_short": "min",
+  "common_seconds_short": "sec",
+  "countdown_empty_title": "No episodes airing soon",
+  "countdown_empty_desc": "New episodes will appear here when air dates are set within 7 days"
 }

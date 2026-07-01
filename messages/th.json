@@ -96,5 +96,19 @@
   "artist_works_count_label": "เรื่อง",
   "artist_detail_empty_title": "ยังไม่มีผลงานในระบบ",
   "artist_detail_empty_desc": "กลับไปเริ่มสำรวจจากหน้าแรกของ GL-Orbit",
-  "artist_detail_empty_back_home": "กลับหน้าแรก"
+  "artist_detail_empty_back_home": "กลับหน้าแรก",
+  "countdown_seo_title": "นับถอยหลังซีรีส์ GL | GL-Orbit",
+  "countdown_seo_description": "นับถอยหลังสู่ตอนใหม่ของซีรีส์ GL ที่กำลังฉายและที่กำลังจะฉาย พร้อมเวลาออกอากาศและแพลตฟอร์มรับชม",
+  "countdown_breadcrumb": "นับถอยหลัง",
+  "countdown_title_plain": "นับถอยหลัง",
+  "countdown_title_accent": "ซีรีส์ GL",
+  "countdown_subtitle": "ติดตามทุกตอนที่กำลังจะฉาย — ซีรีส์ที่กำลังฉายและที่ยังไม่ฉาย ภายใน 7 วันข้างหน้า",
+  "countdown_tracking_label": "กำลังติดตาม",
+  "countdown_tracking_suffix": "ตอนที่จะฉาย · ภายใน 7 วัน",
+  "common_days": "วัน",
+  "common_hours_short": "ชม.",
+  "common_minutes_short": "นาที",
+  "common_seconds_short": "วิ",
+  "countdown_empty_title": "ยังไม่มีตอนที่จะฉายในเร็วๆ นี้",
+  "countdown_empty_desc": "ตอนใหม่จะปรากฏที่นี่เมื่อมีกำหนดออกอากาศภายใน 7 วัน"
 }

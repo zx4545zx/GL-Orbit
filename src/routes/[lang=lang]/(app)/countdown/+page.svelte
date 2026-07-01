@@ -1,4 +1,5 @@
 <script lang="ts">
+import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import {
 		DEFAULT_OG_IMAGE,
@@ -36,15 +37,15 @@
 		return stagger60Classes[Math.min(index, stagger60Classes.length - 1)];
 	}
 
-	const SEO_TITLE = `นับถอยหลังซีรีส์ GL | ${SITE_NAME}`;
-	const SEO_DESCRIPTION = 'นับถอยหลังสู่ตอนใหม่ของซีรีส์ GL ที่กำลังฉายและที่กำลังจะฉาย พร้อมเวลาออกอากาศและแพลตฟอร์มรับชม';
+	const SEO_TITLE = m.countdown_seo_title();
+	const SEO_DESCRIPTION = m.countdown_seo_description();
 
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/countdown'));
 	const jsonLd = $derived(safeJsonLd([
 		buildWebPageJsonLd(page.url.origin, '/countdown', SEO_TITLE, SEO_DESCRIPTION),
 		buildBreadcrumbJsonLd(page.url.origin, [
-			{ name: 'หน้าแรก', path: '/' },
-			{ name: 'นับถอยหลัง', path: '/countdown' }
+			{ name: m.nav_home(), path: '/' },
+			{ name: m.countdown_breadcrumb(), path: '/countdown' }
 		])
 	]));
 
@@ -68,11 +69,8 @@
 		airLabel: string;
 	}
 
-	const dayShortNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
-	const thaiMonths = [
-		'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
-		'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
-	];
+	
+	
 
 	// Only keep airings still in the future — when `diff <= 0` the card disappears.
 	const activeCountdowns = $derived<ActiveCountdown[]>(
@@ -87,7 +85,7 @@
 					hours: Math.max(0, Math.floor((diff % 86_400_000) / 3_600_000)),
 					minutes: Math.max(0, Math.floor((diff % 3_600_000) / 60_000)),
 					seconds: Math.max(0, Math.floor((diff % 60_000) / 1_000)),
-					airLabel: `${dayShortNames[target.getDay()]} ${target.getDate()} ${thaiMonths[target.getMonth()]} · ${pad(target.getHours())}:${pad(target.getMinutes())} น.`
+					airLabel: new Intl.DateTimeFormat(page.data.lang, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).format(target),
 				};
 			})
 			.filter((c) => c.diff > 0)
@@ -116,13 +114,13 @@
 
 <!-- Hero -->
 <section class="relative overflow-hidden -mx-4 px-4 pt-4 sm:pt-8 pb-10 sm:pb-14">
-	<!-- background atmosphere (เหมือน hero หน้าแรก: mesh + floating blobs + orbit) -->
+	<!-- background atmosphere (same as home hero: mesh + floating blobs + orbit) -->
 	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
 	<div class="absolute top-4 left-2 sm:left-10 w-44 h-44 sm:w-72 sm:h-72 bg-coral/20 rounded-full blur-3xl animate-float pointer-events-none"></div>
 	<div class="absolute top-24 right-2 sm:right-12 w-52 h-52 sm:w-80 sm:h-80 bg-lavender/20 rounded-full blur-3xl animate-float-delayed pointer-events-none"></div>
 	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[460px] sm:h-[460px] bg-mint/10 rounded-full blur-3xl pointer-events-none"></div>
 
-	<!-- orbiting particles — signature ของ GL-Orbit -->
+	<!-- orbiting particles — signature of GL-Orbit -->
 	<div class="absolute top-20 right-6 sm:top-24 sm:right-24 w-[170px] h-[170px] sm:w-[230px] sm:h-[230px] pointer-events-none">
 		<div class="absolute w-2.5 h-2.5 bg-coral rounded-full animate-orbit opacity-70"></div>
 		<div class="absolute w-2 h-2 bg-lavender rounded-full animate-orbit opacity-50 orbit-delay-lavender"></div>
@@ -132,7 +130,7 @@
 	<div class="relative z-10 max-w-3xl mx-auto">
 		<button onclick={() => history.back()} class="flex w-fit items-center gap-1.5 text-sm font-medium text-plum-light hover:text-coral-dark transition-colors mb-6 sm:mb-8 glass-card rounded-full pl-3 pr-4 py-2 touch-target">
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-			ย้อนกลับ
+			{m.common_back()}
 		</button>
 
 		<div class="inline-flex items-center gap-2 mb-4 animate-slide-up">
@@ -144,18 +142,18 @@
 		</div>
 
 		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-5xl md:text-6xl font-bold text-plum mb-3 animate-slide-up stagger-1 leading-tight">
-			นับถอยหลัง<span class="text-gradient">ซีรีส์ GL</span>
+			{m.countdown_title_plain()}<span class="text-gradient">{m.countdown_title_accent()}</span>
 		</h1>
 		<p class="text-base sm:text-lg text-plum-light max-w-2xl leading-relaxed animate-slide-up stagger-2">
-			ติดตามทุกตอนที่กำลังจะฉาย — ซีรีส์ที่กำลังฉายและที่ยังไม่ฉาย ภายใน 7 วันข้างหน้า
+			{m.countdown_subtitle()}
 		</p>
 
 		<div class="mt-5 animate-slide-up stagger-3">
 			<span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-card text-plum-light text-xs sm:text-sm">
 				<svg class="w-4 h-4 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-				กำลังติดตาม
+				{m.countdown_tracking_label()}
 				<span class="font-bold text-plum tabular-nums">{activeCountdowns.length}</span>
-				ตอนที่จะฉาย · ภายใน 7 วัน
+				{m.countdown_tracking_suffix()}
 			</span>
 		</div>
 	</div>
@@ -207,18 +205,18 @@
 								</div>
 							</div>
 
-							<!-- orbital days — วงแหวนโคจรรอบจำนวนวัน (สัญลักษณ์ของ GL-Orbit) -->
+							<!-- orbital days — orbital ring around day count (GL-Orbit signature) -->
 							<div class="relative flex-1 flex items-center justify-center py-2">
 								{@render orbitDays(c.days)}
 							</div>
 
 							<!-- HH:MM:SS tiles -->
 							<div class="relative flex items-start justify-center gap-1.5 sm:gap-2 font-[family-name:var(--font-display)]">
-								{@render timeUnit(pad(c.hours), 'ชม.')}
+								{@render timeUnit(pad(c.hours), m.common_hours_short())}
 								<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-2xl sm:text-3xl font-bold text-coral/60 animate-pulse">:</span>
-								{@render timeUnit(pad(c.minutes), 'นาที')}
+								{@render timeUnit(pad(c.minutes), m.common_minutes_short())}
 								<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-2xl sm:text-3xl font-bold text-coral/60 animate-pulse pulse-delay-half">:</span>
-								{@render timeUnit(pad(c.seconds), 'วิ')}
+								{@render timeUnit(pad(c.seconds), m.common_seconds_short())}
 							</div>
 
 							<!-- air date -->
@@ -246,7 +244,7 @@
 		<!-- center: days + label -->
 		<div class="absolute inset-0 flex flex-col items-center justify-center">
 			<span class="font-[family-name:var(--font-display)] text-5xl sm:text-6xl font-extrabold text-gradient tabular-nums leading-none">{days}</span>
-			<span class="font-[family-name:var(--font-display)] text-sm font-bold text-plum-light mt-1">วัน</span>
+			<span class="font-[family-name:var(--font-display)] text-sm font-bold text-plum-light mt-1">{m.common_days()}</span>
 		</div>
 	</div>
 {/snippet}
@@ -273,7 +271,7 @@
 				</svg>
 			</div>
 		</div>
-		<h3 class="font-semibold text-plum mb-1">ยังไม่มีตอนที่จะฉายในเร็วๆ นี้</h3>
-		<p class="text-sm text-plum-light">ตอนใหม่จะปรากฏที่นี่เมื่อมีกำหนดออกอากาศภายใน 7 วัน</p>
+		<h3 class="font-semibold text-plum mb-1">{m.countdown_empty_title()}</h3>
+		<p class="text-sm text-plum-light">{m.countdown_empty_desc()}</p>
 	</div>
 {/snippet}
