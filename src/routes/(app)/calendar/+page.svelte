@@ -258,24 +258,25 @@
 </svelte:head>
 
 {#snippet viewToggle()}
-	<div class="flex justify-start sm:justify-center overflow-x-auto pb-1 -mx-1 px-1">
-		<div class="glass-card rounded-2xl p-1.5 flex items-center gap-1 min-w-max">
+	<div class="w-full sm:w-auto sm:flex sm:justify-center">
+		<div class="glass-card rounded-2xl p-1.5 grid grid-cols-4 gap-1 sm:flex sm:items-center sm:min-w-max">
 			{#each viewButtons as btn, index}
 				{#if index === 2}
-					<div class="mx-1 h-7 w-px bg-lavender/25" aria-hidden="true"></div>
+					<div class="hidden sm:block mx-1 h-7 w-px bg-lavender/25" aria-hidden="true"></div>
 					<span class="hidden sm:inline px-1 text-[10px] font-bold uppercase tracking-wide text-plum-light/60">เดือน</span>
 				{/if}
 				{@const active = viewMode === btn.key}
 				<button
+					aria-label={btn.label}
+					title={btn.label}
 					onclick={() => {
 						viewMode = btn.key;
 						goto(getViewUrl(btn.key, params_y, params_m, params_sd, params_ed));
 					}}
-					class="px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 sm:gap-2 touch-target {active ? 'bg-white text-coral-dark shadow-md shadow-lavender/20 ring-1 ring-coral/10' : btn.group === 'monthly' ? 'text-plum-light/80 hover:bg-lavender/10 hover:text-plum' : 'text-plum-light hover:bg-white/60'}"
+					class="min-w-0 justify-center px-2 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 sm:gap-2 touch-target {active ? 'bg-white text-coral-dark shadow-md shadow-lavender/20 ring-1 ring-coral/10' : btn.group === 'monthly' ? 'text-plum-light/80 hover:bg-lavender/10 hover:text-plum' : 'text-plum-light hover:bg-white/60'}"
 				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">{@html btn.icon}</svg>
+					<svg class="w-5 h-5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">{@html btn.icon}</svg>
 					<span class="hidden sm:inline">{btn.label}</span>
-					<span class="sm:hidden">{btn.short}</span>
 				</button>
 			{/each}
 		</div>
