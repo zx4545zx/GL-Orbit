@@ -24,7 +24,10 @@ function filterSchedule(calendar: CalendarApiResponse, ids: string[]): CalendarA
 		.filter((day) => day.items.length > 0);
 	const platforms = Array.from(new Set([...Object.values(events).flat(), ...scheduleByDay.flatMap((day) => day.items)].flatMap((item) => item.platforms)));
 	const allSeries = Array.from(new Set([...Object.values(events).flat(), ...scheduleByDay.flatMap((day) => day.items)].map((item) => item.series)));
-	return { events, allSeries, platforms, scheduleByDay };
+	const seriesPosters = Object.fromEntries(
+		[...Object.values(events).flat(), ...scheduleByDay.flatMap((day) => day.items)].map((item) => [item.series, item.posterUrl])
+	);
+	return { events, allSeries, seriesPosters, platforms, scheduleByDay };
 }
 
 function parseBody(body: unknown): { type: string; ids: string[] } | null {
