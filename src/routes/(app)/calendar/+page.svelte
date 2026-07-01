@@ -232,10 +232,10 @@
 	]));
 
 	const viewButtons = [
-		{ key: 'card' as const, label: 'สัปดาห์', short: 'สัปดาห์', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
-		{ key: 'list' as const, label: 'ลิสต์', short: 'ลิสต์', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>' },
-		{ key: 'calendar' as const, label: 'เดือน', short: 'เดือน', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
-		{ key: 'grid' as const, label: 'ตาราง', short: 'ตาราง', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>' }
+		{ key: 'card' as const, label: 'สัปดาห์', short: 'สัปดาห์', group: 'primary', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
+		{ key: 'list' as const, label: 'ลิสต์', short: 'ลิสต์', group: 'primary', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>' },
+		{ key: 'calendar' as const, label: 'ปฏิทินเดือน', short: 'เดือน', group: 'monthly', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M7 14h.01M11 14h.01M15 14h.01M7 18h.01M11 18h.01M15 18h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
+		{ key: 'grid' as const, label: 'ตารางเดือน', short: 'ตาราง', group: 'monthly', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M3 10h18M3 16h18M8 4v16M14 4v16"/>' }
 	];
 </script>
 
@@ -259,15 +259,19 @@
 
 {#snippet viewToggle()}
 	<div class="flex justify-start sm:justify-center overflow-x-auto pb-1 -mx-1 px-1">
-		<div class="glass-card rounded-2xl p-1.5 flex gap-1 min-w-max">
-			{#each viewButtons as btn}
+		<div class="glass-card rounded-2xl p-1.5 flex items-center gap-1 min-w-max">
+			{#each viewButtons as btn, index}
+				{#if index === 2}
+					<div class="mx-1 h-7 w-px bg-lavender/25" aria-hidden="true"></div>
+					<span class="hidden sm:inline px-1 text-[10px] font-bold uppercase tracking-wide text-plum-light/60">เดือน</span>
+				{/if}
 				{@const active = viewMode === btn.key}
 				<button
 					onclick={() => {
 						viewMode = btn.key;
 						goto(getViewUrl(btn.key, params_y, params_m, params_sd, params_ed));
 					}}
-					class="px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 sm:gap-2 touch-target {active ? 'bg-white text-coral-dark shadow-md shadow-lavender/20 ring-1 ring-coral/10' : 'text-plum-light hover:bg-white/60'}"
+					class="px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 sm:gap-2 touch-target {active ? 'bg-white text-coral-dark shadow-md shadow-lavender/20 ring-1 ring-coral/10' : btn.group === 'monthly' ? 'text-plum-light/80 hover:bg-lavender/10 hover:text-plum' : 'text-plum-light hover:bg-white/60'}"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">{@html btn.icon}</svg>
 					<span class="hidden sm:inline">{btn.label}</span>
