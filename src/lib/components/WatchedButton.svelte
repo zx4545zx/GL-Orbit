@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
 
+	import { page } from '$app/state';
 	let { seriesId, className = '' }: { seriesId: string; className?: string } = $props();
 
 	let watched = $state(false);

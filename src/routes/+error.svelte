@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
 
+	import { page } from '$app/state';
 	const status = $derived(page.status);
 	const message = $derived(page.error?.message || 'เกิดข้อผิดพลาด');
 
@@ -49,13 +49,13 @@
 
 		<div class="flex flex-col sm:flex-row items-center justify-center gap-3">
 			<a
-				href="/"
+				href="/{page.data.lang}/"
 				class="px-6 py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-medium shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 transition-all hover:-translate-y-0.5 touch-target"
 			>
 				กลับหน้าแรก
 			</a>
 			<a
-				href="/series"
+				href="/{page.data.lang}/series"
 				class="px-6 py-3 rounded-xl glass-card text-plum font-medium hover:bg-white/80 transition-all hover:-translate-y-0.5 touch-target"
 			>
 				ดูซีรีส์ทั้งหมด

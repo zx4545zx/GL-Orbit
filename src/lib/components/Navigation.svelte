@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import NotificationDropdown from './NotificationDropdown.svelte';
+
+	import { page } from '$app/state';	import NotificationDropdown from './NotificationDropdown.svelte';
 
 	let { navHidden = false }: { navHidden?: boolean } = $props();
 
@@ -73,7 +73,7 @@
 	<div class="bg-white mx-2 sm:mx-4 mt-2 sm:mt-4 rounded-2xl shadow-lg shadow-lavender/25 border border-lavender/15 overflow-hidden">
 		<div class="grid grid-cols-[minmax(12rem,1fr)_auto_minmax(12rem,1fr)] items-center gap-3 px-4 sm:px-6 py-3 sm:py-4">
 			<!-- Logo -->
-			<a href="/" class="justify-self-start flex items-center gap-2 group touch-target">
+			<a href="/{page.data.lang}/" class="justify-self-start flex items-center gap-2 group touch-target">
 				<div class="relative w-8 h-8 sm:w-10 sm:h-10">
 					<div class="absolute inset-0 bg-gradient-to-br from-coral via-lavender to-mint rounded-xl"></div>
 					<div class="absolute inset-[2px] bg-white rounded-[0.625rem] flex items-center justify-center">
@@ -109,7 +109,7 @@
 				{#if currentUser}
 					{#if currentUser.role === 'ADMIN'}
 						<a
-							href="/admin/series"
+							href="/{page.data.lang}/admin/series"
 							aria-label="จัดการ"
 							title="จัดการ"
 							class="px-3 xl:px-4 py-2 rounded-xl text-sm font-medium text-plum-light hover:bg-lavender/20 hover:text-plum transition-all touch-target flex items-center justify-center gap-2 whitespace-nowrap"
@@ -125,7 +125,7 @@
 						onMarkAllRead={() => { unreadCount = 0; }}
 					/>
 					<a
-						href="/profile"
+						href="/{page.data.lang}/profile"
 						class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-lavender/20 transition-all touch-target"
 					>
 						{#if currentUser.avatarUrl}
@@ -140,13 +140,13 @@
 				{:else}
 					<div class="flex items-center gap-2">
 						<a
-							href="/login"
+							href="/{page.data.lang}/login"
 							class="px-4 py-2 rounded-xl text-sm font-medium text-plum-light hover:bg-lavender/20 hover:text-plum transition-all touch-target flex items-center"
 						>
 							เข้าสู่ระบบ
 						</a>
 						<a
-							href="/register"
+							href="/{page.data.lang}/register"
 							class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white text-sm font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:scale-105 transition-all duration-300 touch-target flex items-center"
 						>
 							สมัครสมาชิก

@@ -8,9 +8,11 @@ declare global {
 		interface Locals {
 			user: InferSelectModel<typeof users> | null;
 			session: InferSelectModel<typeof sessions> | null;
+			lang: import('$lib/i18n/paraglide.js').AvailableLanguageTag;
 		}
 		interface PageData {
 			user: PublicUser | null;
+			lang: import('$lib/i18n/paraglide.js').AvailableLanguageTag;
 		}
 		// interface PageState {}
 		// interface Platform {}

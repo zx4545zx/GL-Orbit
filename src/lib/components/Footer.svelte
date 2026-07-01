@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
 
+	import { page } from '$app/state';
 	const currentUser = $derived(page.data.user);
 </script>
 
@@ -44,14 +44,14 @@
 			<div>
 				<h3 class="font-[family-name:var(--font-display)] font-semibold text-plum mb-4">ลิงก์ด่วน</h3>
 				<ul class="space-y-3">
-					<li><a href="/" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">หน้าแรก</a></li>
-					<li><a href="/calendar" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">ตารางฉาย</a></li>
-					<li><a href="/series" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">ซีรีส์ทั้งหมด</a></li>
+					<li><a href="/{page.data.lang}/" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">หน้าแรก</a></li>
+					<li><a href="/{page.data.lang}/calendar" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">ตารางฉาย</a></li>
+					<li><a href="/{page.data.lang}/series" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">ซีรีส์ทั้งหมด</a></li>
 					{#if currentUser}
-						<li><a href="/profile" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">โปรไฟล์</a></li>
+						<li><a href="/{page.data.lang}/profile" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">โปรไฟล์</a></li>
 					{:else}
-						<li><a href="/login" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">เข้าสู่ระบบ</a></li>
-						<li><a href="/register" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">สมัครสมาชิก</a></li>
+						<li><a href="/{page.data.lang}/login" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">เข้าสู่ระบบ</a></li>
+						<li><a href="/{page.data.lang}/register" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">สมัครสมาชิก</a></li>
 					{/if}
 				</ul>
 			</div>

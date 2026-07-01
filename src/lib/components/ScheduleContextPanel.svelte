@@ -1,5 +1,6 @@
 <script lang="ts">
-	import type { CalendarApiResponse, CalendarEvent } from '$lib/types/calendar.js';
+
+	import { page } from '$app/state';	import type { CalendarApiResponse, CalendarEvent } from '$lib/types/calendar.js';
 
 	let { calendar }: { calendar: CalendarApiResponse } = $props();
 
@@ -28,7 +29,7 @@
 				<h2 class="truncate text-sm font-bold text-plum">ตารางฉายที่เกี่ยวข้อง</h2>
 				<p class="mt-0.5 text-xs text-plum-light">{totalEvents} รอบฉาย • {calendar.allSeries.length} เรื่อง</p>
 			</div>
-			<a href="/calendar" class="shrink-0 rounded-full border border-lavender/30 bg-white px-3 py-1.5 text-xs font-bold text-plum transition hover:bg-lavender/10">ดูเต็ม</a>
+			<a href="/{page.data.lang}/calendar" class="shrink-0 rounded-full border border-lavender/30 bg-white px-3 py-1.5 text-xs font-bold text-plum transition hover:bg-lavender/10">ดูเต็ม</a>
 		</div>
 	</header>
 

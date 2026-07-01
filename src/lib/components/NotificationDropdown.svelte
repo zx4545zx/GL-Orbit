@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
+
+	import { page } from '$app/state';	import { goto } from '$app/navigation';
 	import type { NotificationItem } from '$lib/types.js';
 
 	let {
@@ -181,7 +181,7 @@
 			<!-- Footer -->
 			<div class="border-t border-lavender/10">
 				<a
-					href="/notifications"
+					href="/{page.data.lang}/notifications"
 					onclick={() => { isOpen = false; }}
 					class="flex items-center justify-center gap-1.5 px-4 py-3 text-sm text-plum-light hover:text-coral transition-colors touch-target"
 				>

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { replaceState } from '$app/navigation';
-	import { page } from '$app/state';
+
+	import { page } from '$app/state';	import { replaceState } from '$app/navigation';
 	import ChatMarkdown from '$lib/components/ChatMarkdown.svelte';
 	import ChatContextPanel from './ChatContextPanel.svelte';
 	import type { ChatContextPayload } from './ChatContext.js';
@@ -292,7 +292,7 @@
 				{/if}
 				<div class="min-w-0 flex-1">
 					<p class="truncate text-sm font-bold text-plum">{currentUser.displayName || currentUser.username}</p>
-					<a href="/profile" class="text-xs text-plum-light hover:text-coral-dark transition">ดูโปรไฟล์</a>
+					<a href="/{page.data.lang}/profile" class="text-xs text-plum-light hover:text-coral-dark transition">ดูโปรไฟล์</a>
 				</div>
 				<button
 					type="button"
@@ -338,7 +338,7 @@
 		</nav>
 
 		<div class="border-t border-black/10 p-3">
-			<a href="/" class="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-plum-light transition hover:bg-lavender/10 hover:text-plum">
+			<a href="/{page.data.lang}/" class="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-plum-light transition hover:bg-lavender/10 hover:text-plum">
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
 				</svg>
