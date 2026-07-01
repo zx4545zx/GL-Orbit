@@ -9,6 +9,8 @@
 	let { data }: { data: PageData } = $props();
 
 	const series = $derived(data.series);
+	const title = $derived(data.title);
+	const description = $derived(data.description);
 	const loading = false;
 
 	const statusConfig: Record<string, { text: string; class: string; bg: string }> = {
@@ -18,9 +20,9 @@
 	};
 
 	const s = $derived(series ? statusConfig[series.status] : null);
-	const seoTitle = $derived(`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''} | GL-Orbit`);
+	const seoTitle = $derived(`${title}${series.titleTh && series.titleEn && title !== series.titleEn ? ` (${series.titleEn})` : ''} | GL-Orbit`);
 	const seoDescription = $derived(truncateSeo(
-		series.description || `${series.titleEn} ซีรีส์ GL จาก ${series.studio} พร้อมข้อมูลนักแสดง จำนวนตอน ตารางฉาย และแพลตฟอร์มรับชม`
+		description || `${title} ซีรีส์ GL จาก ${series.studio} พร้อมข้อมูลนักแสดง จำนวนตอน ตารางฉาย และแพลตฟอร์มรับชม`
 	));
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, `/series/${series.id}`));
 	const seriesJsonLd = $derived(safeJsonLd([
@@ -246,8 +248,8 @@
 					<p class="mt-2 text-base font-medium text-plum-light sm:text-xl">{series.titleTh}</p>
 				</div>
 
-				{#if series.description}
-					<p class="relative rounded-2xl border border-white/60 bg-white/45 p-4 text-sm leading-relaxed text-plum-light shadow-sm shadow-lavender/5 sm:text-base">{series.description}</p>
+				{#if description}
+					<p class="relative rounded-2xl border border-white/60 bg-white/45 p-4 text-sm leading-relaxed text-plum-light shadow-sm shadow-lavender/5 sm:text-base">{description}</p>
 				{/if}
 
 				{#if series.genres.length > 0}

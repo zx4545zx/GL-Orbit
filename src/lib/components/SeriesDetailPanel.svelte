@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { SeriesDetail } from '$lib/server/queries/series-detail.js';
+	import { localizeSeries } from '$lib/i18n/series.js';
+	import { languageTag } from '$lib/i18n/paraglide.js';
 
 	let { detail }: { detail: SeriesDetail } = $props();
+
+	const localized = $derived(localizeSeries(detail, languageTag()));
 
 	const statusConfig: Record<string, { text: string; class: string; bg: string }> = {
 		ONGOING: { text: 'กำลังฉาย', class: 'text-mint-dark', bg: 'bg-mint/20' },
@@ -123,8 +127,8 @@
 				</div>
 			</div>
 
-			{#if detail.description}
-				<p class="rounded-xl border border-white/60 bg-white/45 p-3 text-sm leading-relaxed text-plum-light">{detail.description}</p>
+			{#if localized.description}
+				<p class="rounded-xl border border-white/60 bg-white/45 p-3 text-sm leading-relaxed text-plum-light">{localized.description}</p>
 			{/if}
 
 			{#if detail.genres.length > 0}
