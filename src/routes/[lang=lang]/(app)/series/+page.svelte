@@ -55,7 +55,8 @@ import { m } from '$lib/i18n/paraglide.js';
 		if (search.trim()) params.set('search', search.trim());
 		if (status !== 'ALL') params.set('status', status.toLowerCase());
 		const query = params.toString();
-		return query ? `/series?${query}` : '/series';
+		const base = `/${page.data.lang}/series`;
+		return query ? `${base}?${query}` : base;
 	}
 
 	function getCurrentSeriesUrl(): string {

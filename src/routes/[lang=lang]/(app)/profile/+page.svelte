@@ -28,6 +28,17 @@
 	let libraryView = $state<'favorite' | 'watched'>('favorite');
 	let accountSection = $state<'account' | 'profile' | 'security'>('account');
 
+	const dateLocale = $derived(page.data.lang === 'th' ? 'th-TH' : 'en-US');
+	const profileTabs = $derived([
+		{ id: 'library', label: m.profile_library_tab(), icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+		{ id: 'account', label: m.profile_account_tab(), icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
+	]);
+	const accountSections = $derived([
+		{ id: 'account', label: m.profile_account_tab(), desc: m.profile_account_section_desc(), icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+		{ id: 'profile', label: m.profile_profile_section(), desc: m.profile_profile_section_desc(), icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' },
+		{ id: 'security', label: m.profile_security_section(), desc: m.profile_security_section_desc(), icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' }
+	] as { id: 'account' | 'profile' | 'security'; label: string; desc: string; icon: string }[]);
+
 	let isLoadingProfile = $state(false);
 	let isLoadingPassword = $state(false);
 	let successMessage = $state('');
@@ -183,7 +194,7 @@
 		<h3 class="font-semibold text-plum mb-1">{title}</h3>
 		<p class="text-sm text-plum-light mb-4">{desc}</p>
 		<a href={href} class="inline-flex px-6 py-2.5 rounded-xl {icon === 'watch' ? 'bg-gradient-to-r from-mint to-mint-dark text-plum' : 'bg-gradient-to-r from-coral to-coral-dark text-white'} font-semibold shadow-lg {icon === 'watch' ? 'shadow-mint/25' : 'shadow-coral/25'} hover:shadow-xl hover:scale-[1.02] transition-all duration-300 text-sm touch-target">
-			ไปดูซีรีส์ทั้งหมด
+			{m.profile_view_all_series()}
 		</a>
 	</div>
 {/snippet}
@@ -206,7 +217,7 @@
 			<div class="glass-card rounded-2xl p-8 text-center">
 				<p class="text-coral">{pageError}</p>
 				<button onclick={() => window.location.reload()} class="mt-4 px-6 py-2 rounded-xl bg-coral/10 text-coral-dark font-medium touch-target">
-					ลองอีกครั้ง
+					{m.profile_retry()}
 				</button>
 			</div>
 		{:else if profileUser}
@@ -262,7 +273,7 @@
 								class="flex-1 sm:flex-none py-2.5 px-5 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 text-sm touch-target flex items-center justify-center gap-2"
 							>
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-								แก้ไขโปรไฟล์
+								{m.profile_edit()}
 							</button>
 						</div>
 					</div>
@@ -289,21 +300,21 @@
 								<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
 							</div>
 							<div class="text-xl sm:text-2xl font-bold text-plum font-[family-name:var(--font-display)]">{favoriteSeries.length}</div>
-							<div class="text-[11px] sm:text-xs text-plum-light">รายการโปรด</div>
+							<div class="text-[11px] sm:text-xs text-plum-light">{m.profile_favorites_label()}</div>
 						</div>
 						<div class="glass-card-strong rounded-2xl p-3 sm:p-4 text-center">
 							<div class="flex items-center justify-center mb-1.5 text-mint-dark">
 								<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
 							</div>
 							<div class="text-xl sm:text-2xl font-bold text-plum font-[family-name:var(--font-display)]">{watchedSeries.length}</div>
-							<div class="text-[11px] sm:text-xs text-plum-light">ดูแล้ว</div>
+							<div class="text-[11px] sm:text-xs text-plum-light">{m.profile_watched_label()}</div>
 						</div>
 						<div class="glass-card-strong rounded-2xl p-3 sm:p-4 text-center">
 							<div class="flex items-center justify-center mb-1.5 text-lavender-dark">
 								<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
 							</div>
 							<div class="text-xl sm:text-2xl font-bold text-plum font-[family-name:var(--font-display)]">{new Date(profileUser.createdAt).getFullYear()}</div>
-							<div class="text-[11px] sm:text-xs text-plum-light">สมาชิกตั้งแต่</div>
+							<div class="text-[11px] sm:text-xs text-plum-light">{m.profile_member_since()}</div>
 						</div>
 					</div>
 				</div>
@@ -311,7 +322,7 @@
 				<!-- STICKY TAB BAR (Facebook-style underline tabs) -->
 				<div class="border-t border-lavender/15 px-2 sm:px-6">
 					<div class="flex gap-1 sm:gap-2 relative">
-						{#each [{ id: 'library', label: 'คลังของฉัน', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' }, { id: 'account', label: 'บัญชี', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }] as tab}
+						{#each profileTabs as tab}
 							<button
 								onclick={() => (activeTab = tab.id as 'library' | 'account')}
 								aria-pressed={activeTab === tab.id}
@@ -357,14 +368,14 @@
 								class="relative z-10 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 flex items-center justify-center gap-1.5 touch-target {libraryView === 'favorite' ? 'text-coral-dark' : 'text-plum-light'}"
 							>
 								<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
-								รายการโปรด
+								{m.profile_favorites_label()}
 							</button>
 							<button
 								onclick={() => (libraryView = 'watched')}
 								class="relative z-10 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 flex items-center justify-center gap-1.5 touch-target {libraryView === 'watched' ? 'text-mint-dark' : 'text-plum-light'}"
 							>
 								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-								ดูแล้ว
+								{m.profile_watched_label()}
 							</button>
 						</div>
 
@@ -376,7 +387,7 @@
 									{/each}
 								</div>
 							{:else}
-								{@render emptyState('fav', 'ยังไม่มีซีรีส์ที่ Favorite', 'ไปค้นหาซีรีส์ที่คุณชอบแล้วกดหัวใจเก็บไว้ที่นี่!', '/series')}
+								{@render emptyState('fav', m.profile_empty_favorites_title(), m.profile_empty_favorites_desc(), localizedHref('/series', page.data.lang))}
 							{/if}
 						{:else}
 							{#if watchedSeries.length > 0}
@@ -386,7 +397,7 @@
 									{/each}
 								</div>
 							{:else}
-								{@render emptyState('watch', 'ยังไม่มีซีรีส์ที่ดูแล้ว', 'เปิดซีรีส์ที่ดูจบแล้วกดปุ่ม "ดูแล้ว" เพื่อเก็บประวัติการรับชม!', '/series')}
+								{@render emptyState('watch', m.profile_empty_watched_title(), m.profile_empty_watched_desc(), localizedHref('/series', page.data.lang))}
 							{/if}
 						{/if}
 					</div>
@@ -396,7 +407,7 @@
 						<!-- SIDEBAR: section nav + account actions -->
 						<aside class="lg:sticky lg:top-24 lg:self-start mb-4 lg:mb-0 space-y-3">
 							<nav class="glass-card rounded-2xl sm:rounded-3xl p-2 grid grid-cols-3 lg:grid-cols-1 gap-1">
-								{#each [{ id: 'account', label: 'บัญชี', desc: 'ข้อมูลผู้ใช้', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }, { id: 'profile', label: 'โปรไฟล์', desc: 'รูปและชื่อแสดง', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' }, { id: 'security', label: 'ความปลอดภัย', desc: 'รหัสผ่าน', icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' }] as { id: 'account' | 'profile' | 'security'; label: string; desc: string; icon: string }[] as section}
+								{#each accountSections as section}
 									<button
 										onclick={() => { accountSection = section.id; }}
 										aria-pressed={accountSection === section.id}
@@ -419,7 +430,7 @@
 								{#if profileUser.role === 'ADMIN'}
 									<a href="/{page.data.lang}/admin/series" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 text-sm touch-target flex items-center justify-center gap-2">
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-										<span>หน้าจัดการ</span>
+										<span>{m.profile_admin_panel()}</span>
 									</a>
 								{/if}
 								<button
@@ -427,7 +438,7 @@
 									class="w-full py-2.5 px-4 rounded-xl border-2 border-coral/30 bg-coral/5 text-coral-dark font-semibold hover:bg-coral/10 hover:border-coral/50 hover:scale-[1.02] transition-all duration-300 text-sm touch-target flex items-center justify-center gap-2"
 								>
 									<svg class="w-4 h-4 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-									ออกจากระบบ
+									{m.profile_logout()}
 								</button>
 							</div>
 						</aside>
@@ -440,24 +451,24 @@
 									<div class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6">
 										<div class="flex items-center gap-2 mb-4">
 											<svg class="w-4 h-4 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-											<h2 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">ข้อมูลบัญชี</h2>
+											<h2 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{m.profile_account_section()}</h2>
 										</div>
 										<div class="space-y-3">
 											<div class="flex items-center justify-between gap-3 pb-3 border-b border-lavender/10">
-												<span class="text-sm text-plum-light shrink-0">ชื่อผู้ใช้</span>
+												<span class="text-sm text-plum-light shrink-0">{m.profile_username()}</span>
 												<span class="text-sm font-medium text-plum text-right truncate">{profileUser.username}</span>
 											</div>
 											<div class="flex items-center justify-between gap-3 pb-3 border-b border-lavender/10">
-												<span class="text-sm text-plum-light shrink-0">อีเมล</span>
+												<span class="text-sm text-plum-light shrink-0">{m.profile_email()}</span>
 												<span class="text-sm font-medium text-plum text-right truncate">{profileUser.email}</span>
 											</div>
 											<div class="flex items-center justify-between gap-3 pb-3 border-b border-lavender/10">
-												<span class="text-sm text-plum-light shrink-0">ชื่อที่แสดง</span>
+												<span class="text-sm text-plum-light shrink-0">{m.profile_display_name()}</span>
 												<span class="text-sm font-medium text-plum text-right truncate">{profileUser.displayName || '-'}</span>
 											</div>
 											<div class="flex items-center justify-between gap-3">
-												<span class="text-sm text-plum-light shrink-0">เข้าร่วมเมื่อ</span>
-												<span class="text-sm font-medium text-plum text-right">{new Date(profileUser.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+												<span class="text-sm text-plum-light shrink-0">{m.profile_joined_on()}</span>
+												<span class="text-sm font-medium text-plum text-right">{new Date(profileUser.createdAt).toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
 											</div>
 										</div>
 									</div>
@@ -468,30 +479,30 @@
 									<div class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6">
 										<div class="flex items-center gap-2 mb-4">
 											<span class="w-8 h-8 rounded-lg bg-coral/10 flex items-center justify-center"><svg class="w-4 h-4 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></span>
-											<h2 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">แก้ไขโปรไฟล์</h2>
+											<h2 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{m.profile_edit()}</h2>
 										</div>
 										<form onsubmit={handleUpdateProfile} class="space-y-4">
 											<div>
-												<label for="displayName" class="block text-sm font-medium text-plum mb-1.5">ชื่อที่แสดง</label>
-												<input id="displayName" name="displayName" type="text" bind:value={displayName} placeholder="ชื่อของคุณ" class="w-full px-3 sm:px-4 py-2.5 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target" />
+												<label for="displayName" class="block text-sm font-medium text-plum mb-1.5">{m.profile_display_name()}</label>
+												<input id="displayName" name="displayName" type="text" bind:value={displayName} placeholder={m.profile_display_name_placeholder()} class="w-full px-3 sm:px-4 py-2.5 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target" />
 											</div>
 											<div>
-												<label for="avatarUrl" class="block text-sm font-medium text-plum mb-1.5">URL รูปโปรไฟล์</label>
+												<label for="avatarUrl" class="block text-sm font-medium text-plum mb-1.5">{m.profile_avatar_url()}</label>
 												<input id="avatarUrl" name="avatarUrl" type="url" bind:value={avatarUrl} placeholder="https://example.com/avatar.jpg" class="w-full px-3 sm:px-4 py-2.5 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target" />
 											</div>
 											<div>
-												<label for="coverUrl" class="block text-sm font-medium text-plum mb-1.5">URL รูปปก <span class="text-plum-light font-normal">(แนะนำอัตราส่วนกว้างประมาณ 3:1)</span></label>
+												<label for="coverUrl" class="block text-sm font-medium text-plum mb-1.5">{m.profile_cover_url()} <span class="text-plum-light font-normal">({m.profile_cover_url_hint()})</span></label>
 												<input id="coverUrl" name="coverUrl" type="url" bind:value={coverUrl} placeholder="https://example.com/cover.jpg" class="w-full px-3 sm:px-4 py-2.5 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target" />
 												{#if coverUrl}
-													<div class="mt-2 rounded-xl overflow-hidden border border-lavender/20 aspect-[3/1]"><img src={coverUrl} alt="ตัวอย่างรูปปก" class="w-full h-full object-cover" loading="lazy" decoding="async" /></div>
+													<div class="mt-2 rounded-xl overflow-hidden border border-lavender/20 aspect-[3/1]"><img src={coverUrl} alt={m.profile_cover_preview_alt()} class="w-full h-full object-cover" loading="lazy" decoding="async" /></div>
 												{/if}
 											</div>
 											<button type="submit" disabled={isLoadingProfile} class="w-full py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-60 text-sm sm:text-base touch-target flex items-center justify-center gap-2">
 												{#if isLoadingProfile}
 													<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-													กำลังบันทึก...
+													{m.profile_saving()}
 												{:else}
-													บันทึกโปรไฟล์
+													{m.profile_save_profile()}
 												{/if}
 											</button>
 										</form>
@@ -503,18 +514,18 @@
 									<div class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6">
 										<div class="flex items-center gap-2 mb-4">
 											<span class="w-8 h-8 rounded-lg bg-lavender/10 flex items-center justify-center"><svg class="w-4 h-4 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg></span>
-											<h2 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">เปลี่ยนรหัสผ่าน</h2>
+											<h2 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{m.profile_change_password_title()}</h2>
 										</div>
 										<form onsubmit={handleChangePassword} class="space-y-4">
-											<PasswordInput id="currentPassword" name="currentPassword" bind:value={currentPassword} label="รหัสผ่านปัจจุบัน" />
-											<PasswordInput id="newPassword" name="newPassword" bind:value={newPassword} label="รหัสผ่านใหม่" placeholder="อย่างน้อย 6 ตัวอักษร" minlength={6} />
-											<PasswordInput id="confirmPassword" name="confirmPassword" bind:value={confirmNewPassword} label="ยืนยันรหัสผ่านใหม่" />
+											<PasswordInput id="currentPassword" name="currentPassword" bind:value={currentPassword} label={m.profile_current_password()} />
+											<PasswordInput id="newPassword" name="newPassword" bind:value={newPassword} label={m.profile_new_password()} placeholder={m.profile_new_password_placeholder()} minlength={6} />
+											<PasswordInput id="confirmPassword" name="confirmPassword" bind:value={confirmNewPassword} label={m.profile_confirm_new_password()} />
 											<button type="submit" disabled={isLoadingPassword} class="w-full py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-60 text-sm sm:text-base touch-target flex items-center justify-center gap-2">
 												{#if isLoadingPassword}
 													<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-													กำลังบันทึก...
+													{m.profile_saving()}
 												{:else}
-													เปลี่ยนรหัสผ่าน
+													{m.profile_change_password()}
 												{/if}
 											</button>
 										</form>
@@ -528,7 +539,7 @@
 							{#if profileUser.role === 'ADMIN'}
 								<a href="/{page.data.lang}/admin/series" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 text-sm sm:text-base touch-target flex items-center justify-center gap-2">
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-									หน้าจัดการ
+									{m.profile_admin_panel()}
 								</a>
 							{/if}
 							<button
@@ -536,7 +547,7 @@
 								class="w-full py-3 px-4 rounded-xl border-2 border-coral/30 bg-coral/5 text-coral-dark font-semibold hover:bg-coral/10 hover:border-coral/50 hover:scale-[1.02] transition-all duration-300 text-sm sm:text-base touch-target flex items-center justify-center gap-2"
 							>
 								<svg class="w-5 h-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-								ออกจากระบบ
+								{m.profile_logout()}
 							</button>
 						</div>
 					</div>

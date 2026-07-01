@@ -72,25 +72,28 @@ export function getEndOfWeek(date: Date): Date {
  */
 export function getViewUrl(
 	view: 'grid' | 'calendar' | 'list' | 'card',
+	lang: string,
 	currentYear: number | undefined,
 	currentMonth: number | undefined,
 	currentStartDate: string | null,
-	currentEndDate: string | null,
+	currentEndDate: string | null
 ): string {
+	const base = `/${lang}/calendar`;
+
 	if (view === 'grid' || view === 'calendar') {
 		const y = currentYear ?? new Date().getFullYear();
 		const m = currentMonth ?? new Date().getMonth() + 1;
-		return `/calendar?year=${y}&month=${m}`;
+		return `${base}?year=${y}&month=${m}`;
 	}
 
 	if (view === 'list' || view === 'card') {
 		if (currentStartDate && currentEndDate) {
-			return `/calendar?startDate=${currentStartDate}&endDate=${currentEndDate}`;
+			return `${base}?startDate=${currentStartDate}&endDate=${currentEndDate}`;
 		}
 	}
 	const today = new Date();
 	const start = getStartOfWeek(today);
 	const end = getEndOfWeek(today);
-	return `/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`;
+	return `${base}?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`;
 }
 

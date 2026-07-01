@@ -6,7 +6,7 @@
 
 	let { navHidden = false }: { navHidden?: boolean } = $props();
 
-	const navLinks = [
+	const navLinks = $derived([
 		{
 			href: `/${page.data.lang}/`,
 			label: m.nav_home(),
@@ -27,12 +27,12 @@
 			label: m.nav_chat(),
 			icon: '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.142-4.03 7.5-9 7.5a10.55 10.55 0 0 1-3.72-.66L3 20.25l1.46-3.98A6.82 6.82 0 0 1 3 12c0-4.142 4.03-7.5 9-7.5s9 3.358 9 7.5Z" /></svg>'
 		}
-	];
+	]);
 
 	function isActive(href: string) {
 		const p = page.url.pathname;
 		const langPrefix = `/${page.data.lang}`;
-		if (href === `${langPrefix}/`) return p === `${langPrefix}/`;
+		if (href === `${langPrefix}/`) return p === langPrefix || p === `${langPrefix}/`;
 		// "สำรวจ" ครอบทั้ง /th/explore/series และ /th/explore/artists
 		if (href.startsWith(`${langPrefix}/explore`)) return p.startsWith(`${langPrefix}/explore`);
 		return p === href || p.startsWith(href + '/');
@@ -109,7 +109,7 @@
 
 			<!-- Auth Section -->
 			<div class="justify-self-end flex items-center gap-2 xl:gap-3 min-w-0">
-				<LanguageSwitcher className="hidden lg:flex" />
+				<LanguageSwitcher variant="icon" className="hidden lg:inline-flex" />
 				{#if currentUser}
 					{#if currentUser.role === 'ADMIN'}
 						<a

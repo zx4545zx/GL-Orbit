@@ -43,7 +43,8 @@
 		const params = new URLSearchParams();
 		if (search.trim()) params.set('search', search.trim());
 		const query = params.toString();
-		return query ? `/explore/artists?${query}` : '/explore/artists';
+		const base = `/${page.data.lang}/explore/artists`;
+		return query ? `${base}?${query}` : base;
 	}
 
 	async function updateUrl(search: string) {

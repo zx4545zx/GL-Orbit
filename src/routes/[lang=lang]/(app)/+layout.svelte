@@ -6,12 +6,14 @@
 
 	let { children } = $props();
 
+	const langPrefix = $derived(`/${page.data.lang}`);
+
 	// Show the floating back-to-top button on long list pages, but NOT on detail pages.
 	const showBackToTop = $derived(
-		page.url.pathname === '/series' ||
-		page.url.pathname === '/artists' ||
-		page.url.pathname.startsWith('/explore/series') ||
-		page.url.pathname.startsWith('/explore/artists')
+		page.url.pathname === `${langPrefix}/series` ||
+		page.url.pathname === `${langPrefix}/artists` ||
+		page.url.pathname.startsWith(`${langPrefix}/explore/series`) ||
+		page.url.pathname.startsWith(`${langPrefix}/explore/artists`)
 	);
 
 	// Shared scroll state — drives both the auto-hide nav bars and the floating button position.

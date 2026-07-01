@@ -37,7 +37,8 @@ import { m } from '$lib/i18n/paraglide.js';
 		const params = new URLSearchParams();
 		if (search.trim()) params.set('search', search.trim());
 		const query = params.toString();
-		return query ? `/artists?${query}` : '/artists';
+		const base = `/${page.data.lang}/artists`;
+		return query ? `${base}?${query}` : base;
 	}
 
 	function getCurrentUrl(): string {

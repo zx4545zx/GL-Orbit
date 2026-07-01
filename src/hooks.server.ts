@@ -1,6 +1,7 @@
-import type { Handle } from '@sveltejs/kit';
+import { redirect, type Handle } from '@sveltejs/kit';
 import { validateSession } from '$lib/server/auth/session.js';
 import { detectLocale } from '$lib/i18n/detect.js';
+import { availableLanguageTags, type AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 import { getDb } from '$lib/server/db/index.js';
 import { users } from '$lib/server/db/schema.js';
 import { eq } from 'drizzle-orm';
@@ -42,6 +43,23 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	event.locals.lang = locale;
 	event.cookies.set('locale', locale, { path: '/', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' });
+
+	// Redirect non-localized public routes to the detected locale.
+	// Static assets, API routes, and special top-level routes are skipped.
+	const firstSegment = pathLang;
+	const isLocalized = availableLanguageTags.includes(firstSegment as AvailableLanguageTag);
+	const lastSegment = event.url.pathname.split('/').pop() ?? '';
+	const hasFileExtension = lastSegment.includes('.');
+	const nonLocalizedRoutes = new Set(['api', 'og-image']);
+
+	if (
+		!isLocalized &&
+		event.url.pathname !== '/' &&
+		!hasFileExtension &&
+		!nonLocalizedRoutes.has(firstSegment)
+	) {
+		throw redirect(302, `/${locale}${event.url.pathname}${event.url.search}`);
+	}
 
 	return resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('%lang%', locale)

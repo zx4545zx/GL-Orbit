@@ -110,31 +110,31 @@
 
 	function prevMonth() {
 		const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
-		navigateCalendar(`/calendar?year=${newDate.getFullYear()}&month=${newDate.getMonth() + 1}`);
+		navigateCalendar(`/${lang}/calendar?year=${newDate.getFullYear()}&month=${newDate.getMonth() + 1}`);
 	}
 
 	function nextMonth() {
 		const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
-		navigateCalendar(`/calendar?year=${newDate.getFullYear()}&month=${newDate.getMonth() + 1}`);
+		navigateCalendar(`/${lang}/calendar?year=${newDate.getFullYear()}&month=${newDate.getMonth() + 1}`);
 	}
 
 	function goToToday() {
 		const today = new Date();
-		navigateCalendar(`/calendar?year=${today.getFullYear()}&month=${today.getMonth() + 1}`);
+		navigateCalendar(`/${lang}/calendar?year=${today.getFullYear()}&month=${today.getMonth() + 1}`);
 	}
 
 	function prevWeek() {
 		const newDate = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate() - 7);
 		const start = getStartOfWeek(newDate);
 		const end = getEndOfWeek(newDate);
-		navigateCalendar(`/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
+		navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
 	}
 
 	function nextWeek() {
 		const newDate = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate() + 7);
 		const start = getStartOfWeek(newDate);
 		const end = getEndOfWeek(newDate);
-		navigateCalendar(`/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
+		navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
 	}
 
 	async function goToThisWeek() {
@@ -142,7 +142,7 @@
 		const today = new Date();
 		const start = getStartOfWeek(today);
 		const end = getEndOfWeek(today);
-		await navigateCalendar(`/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
+		await navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
 		await scrollToSchedule();
 	}
 
@@ -288,7 +288,7 @@
 					title={btn.label}
 					onclick={() => {
 						viewMode = btn.key;
-						navigateCalendar(getViewUrl(btn.key, params_y, params_m, params_sd, params_ed));
+						navigateCalendar(getViewUrl(btn.key, lang, params_y, params_m, params_sd, params_ed));
 					}}
 					class="min-w-0 justify-center px-2 lg:px-4 py-2.5 lg:py-2 rounded-xl text-xs lg:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 lg:gap-2 touch-target {active ? 'bg-white text-coral-dark shadow-md shadow-lavender/20 ring-1 ring-coral/10' : btn.group === 'monthly' ? 'text-plum-light/80 hover:bg-lavender/10 hover:text-plum' : 'text-plum-light hover:bg-white/60'}"
 				>

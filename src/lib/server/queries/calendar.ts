@@ -277,6 +277,8 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 		platformSet.add(s.platformName);
 	}
 
+	const dayOrder = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
+
 	const scheduleByDay = Array.from(scheduleByDayMap.entries()).map(([day, itemsMap]) => ({
 		day,
 		dayIndex: (dayOrder.indexOf(day) + 6) % 7,
@@ -291,7 +293,6 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 		}))
 	}));
 
-	const dayOrder = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
 	scheduleByDay.sort((a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day));
 
 	const result: CalendarApiResponse = {

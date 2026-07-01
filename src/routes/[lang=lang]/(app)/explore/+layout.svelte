@@ -4,10 +4,11 @@
 	import { page } from '$app/state';
 	let { children } = $props();
 
-	const tabs = [
-		{ id: 'series', href: '/explore/series', label: m.nav_series(), icon: 'M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4' },
-		{ id: 'artists', href: '/explore/artists', label: m.nav_artists(), icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
-	] as const;
+	const langPrefix = $derived(`/${page.data.lang}`);
+	const tabs = $derived([
+		{ id: 'series', href: `${langPrefix}/explore/series`, label: m.nav_series(), icon: 'M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4' },
+		{ id: 'artists', href: `${langPrefix}/explore/artists`, label: m.nav_artists(), icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
+	]);
 
 	function isActive(href: string) {
 		return page.url.pathname === href || page.url.pathname.startsWith(href + '/');

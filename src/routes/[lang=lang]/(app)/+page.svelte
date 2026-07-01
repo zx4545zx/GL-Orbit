@@ -1,11 +1,15 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
 
-	import { page } from '$app/state';	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
+	import { page } from '$app/state';
+	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, defaultSeoDescription, defaultSeoTitle, jsonLdScript, safeJsonLd } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
 	import type { CountdownItem, FeaturedSeriesItem, UpcomingScheduleItem } from '$lib/types/home.js';
 
 	let { data }: { data: PageData } = $props();
+
+	const pageTitle = $derived(defaultSeoTitle(page.data.lang));
+	const pageDescription = $derived(defaultSeoDescription(page.data.lang));
 
 	const featuredSeries = $derived<FeaturedSeriesItem[]>(data.featuredSeries);
 	const upcomingSchedule = $derived<UpcomingScheduleItem[]>(data.upcomingSchedule);
@@ -56,7 +60,7 @@ import { m } from '$lib/i18n/paraglide.js';
 
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/'));
 	const homeJsonLd = $derived(safeJsonLd([
-		buildWebPageJsonLd(page.url.origin, '/', DEFAULT_SEO_TITLE, DEFAULT_SEO_DESCRIPTION),
+		buildWebPageJsonLd(page.url.origin, '/', pageTitle, pageDescription),
 		{
 			'@context': 'https://schema.org',
 			'@type': 'WebSite',
@@ -75,7 +79,7 @@ import { m } from '$lib/i18n/paraglide.js';
 			name: SITE_NAME,
 			url: canonicalUrl,
 			logo: absoluteUrl(page.url.origin, '/icons/gl-orbit-icon.png'),
-			description: DEFAULT_SEO_DESCRIPTION,
+			description: pageDescription,
 			inLanguage: page.data.lang === 'th' ? 'th-TH' : 'en-US'
 		},
 		buildBreadcrumbJsonLd(page.url.origin, [{ name: m.nav_home(), path: '/' }])
@@ -134,20 +138,20 @@ import { m } from '$lib/i18n/paraglide.js';
 </script>
 
 <svelte:head>
-	<title>{DEFAULT_SEO_TITLE}</title>
-	<meta name="description" content={DEFAULT_SEO_DESCRIPTION} />
+	<title>{pageTitle}</title>
+	<meta name="description" content={pageDescription} />
 	<meta name="robots" content="index, follow" />
 	<link rel="canonical" href={canonicalUrl} />
 	<meta property="og:type" content="website" />
-	<meta property="og:title" content={DEFAULT_SEO_TITLE} />
-	<meta property="og:description" content={DEFAULT_SEO_DESCRIPTION} />
+	<meta property="og:title" content={pageTitle} />
+	<meta property="og:description" content={pageDescription} />
 	<meta property="og:url" content={canonicalUrl} />
 	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
 	<meta property="og:image:width" content={OG_IMAGE_WIDTH} />
 	<meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
 	<meta property="og:image:type" content={OG_IMAGE_TYPE} />
-	<meta name="twitter:title" content={DEFAULT_SEO_TITLE} />
-	<meta name="twitter:description" content={DEFAULT_SEO_DESCRIPTION} />
+	<meta name="twitter:title" content={pageTitle} />
+	<meta name="twitter:description" content={pageDescription} />
 	{@html jsonLdScript(homeJsonLd)}
 </svelte:head>
 
@@ -157,7 +161,6 @@ import { m } from '$lib/i18n/paraglide.js';
 	aria-label={m.home_chat_aria_label()}
 	class="group fixed right-4 z-[55] mobile-chat-fab flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-coral to-coral-dark text-white shadow-xl shadow-coral/40 transition-all duration-300 active:scale-95 md:hidden"
 >
-	{m.home_chat_aria_label()}
 	<svg class="h-5 w-5 transition-transform duration-300 group-active:scale-95" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
 		<path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
 		<path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.142-4.03 7.5-9 7.5a10.55 10.55 0 0 1-3.72-.66L3 20.25l1.46-3.98A6.82 6.82 0 0 1 3 12c0-4.142 4.03-7.5 9-7.5s9 3.358 9 7.5Z" />
@@ -300,7 +303,7 @@ import { m } from '$lib/i18n/paraglide.js';
 									<div class="flex items-center gap-1.5 mb-0.5">
 										<h3 class="font-semibold text-plum text-sm sm:text-base truncate group-hover:text-coral-dark transition-colors">{c.title}</h3>
 										{#if c.isUncut}
-											<span class="flex-shrink-0 px-1.5 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[9px] font-bold border border-coral/20">Uncut</span>
+											<span class="flex-shrink-0 px-1.5 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[9px] font-bold border border-coral/20">{m.common_uncut()}</span>
 										{/if}
 									</div>
 									<p class="text-xs text-plum-light truncate">{c.episode} · {c.platform}</p>
@@ -365,7 +368,7 @@ import { m } from '$lib/i18n/paraglide.js';
 				<p class="text-sm sm:text-base text-plum-light">{m.home_featured_subtitle()}</p>
 			</div>
 			<a href="/{page.data.lang}/series" class="flex items-center gap-2 text-coral-dark font-medium hover:gap-3 transition-all text-sm sm:text-base touch-target">
-				ดูทั้งหมด
+				{m.home_featured_see_all()}
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
 			</a>
 		</div>
@@ -518,7 +521,7 @@ import { m } from '$lib/i18n/paraglide.js';
 								<div class="flex items-center gap-2 mb-1 relative">
 									<h3 class="font-semibold text-plum text-sm sm:text-base truncate group-hover:text-coral-dark transition-colors">{item.series}</h3>
 									{#if item.isUncut}
-										<span class="flex-shrink-0 px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] sm:text-xs font-bold border border-coral/20">Uncut</span>
+										<span class="flex-shrink-0 px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] sm:text-xs font-bold border border-coral/20">{m.common_uncut()}</span>
 									{/if}
 								</div>
 								<div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-plum-light relative">

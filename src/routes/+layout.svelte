@@ -3,8 +3,16 @@
 	import { navigating, page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { DEFAULT_OG_IMAGE, defaultSeoDescription, defaultSeoTitle, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, siteLocale, SITE_NAME, absoluteUrl } from '$lib/seo.js';
+	import { availableLanguageTags, setLanguageTag, type AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 
 	let { children } = $props();
+
+	const currentLanguageTag = $derived(
+		availableLanguageTags.includes(page.data.lang as AvailableLanguageTag)
+			? (page.data.lang as AvailableLanguageTag)
+			: 'th'
+	);
+	setLanguageTag(() => currentLanguageTag);
 
 	// iOS PWA has rubber-band overscroll: pulling past the top/bottom of the
 	// document reveals the body background behind the app. The chat route avoids
@@ -144,5 +152,7 @@
 {/if}
 
 <div data-sveltekit-preload-data="hover" data-sveltekit-preload-code="viewport">
-	{@render children()}
+	{#key currentLanguageTag}
+		{@render children()}
+	{/key}
 </div>

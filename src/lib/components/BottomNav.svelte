@@ -2,7 +2,6 @@
 	import { m } from '$lib/i18n/paraglide.js';
 	import { navigating, page } from '$app/state';
 	import NotificationBadge from './NotificationBadge.svelte';
-	import LanguageSwitcher from './LanguageSwitcher.svelte';
 
 	let { bottomNavHidden = false }: { bottomNavHidden?: boolean } = $props();
 
@@ -38,7 +37,7 @@
 		};
 	});
 
-	const homeItem = {
+	const homeItem = $derived({
 		href: `/${page.data.lang}/`,
 		label: m.nav_home(),
 		icon: (active: boolean) => `
@@ -46,9 +45,9 @@
 				<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
 			</svg>
 		`
-	};
+	});
 
-	const secondaryItems = [
+	const secondaryItems = $derived([
 		{
 			href: `/${page.data.lang}/calendar`,
 			label: m.nav_calendar(),
@@ -67,29 +66,17 @@
 					</svg>
 				`
 			}
-		];
+		]);
 
-	const authItem = $derived(
-		currentUser
-			? {
-					href: `/${page.data.lang}/profile`,
-					label: m.nav_profile(),
-					icon: (active: boolean) => `
-						<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-						</svg>
-					`
-				}
-			: {
-					href: `/${page.data.lang}/login`,
-					label: m.nav_login(),
-					icon: (active: boolean) => `
-						<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-						</svg>
-					`
-				}
-	);
+	const menuItem = $derived({
+		href: `/${page.data.lang}/menus`,
+		label: m.nav_menus(),
+		icon: (active: boolean) => `
+			<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '2.3' : '1.7'}">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+			</svg>
+		`
+	});
 
 	const notificationItem = $derived(
 		currentUser
@@ -110,7 +97,7 @@
 		if (notificationItem) {
 			items.push(notificationItem);
 		}
-		items.push(authItem);
+		items.push(menuItem);
 		return items;
 	});
 
@@ -119,13 +106,13 @@
 	function isActive(href: string) {
 		const langPrefix = `/${page.data.lang}`;
 		if (href === `${langPrefix}/`) {
-			return activePathname === `${langPrefix}/`;
+			return activePathname === langPrefix || activePathname === `${langPrefix}/`;
 		}
 		// "สำรวจ" ครอบทั้ง /th/explore/series และ /th/explore/artists
 		if (href.startsWith(`${langPrefix}/explore`)) {
 			return activePathname.startsWith(`${langPrefix}/explore`);
 		}
-		return activePathname.startsWith(href);
+		return activePathname === href || activePathname.startsWith(href + '/');
 	}
 </script>
 
@@ -134,7 +121,6 @@
 >
 	<div class="bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(196,181,253,0.3)] overflow-hidden border-t border-lavender/15 safe-area-bottom">
 		<div class="flex items-center justify-around px-2">
-			<LanguageSwitcher className="hidden" />
 			{#each navItems as item}
 				{@const active = isActive(item.href)}
 				<a

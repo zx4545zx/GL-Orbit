@@ -5,7 +5,7 @@ import { verifyPassword } from '$lib/server/auth/password.js';
 import { createSession } from '$lib/server/auth/session.js';
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, params }) => {
 		const formData = await request.formData();
 		const identifier = formData.get('identifier')?.toString().trim() ?? '';
 		const password = formData.get('password')?.toString() ?? '';
@@ -42,6 +42,6 @@ export const actions: Actions = {
 			expires: expiresAt
 		});
 
-		throw redirect(303, '/admin/series');
+		throw redirect(303, `/${params.lang}/admin/series`);
 	}
 };

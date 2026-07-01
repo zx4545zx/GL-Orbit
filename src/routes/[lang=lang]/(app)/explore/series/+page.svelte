@@ -47,7 +47,8 @@
 		if (search.trim()) params.set('search', search.trim());
 		if (status !== 'ALL') params.set('status', status.toLowerCase());
 		const query = params.toString();
-		return query ? `/explore/series?${query}` : '/explore/series';
+		const base = `/${page.data.lang}/explore/series`;
+		return query ? `${base}?${query}` : base;
 	}
 
 	async function updateUrl(search: string, status: SeriesStatusFilter) {

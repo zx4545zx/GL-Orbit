@@ -1,24 +1,25 @@
 <script lang="ts">
-
 	import { page } from '$app/state';
-	const status = $derived(page.status);
-	const message = $derived(page.error?.message || 'เกิดข้อผิดพลาด');
+	import { m } from '$lib/i18n/paraglide.js';
 
-	const errorConfig: Record<number, { title: string; desc: string; icon: string }> = {
+	const status = $derived(page.status);
+	const message = $derived(page.error?.message || m.error_generic_message());
+
+	const errorConfig = $derived<Record<number, { title: string; desc: string; icon: string }>>({
 		404: {
-			title: 'ไม่พบหน้านี้',
-			desc: 'หน้าที่คุณกำลังมองหาอาจถูกย้ายหรือลบไปแล้ว',
+			title: m.error_404_title(),
+			desc: m.error_404_desc(),
 			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'
 		},
 		500: {
-			title: 'ระบบขัดข้อง',
-			desc: 'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์ กรุณาลองใหม่ในภายหลัง',
+			title: m.error_500_title(),
+			desc: m.error_500_desc(),
 			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>'
 		}
-	};
+	});
 
 	const config = $derived(errorConfig[status] || {
-		title: `ข้อผิดพลาด ${status}`,
+		title: m.error_generic_title({ status }),
 		desc: message,
 		icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'
 	});
@@ -52,13 +53,13 @@
 				href="/{page.data.lang}/"
 				class="px-6 py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-medium shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 transition-all hover:-translate-y-0.5 touch-target"
 			>
-				กลับหน้าแรก
+				{m.error_back_home()}
 			</a>
 			<a
 				href="/{page.data.lang}/series"
 				class="px-6 py-3 rounded-xl glass-card text-plum font-medium hover:bg-white/80 transition-all hover:-translate-y-0.5 touch-target"
 			>
-				ดูซีรีส์ทั้งหมด
+				{m.error_view_all_series()}
 			</a>
 		</div>
 	</div>

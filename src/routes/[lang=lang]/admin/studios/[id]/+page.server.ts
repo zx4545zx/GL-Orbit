@@ -6,7 +6,7 @@ import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!locals.user || locals.user.role !== 'ADMIN') {
-		redirect(303, '/admin/login');
+		redirect(303, `/${params.lang}/admin/login`);
 	}
 
 	const db = await getDb();
