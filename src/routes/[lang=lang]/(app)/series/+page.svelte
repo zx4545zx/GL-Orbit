@@ -1,4 +1,5 @@
 <script lang="ts">
+import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
 	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, jsonLdScript } from '$lib/seo.js';
@@ -8,16 +9,16 @@
 	let { data }: { data: PageData } = $props();
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
-		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
-		UPCOMING: { text: 'เร็วๆ นี้', class: 'bg-lavender/20 text-lavender-dark' },
-		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
+		ONGOING: { text: m.status_ongoing(), class: 'bg-mint/20 text-mint-dark' },
+		UPCOMING: { text: m.status_upcoming(), class: 'bg-lavender/20 text-lavender-dark' },
+		ENDED: { text: m.status_ended(), class: 'bg-coral/10 text-coral-dark' }
 	};
 
 	const filterOptions: { key: FilterKey; label: string }[] = [
-		{ key: 'ALL', label: 'ทั้งหมด' },
-		{ key: 'ONGOING', label: 'กำลังฉาย' },
-		{ key: 'UPCOMING', label: 'เร็วๆ นี้' },
-		{ key: 'ENDED', label: 'จบแล้ว' }
+		{ key: 'ALL', label: m.filter_all() },
+		{ key: 'ONGOING', label: m.status_ongoing() },
+		{ key: 'UPCOMING', label: m.status_upcoming() },
+		{ key: 'ENDED', label: m.status_ended() }
 	];
 
 	let extraSeries = $state<SeriesApiResponseItem[]>([]);
@@ -137,7 +138,7 @@
 			}
 		} catch (err) {
 			if (err instanceof Error && err.name === 'AbortError') return;
-			loadMoreError = 'โหลดไม่สำเร็จ กรุณาลองใหม่';
+			loadMoreError = m.series_load_error();
 		} finally {
 			if (loadMoreController === controller) {
 				loadMoreLoading = false;
@@ -177,15 +178,15 @@
 					type="text"
 					bind:value={searchQuery}
 					oninput={scheduleSearchUpdate}
-					placeholder="ค้นหาชื่อซีรีส์..."
-					aria-label="ค้นหาซีรีส์"
+					placeholder={m.series_search_placeholder()}
+					aria-label={m.series_search_label()}
 					class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base"
 				/>
 				{#if searchQuery}
 					<button
 						onclick={clearSearch}
 						class="p-1 rounded-lg hover:bg-lavender/20 transition-colors flex-shrink-0"
-						aria-label="ล้างการค้นหา"
+						aria-label={m.common_search_clear()}
 					>
 						<svg class="w-4 h-4 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
@@ -216,9 +217,9 @@
 	<!-- Title -->
 	<div class="text-center mb-6 sm:mb-8">
 		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
-			ซีรีส์<span class="text-coral">ทั้งหมด</span>
+			<span>{m.series_heading_plain()}</span><span class="text-coral">{m.series_heading_accent()}</span>
 		</h1>
-		<p class="text-sm sm:text-base text-plum-light">รวบรวมซีรีส์ GL จากทุกสตูดิโอ</p>
+		<p class="text-sm sm:text-base text-plum-light">{m.series_subtitle()}</p>
 	</div>
 
 	<!-- Normal Search & Filter -->
@@ -293,9 +294,9 @@
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 					</svg>
-					กำลังโหลด...
+					{m.common_loading()}
 				{:else}
-					ดูเพิ่มเติม
+					{m.common_load_more()}
 				{/if}
 			</button>
 
@@ -313,12 +314,12 @@
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
 				</svg>
 			</div>
-			<h3 class="font-semibold text-plum mb-1">ไม่พบซีรีส์</h3>
+			<h3 class="font-semibold text-plum mb-1">{m.series_empty_title()}</h3>
 			<p class="text-sm text-plum-light">
 				{#if searchQuery}
-					ลองค้นหาด้วยคำอื่น หรือ <button onclick={clearSearch} class="text-coral-dark font-medium hover:underline">ล้างการค้นหา</button>
+					{m.series_empty_search_prompt()}<button onclick={clearSearch} class="text-coral-dark font-medium hover:underline">{m.common_search_clear()}</button>
 				{:else}
-					ไม่พบซีรีส์ในหมวดหมู่นี้
+					{m.series_empty_category()}
 				{/if}
 			</p>
 		</div>
