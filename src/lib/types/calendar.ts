@@ -10,6 +10,7 @@ export interface CalendarEvent {
 
 export interface ScheduleDay {
   day: string;
+  dayIndex: number;
   items: CalendarEvent[];
 }
 

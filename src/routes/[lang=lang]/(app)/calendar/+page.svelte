@@ -8,6 +8,7 @@
 	import { getViewUrl } from './calendar.js';
 	import CalendarWeekHeader from './CalendarWeekHeader.svelte';
 	import CardScheduleBoard from './CardScheduleBoard.svelte';
+	import { m } from '$lib/i18n/paraglide.js';
 
 	let { data }: { data: PageData } = $props();
 
@@ -38,16 +39,23 @@
 	const monthPlatforms = $derived(calendar.platforms);
 	const weekScheduleByDay = $derived(calendar.scheduleByDay);
 
-	const weekDays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
-	const weekDayNames = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
-	const thaiMonths = [
-		'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-		'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-	];
-	const thaiMonthsShort = [
-		'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
-		'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
-	];
+	const lang = $derived(page.data.lang);
+
+	function getMonthName(date: Date, l: string) {
+		return new Intl.DateTimeFormat(l, { month: 'long' }).format(date);
+	}
+	function getMonthShort(date: Date, l: string) {
+		return new Intl.DateTimeFormat(l, { month: 'short' }).format(date);
+	}
+	function getWeekDayLong(date: Date, l: string) {
+		return new Intl.DateTimeFormat(l, { weekday: 'long' }).format(date);
+	}
+	function getWeekDayShort(date: Date, l: string) {
+		return new Intl.DateTimeFormat(l, { weekday: 'short' }).format(date);
+	}
+
+	const weekDays = $derived(Array.from({ length: 7 }, (_, i) => getWeekDayShort(new Date(2024, 0, 7 + i), lang)));
+	const weekDayNames = $derived(Array.from({ length: 7 }, (_, i) => getWeekDayLong(new Date(2024, 0, 1 + i), lang)));
 
 	function formatDateLocal(date: Date): string {
 		const year = date.getFullYear();
@@ -75,15 +83,12 @@
 	const currentWeekStart = $derived(getStartOfWeek(currentWeek));
 	const weekSummary = $derived((() => {
 		const today = new Date();
-		const todayIndex = weekDayNames.findIndex((_, index) => {
-			const day = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth(), currentWeekStart.getDate() + index);
-			return isSameDate(day, today);
-		});
-		const todayName = todayIndex >= 0 ? weekDayNames[todayIndex] : null;
-		const todaySchedule = todayName ? weekScheduleByDay.find((day) => day.day === todayName) : undefined;
+		const todayIndex = (today.getDay() + 6) % 7;
+		const todayName = weekDayNames[todayIndex];
+		const todaySchedule = weekScheduleByDay.find((day) => day.dayIndex === todayIndex);
 		const weekCount = weekScheduleByDay.reduce((sum, day) => sum + day.items.length, 0);
 		const firstDayWithEvent = weekScheduleByDay.find((day) => day.items.length > 0);
-		const featuredDay = todaySchedule?.items.length ? todayName : firstDayWithEvent?.day;
+		const featuredDay = todaySchedule?.items.length ? todayName : (firstDayWithEvent ? weekDayNames[firstDayWithEvent.dayIndex] : null);
 		const featuredEvent = todaySchedule?.items[0] ?? firstDayWithEvent?.items[0] ?? null;
 
 		return {
@@ -223,32 +228,32 @@
 		return map;
 	})());
 
-	const dayColors: Record<string, string> = {
-		'จันทร์': 'from-coral/20 to-coral/5',
-		'อังคาร': 'from-orange-300/20 to-orange-300/5',
-		'พุธ': 'from-lavender/20 to-lavender/5',
-		'พฤหัสบดี': 'from-emerald-300/20 to-emerald-300/5',
-		'ศุกร์': 'from-teal-300/20 to-teal-300/5',
-		'เสาร์': 'from-blue-300/20 to-blue-300/5',
-		'อาทิตย์': 'from-rose-300/20 to-rose-300/5'
-	};
+	const dayColorClasses = [
+		'from-coral/20 to-coral/5',
+		'from-orange-300/20 to-orange-300/5',
+		'from-lavender/20 to-lavender/5',
+		'from-emerald-300/20 to-emerald-300/5',
+		'from-teal-300/20 to-teal-300/5',
+		'from-blue-300/20 to-blue-300/5',
+		'from-rose-300/20 to-rose-300/5'
+	];
 
-	const seoTitle = 'ตารางฉายซีรีส์ GL | GL-Orbit';
-	const seoDescription = 'ติดตามตารางฉายซีรีส์ Girls\' Love รายเดือนและรายสัปดาห์ พร้อมเวลาฉาย แพลตฟอร์มรับชม และป้าย Uncut version';
+	const seoTitle = m.calendar_seo_title();
+	const seoDescription = m.calendar_seo_description();
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/calendar'));
 	const calendarJsonLd = $derived(safeJsonLd([
 		buildWebPageJsonLd(page.url.origin, '/calendar', seoTitle, seoDescription),
 		buildBreadcrumbJsonLd(page.url.origin, [
-			{ name: 'หน้าแรก', path: '/' },
-			{ name: 'ตารางฉาย', path: '/calendar' }
+			{ name: m.nav_home(), path: '/' },
+			{ name: m.calendar_breadcrumb(), path: '/calendar' }
 		])
 	]));
 
 	const viewButtons = [
-		{ key: 'card' as const, label: 'สัปดาห์', short: 'สัปดาห์', group: 'primary', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
-		{ key: 'list' as const, label: 'ลิสต์', short: 'ลิสต์', group: 'primary', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>' },
-		{ key: 'calendar' as const, label: 'ปฏิทินเดือน', short: 'เดือน', group: 'monthly', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M7 14h.01M11 14h.01M15 14h.01M7 18h.01M11 18h.01M15 18h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
-		{ key: 'grid' as const, label: 'ตารางเดือน', short: 'ตาราง', group: 'monthly', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M3 10h18M3 16h18M8 4v16M14 4v16"/>' }
+		{ key: 'card' as const, label: m.calendar_view_week(), short: m.calendar_view_week(), group: 'primary', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
+		{ key: 'list' as const, label: m.calendar_view_list(), short: m.calendar_view_list(), group: 'primary', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>' },
+		{ key: 'calendar' as const, label: m.calendar_view_month_calendar(), short: m.calendar_view_month_calendar(), group: 'monthly', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M7 14h.01M11 14h.01M15 14h.01M7 18h.01M11 18h.01M15 18h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
+		{ key: 'grid' as const, label: m.calendar_view_month_grid(), short: m.calendar_view_month_grid(), group: 'monthly', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M3 10h18M3 16h18M8 4v16M14 4v16"/>' }
 	];
 </script>
 
@@ -299,7 +304,7 @@
 	<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-5 mb-4 sm:mb-6">
 		<div class="flex items-center gap-3">
 			<button
-				aria-label="เดือนก่อนหน้า"
+				aria-label={m.calendar_month_prev_aria()}
 				onclick={prevMonth}
 				class="w-11 h-11 rounded-2xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:-translate-x-0.5 touch-target flex-shrink-0"
 			>
@@ -308,25 +313,25 @@
 
 			<div class="flex-1 min-w-0 text-center">
 				<div class="text-[11px] sm:text-xs font-bold text-coral-dark uppercase tracking-wide mb-0.5">
-					{viewMode === 'grid' ? 'ตารางเดือน' : 'ปฏิทินเดือน'}
+					{viewMode === 'grid' ? m.calendar_view_month_grid() : m.calendar_view_month_calendar()}
 				</div>
 				<h2 class="font-[family-name:var(--font-display)] text-base sm:text-2xl md:text-3xl font-bold text-plum truncate">
-					<span class="sm:hidden">{thaiMonthsShort[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
-					<span class="hidden sm:inline">{thaiMonths[currentMonth.getMonth()]} {currentMonth.getFullYear() + 543}</span>
+					<span class="sm:hidden">{new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'short' }).format(currentMonth)}</span>
+					<span class="hidden sm:inline">{new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' }).format(currentMonth)}</span>
 				</h2>
 			</div>
 
 			<div class="flex items-center gap-2 flex-shrink-0">
 				<button
 					onclick={goToToday}
-					aria-label="เดือนนี้"
+					aria-label={m.calendar_month_today_aria()}
 					class="hidden sm:inline-flex h-11 px-5 rounded-2xl items-center justify-center bg-gradient-to-r from-coral to-coral-dark text-white text-sm font-bold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
 				>
-					เดือนนี้
+					{m.calendar_month_today_text()}
 				</button>
 				<button
 					onclick={goToToday}
-					aria-label="เดือนนี้"
+					aria-label={m.calendar_month_today_aria()}
 					class="sm:hidden w-11 h-11 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white flex items-center justify-center shadow-lg shadow-coral/25 touch-target"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,7 +339,7 @@
 					</svg>
 				</button>
 				<button
-					aria-label="เดือนถัดไป"
+					aria-label={m.calendar_month_next_aria()}
 					onclick={nextMonth}
 					class="w-11 h-11 rounded-2xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:translate-x-0.5 touch-target"
 				>
@@ -357,32 +362,32 @@
 					Today / This Week
 				</div>
 				<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum leading-tight mb-2">
-					ตารางฉาย<span class="text-coral"> GL</span>
+					{m.calendar_title_plain()}<span class="text-coral"> GL</span>
 				</h1>
 				<p class="text-sm sm:text-base text-plum-light max-w-2xl leading-relaxed">
-					เปิดมาปุ๊บรู้ทันทีว่าวันนี้และสัปดาห์นี้มีเรื่องไหนฉาย กี่โมง และดูได้ที่แพลตฟอร์มไหน
+					{m.calendar_subtitle()}
 				</p>
 			</div>
 
 			<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
 				<div class="rounded-2xl bg-white/70 p-4 shadow-sm shadow-lavender/10 border border-white/60">
-					<div class="text-xs font-medium text-plum-light mb-1">วันนี้</div>
+					<div class="text-xs font-medium text-plum-light mb-1">{m.calendar_today_label()}</div>
 					<div class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum">{weekSummary.todayCount}</div>
-					<div class="text-[11px] text-plum-light">รายการฉาย</div>
+					<div class="text-[11px] text-plum-light">{m.calendar_today_count_label()}</div>
 				</div>
 				<div class="rounded-2xl bg-white/70 p-4 shadow-sm shadow-lavender/10 border border-white/60">
-					<div class="text-xs font-medium text-plum-light mb-1">สัปดาห์นี้</div>
+					<div class="text-xs font-medium text-plum-light mb-1">{m.calendar_week_label()}</div>
 					<div class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum">{weekSummary.weekCount}</div>
-					<div class="text-[11px] text-plum-light">รายการทั้งหมด</div>
+					<div class="text-[11px] text-plum-light">{m.calendar_week_count_label()}</div>
 				</div>
 				<div class="col-span-2 sm:col-span-1 lg:col-span-2 xl:col-span-1 rounded-2xl bg-gradient-to-br from-coral/10 to-lavender/15 p-4 border border-coral/10">
-					<div class="text-xs font-medium text-plum-light mb-1">ไฮไลต์ถัดไป</div>
+					<div class="text-xs font-medium text-plum-light mb-1">{m.calendar_featured_label()}</div>
 					{#if weekSummary.featuredEvent}
 						<div class="text-sm font-bold text-plum truncate">{weekSummary.featuredEvent.series}</div>
 						<div class="text-xs text-coral-dark font-semibold mt-1">{weekSummary.featuredDay} · {weekSummary.featuredEvent.time}</div>
 					{:else}
-						<div class="text-sm font-bold text-plum">ยังไม่มีคิวฉาย</div>
-						<div class="text-xs text-plum-light mt-1">ลองดูสัปดาห์ถัดไป</div>
+						<div class="text-sm font-bold text-plum">{m.calendar_featured_empty()}</div>
+						<div class="text-xs text-plum-light mt-1">{m.calendar_featured_empty_sub()}</div>
 					{/if}
 				</div>
 			</div>
@@ -393,7 +398,7 @@
 				onclick={goToThisWeek}
 				class="inline-flex w-full lg:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-coral to-coral-dark px-5 py-3 text-sm font-bold text-white shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
 			>
-				ดูสัปดาห์นี้
+				{m.calendar_this_week_cta()}
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
 			</button>
 			<div class="w-full lg:max-w-max">
@@ -455,7 +460,7 @@
 						<thead>
 							<tr class="border-b border-lavender/10">
 								<th class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-semibold text-plum-light w-28 sm:w-32 md:w-44 lg:w-52 border-r border-lavender/10 align-top">
-									ซีรีส์
+									{m.calendar_grid_series_header()}
 								</th>
 								{#each monthDays as day}
 									{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
@@ -463,16 +468,7 @@
 									{@const dayOfWeek = dateObj.getDay()}
 									<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[32px] sm:min-w-[44px] {isTodayDate ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
 										<div class="font-bold">{day}</div>
-										<div class="text-[8px] sm:text-[10px] opacity-70">
-											{#if dayOfWeek === 0}อา
-											{:else if dayOfWeek === 1}จ
-											{:else if dayOfWeek === 2}อ
-											{:else if dayOfWeek === 3}พ
-											{:else if dayOfWeek === 4}พฤ
-											{:else if dayOfWeek === 5}ศ
-											{:else}ส
-											{/if}
-										</div>
+										<div class="text-[8px] sm:text-[10px] opacity-70">{weekDays[dayOfWeek]}</div>
 									</th>
 								{/each}
 							</tr>
@@ -524,7 +520,7 @@
 				</div>
 
 				<div class="mt-4 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-plum-light px-4 sm:px-6 pb-4 sm:pb-6">
-					<span>แพลตฟอร์ม:</span>
+					<span>{m.calendar_platform_label()}</span>
 					{#each Object.entries(platformColors) as [platform, colorClass]}
 						<div class="flex items-center gap-1">
 							<div class="w-3 h-3 rounded {colorClass.split(' ')[0]}"></div>
@@ -581,7 +577,7 @@
 										</div>
 									{/if}
 									{#if isToday(day.fullDate)}
-										<span class="absolute -top-1.5 -right-1 px-1.5 py-0.5 bg-coral rounded-md text-[8px] sm:text-[10px] text-white font-bold shadow-sm leading-none">วันนี้</span>
+										<span class="absolute -top-1.5 -right-1 px-1.5 py-0.5 bg-coral rounded-md text-[8px] sm:text-[10px] text-white font-bold shadow-sm leading-none">{m.calendar_today_badge()}</span>
 									{/if}
 								</button>
 							{/each}
@@ -590,11 +586,11 @@
 						<div class="mt-3 sm:mt-4 flex items-center gap-3 sm:gap-4 text-[10px] sm:text-xs text-plum-light">
 							<div class="flex items-center gap-1 sm:gap-1.5">
 								<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-coral"></div>
-								<span>มีซีรีส์ฉาย</span>
+								<span>{m.calendar_legend_has_event()}</span>
 							</div>
 							<div class="flex items-center gap-1 sm:gap-1.5">
 								<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-coral ring-1 sm:ring-1 ring-coral"></div>
-								<span>วันนี้</span>
+								<span>{m.calendar_today_badge()}</span>
 							</div>
 						</div>
 					{/if}
@@ -606,9 +602,9 @@
 					{#if selectedDate && selectedEvents.length > 0}
 						{@const d = new Date(selectedDate)}
 						<h3 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum mb-1">
-							{d.getDate()} {thaiMonths[d.getMonth()]}
+							{d.getDate()} {getMonthName(d, lang)}
 						</h3>
-						<p class="text-xs sm:text-sm text-plum-light mb-4 sm:mb-5">มี {selectedEvents.length} รายการ</p>
+						<p class="text-xs sm:text-sm text-plum-light mb-4 sm:mb-5">{m.calendar_selected_count({ count: selectedEvents.length })}</p>
 
 						<div class="space-y-2 sm:space-y-3">
 							{#each selectedEvents as event}
@@ -634,7 +630,7 @@
 												<span class="truncate">{event.platforms.join(', ')}</span>
 											</div>
 											<a href="/{page.data.lang}/series/{event.seriesId}" class="mt-2 sm:mt-3 inline-flex items-center gap-1 text-xs font-medium text-coral-dark hover:text-coral transition-colors">
-												ดูรายละเอียด
+												{m.calendar_detail_link()}
 												<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
 											</a>
 										</div>
@@ -651,9 +647,9 @@
 							</div>
 							<p class="text-plum-light text-xs sm:text-sm">
 								{#if selectedDate}
-									ไม่มีซีรีส์ฉายในวันนี้
+									{m.calendar_selected_empty()}
 								{:else}
-									เลือกวันที่มีจุดสีชมพู<br/>เพื่อดูรายละเอียด
+									{@html m.calendar_selected_hint().replace('\n', '<br/>')}
 								{/if}
 							</p>
 						</div>
@@ -697,12 +693,12 @@
 			</div>
 		{:else}
 			<div class="space-y-4 sm:space-y-6">
-				{#each weekScheduleByDay as day}
+				{#each weekScheduleByDay as day, i}
 					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
-						<div class="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r {dayColors[day.day] || 'from-lavender/20 to-lavender/5'} border-b border-white/50">
+						<div class="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r {dayColorClasses[i] || 'from-lavender/20 to-lavender/5'} border-b border-white/50">
 							<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum flex items-center gap-2 sm:gap-3">
 								<span class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/80 flex items-center justify-center text-base sm:text-lg">📅</span>
-								{day.day}
+								{weekDayNames[day.dayIndex]}
 							</h2>
 						</div>
 						<div class="divide-y divide-lavender/10">
@@ -732,7 +728,7 @@
 									</div>
 									<a
 										href="/{page.data.lang}/series/{item.seriesId}"
-										aria-label="ดูรายละเอียด"
+										aria-label={m.calendar_list_detail_aria()}
 										class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-coral/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-coral/20 touch-target"
 									>
 										<svg class="w-4 h-4 sm:w-5 sm:h-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -778,8 +774,8 @@
 			<svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-3 4-4 7-4 10v2l-1 2h10l-1-2v-2c0-3-1-6-4-10z"/><circle cx="12" cy="10" r="1.5" fill="white" opacity="0.6"/><path d="M10 17c0 1.5 2 2.5 2 2.5s2-1 2-2.5" fill="currentColor" opacity="0.4"/></svg>
 		</div>
 		<div class="flex-1 min-w-0">
-			<h3 class="font-[family-name:var(--font-display)] text-sm sm:text-base font-bold text-plum group-hover:text-coral-dark transition-colors">นับถอยหลัง · ซีรีส์ใกล้ฉาย</h3>
-			<p class="text-xs sm:text-sm text-plum-light">ติดตามซีรีส์ที่กำลังจะออกอากาศภายใน 7 วันนี้</p>
+			<h3 class="font-[family-name:var(--font-display)] text-sm sm:text-base font-bold text-plum group-hover:text-coral-dark transition-colors">{m.calendar_countdown_cta_title()}</h3>
+			<p class="text-xs sm:text-sm text-plum-light">{m.calendar_countdown_cta_desc()}</p>
 		</div>
 		<svg class="w-5 h-5 sm:w-6 sm:h-6 text-coral-dark group-hover:translate-x-1 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
 	</a>
@@ -792,10 +788,9 @@
 			</svg>
 		</div>
 		<div>
-			<h3 class="font-semibold text-plum mb-1 text-sm sm:text-base">หมายเหตุ</h3>
+			<h3 class="font-semibold text-plum mb-1 text-sm sm:text-base">{m.calendar_notes_title()}</h3>
 			<p class="text-xs sm:text-sm text-plum-light leading-relaxed">
-				เวลาฉายแสดงตามเวลาในประเทศไทย หากมีการเปลี่ยนแปลงตารางฉาย
-				ระบบจะอัปเดตให้โดยอัตโนมัติ ติ่งทุกคนสามารถตรวจสอบเวลาฉาย Uncut version ได้จากป้ายสีชมพู
+				{m.calendar_notes_body()}
 			</p>
 		</div>
 	</div>
