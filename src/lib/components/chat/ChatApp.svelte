@@ -1,5 +1,6 @@
 <script lang="ts">
 
+	import { m } from '$lib/i18n/paraglide.js';
 	import { page } from '$app/state';	import { replaceState } from '$app/navigation';
 	import ChatMarkdown from '$lib/components/ChatMarkdown.svelte';
 	import ChatContextPanel from './ChatContextPanel.svelte';
@@ -93,12 +94,12 @@
 	}
 
 	const loadingSteps = [
-		{ delay: 0, status: 'กำลังอ่านคำถามของคุณ', detail: 'กำลังดูว่าคุณอยากรู้เรื่องซีรีส์ นักแสดง หรือตารางฉาย' },
-		{ delay: 2500, status: 'กำลังหาข้อมูลที่เกี่ยวข้อง', detail: 'กำลังค้นจากข้อมูลซีรีส์ที่มีใน GL-Orbit' },
-		{ delay: 7000, status: 'กำลังคัดคำตอบให้ตรงคำถาม', detail: 'กำลังเลือกเฉพาะข้อมูลที่น่าจะช่วยตอบคำถามนี้' },
-		{ delay: 10000, status: 'กำลังรวบรวมรายละเอียด', detail: 'กำลังเช็กชื่อเรื่อง สถานะ นักแสดง หรือช่องทางรับชมที่เกี่ยวข้อง' },
-		{ delay: 15000, status: 'กำลังจัดคำตอบให้อ่านง่าย', detail: 'อีกสักครู่จะสรุปให้เป็นภาษาที่อ่านเข้าใจง่าย' },
-		{ delay: 25000, status: 'ยังทำงานอยู่', detail: 'คำถามนี้ใช้เวลานานกว่าปกตินิดหน่อย กำลังพยายามหาคำตอบให้ครบ' }
+		{ delay: 0, status: m.chat_status_reading(), detail: m.chat_status_reading_detail() },
+		{ delay: 2500, status: m.chat_status_searching(), detail: m.chat_status_searching_detail() },
+		{ delay: 7000, status: m.chat_status_filtering(), detail: m.chat_status_filtering_detail() },
+		{ delay: 10000, status: m.chat_status_gathering(), detail: m.chat_status_gathering_detail() },
+		{ delay: 15000, status: m.chat_status_formatting(), detail: m.chat_status_formatting_detail() },
+		{ delay: 25000, status: m.chat_status_long(), detail: m.chat_status_long_detail() }
 	];
 
 	function startLoadingStatus() {
@@ -125,7 +126,7 @@
 		history = body.conversations ?? history;
 	}
 
-	async function createConversation(title = 'แชตใหม่', options: { resetMessages?: boolean } = {}) {
+	async function createConversation(title = m.chat_new_title(), options: { resetMessages?: boolean } = {}) {
 		if (current && messages.length === 0) {
 			await replaceState(`/chat/${current.id}`, page.state);
 			return current;
@@ -180,7 +181,7 @@
 			});
 			const body = await res.json();
 			if (!res.ok) {
-				error = body.error ?? 'ตอบคำถามไม่ได้ในตอนนี้';
+				error = body.error ?? m.chat_error_default();
 				messages = messages.filter((message) => message.id !== optimisticUser.id);
 				input = text;
 				return;
@@ -204,7 +205,7 @@
 				: [];
 			await refreshHistory();
 		} catch {
-			error = 'เชื่อมต่อแชตไม่ได้ ลองใหม่อีกครั้งนะคะ';
+			error = m.chat_error_connect();
 			messages = messages.filter((message) => message.id !== optimisticUser.id);
 			input = text;
 			panelContext = null;
@@ -216,10 +217,10 @@
 	}
 
 	const SUGGESTIONS = [
-		{ label: 'ตารางฉายวันนี้', prompt: 'ตารางฉายวันนี้มีอะไรบ้าง?' },
-		{ label: 'กำลังฉายอยู่', prompt: 'ตอนนี้มีซีรีส์เรื่องไหนกำลังฉายอยู่บ้าง?' },
-		{ label: 'รอฉายใหม่', prompt: 'ซีรีส์ที่กำลังจะฉายมีเรื่องอะไรบ้าง?' },
-		{ label: 'แนะนำแนวโรแมนติก', prompt: 'มีซีรีส์แนวโรแมนติกเรื่องอะไรบ้าง?' }
+		{ label: m.chat_suggestion_today_schedule(), prompt: m.chat_suggestion_today_schedule_prompt() },
+		{ label: m.chat_suggestion_ongoing(), prompt: m.chat_suggestion_ongoing_prompt() },
+		{ label: m.chat_suggestion_upcoming(), prompt: m.chat_suggestion_upcoming_prompt() },
+		{ label: m.chat_suggestion_romance(), prompt: m.chat_suggestion_romance_prompt() }
 	];
 
 	function sendSuggestion(text: string) {
@@ -257,7 +258,7 @@
 	}
 
 	async function deleteConversation(conversationId: string) {
-		if (!confirm('ลบแชตนี้หรือไม่?')) return;
+		if (!confirm(m.chat_delete_confirm())) return;
 		const res = await fetch(`/api/chat/conversations/${conversationId}`, { method: 'DELETE' });
 		if (!res.ok) return;
 		history = history.filter((item) => item.id !== conversationId);
@@ -277,7 +278,7 @@
 
 <div class="flex h-full overflow-hidden">
 	{#if sidebarOpen}
-		<button class="fixed inset-0 z-30 bg-black/20 md:hidden" type="button" aria-label="ปิดประวัติแชต" onclick={() => sidebarOpen = false}></button>
+		<button class="fixed inset-0 z-30 bg-black/20 md:hidden" type="button" aria-label={m.chat_close_history_aria()} onclick={() => sidebarOpen = false}></button>
 	{/if}
 
 	<aside class="fixed top-[var(--pwa-safe-top)] bottom-0 left-0 z-40 flex w-80 max-w-[86vw] flex-col border-r border-black/10 bg-white transition-transform md:static md:translate-x-0 {sidebarOpen ? 'translate-x-0' : '-translate-x-full'}">
@@ -292,12 +293,12 @@
 				{/if}
 				<div class="min-w-0 flex-1">
 					<p class="truncate text-sm font-bold text-plum">{currentUser.displayName || currentUser.username}</p>
-					<a href="/{page.data.lang}/profile" class="text-xs text-plum-light hover:text-coral-dark transition">ดูโปรไฟล์</a>
+					<a href="/{page.data.lang}/profile" class="text-xs text-plum-light hover:text-coral-dark transition">{m.chat_view_profile()}</a>
 				</div>
 				<button
 					type="button"
 					class="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10 hover:text-plum md:hidden"
-					aria-label="ปิดเมนู"
+					aria-label={m.chat_close_menu_aria()}
 					onclick={() => sidebarOpen = false}
 				>
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -308,8 +309,8 @@
 		{/if}
 
 		<div class="p-3">
-			<button type="button" class="flex w-full items-center justify-center rounded-xl border border-lavender/30 bg-white px-4 py-3 text-sm font-bold text-plum shadow-sm transition hover:bg-lavender/10" onclick={() => createConversation('แชตใหม่', { resetMessages: true })}>
-				แชตใหม่
+			<button type="button" class="flex w-full items-center justify-center rounded-xl border border-lavender/30 bg-white px-4 py-3 text-sm font-bold text-plum shadow-sm transition hover:bg-lavender/10" onclick={() => createConversation(m.chat_new_title(), { resetMessages: true })}>
+				{m.chat_new_title()}
 			</button>
 		</div>
 
@@ -325,13 +326,13 @@
 								if (event.key === 'Escape') renamingId = null;
 							}}
 						/>
-						<button type="button" class="px-2 text-xs font-bold text-coral-dark" onclick={() => saveRename(conversation.id)}>บันทึก</button>
+						<button type="button" class="px-2 text-xs font-bold text-coral-dark" onclick={() => saveRename(conversation.id)}>{m.chat_save()}</button>
 					{:else}
 						<a href={`/chat/${conversation.id}`} class="min-w-0 flex-1 truncate px-3 py-2.5 text-sm font-medium text-plum" onclick={() => sidebarOpen = false}>
 							{conversation.title}
 						</a>
-						<button type="button" class="px-2 text-xs text-plum-light opacity-100 md:opacity-0 md:group-hover:opacity-100" onclick={() => startRename(conversation)}>แก้</button>
-						<button type="button" class="px-2 pr-3 text-xs text-coral-dark opacity-100 md:opacity-0 md:group-hover:opacity-100" onclick={() => deleteConversation(conversation.id)}>ลบ</button>
+						<button type="button" class="px-2 text-xs text-plum-light opacity-100 md:opacity-0 md:group-hover:opacity-100" onclick={() => startRename(conversation)}>{m.chat_rename()}</button>
+						<button type="button" class="px-2 pr-3 text-xs text-coral-dark opacity-100 md:opacity-0 md:group-hover:opacity-100" onclick={() => deleteConversation(conversation.id)}>{m.chat_delete()}</button>
 					{/if}
 				</div>
 			{/each}
@@ -342,7 +343,7 @@
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
 				</svg>
-				กลับหน้าเว็บ
+				{m.chat_back_home()}
 			</a>
 		</div>
 	</aside>
@@ -353,7 +354,7 @@
 				<button
 					type="button"
 					class="flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10 md:hidden"
-					aria-label="เปิดเมนู"
+					aria-label={m.chat_open_menu_aria()}
 					onclick={() => sidebarOpen = true}
 				>
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -361,12 +362,12 @@
 					</svg>
 				</button>
 				<div class="min-w-0">
-					<h1 class="truncate text-base font-bold text-plum">{current?.title ?? 'แชตใหม่'}</h1>
-					<p class="text-xs text-plum-light">ถามต่อได้ในบทสนทนาเดิม</p>
+					<h1 class="truncate text-base font-bold text-plum">{current?.title ?? m.chat_new_title()}</h1>
+					<p class="text-xs text-plum-light">{m.chat_header_subtitle()}</p>
 				</div>
 			</div>
 			{#if hasContextItems(latestContext)}
-				<button type="button" class="relative flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10 {previewOpen ? 'bg-coral/10 text-coral-dark' : ''}" aria-label={previewOpen ? 'ซ่อนข้อมูลที่เกี่ยวข้อง' : 'แสดงข้อมูลที่เกี่ยวข้องล่าสุด'} aria-pressed={previewOpen} onclick={togglePreviewContext}>
+				<button type="button" class="relative flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10 {previewOpen ? 'bg-coral/10 text-coral-dark' : ''}" aria-label={previewOpen ? m.chat_hide_preview() : m.chat_show_preview()} aria-pressed={previewOpen} onclick={togglePreviewContext}>
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
 					</svg>
@@ -382,7 +383,7 @@
 				{#if messages.length === 0}
 					<div class="flex min-h-[52dvh] flex-col items-center justify-center text-center">
 						<div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-coral/15 text-lg font-black text-coral-dark">AI</div>
-						<h2 class="text-2xl font-black text-plum">อยากรู้เรื่องซีรีส์อะไร?</h2>
+						<h2 class="text-2xl font-black text-plum">{m.chat_empty_title()}</h2>
 						<div class="mt-5 flex flex-wrap items-center justify-center gap-2">
 							{#each SUGGESTIONS as suggestion (suggestion.prompt)}
 								<button type="button" onclick={() => sendSuggestion(suggestion.prompt)} class="rounded-full border border-lavender/30 bg-white px-4 py-2 text-sm font-semibold text-plum shadow-sm transition hover:border-coral hover:bg-coral/5 hover:text-coral-dark">
@@ -404,7 +405,7 @@
 								</div>
 								{#if message.role === 'ASSISTANT' && hasContextItems(message.context)}
 									<button type="button" class="inline-flex items-center gap-1.5 rounded-full border border-lavender/30 bg-white/90 px-3 py-1.5 text-xs font-bold text-plum-light shadow-sm transition hover:border-coral/30 hover:bg-coral/5 hover:text-coral-dark" onclick={() => selectPreviewContext(message.context)}>
-										<span>ดูข้อมูลที่เกี่ยวข้อง</span>
+										<span>{m.chat_context_button()}</span>
 										<span class="rounded-full bg-coral px-1.5 py-0.5 text-[10px] leading-none text-white">{getContextCount(message.context)}</span>
 									</button>
 								{/if}
@@ -421,9 +422,9 @@
 								<span class="h-2 w-2 animate-bounce rounded-full bg-coral bounce-delay-1"></span>
 								<span class="h-2 w-2 animate-bounce rounded-full bg-coral bounce-delay-2"></span>
 							</span>
-							{loadingStatus || 'กำลังเริ่มทำงาน'}
+							{loadingStatus || m.chat_starting()}
 						</div>
-						<p class="mt-1 text-sm leading-5 text-plum-light">{loadingDetail || 'กำลังเตรียมคำถามของคุณ'}</p>
+						<p class="mt-1 text-sm leading-5 text-plum-light">{loadingDetail || m.chat_preparing()}</p>
 					</div>
 				{/if}
 
@@ -469,12 +470,12 @@
 							onkeydown={handleKeydown}
 							rows="1"
 							maxlength="500"
-							placeholder="ถาม GL-Orbit AI..."
+							placeholder={m.chat_placeholder()}
 							class="max-h-36 min-h-11 flex-1 resize-none bg-transparent px-2 py-2.5 text-base leading-6 text-plum placeholder:text-plum-light/70 outline-none sm:px-3"
 							disabled={loading}
 						></textarea>
 						<button type="button" onclick={sendMessage} disabled={loading || !input.trim()} class="group flex h-11 shrink-0 items-center gap-2 rounded-2xl bg-gradient-to-br from-plum to-coral px-4 text-sm font-black text-white shadow-lg shadow-coral/20 transition hover:-translate-y-0.5 hover:shadow-coral/35 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-45 sm:px-5">
-							<span class="hidden sm:inline">ส่ง</span>
+							<span class="hidden sm:inline">{m.chat_send()}</span>
 							<svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.4">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m0 0-5-5m5 5-5 5" />
 							</svg>

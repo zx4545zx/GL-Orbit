@@ -1,12 +1,17 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 	import type { SeriesDetail } from '$lib/server/queries/series-detail.js';
+	import { localizeSeries } from '$lib/i18n/series.js';
+	import { languageTag } from '$lib/i18n/paraglide.js';
 
 	let { detail }: { detail: SeriesDetail } = $props();
 
+	const localized = $derived(localizeSeries(detail, languageTag()));
+
 	const statusConfig: Record<string, { text: string; class: string; bg: string }> = {
-		ONGOING: { text: 'กำลังฉาย', class: 'text-mint-dark', bg: 'bg-mint/20' },
-		UPCOMING: { text: ' upcoming', class: 'text-lavender-dark', bg: 'bg-lavender/20' },
-		ENDED: { text: 'จบแล้ว', class: 'text-coral-dark', bg: 'bg-coral/10' }
+		ONGOING: { text: m.status_ongoing(), class: 'text-mint-dark', bg: 'bg-mint/20' },
+		UPCOMING: { text: m.status_upcoming(), class: 'text-lavender-dark', bg: 'bg-lavender/20' },
+		ENDED: { text: m.status_ended(), class: 'text-coral-dark', bg: 'bg-coral/10' }
 	};
 
 	const s = $derived(statusConfig[detail.status] ?? null);
@@ -59,7 +64,7 @@
 		const valid = item.schedules.filter((s) => s.platform !== 'TBA');
 		if (valid.length === 0) return 'TBA';
 		if (valid.length === 1) return valid[0].platform;
-		return `${valid.length} แพลตฟอร์ม`;
+		return m.series_platform_count({ count: valid.length });
 	}
 
 	function isToday(schedules: { airDate: string }[]): boolean {
@@ -102,7 +107,7 @@
 	<header class="flex items-center justify-between gap-3 border-b border-black/10 bg-white px-4 py-3">
 		<h2 class="truncate text-sm font-bold text-plum">{detail.titleTh || detail.titleEn}</h2>
 		<a href={`/series/${detail.id}`} class="shrink-0 rounded-full border border-lavender/30 bg-white px-3 py-1.5 text-xs font-bold text-plum transition hover:bg-lavender/10">
-			ดูหน้าเต็ม
+			{m.common_full_page()}
 		</a>
 	</header>
 
@@ -123,8 +128,8 @@
 				</div>
 			</div>
 
-			{#if detail.description}
-				<p class="rounded-xl border border-white/60 bg-white/45 p-3 text-sm leading-relaxed text-plum-light">{detail.description}</p>
+			{#if localized.description}
+				<p class="rounded-xl border border-white/60 bg-white/45 p-3 text-sm leading-relaxed text-plum-light">{localized.description}</p>
 			{/if}
 
 			{#if detail.genres.length > 0}
@@ -138,17 +143,17 @@
 			<div class="grid grid-cols-3 gap-2">
 				<div class="rounded-xl border border-coral/15 bg-gradient-to-br from-white/70 to-coral/10 p-2 text-center">
 					<div class="text-xl font-extrabold text-coral-dark">{detail.episodes}</div>
-					<div class="text-[10px] font-bold uppercase tracking-wide text-plum-light">ตอน</div>
+					<div class="text-[10px] font-bold uppercase tracking-wide text-plum-light">{m.common_episodes()}</div>
 				</div>
 				{#if detail.year}
 					<div class="rounded-xl border border-lavender/20 bg-gradient-to-br from-white/70 to-lavender/15 p-2 text-center">
 						<div class="text-xl font-extrabold text-lavender-dark">{detail.year}</div>
-						<div class="text-[10px] font-bold uppercase tracking-wide text-plum-light">ปีฉาย</div>
+						<div class="text-[10px] font-bold uppercase tracking-wide text-plum-light">{m.common_year()}</div>
 					</div>
 				{/if}
 				<div class="rounded-xl border border-mint/20 bg-gradient-to-br from-white/70 to-mint/10 p-2 text-center">
 					<div class="text-xl font-extrabold text-mint-dark">{detail.artists.length}</div>
-					<div class="text-[10px] font-bold uppercase tracking-wide text-plum-light">นักแสดง</div>
+					<div class="text-[10px] font-bold uppercase tracking-wide text-plum-light">{m.common_cast()}</div>
 				</div>
 			</div>
 
@@ -169,7 +174,7 @@
 		<!-- Artists -->
 		{#if detail.artists.length > 0}
 			<section>
-				<h3 class="mb-3 text-base font-bold text-plum">นักแสดง</h3>
+				<h3 class="mb-3 text-base font-bold text-plum">{m.common_cast()}</h3>
 				<div class="grid grid-cols-2 gap-2">
 					{#each detail.artists as artist}
 						<a href={`/artists/${artist.id}`} class="glass-card relative overflow-hidden rounded-xl p-2.5 transition hover:-translate-y-1 hover:shadow-md hover:shadow-lavender/20">
@@ -190,9 +195,9 @@
 		{#if detail.schedule.length > 0}
 			<section>
 				<div class="mb-3 flex items-center justify-between gap-3">
-					<h3 class="text-base font-bold text-plum">ตารางฉาย</h3>
+					<h3 class="text-base font-bold text-plum">{m.common_schedule()}</h3>
 					<button onclick={toggleAll} class="rounded-full border border-coral/30 bg-coral/5 px-3 py-1 text-xs font-semibold text-coral-dark hover:bg-coral/15 transition touch-target">
-						{allExpanded ? 'ย่อทั้งหมด' : 'ขยายทั้งหมด'}
+						{allExpanded ? m.common_collapse_all() : m.common_expand_all()}
 					</button>
 				</div>
 				<div class="glass-card-strong overflow-hidden rounded-xl">
@@ -212,7 +217,7 @@
 									<div class="flex items-center gap-2.5 min-w-0">
 										{#if item.coverUrl}
 											<div class="relative h-10 w-14 shrink-0 overflow-hidden rounded-xl border border-white/70 bg-lavender/10">
-												<img src={item.coverUrl} alt={`EP ${item.episode}`} width={112} height={63} loading="lazy" class="h-full w-full object-cover" />
+												<img src={item.coverUrl} alt={m.series_episode_cover_alt({ episode: item.episode })} width={112} height={63} loading="lazy" class="h-full w-full object-cover" />
 												<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/70 to-transparent px-1.5 py-0.5">
 													<span class="text-[9px] font-bold text-white">{item.episode}</span>
 												</div>
@@ -229,7 +234,7 @@
 									</div>
 									<div class="flex items-center gap-2 shrink-0">
 										{#if isToday(item.schedules)}
-											<span class="px-1.5 py-0.5 rounded-full bg-coral/15 text-coral-dark text-[9px] font-bold">วันนี้</span>
+											<span class="px-1.5 py-0.5 rounded-full bg-coral/15 text-coral-dark text-[9px] font-bold">{m.common_today()}</span>
 										{/if}
 										<span class="text-xs font-medium text-coral-dark whitespace-nowrap">{firstAirDate(item)}</span>
 										{#if hasEpisodeContent}
@@ -266,7 +271,7 @@
 												</div>
 												{#if sch.streamLink}
 													<a href={sch.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-coral to-coral-dark hover:from-coral-dark hover:to-coral transition shrink-0 touch-target">
-														ดูเลย
+														{m.series_detail_watch_now()}
 														<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
 													</a>
 												{/if}

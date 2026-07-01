@@ -1,3 +1,4 @@
+import { m } from '$lib/i18n/paraglide.js';
 import { redirect } from '@sveltejs/kit';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import { toProfileUser } from '$lib/server/auth/public-user.js';
@@ -51,7 +52,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			subtitle: s.titleTh ?? '',
 			poster: s.posterUrl ?? FALLBACK_POSTER,
 			status: s.status,
-			studio: s.studioName ?? 'ไม่ระบุสตูดิโอ'
+			studio: s.studioName ?? m.profile_unknown_studio()
 		})),
 		watchedSeries: watchedSeries.map((s) => ({
 			id: s.id,
@@ -59,7 +60,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			subtitle: s.titleTh ?? '',
 			poster: s.posterUrl ?? FALLBACK_POSTER,
 			status: s.status,
-			studio: s.studioName ?? 'ไม่ระบุสตูดิโอ'
+			studio: s.studioName ?? m.profile_unknown_studio()
 		}))
 	};
 };

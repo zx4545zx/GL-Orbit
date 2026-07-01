@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 	import SeriesPosterCard from '$lib/components/SeriesPosterCard.svelte';
 	import SeriesDetailPanel from '$lib/components/SeriesDetailPanel.svelte';
 	import ArtistDetailPanel from '$lib/components/ArtistDetailPanel.svelte';
@@ -35,7 +36,7 @@
 		genres: s.genres.map((g) => ({ id: '', name: g }))
 	})));
 
-	const title = $derived(context?.type === 'artist' ? 'นักแสดงที่เกี่ยวข้อง' : context?.type === 'schedule' ? 'ตารางฉายที่เกี่ยวข้อง' : 'ซีรีส์ที่เกี่ยวข้อง');
+	const title = $derived(context?.type === 'artist' ? m.chat_context_artists() : context?.type === 'schedule' ? m.chat_context_schedule() : m.chat_context_series());
 
 	function payloadForContext(ctx: NonNullable<ChatContextPayload>): { type: string; ids: string[] } {
 		if (ctx.type === 'artist') return { type: 'artist', ids: ctx.artistIds };
@@ -73,7 +74,7 @@
 				selectedSeriesId = seriesItems.length === 1 ? seriesItems[0].id : null;
 			}
 		} catch {
-			error = 'โหลดข้อมูลไม่สำเร็จ ลองอีกครั้ง';
+			error = m.chat_context_load_error();
 		} finally {
 			loading = false;
 		}
@@ -97,7 +98,7 @@
 <section class="flex h-full min-h-0 w-full flex-col bg-[#f7f7f8]" aria-label={title}>
 	<header class="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-black/10 bg-white px-4">
 		{#if (view === 'series-detail' || view === 'artist-detail') && seriesItems.length > 1 || view === 'artist-detail' && artistItems.length > 1}
-			<button type="button" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10" aria-label="ย้อนกลับ" onclick={() => (view = 'list')}>
+			<button type="button" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10" aria-label={m.chat_context_back_aria()} onclick={() => (view = 'list')}>
 				<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
 			</button>
 			<div class="min-w-0">
@@ -117,7 +118,7 @@
 			</div>
 		{/if}
 		{#if onClose}
-			<button type="button" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10" aria-label="ปิด" onclick={onClose}>×</button>
+			<button type="button" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10" aria-label={m.chat_context_close_aria()} onclick={onClose}>×</button>
 		{/if}
 	</header>
 
@@ -129,7 +130,7 @@
 			{:else if error}
 				<div class="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
 					<p class="text-sm text-coral-dark">{error}</p>
-					<button type="button" class="rounded-full border border-lavender/30 bg-white px-4 py-2 text-xs font-bold text-plum" onclick={() => fetchContext()}>ลองใหม่</button>
+					<button type="button" class="rounded-full border border-lavender/30 bg-white px-4 py-2 text-xs font-bold text-plum" onclick={() => fetchContext()}>{m.chat_context_retry()}</button>
 				</div>
 			{:else if view === 'series-detail' && selectedSeriesDetail}
 				<SeriesDetailPanel detail={selectedSeriesDetail} />
@@ -156,7 +157,7 @@
 								<span class="min-w-0 flex-1">
 									<span class="block truncate text-base font-bold text-plum">{artist.nickname}</span>
 									{#if artist.fullNameEn}<span class="block truncate text-xs text-plum-light">{artist.fullNameEn}</span>{/if}
-									<span class="mt-1 block text-xs font-semibold text-coral-dark">{artist.series.length} ผลงาน</span>
+									<span class="mt-1 block text-xs font-semibold text-coral-dark">{artist.series.length} {m.chat_context_works()}</span>
 								</span>
 								<svg class="h-4 w-4 shrink-0 text-plum-light transition group-hover:translate-x-0.5 group-hover:text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
 							</button>
@@ -165,7 +166,7 @@
 				</div>
 			{:else}
 				<div class="flex h-full items-center justify-center px-6 text-center">
-					<p class="text-sm text-plum-light">ยังไม่พบข้อมูลที่เกี่ยวข้อง</p>
+					<p class="text-sm text-plum-light">{m.chat_context_no_data()}</p>
 				</div>
 			{/if}
 	</div>

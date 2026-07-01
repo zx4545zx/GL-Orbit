@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import type { PageData } from './$types.js';
 	import type { NotificationItem, NotificationsListResponse } from '$lib/types.js';
+	import { m } from '$lib/i18n/paraglide.js';
 
 	let { data }: { data: PageData } = $props();
 
@@ -22,19 +24,19 @@
 	});
 
 	function formatRelativeTime(dateStr: string): string {
-		const now = Date.now();
+		const now = new Date().getTime();
 		const date = new Date(dateStr).getTime();
 		const diffMs = now - date;
 		const diffSeconds = Math.floor(diffMs / 1000);
 		const diffMinutes = Math.floor(diffSeconds / 60);
 		const diffHours = Math.floor(diffMinutes / 60);
 		const diffDays = Math.floor(diffHours / 24);
-
-		if (diffSeconds < 60) return 'เมื่อสักครู่';
-		if (diffMinutes < 60) return `${diffMinutes} นาทีที่แล้ว`;
-		if (diffHours < 24) return `${diffHours} ชั่วโมงที่แล้ว`;
-		if (diffDays < 7) return `${diffDays} วันที่แล้ว`;
-		return new Date(dateStr).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
+		const rtf = new Intl.RelativeTimeFormat(page.data.lang, { numeric: 'auto' });
+		if (diffSeconds < 60) return rtf.format(-diffSeconds, 'second');
+		if (diffMinutes < 60) return rtf.format(-diffMinutes, 'minute');
+		if (diffHours < 24) return rtf.format(-diffHours, 'hour');
+		if (diffDays < 7) return rtf.format(-diffDays, 'day');
+		return new Intl.DateTimeFormat(page.data.lang, { day: 'numeric', month: 'short' }).format(new Date(dateStr));
 	}
 
 	function getTypeIcon(type: string): string {
@@ -62,14 +64,14 @@
 		loadError = '';
 		try {
 			const res = await fetch(`/api/notifications?limit=20&offset=${offset}`);
-			if (!res.ok) throw new Error('ไม่สามารถโหลดการแจ้งเตือนได้');
+			if (!res.ok) throw new Error(m.notifications_load_error());
 			const data: NotificationsListResponse = await res.json();
 			const newItems: NotificationItem[] = data.notifications ?? [];
 			notifications = [...notifications, ...newItems];
 			offset += newItems.length;
 			hasMore = data.hasMore;
 		} catch (e) {
-			loadError = 'ไม่สามารถโหลดการแจ้งเตือนได้';
+			loadError = m.notifications_load_error();
 		} finally {
 			loading = false;
 		}
@@ -95,8 +97,8 @@
 </script>
 
 <svelte:head>
-	<title>การแจ้งเตือน | GL-Orbit</title>
-	<meta name="description" content="การแจ้งเตือน GL-Orbit — ติดตามตอนใหม่ของซีรีส์ GL ที่คุณชื่นชอบได้ที่นี่" />
+	<title>{m.notifications_seo_title()}</title>
+	<meta name="description" content={m.notifications_seo_description()} />
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
@@ -104,7 +106,7 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between mb-6">
 		<h1 class="text-2xl font-bold text-plum font-[family-name:var(--font-display)]">
-			การแจ้งเตือน
+			{m.notifications_title()}
 		</h1>
 		{#if notifications.length > 0}
 			<button
@@ -112,7 +114,7 @@
 				disabled={markingAll}
 				class="text-sm font-medium text-coral hover:text-coral-dark transition-colors disabled:opacity-50 touch-target px-3 py-1.5"
 			>
-				{markingAll ? 'กำลังดำเนินการ...' : 'อ่านทั้งหมด'}
+				{markingAll ? m.notifications_mark_all_loading() : m.notifications_mark_all()}
 			</button>
 		{/if}
 	</div>
@@ -140,7 +142,7 @@
 			<svg class="w-16 h-16 mx-auto text-lavender/40 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
 				<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
 			</svg>
-			<p class="text-plum-light/60 text-base">ไม่มีการแจ้งเตือน</p>
+			<p class="text-plum-light/60 text-base">{m.notifications_empty()}</p>
 		</div>
 	{:else}
 		<div class="space-y-2">
@@ -174,10 +176,10 @@
 					{#if loading}
 						<span class="flex items-center gap-2 justify-center">
 							<div class="w-4 h-4 border-2 border-coral border-t-transparent rounded-full animate-spin"></div>
-							กำลังโหลด...
+							{m.notifications_load_more_loading()}
 						</span>
 					{:else}
-						โหลดเพิ่ม
+						{m.notifications_load_more()}
 					{/if}
 				</button>
 			</div>
@@ -191,14 +193,14 @@
 					onclick={loadMore}
 					class="text-sm text-coral hover:text-coral-dark font-medium underline touch-target px-3 py-1"
 				>
-					ลองอีกครั้ง
+					{m.notifications_retry()}
 				</button>
 			</div>
 		{/if}
 
 		<!-- Total count -->
 		<p class="text-center text-xs text-plum-light/40 mt-6">
-			แสดง {notifications.length} รายการ
+			{m.notifications_count({ count: notifications.length })}
 		</p>
 	{/if}
 </div>

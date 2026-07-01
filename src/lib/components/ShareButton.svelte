@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 	let {
 		title,
 		text,
 		url,
 		className = '',
-		ariaLabel = 'แชร์',
+		ariaLabel = m.share_aria_label(),
 		variant = 'compact'
 	}: {
 		title: string;
@@ -121,7 +122,7 @@
 
 			<span class="min-w-0 leading-none">
 				<span class="block text-[10px] font-bold uppercase tracking-[0.22em] opacity-55">SHARE</span>
-				<span class="mt-1 block truncate text-xs font-bold sm:text-sm">ส่งต่อให้เพื่อน</span>
+				<span class="mt-1 block truncate text-xs font-bold sm:text-sm">{m.share_command_title()}</span>
 			</span>
 		{:else}
 			<span class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_0%,rgba(196,181,253,0.22),transparent_45%),linear-gradient(135deg,rgba(255,255,255,0.65),rgba(255,255,255,0.2))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
@@ -135,7 +136,7 @@
 					/>
 				</svg>
 			</div>
-			<span>แชร์</span>
+			<span>{m.share_aria_label()}</span>
 		{/if}
 	</button>
 
@@ -143,10 +144,10 @@
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			role="menu"
-			aria-label="ตัวเลือกแชร์"
+			aria-label={m.share_menu_label()}
 			class="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-3xl border border-white/70 bg-white/90 p-2 shadow-2xl shadow-lavender/25 backdrop-blur-xl animate-fade-in"
 		>
-			<p class="px-3 pb-2 pt-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-plum-light">แชร์ไปยัง</p>
+			<p class="px-3 pb-2 pt-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-plum-light">{m.share_to()}</p>
 
 			<a
 				href={lineUrl}
@@ -206,7 +207,7 @@
 						<svg class="w-4 h-4 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
 					{/if}
 				</span>
-				<span class="text-sm font-medium text-plum">{copied ? 'คัดลอกลิงก์แล้ว' : 'คัดลอกลิงก์'}</span>
+				<span class="text-sm font-medium text-plum">{copied ? m.share_copied() : m.share_copy()}</span>
 			</button>
 		</div>
 	{/if}

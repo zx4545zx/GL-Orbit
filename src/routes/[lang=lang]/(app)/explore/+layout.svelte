@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';
 	let { children } = $props();
 
 	const tabs = [
-		{ id: 'series', href: '/explore/series', label: 'ซีรีส์', icon: 'M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4' },
-		{ id: 'artists', href: '/explore/artists', label: 'นักแสดง', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
+		{ id: 'series', href: '/explore/series', label: m.nav_series(), icon: 'M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4' },
+		{ id: 'artists', href: '/explore/artists', label: m.nav_artists(), icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
 	] as const;
 
 	function isActive(href: string) {
@@ -18,9 +19,9 @@
 	<div class="flex flex-col items-center gap-4 mb-6 sm:mb-8">
 		<div class="text-center">
 			<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-1.5 sm:mb-2">
-				<span class="text-gradient">สำรวจ</span>
+				<span class="text-gradient">{m.nav_explore()}</span>
 			</h1>
-			<p class="text-sm sm:text-base text-plum-light">ค้นหาซีรีส์และนักแสดง GL ที่คุณชื่นชอบ</p>
+			<p class="text-sm sm:text-base text-plum-light">{m.explore_subtitle()}</p>
 		</div>
 
 		<!-- Static tab switcher (in-flow, not floating) -->

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
 	import WatchedButton from '$lib/components/WatchedButton.svelte';
@@ -9,18 +10,20 @@
 	let { data }: { data: PageData } = $props();
 
 	const series = $derived(data.series);
+	const title = $derived(data.title);
+	const description = $derived(data.description);
 	const loading = false;
 
 	const statusConfig: Record<string, { text: string; class: string; bg: string }> = {
-		ONGOING: { text: 'กำลังฉาย', class: 'text-mint-dark', bg: 'bg-mint/20' },
-		UPCOMING: { text: ' upcoming', class: 'text-lavender-dark', bg: 'bg-lavender/20' },
-		ENDED: { text: 'จบแล้ว', class: 'text-coral-dark', bg: 'bg-coral/10' }
+		ONGOING: { text: m.status_ongoing(), class: 'text-mint-dark', bg: 'bg-mint/20' },
+		UPCOMING: { text: m.status_upcoming(), class: 'text-lavender-dark', bg: 'bg-lavender/20' },
+		ENDED: { text: m.status_ended(), class: 'text-coral-dark', bg: 'bg-coral/10' }
 	};
 
 	const s = $derived(series ? statusConfig[series.status] : null);
-	const seoTitle = $derived(`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''} | GL-Orbit`);
+	const seoTitle = $derived(`${title}${series.titleTh && series.titleEn && title !== series.titleEn ? ` (${series.titleEn})` : ''} | GL-Orbit`);
 	const seoDescription = $derived(truncateSeo(
-		series.description || `${series.titleEn} ซีรีส์ GL จาก ${series.studio} พร้อมข้อมูลนักแสดง จำนวนตอน ตารางฉาย และแพลตฟอร์มรับชม`
+		description || m.series_detail_seo_fallback({ title, studio: series.studio })
 	));
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, `/series/${series.id}`));
 	const seriesJsonLd = $derived(safeJsonLd([
@@ -38,8 +41,8 @@
 			actor: series.artists.map((artist) => ({ '@type': 'Person', name: artist.name }))
 		},
 		buildBreadcrumbJsonLd(page.url.origin, [
-			{ name: 'หน้าแรก', path: '/' },
-			{ name: 'ซีรีส์ทั้งหมด', path: '/series' },
+			{ name: m.nav_home(), path: '/' },
+			{ name: m.series_breadcrumb_all(), path: '/series' },
 			{ name: series.titleEn, path: `/series/${series.id}` }
 		])
 	]));
@@ -102,7 +105,7 @@
 		const valid = item.schedules.filter((s) => s.platform !== 'TBA');
 		if (valid.length === 0) return 'TBA';
 		if (valid.length === 1) return valid[0].platform;
-		return `${valid.length} แพลตฟอร์ม`;
+		return m.series_platform_count({ count: String(valid.length) });
 	}
 
 	function isToday(schedules: { airDate: string }[]): boolean {
@@ -203,7 +206,7 @@
 		<!-- Back button -->
 		<button onclick={() => history.back()} class="relative z-10 mb-6 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-coral/30 hover:bg-white/80 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
 			<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-			<span>ย้อนกลับ</span>
+			<span>{m.common_back()}</span>
 		</button>
 
 		<!-- Hero -->
@@ -224,9 +227,9 @@
 						<div class="col-span-2">
 							<ShareButton
 								title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`}
-								text={`ดู «${series.titleEn}» บน GL-Orbit — ข้อมูลนักแสดง ตารางฉาย แพลตฟอร์มรับชม`}
+								text={m.series_share_text({ title })}
 								url={canonicalUrl}
-								ariaLabel="แชร์ซีรีส์นี้"
+								ariaLabel={m.series_share_aria_label()}
 								variant="command"
 								className="w-full justify-start"
 							/>
@@ -246,15 +249,15 @@
 					<p class="mt-2 text-base font-medium text-plum-light sm:text-xl">{series.titleTh}</p>
 				</div>
 
-				{#if series.description}
-					<p class="relative rounded-2xl border border-white/60 bg-white/45 p-4 text-sm leading-relaxed text-plum-light shadow-sm shadow-lavender/5 sm:text-base">{series.description}</p>
+				{#if description}
+					<p class="relative rounded-2xl border border-white/60 bg-white/45 p-4 text-sm leading-relaxed text-plum-light shadow-sm shadow-lavender/5 sm:text-base">{description}</p>
 				{/if}
 
 				{#if series.genres.length > 0}
 					<div class="rounded-2xl border border-white/70 bg-white/50 p-3 shadow-sm shadow-lavender/10 backdrop-blur-xl">
 						<div class="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-plum-light">
 							<span class="h-2 w-2 rounded-full bg-coral shadow-sm shadow-coral/40"></span>
-							ประเภทซีรีส์
+							{m.series_genres_label()}
 						</div>
 						<div class="flex flex-wrap gap-2">
 							{#each series.genres as genre}
@@ -267,17 +270,17 @@
 				<div class="relative grid grid-cols-3 gap-2 sm:gap-4">
 					<div class="rounded-2xl border border-coral/15 bg-gradient-to-br from-white/70 to-coral/10 p-3 text-center shadow-sm shadow-coral/10 sm:p-4">
 						<div class="text-2xl font-extrabold text-coral-dark sm:text-3xl">{series.episodes}</div>
-						<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">ตอน</div>
+						<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">{m.common_episodes()}</div>
 					</div>
 					{#if series.year}
 						<div class="rounded-2xl border border-lavender/20 bg-gradient-to-br from-white/70 to-lavender/15 p-3 text-center shadow-sm shadow-lavender/10 sm:p-4">
 							<div class="text-2xl font-extrabold text-lavender-dark sm:text-3xl">{series.year}</div>
-							<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">ปีฉาย</div>
+							<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">{m.common_year()}</div>
 						</div>
 					{/if}
 					<div class="rounded-2xl border border-mint/20 bg-gradient-to-br from-white/70 to-mint/10 p-3 text-center shadow-sm shadow-mint/10 sm:p-4">
 						<div class="text-2xl font-extrabold text-mint-dark sm:text-3xl">{series.artists.length}</div>
-						<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">นักแสดง</div>
+						<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">{m.common_cast()}</div>
 					</div>
 				</div>
 
@@ -302,9 +305,9 @@
 				<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
 					<div>
 						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark/70">Cast constellation</p>
-						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">นักแสดง</h2>
+						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">{m.common_cast()}</h2>
 					</div>
-					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{series.artists.length} คน</span>
+					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{series.artists.length} {m.common_people()}</span>
 				</div>
 				<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
 					{#each series.artists as artist}
@@ -332,16 +335,16 @@
 				<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
 					<div>
 						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-lavender-dark/70">Episode orbit</p>
-						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">ตารางฉาย</h2>
+						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">{m.common_schedule()}</h2>
 					</div>
 					<div class="flex items-center gap-2">
-						<button onclick={toggleAll} class="rounded-full border border-coral/30 bg-coral/5 pl-2 pr-3 py-1 text-xs font-semibold text-coral-dark shadow-sm hover:bg-coral/15 hover:border-coral/50 transition-all duration-200 active:scale-95 touch-target whitespace-nowrap flex items-center gap-1" aria-label={allExpanded ? 'ย่อทั้งหมด' : 'ขยายทั้งหมด'}>
+						<button onclick={toggleAll} class="rounded-full border border-coral/30 bg-coral/5 pl-2 pr-3 py-1 text-xs font-semibold text-coral-dark shadow-sm hover:bg-coral/15 hover:border-coral/50 transition-all duration-200 active:scale-95 touch-target whitespace-nowrap flex items-center gap-1" aria-label={allExpanded ? m.common_collapse_all() : m.common_expand_all()}>
 							{#if allExpanded}
 								<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 15 12 7 20 15"/><line x1="4" y1="19" x2="20" y2="19"/></svg>
-								<span>ย่อทั้งหมด</span>
+								<span>{m.common_collapse_all()}</span>
 							{:else}
 								<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 9 12 17 20 9"/><line x1="4" y1="5" x2="20" y2="5"/></svg>
-								<span>ขยายทั้งหมด</span>
+								<span>{m.common_expand_all()}</span>
 							{/if}
 						</button>
 					</div>
@@ -365,7 +368,7 @@
 									<div class="flex items-center gap-3 sm:gap-4 min-w-0">
 										{#if item.coverUrl}
 											<div class="relative h-12 w-16 flex-shrink-0 overflow-hidden rounded-2xl border border-white/70 bg-lavender/10 shadow-sm shadow-lavender/10 sm:h-14 sm:w-20">
-												<img src={item.coverUrl} alt={`ภาพปกตอนที่ ${item.episode}`} width={160} height={90} loading="lazy" decoding="async" class="h-full w-full object-cover" />
+												<img src={item.coverUrl} alt={m.series_episode_cover_alt({ episode: item.episode })} width={160} height={90} loading="lazy" decoding="async" class="h-full w-full object-cover" />
 												<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/70 to-transparent px-2 py-1">
 													<span class="text-[10px] font-bold text-white">EP {item.episode}</span>
 												</div>
@@ -382,7 +385,7 @@
 									</div>
 									<div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
 										{#if isToday(item.schedules)}
-											<span class="px-2 py-0.5 rounded-full bg-coral/15 text-coral-dark text-[10px] font-bold border border-coral/20 whitespace-nowrap">วันนี้</span>
+											<span class="px-2 py-0.5 rounded-full bg-coral/15 text-coral-dark text-[10px] font-bold border border-coral/20 whitespace-nowrap">{m.common_today()}</span>
 										{/if}
 										<span class="text-xs sm:text-sm font-medium text-coral-dark whitespace-nowrap">{firstAirDate(item)}</span>
 										{#if hasEpisodeContent}
@@ -411,7 +414,7 @@
 											{:else}
 												<div class="rounded-2xl border border-lavender/20 bg-gradient-to-br from-white/70 to-lavender/10 p-4 shadow-sm shadow-lavender/10">
 													<p class="text-xs font-bold uppercase tracking-[0.22em] text-lavender-dark/75">Trailer</p>
-													<p class="mt-1 text-sm text-plum-light">ลิงก์นี้ไม่ใช่ YouTube เปิดดูในแท็บใหม่</p>
+													<p class="mt-1 text-sm text-plum-light">{m.series_trailer_external_notice()}</p>
 													<a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 rounded-full bg-plum px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-plum/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-coral-dark touch-target">
 														เปิด Trailer
 														<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>

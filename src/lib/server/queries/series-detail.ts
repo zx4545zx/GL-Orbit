@@ -10,10 +10,11 @@ export type SeriesDetail = {
 	id: string;
 	titleEn: string;
 	titleTh: string;
+	descriptionTh: string;
+	descriptionEn: string;
 	status: 'UPCOMING' | 'ONGOING' | 'ENDED';
 	studio: string;
 	poster: string;
-	description: string;
 	genres: string[];
 	episodes: number;
 	year?: number;
@@ -176,7 +177,8 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		status: seriesResult.status as SeriesDetail['status'],
 		studio: seriesResult.studioName ?? 'ไม่ระบุสตูดิโอ',
 		poster: seriesResult.posterUrl ?? '/placeholders/poster.svg',
-		description: seriesResult.descriptionTh ?? seriesResult.descriptionEn ?? '',
+		descriptionTh: seriesResult.descriptionTh ?? '',
+		descriptionEn: seriesResult.descriptionEn ?? '',
 		genres: genresResult.map((g) => g.name),
 		episodes: episodesResult.length,
 		year: firstAirDate,

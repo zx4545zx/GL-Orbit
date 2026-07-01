@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
 	import type { PageData } from './$types.js';
@@ -15,9 +16,9 @@
 	] as const;
 
 	const cuteIcons = [
-		{ label: 'หัวใจ', path: 'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733C11.285 4.876 9.623 3.75 7.688 3.75 5.099 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z' },
-		{ label: 'ดาว', path: 'M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557L3.04 10.385a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345l2.125-5.111z' },
-		{ label: 'ประกาย', path: 'M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.091-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.091L9 5.25l.813 2.846a4.5 4.5 0 003.091 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.091zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.456-2.456L14.25 6l1.035-.259a3.375 3.375 0 002.456-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z' }
+		{ label: m.artist_filter_heart(), path: 'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733C11.285 4.876 9.623 3.75 7.688 3.75 5.099 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z' },
+		{ label: m.artist_filter_star(), path: 'M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557L3.04 10.385a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345l2.125-5.111z' },
+		{ label: m.artist_filter_sparkle(), path: 'M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.091-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.091L9 5.25l.813 2.846a4.5 4.5 0 003.091 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.091zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.456-2.456L14.25 6l1.035-.259a3.375 3.375 0 002.456-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z' }
 	] as const;
 
 	let extraArtists = $state<ArtistListItem[]>([]);
@@ -89,7 +90,7 @@
 			const result: { items: ArtistListItem[] } = await res.json();
 			extraArtists = [...extraArtists, ...result.items];
 		} catch {
-			loadMoreError = 'โหลดเพิ่มไม่สำเร็จ ลองอีกครั้ง';
+			loadMoreError = m.load_more_error();
 		} finally {
 			loadMoreLoading = false;
 		}
@@ -97,17 +98,17 @@
 </script>
 
 <svelte:head>
-	<title>สำรวจนักแสดง GL | GL-Orbit</title>
-	<meta name="description" content="สำรวจนักแสดงซีรีส์ Girls' Love พร้อมผลงานและโซเชียลมีเดีย" />
+	<title>{m.explore_artists_seo_title()}</title>
+	<meta name="description" content={m.explore_artists_seo_description()} />
 </svelte:head>
 
 <!-- Search -->
 <div class="max-w-xl mx-auto mb-6 sm:mb-8">
 	<div class="glass-card-strong rounded-2xl flex items-center px-4 py-3 gap-3 transition-all duration-300 focus-within:ring-2 focus-within:ring-coral/30 focus-within:border-coral/30">
 		<svg class="w-5 h-5 text-plum-light flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
-		<input type="text" bind:value={searchQuery} oninput={scheduleSearchUpdate} placeholder="ค้นหาชื่อนักแสดง..." aria-label="ค้นหานักแสดง" class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base" />
+		<input type="text" bind:value={searchQuery} oninput={scheduleSearchUpdate} placeholder={m.artist_search_placeholder()} aria-label={m.artist_search_label()} class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base" />
 		{#if searchQuery}
-			<button onclick={clearSearch} class="p-1 rounded-lg hover:bg-lavender/20 transition-colors flex-shrink-0" aria-label="ล้างการค้นหา"><svg class="w-4 h-4 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" /></svg></button>
+			<button onclick={clearSearch} class="p-1 rounded-lg hover:bg-lavender/20 transition-colors flex-shrink-0" aria-label={m.common_search_clear()}><svg class="w-4 h-4 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" /></svg></button>
 		{/if}
 	</div>
 </div>
@@ -162,11 +163,11 @@
 							{#if a.fullNameEn}<p class="mt-0.5 text-xs sm:text-sm text-plum-light line-clamp-1">{a.fullNameEn}</p>{/if}
 							<div class="mt-2 flex flex-wrap items-center gap-1.5">
 								{#if a.seriesCount > 0}
-									<span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold {accent.chip}">{a.seriesCount} ผลงาน</span>
+									<span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold {accent.chip}">{m.artist_works_count({ count: a.seriesCount })}</span>
 								{:else}
-									<span class="inline-flex items-center rounded-full bg-lavender/10 px-2.5 py-1 text-[11px] font-medium text-plum-light/75">ยังไม่มีผลงาน</span>
+									<span class="inline-flex items-center rounded-full bg-lavender/10 px-2.5 py-1 text-[11px] font-medium text-plum-light/75">{m.artist_no_works()}</span>
 								{/if}
-								<span class="hidden rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-medium text-plum-light/80 sm:inline-flex">ดูโปรไฟล์</span>
+								<span class="hidden rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-medium text-plum-light/80 sm:inline-flex">{m.artist_view_profile()}</span>
 							</div>
 						</div>
 
@@ -198,7 +199,7 @@
 		<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
 			<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
 		</div>
-		<h3 class="font-semibold text-plum mb-1">ไม่พบนักแสดง</h3>
+		<h3 class="font-semibold text-plum mb-1">{m.artist_list_empty_title()}</h3>
 		<p class="text-sm text-plum-light">{#if searchQuery}ลองค้นหาด้วยคำอื่น หรือ <button onclick={clearSearch} class="text-coral-dark font-medium hover:underline">ล้างการค้นหา</button>{:else}ยังไม่มีนักแสดงในระบบ{/if}</p>
 	</div>
 {/if}

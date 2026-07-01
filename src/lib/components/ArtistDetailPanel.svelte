@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/i18n/paraglide.js';
 	import SeriesPosterCard from '$lib/components/SeriesPosterCard.svelte';
 
 	type ArtistDetail = import('$lib/server/queries/artist-detail.js').ArtistDetail;
@@ -35,7 +36,7 @@
 	<header class="flex items-center justify-between gap-3 border-b border-black/10 bg-white px-4 py-3">
 		<h2 class="truncate text-sm font-bold text-plum">{detail.nickname}</h2>
 		<a href={`/artists/${detail.id}`} class="shrink-0 rounded-full border border-lavender/30 bg-white px-3 py-1.5 text-xs font-bold text-plum transition hover:bg-lavender/10">
-			ดูหน้าเต็ม
+			{m.artist_detail_full_page()}
 		</a>
 	</header>
 
@@ -55,9 +56,9 @@
 				{#if detail.fullNameTh}<p class="text-sm font-medium text-plum-light/85">{detail.fullNameTh}</p>{/if}
 
 				<div class="mt-4 flex flex-wrap justify-center gap-2">
-					<span class="rounded-full border border-white/70 bg-white/70 px-3 py-1 text-xs font-bold text-lavender-dark">{detail.series.length} ผลงาน</span>
+					<span class="rounded-full border border-white/70 bg-white/70 px-3 py-1 text-xs font-bold text-lavender-dark">{m.artist_works_count_label({ count: detail.series.length })}</span>
 					{#if detail.socials.length > 0}
-						<span class="rounded-full border border-white/70 bg-white/70 px-3 py-1 text-xs font-bold text-mint-dark">{detail.socials.length} ช่องทาง</span>
+						<span class="rounded-full border border-white/70 bg-white/70 px-3 py-1 text-xs font-bold text-mint-dark">{m.artist_socials_label({ count: detail.socials.length })}</span>
 					{/if}
 				</div>
 			</div>
@@ -65,7 +66,7 @@
 
 		{#if detail.socials.length > 0}
 			<section>
-				<h3 class="mb-3 text-base font-bold text-plum">โซเชียลมีเดีย</h3>
+				<h3 class="mb-3 text-base font-bold text-plum">{m.artist_socials_heading()}</h3>
 				<div class="grid gap-2">
 					{#each detail.socials as social (social.id)}
 						<a href={social.url} target="_blank" rel="noopener noreferrer" class="group flex items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/70 px-3 py-3 shadow-sm shadow-lavender/10 transition hover:-translate-y-0.5 hover:border-coral/25 hover:bg-white">
@@ -77,7 +78,7 @@
 								{/if}
 								<span class="min-w-0">
 									<span class="block truncate text-sm font-bold text-plum">{socialLabel(social.platform)}</span>
-									<span class="block truncate text-xs text-plum-light">เปิดลิงก์ภายนอก</span>
+									<span class="block truncate text-xs text-plum-light">{m.common_open_external()}</span>
 								</span>
 							</span>
 							<svg class="h-4 w-4 shrink-0 text-plum-light transition group-hover:translate-x-0.5 group-hover:text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -89,13 +90,13 @@
 
 		{#if workCards.length > 0}
 			<section>
-				<h3 class="mb-3 text-base font-bold text-plum">ผลงานซีรีส์</h3>
+				<h3 class="mb-3 text-base font-bold text-plum">{m.artist_works_heading()}</h3>
 				<div class="grid grid-cols-2 gap-3">
 					{#each workCards as work (work.item.id)}
 						<div class="space-y-1">
 							<SeriesPosterCard item={work.item} />
 							{#if work.roleName}
-								<p class="px-1 text-xs font-medium text-plum-light">รับบท: {work.roleName}</p>
+								<p class="px-1 text-xs font-medium text-plum-light">{m.artist_works_role({ role: work.roleName })}</p>
 							{/if}
 						</div>
 					{/each}

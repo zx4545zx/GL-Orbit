@@ -105,7 +105,7 @@ describe('getViewUrl', () => {
 describe('calendar page loading structure — source-level regression', () => {
 	it('title (h1) is rendered outside contentLoading block', () => {
 		const source = readFileSync(pagePath, 'utf-8');
-		const titlePos = source.indexOf('ตารางฉาย');
+		const titlePos = source.indexOf('calendar_title_plain');
 		const loadingPos = source.indexOf('{#if contentLoading}');
 		expect(titlePos).toBeGreaterThan(0);
 		expect(loadingPos).toBeGreaterThan(0);
@@ -157,9 +157,11 @@ describe('calendar page loading structure — source-level regression', () => {
 		expect(thisWeekPropPos).toBeGreaterThan(0);
 	});
 
-	it('removes text-based loading indicator กำลังโหลดตารางฉาย', () => {
+	it('uses skeleton instead of text-based loading indicator', () => {
 		const source = readFileSync(pagePath, 'utf-8');
-		expect(source).not.toContain('กำลังโหลดตารางฉาย');
+		expect(source).toContain('list-loading-skeleton');
+		expect(source).toContain('calendar-loading-skeleton');
+		expect(source).toContain('grid-loading-skeleton');
 	});
 
 	it('grid view has structural table skeleton with day headers and series rows', () => {
@@ -193,12 +195,12 @@ describe('calendar page loading structure — source-level regression', () => {
 		expect(cardComponentPos).toBeGreaterThan(0);
 	});
 
-	it('notes section (หมายเหตุ) appears outside any contentLoading block', () => {
+	it('notes section appears outside any contentLoading block', () => {
 		const source = readFileSync(pagePath, 'utf-8');
 		// Find last {@render children()} or {/if} that closes the outermost content-area block
 		// In the fixed code, notes will be after all contentLoading {/if} blocks
 		const lastClosingIf = source.lastIndexOf('{/if}');
-		const notesPos = source.indexOf('หมายเหตุ');
+		const notesPos = source.indexOf('calendar_notes_title');
 		expect(notesPos).toBeGreaterThan(0);
 		expect(notesPos).toBeGreaterThan(lastClosingIf);
 	});

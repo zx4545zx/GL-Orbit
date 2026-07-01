@@ -1,6 +1,7 @@
 <script lang="ts">
-
-	import { page } from '$app/state';	import type { ScheduleDay, CalendarEvent } from '$lib/types/calendar.js';
+	import { page } from '$app/state';
+	import { m } from '$lib/i18n/paraglide.js';
+	import type { ScheduleDay, CalendarEvent } from '$lib/types/calendar.js';
 
 	interface Props {
 		scheduleByDay: ScheduleDay[];
@@ -9,33 +10,40 @@
 
 	let { scheduleByDay, weekStart }: Props = $props();
 
-	const weekDays = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
-	const weekDaysShort = ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'];
-	const thaiMonths = [
-		'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-		'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-	];
-	const thaiMonthsShort = [
-		'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
-		'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
-	];
+	const lang = $derived(page.data.lang);
 
-	const dayColors: Record<string, string> = {
-		'จันทร์': 'from-coral/15 to-coral/5',
-		'อังคาร': 'from-orange-300/15 to-orange-300/5',
-		'พุธ': 'from-lavender/15 to-lavender/5',
-		'พฤหัสบดี': 'from-emerald-300/15 to-emerald-300/5',
-		'ศุกร์': 'from-teal-300/15 to-teal-300/5',
-		'เสาร์': 'from-blue-300/15 to-blue-300/5',
-		'อาทิตย์': 'from-rose-300/15 to-rose-300/5'
-	};
+	function getWeekDayLong(date: Date, l: string) {
+		return new Intl.DateTimeFormat(l, { weekday: 'long' }).format(date);
+	}
+	function getWeekDayShort(date: Date, l: string) {
+		return new Intl.DateTimeFormat(l, { weekday: 'short' }).format(date);
+	}
+	function getMonthShort(date: Date, l: string) {
+		return new Intl.DateTimeFormat(l, { month: 'short' }).format(date);
+	}
+	function getMonthLong(date: Date, l: string) {
+		return new Intl.DateTimeFormat(l, { month: 'long' }).format(date);
+	}
+
+	const weekDayNames = $derived(Array.from({ length: 7 }, (_, i) => getWeekDayLong(new Date(2024, 0, 1 + i), lang)));
+	const weekDayNamesShort = $derived(Array.from({ length: 7 }, (_, i) => getWeekDayShort(new Date(2024, 0, 1 + i), lang)));
+
+	const dayColorClasses = [
+		'from-coral/15 to-coral/5',
+		'from-orange-300/15 to-orange-300/5',
+		'from-lavender/15 to-lavender/5',
+		'from-emerald-300/15 to-emerald-300/5',
+		'from-teal-300/15 to-teal-300/5',
+		'from-blue-300/15 to-blue-300/5',
+		'from-rose-300/15 to-rose-300/5'
+	];
 
 	function getDayDate(index: number): Date {
 		return new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + index);
 	}
 
 	function formatDayDate(date: Date): string {
-		return `${date.getDate()} ${thaiMonthsShort[date.getMonth()]}`;
+		return `${date.getDate()} ${getMonthShort(date, lang)}`;
 	}
 
 	function isToday(date: Date): boolean {
@@ -48,21 +56,19 @@
 	}
 
 	const scheduleMap = $derived((() => {
-		const map: Record<string, ScheduleDay | undefined> = {};
+		const map: Record<number, ScheduleDay | undefined> = {};
 		for (const day of scheduleByDay) {
-			map[day.day] = day;
+			map[day.dayIndex] = day;
 		}
 		return map;
 	})());
 
 	const defaultMobileDay = $derived((() => {
-		const today = new Date();
 		for (let i = 0; i < 7; i++) {
-			const d = getDayDate(i);
-			if (isToday(d)) return i;
+			if (isToday(getDayDate(i))) return i;
 		}
 		for (let i = 0; i < 7; i++) {
-			const day = scheduleMap[weekDays[i]];
+			const day = scheduleMap[i];
 			if (day && day.items.length > 0) return i;
 		}
 		return 0;
@@ -82,9 +88,9 @@
 		return a.time.localeCompare(b.time);
 	}
 
-	const mobileDay = $derived(weekDays[selectedMobileDay]);
+	const mobileDay = $derived(weekDayNames[selectedMobileDay]);
 	const mobileDate = $derived(getDayDate(selectedMobileDay));
-	const mobileEvents = $derived(scheduleMap[mobileDay]?.items.slice().sort(sortByTime) ?? []);
+	const mobileEvents = $derived(scheduleMap[selectedMobileDay]?.items.slice().sort(sortByTime) ?? []);
 	const mobileToday = $derived(isToday(mobileDate));
 
 	function platformClass(platform: string): string {
@@ -108,11 +114,11 @@
 
 <!-- Mobile Day Tabs -->
 <div class="md:hidden mb-4">
-	<div class="glass-card rounded-2xl p-1.5 flex justify-between" role="tablist" aria-label="เลือกวัน">
-		{#each weekDays as day, i}
+	<div class="glass-card rounded-2xl p-1.5 flex justify-between" role="tablist" aria-label={m.calendar_card_select_day_aria()}>
+		{#each weekDayNames as day, i}
 			{@const date = getDayDate(i)}
 			{@const active = selectedMobileDay === i}
-			{@const hasEvents = !!scheduleMap[day]?.items.length}
+			{@const hasEvents = !!scheduleMap[i]?.items.length}
 			<button
 				role="tab"
 				aria-selected={active}
@@ -120,10 +126,10 @@
 				onclick={() => selectMobileDay(i)}
 				class="flex-1 flex flex-col items-center justify-center py-2 rounded-xl text-xs font-medium transition-all duration-200 touch-target min-w-0 {active ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/50'}"
 			>
-				<span class="font-bold">{weekDaysShort[i]}</span>
+				<span class="font-bold">{weekDayNamesShort[i]}</span>
 				<span class="text-[10px] opacity-80 mt-0.5 truncate w-full px-1 text-center">{date.getDate()}</span>
 				{#if hasEvents}
-					<span class="mt-1 min-w-4 h-4 px-1 rounded-full text-[9px] leading-4 {active ? 'bg-white/20 text-white' : 'bg-coral/10 text-coral-dark'}">{scheduleMap[day]?.items.length}</span>
+					<span class="mt-1 min-w-4 h-4 px-1 rounded-full text-[9px] leading-4 {active ? 'bg-white/20 text-white' : 'bg-coral/10 text-coral-dark'}">{scheduleMap[i]?.items.length}</span>
 				{:else}
 					<span class="mt-1 w-1 h-1 rounded-full {active ? 'bg-white/40' : 'bg-plum-light/20'}"></span>
 				{/if}
@@ -134,13 +140,13 @@
 
 <!-- Desktop Board -->
 <div class="hidden md:grid grid-cols-7 gap-3">
-	{#each weekDays as day, i}
+	{#each weekDayNames as day, i}
 		{@const date = getDayDate(i)}
-		{@const schedule = scheduleMap[day]}
+		{@const schedule = scheduleMap[i]}
 		{@const events = schedule?.items.slice().sort(sortByTime) ?? []}
 		{@const today = isToday(date)}
 		<div class="flex flex-col min-h-[320px] rounded-2xl overflow-hidden glass-card">
-			<div class="px-3 py-3 text-center bg-gradient-to-b {dayColors[day]} border-b border-white/50">
+			<div class="px-3 py-3 text-center bg-gradient-to-b {dayColorClasses[i]} border-b border-white/50">
 				<div class="text-xs font-medium opacity-80 mb-0.5 {today ? 'text-coral-dark' : 'text-plum-light'}">{day}</div>
 				<div class="font-[family-name:var(--font-display)] text-lg font-bold text-plum flex items-center justify-center gap-1.5">
 					{#if today}
@@ -148,13 +154,13 @@
 					{/if}
 					{date.getDate()}
 				</div>
-				<div class="text-[10px] text-plum-light">{thaiMonthsShort[date.getMonth()]}</div>
+				<div class="text-[10px] text-plum-light">{getMonthShort(date, lang)}</div>
 			</div>
 			<div class="flex-1 p-2 space-y-2 {events.length === 0 ? 'flex flex-col items-center justify-center' : ''}">
 				{#if events.length > 0}
 					{#each events as event, idx (event.series + event.time + event.episode)}
 						<article
-							aria-label="{event.series} {event.episode} เวลา {event.time}"
+							aria-label={m.calendar_event_aria({ series: event.series, episode: event.episode, time: event.time })}
 							class="group glass-card-strong rounded-xl p-2.5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer animate-fade-in"
 							style="animation-delay: {idx * 60}ms"
 						>
@@ -188,34 +194,35 @@
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
 							</svg>
 						</div>
-						<p class="text-[11px] text-plum-light">ไม่มีซีรีส์ฉาย</p>
+						<p class="text-[11px] text-plum-light">{m.calendar_card_no_events()}</p>
 					</div>
 				{/if}
 			</div>
 		</div>
-	{/each}</div>
+	{/each}
+</div>
 
 <!-- Mobile Selected Day Cards -->
-<div class="md:hidden space-y-3" role="tabpanel" aria-label="รายการของวัน{mobileDay}">
+<div class="md:hidden space-y-3" role="tabpanel" aria-label={m.calendar_card_day_items_aria({ day: mobileDay })}>
 	<div class="glass-card rounded-2xl p-4">
 		<div class="flex items-center justify-between gap-3 mb-4">
 			<div class="flex items-center gap-3 min-w-0">
-				<div class="w-11 h-11 rounded-xl bg-gradient-to-br {dayColors[mobileDay]} flex items-center justify-center flex-shrink-0">
-					<span class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{weekDaysShort[selectedMobileDay]}</span>
+				<div class="w-11 h-11 rounded-xl bg-gradient-to-br {dayColorClasses[selectedMobileDay]} flex items-center justify-center flex-shrink-0">
+					<span class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{weekDayNamesShort[selectedMobileDay]}</span>
 				</div>
 				<div class="min-w-0">
 					<div class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">
 						{mobileDay}
 						{#if mobileToday}
-							<span class="ml-1.5 text-xs px-2 py-0.5 rounded-full bg-coral text-white">วันนี้</span>
+							<span class="ml-1.5 text-xs px-2 py-0.5 rounded-full bg-coral text-white">{m.calendar_card_today_badge()}</span>
 						{/if}
 					</div>
-					<div class="text-sm text-plum-light truncate">{mobileDate.getDate()} {thaiMonths[mobileDate.getMonth()]} {mobileDate.getFullYear() + 543}</div>
+					<div class="text-sm text-plum-light truncate">{mobileDate.getDate()} {getMonthLong(mobileDate, lang)} {new Intl.DateTimeFormat(lang, { year: 'numeric' }).format(mobileDate)}</div>
 				</div>
 			</div>
 			<div class="rounded-2xl bg-coral/10 px-3 py-2 text-center flex-shrink-0">
 				<div class="font-[family-name:var(--font-display)] text-xl font-bold text-coral-dark">{mobileEvents.length}</div>
-				<div class="text-[10px] text-plum-light">รายการ</div>
+				<div class="text-[10px] text-plum-light">{m.calendar_card_items_label()}</div>
 			</div>
 		</div>
 
@@ -223,7 +230,7 @@
 			<div class="space-y-3">
 				{#each mobileEvents as event, idx (event.series + event.time + event.episode)}
 					<article
-						aria-label="{event.series} {event.episode} เวลา {event.time}"
+						aria-label={m.calendar_event_aria({ series: event.series, episode: event.episode, time: event.time })}
 						class="group glass-card-strong rounded-xl p-3 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 animate-fade-in"
 						style="animation-delay: {idx * 60}ms"
 					>
@@ -247,7 +254,7 @@
 								<h3 class="font-semibold text-plum text-sm leading-snug line-clamp-2 mb-1" title={event.series}>{event.series}</h3>
 								<div class="text-xs text-plum-light font-medium">{event.episode}</div>
 								<div class="mt-2 flex items-center text-xs text-coral-dark font-medium group-hover:translate-x-1 transition-transform">
-									ดูรายละเอียด
+									{m.calendar_card_detail_link()}
 									<svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
 									</svg>
@@ -264,8 +271,8 @@
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
 					</svg>
 				</div>
-				<p class="font-semibold text-plum text-sm mb-1">วันนี้ยังไม่มีซีรีส์ฉาย</p>
-				<p class="text-plum-light text-xs leading-relaxed">ลองแตะวันอื่นด้านบน หรือเลื่อนไปสัปดาห์ถัดไปเพื่อดูคิวใหม่</p>
+				<p class="font-semibold text-plum text-sm mb-1">{m.calendar_card_mobile_empty_title()}</p>
+				<p class="text-plum-light text-xs leading-relaxed">{m.calendar_card_mobile_empty_hint()}</p>
 			</div>
 		{/if}
 	</div>

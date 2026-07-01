@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import { m } from '$lib/i18n/paraglide.js';
+
 	interface Props {
 		currentWeek: Date;
 		onPrevWeek: () => void;
@@ -8,14 +11,7 @@
 
 	let { currentWeek, onPrevWeek, onNextWeek, onThisWeek }: Props = $props();
 
-	const thaiMonths = [
-		'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-		'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-	];
-	const thaiMonthsShort = [
-		'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
-		'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
-	];
+	const lang = $derived(page.data.lang);
 
 	function getStartOfWeek(date: Date): Date {
 		const d = new Date(date);
@@ -32,32 +28,19 @@
 	const weekRangeText = $derived((() => {
 		const start = getStartOfWeek(currentWeek);
 		const end = getEndOfWeek(currentWeek);
-		const startDay = start.getDate();
-		const endDay = end.getDate();
-		const startMonth = thaiMonths[start.getMonth()];
-		const endMonth = thaiMonths[end.getMonth()];
-		const startMonthShort = thaiMonthsShort[start.getMonth()];
-		const endMonthShort = thaiMonthsShort[end.getMonth()];
-		const year = start.getFullYear() + 543;
-
-		if (start.getMonth() === end.getMonth()) {
-			return {
-				short: `${startDay} - ${endDay} ${startMonthShort} ${year}`,
-				full: `${startDay} - ${endDay} ${startMonth} ${year}`
-			};
-		} else {
-			return {
-				short: `${startDay} ${startMonthShort} - ${endDay} ${endMonthShort} ${year}`,
-				full: `${startDay} ${startMonth} - ${endDay} ${endMonth} ${year}`
-			};
-		}
+		const shortFmt = new Intl.DateTimeFormat(lang, { month: 'short', day: 'numeric', year: 'numeric' });
+		const fullFmt = new Intl.DateTimeFormat(lang, { month: 'long', day: 'numeric', year: 'numeric' });
+		return {
+			short: `${shortFmt.format(start)} - ${shortFmt.format(end)}`,
+			full: `${fullFmt.format(start)} - ${fullFmt.format(end)}`
+		};
 	})());
 </script>
 
 <div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-5 mb-4 sm:mb-6">
 	<div class="flex items-center gap-3">
 		<button
-			aria-label="สัปดาห์ก่อนหน้า"
+			aria-label={m.calendar_week_header_prev_aria()}
 			onclick={onPrevWeek}
 			class="w-11 h-11 rounded-2xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:-translate-x-0.5 touch-target flex-shrink-0"
 		>
@@ -67,7 +50,7 @@
 		</button>
 
 		<div class="flex-1 min-w-0 text-center">
-			<div class="text-[11px] sm:text-xs font-bold text-coral-dark uppercase tracking-wide mb-0.5">สัปดาห์ที่กำลังดู</div>
+			<div class="text-[11px] sm:text-xs font-bold text-coral-dark uppercase tracking-wide mb-0.5">{m.calendar_week_header_current_label()}</div>
 			<h2 class="font-[family-name:var(--font-display)] text-base sm:text-2xl md:text-3xl font-bold text-plum truncate">
 				<span class="sm:hidden">{weekRangeText.short}</span>
 				<span class="hidden sm:inline">{weekRangeText.full}</span>
@@ -77,14 +60,14 @@
 		<div class="flex items-center gap-2 flex-shrink-0">
 			<button
 				onclick={onThisWeek}
-				aria-label="สัปดาห์นี้"
+				aria-label={m.calendar_week_header_this_week_aria()}
 				class="hidden sm:inline-flex h-11 px-5 rounded-2xl items-center justify-center bg-gradient-to-r from-coral to-coral-dark text-white text-sm font-bold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
 			>
-				สัปดาห์นี้
+				{m.calendar_week_header_this_week_text()}
 			</button>
 			<button
 				onclick={onThisWeek}
-				aria-label="สัปดาห์นี้"
+				aria-label={m.calendar_week_header_this_week_aria()}
 				class="sm:hidden w-11 h-11 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white flex items-center justify-center shadow-lg shadow-coral/25 touch-target"
 			>
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,7 +75,7 @@
 				</svg>
 			</button>
 			<button
-				aria-label="สัปดาห์ถัดไป"
+				aria-label={m.calendar_week_header_next_aria()}
 				onclick={onNextWeek}
 				class="w-11 h-11 rounded-2xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:translate-x-0.5 touch-target"
 			>

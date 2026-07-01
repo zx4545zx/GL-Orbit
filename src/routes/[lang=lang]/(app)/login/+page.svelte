@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { localizedHref } from '$lib/i18n/link.js';	import { goto } from '$app/navigation';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
+	import { m } from '$lib/i18n/paraglide.js';
 
 	let isLoading = $state(false);
 	let errorMessage = $state('');
@@ -26,12 +27,12 @@
 			});
 			const data = await res.json();
 			if (!res.ok) {
-				errorMessage = data.error || 'ไม่สามารถเข้าสู่ระบบได้ กรุณาลองอีกครั้ง';
+				errorMessage = data.error || m.login_error_default();
 				return;
 			}
 			await goto(localizedHref('/profile', page.data.lang), { invalidateAll: true });
 		} catch {
-			errorMessage = 'ไม่สามารถเข้าสู่ระบบได้ กรุณาลองอีกครั้ง';
+			errorMessage = m.login_error_default();
 		} finally {
 			isLoading = false;
 		}
@@ -39,8 +40,8 @@
 </script>
 
 <svelte:head>
-	<title>เข้าสู่ระบบ | GL-Orbit</title>
-	<meta name="description" content="เข้าสู่ระบบ GL-Orbit เพื่อจัดการโปรไฟล์ บันทึกซีรีส์ที่ชอบ และรับการแจ้งเตือนตารางฉาย" />
+	<title>{m.login_seo_title()}</title>
+	<meta name="description" content={m.login_seo_description()} />
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
@@ -54,8 +55,8 @@
 			<div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coral to-lavender mb-4 shadow-lg shadow-coral/25">
 				<span class="text-xl sm:text-2xl font-bold text-white">G</span>
 			</div>
-			<h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum mb-2">เข้าสู่ระบบ</h1>
-			<p class="text-sm sm:text-base text-plum-light">ยินดีต้อนรับกลับมา! 👋</p>
+			<h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum mb-2">{m.login_title()}</h1>
+			<p class="text-sm sm:text-base text-plum-light">{m.login_subtitle()}</p>
 		</div>
 
 		<div class="glass-card-strong rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-lavender/10">
@@ -67,13 +68,13 @@
 
 			<form onsubmit={handleSubmit} class="space-y-4 sm:space-y-5">
 				<div>
-					<label for="identifier" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">ชื่อผู้ใช้ หรือ อีเมล</label>
+					<label for="identifier" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">{m.login_label_identifier()}</label>
 					<input
 						id="identifier"
 						name="identifier"
 						type="text"
 						bind:value={email}
-						placeholder="ชื่อผู้ใช้ หรือ your@email.com"
+						placeholder={m.login_placeholder_identifier()}
 						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target"
 						required
 					/>
@@ -87,18 +88,18 @@
 					{#if isLoading}
 						<div class="flex items-center justify-center gap-2">
 							<svg class="animate-spin w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
-						<span>กำลังเข้าสู่ระบบ...</span>
+						<span>{m.login_submit_loading()}</span>
 					</div>
 					{:else}
-						เข้าสู่ระบบ
+						{m.login_submit()}
 					{/if}
 				</button>
 			</form>
 
 			<div class="mt-5 text-center">
 				<p class="text-sm text-plum-light">
-					ยังไม่มีบัญชี?
-					<a href="/{page.data.lang}/register" class="text-coral-dark font-medium hover:underline">สมัครสมาชิก</a>
+					{m.login_no_account()}
+					<a href="/{page.data.lang}/register" class="text-coral-dark font-medium hover:underline">{m.login_register_link()}</a>
 				</p>
 			</div>
 		</div>

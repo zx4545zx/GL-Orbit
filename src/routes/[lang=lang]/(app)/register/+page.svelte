@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { localizedHref } from '$lib/i18n/link.js';	import { goto } from '$app/navigation';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
+	import { m } from '$lib/i18n/paraglide.js';
 
 
 	$effect(() => {
@@ -32,13 +33,13 @@
 			});
 			const data = await res.json();
 			if (!res.ok) {
-				errorMessage = data.error || 'ไม่สามารถสมัครสมาชิกได้ กรุณาลองอีกครั้ง';
+				errorMessage = data.error || m.register_error_default();
 				if (data.fields) fieldErrors = data.fields;
 				return;
 			}
 			await goto(localizedHref('/profile', page.data.lang), { invalidateAll: true });
 		} catch {
-			errorMessage = 'ไม่สามารถสมัครสมาชิกได้ กรุณาลองอีกครั้ง';
+			errorMessage = m.register_error_default();
 		} finally {
 			isLoading = false;
 		}
@@ -46,8 +47,8 @@
 </script>
 
 <svelte:head>
-	<title>สมัครสมาชิก | GL-Orbit</title>
-	<meta name="description" content="สมัครสมาชิก GL-Orbit เพื่อติดตามซีรีส์ GL ที่คุณชื่นชอบ รับการแจ้งเตือนตอนใหม่ และจัดการตารางฉายส่วนตัว" />
+	<title>{m.register_seo_title()}</title>
+	<meta name="description" content={m.register_seo_description()} />
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
@@ -61,8 +62,8 @@
 			<div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coral to-lavender mb-4 shadow-lg shadow-coral/25">
 				<span class="text-xl sm:text-2xl font-bold text-white">G</span>
 			</div>
-			<h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum mb-2">สมัครสมาชิก</h1>
-			<p class="text-sm sm:text-base text-plum-light">มาเป็นส่วนหนึ่งของชุมชน GL-Orbit 🌸</p>
+			<h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum mb-2">{m.register_title()}</h1>
+			<p class="text-sm sm:text-base text-plum-light">{m.register_subtitle()}</p>
 		</div>
 
 		<div class="glass-card-strong rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-lavender/10">
@@ -74,7 +75,7 @@
 
 			<form onsubmit={handleSubmit} class="space-y-4 sm:space-y-5">
 				<div>
-					<label for="username" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">ชื่อผู้ใช้</label>
+					<label for="username" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">{m.register_label_username()}</label>
 					<input
 						id="username"
 						name="username"
@@ -89,18 +90,18 @@
 					{/if}
 				</div>
 				<div>
-					<label for="displayName" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">ชื่อที่แสดง <span class="text-plum-light/60 font-normal">(ไม่บังคับ)</span></label>
+					<label for="displayName" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">{m.register_label_display_name()} <span class="text-plum-light/60 font-normal">{m.register_optional_note()}</span></label>
 					<input
 						id="displayName"
 						name="displayName"
 						type="text"
 						bind:value={displayName}
-						placeholder="ชื่อของคุณ"
+						placeholder={m.register_placeholder_display_name()}
 						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target"
 					/>
 				</div>
 				<div>
-					<label for="email" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">อีเมล</label>
+					<label for="email" class="block text-sm font-medium text-plum mb-1.5 sm:mb-2">{m.register_label_email()}</label>
 					<input
 						id="email"
 						name="email"
@@ -118,15 +119,15 @@
 					id="password"
 					name="password"
 					bind:value={password}
-					placeholder="อย่างน้อย 6 ตัวอักษร"
+					placeholder={m.register_password_placeholder()}
 					minlength={6}
-					label="รหัสผ่าน"
+					label={m.register_password_label()}
 				/>
 				<PasswordInput
 					id="confirmPassword"
 					name="confirmPassword"
 					bind:value={confirmPassword}
-					label="ยืนยันรหัสผ่าน"
+					label={m.register_confirm_password_label()}
 				/>
 				<button
 					type="submit"
@@ -136,18 +137,18 @@
 					{#if isLoading}
 						<div class="flex items-center justify-center gap-2">
 							<svg class="animate-spin w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
-						<span>กำลังสมัครสมาชิก...</span>
+						<span>{m.register_submit_loading()}</span>
 					</div>
 					{:else}
-						สมัครสมาชิก
+						{m.register_submit()}
 					{/if}
 				</button>
 			</form>
 
 			<div class="mt-5 text-center">
 				<p class="text-sm text-plum-light">
-					มีบัญชีแล้ว?
-					<a href="/{page.data.lang}/login" class="text-coral-dark font-medium hover:underline">เข้าสู่ระบบ</a>
+					{m.register_have_account()}
+					<a href="/{page.data.lang}/login" class="text-coral-dark font-medium hover:underline">{m.register_login_link()}</a>
 				</p>
 			</div>
 		</div>
