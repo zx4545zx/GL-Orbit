@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "preferred_language" varchar(10) DEFAULT 'th' NOT NULL;

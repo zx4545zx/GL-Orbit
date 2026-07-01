@@ -12,6 +12,7 @@ export const users = pgTable('users', {
 	coverUrl: text('cover_url'),
 	passwordHash: varchar('password_hash', { length: 255 }).notNull(),
 	role: userRoleEnum('role').notNull().default('USER'),
+	preferredLanguage: varchar('preferred_language', { length: 10 }).notNull().default('th'),
 	isActive: boolean('is_active').notNull().default(true),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
