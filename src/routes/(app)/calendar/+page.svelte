@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { navigating, page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
@@ -12,6 +13,7 @@
 
 	let viewMode = $state<'grid' | 'calendar' | 'list' | 'card'>(data.params.startDate ? 'card' : 'calendar');
 	let selectedDate = $state<string | null>(null);
+	let scheduleSection = $state<HTMLElement>();
 
 	const calendar = $derived<CalendarApiResponse>(data.calendar);
 	const params_y = $derived(data.params.year);
@@ -92,8 +94,13 @@
 		};
 	})());
 
-	function navigateCalendar(url: string) {
-		goto(url, { noScroll: true, keepFocus: true });
+	async function navigateCalendar(url: string) {
+		await goto(url, { noScroll: true, keepFocus: true });
+	}
+
+	async function scrollToSchedule() {
+		await tick();
+		scheduleSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 
 	function prevMonth() {
@@ -125,11 +132,13 @@
 		navigateCalendar(`/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
 	}
 
-	function goToThisWeek() {
+	async function goToThisWeek() {
+		viewMode = 'card';
 		const today = new Date();
 		const start = getStartOfWeek(today);
 		const end = getEndOfWeek(today);
-		navigateCalendar(`/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
+		await navigateCalendar(`/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
+		await scrollToSchedule();
 	}
 
 	function isToday(fullDate: string) {
@@ -393,6 +402,7 @@
 		</div>
 	</section>
 
+	<div bind:this={scheduleSection} class="scroll-mt-24 sm:scroll-mt-28">
 	<!-- Grid View -->
 	{#if viewMode === 'grid'}
 		{@render monthHeader()}
@@ -760,6 +770,7 @@
 			<CardScheduleBoard scheduleByDay={weekScheduleByDay} weekStart={getStartOfWeek(currentWeek)} />
 		{/if}
 	{/if}
+	</div>
 
 	<!-- Countdown CTA -->
 	<a href="/countdown" class="group flex items-center gap-4 sm:gap-5 mt-6 sm:mt-8 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:shadow-lavender/20 transition-all duration-300">
