@@ -10,7 +10,7 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let viewMode = $state<'grid' | 'calendar' | 'list' | 'card'>('grid');
+	let viewMode = $state<'grid' | 'calendar' | 'list' | 'card'>(data.params.startDate ? 'card' : 'calendar');
 	let selectedDate = $state<string | null>(null);
 
 	const calendar = $derived<CalendarApiResponse>(data.calendar);
@@ -37,6 +37,7 @@
 	const weekScheduleByDay = $derived(calendar.scheduleByDay);
 
 	const weekDays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+	const weekDayNames = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
 	const thaiMonths = [
 		'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
 		'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
@@ -64,6 +65,32 @@
 		const start = getStartOfWeek(date);
 		return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7);
 	}
+
+	function isSameDate(a: Date, b: Date): boolean {
+		return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+	}
+
+	const currentWeekStart = $derived(getStartOfWeek(currentWeek));
+	const weekSummary = $derived((() => {
+		const today = new Date();
+		const todayIndex = weekDayNames.findIndex((_, index) => {
+			const day = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth(), currentWeekStart.getDate() + index);
+			return isSameDate(day, today);
+		});
+		const todayName = todayIndex >= 0 ? weekDayNames[todayIndex] : null;
+		const todaySchedule = todayName ? weekScheduleByDay.find((day) => day.day === todayName) : undefined;
+		const weekCount = weekScheduleByDay.reduce((sum, day) => sum + day.items.length, 0);
+		const firstDayWithEvent = weekScheduleByDay.find((day) => day.items.length > 0);
+		const featuredDay = todaySchedule?.items.length ? todayName : firstDayWithEvent?.day;
+		const featuredEvent = todaySchedule?.items[0] ?? firstDayWithEvent?.items[0] ?? null;
+
+		return {
+			todayCount: todaySchedule?.items.length ?? 0,
+			weekCount,
+			featuredDay,
+			featuredEvent
+		};
+	})());
 
 	function prevMonth() {
 		const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
@@ -205,10 +232,10 @@
 	]));
 
 	const viewButtons = [
-		{ key: 'card' as const, label: 'การ์ด', short: 'การ์ด', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>' },
-		{ key: 'list' as const, label: 'รายการ', short: 'รายการ', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>' },
-		{ key: 'grid' as const, label: 'ตาราง', short: 'ตาราง', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>' },
-		{ key: 'calendar' as const, label: 'ปฏิทิน', short: 'ปฏิทิน', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' }
+		{ key: 'card' as const, label: 'สัปดาห์', short: 'สัปดาห์', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
+		{ key: 'list' as const, label: 'ลิสต์', short: 'ลิสต์', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>' },
+		{ key: 'calendar' as const, label: 'เดือน', short: 'เดือน', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
+		{ key: 'grid' as const, label: 'ตาราง', short: 'ตาราง', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>' }
 	];
 </script>
 
@@ -231,8 +258,8 @@
 </svelte:head>
 
 {#snippet viewToggle()}
-	<div class="flex justify-center">
-		<div class="glass-card rounded-2xl p-1.5 flex gap-1">
+	<div class="flex justify-start sm:justify-center overflow-x-auto pb-1 -mx-1 px-1">
+		<div class="glass-card rounded-2xl p-1.5 flex gap-1 min-w-max">
 			{#each viewButtons as btn}
 				{@const active = viewMode === btn.key}
 				<button
@@ -240,7 +267,7 @@
 						viewMode = btn.key;
 						goto(getViewUrl(btn.key, params_y, params_m, params_sd, params_ed));
 					}}
-					class="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 flex items-center gap-1.5 sm:gap-2 touch-target {active ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/60'}"
+					class="px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 sm:gap-2 touch-target {active ? 'bg-white text-coral-dark shadow-md shadow-lavender/20 ring-1 ring-coral/10' : 'text-plum-light hover:bg-white/60'}"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">{@html btn.icon}</svg>
 					<span class="hidden sm:inline">{btn.label}</span>
@@ -252,18 +279,61 @@
 {/snippet}
 
 <div class="py-6 sm:py-8 max-w-6xl mx-auto">
-	<!-- Title -->
-	<div class="text-center mb-6 sm:mb-8">
-		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
-			ตารางฉาย<span class="text-coral">ประจำเดือน</span>
-		</h1>
-		<p class="text-sm sm:text-base text-plum-light">อัปเดตตารางฉายซีรีส์ GL ล่าสุด</p>
-	</div>
+	<!-- Today / This Week Hero -->
+	<section class="relative overflow-hidden glass-card rounded-3xl p-5 sm:p-8 mb-5 sm:mb-7">
+		<div class="absolute -top-16 -right-12 w-40 h-40 rounded-full bg-coral/10 blur-3xl"></div>
+		<div class="absolute -bottom-20 -left-16 w-52 h-52 rounded-full bg-lavender/20 blur-3xl"></div>
+		<div class="relative grid gap-5 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+			<div>
+				<div class="inline-flex items-center gap-2 rounded-full bg-coral/10 px-3 py-1 text-xs font-bold text-coral-dark mb-3">
+					<span class="w-1.5 h-1.5 rounded-full bg-coral animate-pulse"></span>
+					Today / This Week
+				</div>
+				<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum leading-tight mb-2">
+					ตารางฉาย<span class="text-coral"> GL</span>
+				</h1>
+				<p class="text-sm sm:text-base text-plum-light max-w-2xl leading-relaxed">
+					เปิดมาปุ๊บรู้ทันทีว่าวันนี้และสัปดาห์นี้มีเรื่องไหนฉาย กี่โมง และดูได้ที่แพลตฟอร์มไหน
+				</p>
+			</div>
 
-	<!-- Normal View Toggle -->
-	<div class="mb-6 sm:mb-8">
-		{@render viewToggle()}
-	</div>
+			<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
+				<div class="rounded-2xl bg-white/70 p-4 shadow-sm shadow-lavender/10 border border-white/60">
+					<div class="text-xs font-medium text-plum-light mb-1">วันนี้</div>
+					<div class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum">{weekSummary.todayCount}</div>
+					<div class="text-[11px] text-plum-light">รายการฉาย</div>
+				</div>
+				<div class="rounded-2xl bg-white/70 p-4 shadow-sm shadow-lavender/10 border border-white/60">
+					<div class="text-xs font-medium text-plum-light mb-1">สัปดาห์นี้</div>
+					<div class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum">{weekSummary.weekCount}</div>
+					<div class="text-[11px] text-plum-light">รายการทั้งหมด</div>
+				</div>
+				<div class="col-span-2 sm:col-span-1 lg:col-span-2 xl:col-span-1 rounded-2xl bg-gradient-to-br from-coral/10 to-lavender/15 p-4 border border-coral/10">
+					<div class="text-xs font-medium text-plum-light mb-1">ไฮไลต์ถัดไป</div>
+					{#if weekSummary.featuredEvent}
+						<div class="text-sm font-bold text-plum truncate">{weekSummary.featuredEvent.series}</div>
+						<div class="text-xs text-coral-dark font-semibold mt-1">{weekSummary.featuredDay} · {weekSummary.featuredEvent.time}</div>
+					{:else}
+						<div class="text-sm font-bold text-plum">ยังไม่มีคิวฉาย</div>
+						<div class="text-xs text-plum-light mt-1">ลองดูสัปดาห์ถัดไป</div>
+					{/if}
+				</div>
+			</div>
+		</div>
+
+		<div class="relative mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+			<button
+				onclick={goToThisWeek}
+				class="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-coral to-coral-dark px-5 py-3 text-sm font-bold text-white shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
+			>
+				ดูสัปดาห์นี้
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+			</button>
+			<div class="sm:max-w-max">
+				{@render viewToggle()}
+			</div>
+		</div>
+	</section>
 
 	<!-- Grid View -->
 	{#if viewMode === 'grid'}
@@ -706,8 +776,8 @@
 	{/if}
 
 	<!-- Countdown CTA -->
-	<a href="/countdown" class="group flex items-center gap-4 sm:gap-5 mt-6 sm:mt-10 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-lg hover:shadow-lavender/20 transition-all duration-300">
-		<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coral to-lavender flex items-center justify-center flex-shrink-0 shadow-lg shadow-coral/30">
+	<a href="/countdown" class="group flex items-center gap-4 sm:gap-5 mt-6 sm:mt-8 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:shadow-lavender/20 transition-all duration-300">
+		<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coral/90 to-lavender flex items-center justify-center flex-shrink-0 shadow-lg shadow-coral/20">
 			<svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-3 4-4 7-4 10v2l-1 2h10l-1-2v-2c0-3-1-6-4-10z"/><circle cx="12" cy="10" r="1.5" fill="white" opacity="0.6"/><path d="M10 17c0 1.5 2 2.5 2 2.5s2-1 2-2.5" fill="currentColor" opacity="0.4"/></svg>
 		</div>
 		<div class="flex-1 min-w-0">
@@ -718,7 +788,7 @@
 	</a>
 
 	<!-- Notes section (always visible, independent of contentLoading) -->
-	<div class="mt-6 sm:mt-10 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 flex items-start gap-3 sm:gap-4">
+	<div class="mt-4 sm:mt-6 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex items-start gap-3 sm:gap-4 opacity-95">
 		<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-lavender/20 flex items-center justify-center flex-shrink-0">
 			<svg class="w-4 h-4 sm:w-5 sm:h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

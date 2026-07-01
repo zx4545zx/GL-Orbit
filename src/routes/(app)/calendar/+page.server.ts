@@ -1,4 +1,4 @@
-import { parseCalendarParams } from './calendar.js';
+import { formatDateLocal, getEndOfWeek, getStartOfWeek, parseCalendarParams } from './calendar.js';
 import { type CalendarQuery, getCalendarData } from '$lib/server/queries/calendar.js';
 import type { PageServerLoad } from './$types.js';
 
@@ -22,7 +22,11 @@ export const load: PageServerLoad = async ({ url }) => {
 	} else {
 		displayYear = now.getFullYear();
 		displayMonth = now.getMonth() + 1;
-		query = { type: 'month', year: displayYear, month: displayMonth };
+		const start = getStartOfWeek(now);
+		const end = getEndOfWeek(now);
+		params.startDate = formatDateLocal(start);
+		params.endDate = formatDateLocal(end);
+		query = { type: 'week', startDate: params.startDate, endDate: params.endDate };
 	}
 
 	const calendar = await getCalendarData(query);

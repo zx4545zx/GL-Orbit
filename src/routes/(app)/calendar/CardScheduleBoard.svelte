@@ -117,8 +117,10 @@
 			>
 				<span class="font-bold">{weekDaysShort[i]}</span>
 				<span class="text-[10px] opacity-80 mt-0.5 truncate w-full px-1 text-center">{date.getDate()}</span>
-				{#if hasEvents && !active}
-					<span class="mt-1 w-1 h-1 rounded-full bg-coral"></span>
+				{#if hasEvents}
+					<span class="mt-1 min-w-4 h-4 px-1 rounded-full text-[9px] leading-4 {active ? 'bg-white/20 text-white' : 'bg-coral/10 text-coral-dark'}">{scheduleMap[day]?.items.length}</span>
+				{:else}
+					<span class="mt-1 w-1 h-1 rounded-full {active ? 'bg-white/40' : 'bg-plum-light/20'}"></span>
 				{/if}
 			</button>
 		{/each}
@@ -191,18 +193,24 @@
 <!-- Mobile Selected Day Cards -->
 <div class="md:hidden space-y-3" role="tabpanel" aria-label="รายการของวัน{mobileDay}">
 	<div class="glass-card rounded-2xl p-4">
-		<div class="flex items-center gap-3 mb-4">
-			<div class="w-11 h-11 rounded-xl bg-gradient-to-br {dayColors[mobileDay]} flex items-center justify-center">
-				<span class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{weekDaysShort[selectedMobileDay]}</span>
-			</div>
-			<div>
-				<div class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">
-					{mobileDay}
-					{#if mobileToday}
-						<span class="ml-1.5 text-xs px-2 py-0.5 rounded-full bg-coral text-white">วันนี้</span>
-					{/if}
+		<div class="flex items-center justify-between gap-3 mb-4">
+			<div class="flex items-center gap-3 min-w-0">
+				<div class="w-11 h-11 rounded-xl bg-gradient-to-br {dayColors[mobileDay]} flex items-center justify-center flex-shrink-0">
+					<span class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{weekDaysShort[selectedMobileDay]}</span>
 				</div>
-				<div class="text-sm text-plum-light">{mobileDate.getDate()} {thaiMonths[mobileDate.getMonth()]} {mobileDate.getFullYear() + 543}</div>
+				<div class="min-w-0">
+					<div class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">
+						{mobileDay}
+						{#if mobileToday}
+							<span class="ml-1.5 text-xs px-2 py-0.5 rounded-full bg-coral text-white">วันนี้</span>
+						{/if}
+					</div>
+					<div class="text-sm text-plum-light truncate">{mobileDate.getDate()} {thaiMonths[mobileDate.getMonth()]} {mobileDate.getFullYear() + 543}</div>
+				</div>
+			</div>
+			<div class="rounded-2xl bg-coral/10 px-3 py-2 text-center flex-shrink-0">
+				<div class="font-[family-name:var(--font-display)] text-xl font-bold text-coral-dark">{mobileEvents.length}</div>
+				<div class="text-[10px] text-plum-light">รายการ</div>
 			</div>
 		</div>
 
@@ -251,7 +259,8 @@
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
 					</svg>
 				</div>
-				<p class="text-plum-light text-sm">ไม่มีซีรีส์ฉายในวันนี้</p>
+				<p class="font-semibold text-plum text-sm mb-1">วันนี้ยังไม่มีซีรีส์ฉาย</p>
+				<p class="text-plum-light text-xs leading-relaxed">ลองแตะวันอื่นด้านบน หรือเลื่อนไปสัปดาห์ถัดไปเพื่อดูคิวใหม่</p>
 			</div>
 		{/if}
 	</div>
