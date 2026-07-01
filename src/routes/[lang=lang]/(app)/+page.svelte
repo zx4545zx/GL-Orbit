@@ -1,4 +1,5 @@
 <script lang="ts">
+import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import { DEFAULT_OG_IMAGE, DEFAULT_SEO_DESCRIPTION, DEFAULT_SEO_TITLE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
@@ -61,7 +62,7 @@
 			'@type': 'WebSite',
 			name: SITE_NAME,
 			url: canonicalUrl,
-			inLanguage: 'th-TH',
+			inLanguage: page.data.lang === 'th' ? 'th-TH' : 'en-US',
 			potentialAction: {
 				'@type': 'SearchAction',
 				target: `${absoluteUrl(page.url.origin, '/series')}?search={search_term_string}`,
@@ -75,15 +76,15 @@
 			url: canonicalUrl,
 			logo: absoluteUrl(page.url.origin, '/icons/gl-orbit-icon.png'),
 			description: DEFAULT_SEO_DESCRIPTION,
-			inLanguage: 'th-TH'
+			inLanguage: page.data.lang === 'th' ? 'th-TH' : 'en-US'
 		},
-		buildBreadcrumbJsonLd(page.url.origin, [{ name: 'หน้าแรก', path: '/' }])
+		buildBreadcrumbJsonLd(page.url.origin, [{ name: m.nav_home(), path: '/' }])
 	]));
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
-		ONGOING: { text: 'กำลังฉาย', class: 'bg-mint/20 text-mint-dark' },
-		UPCOMING: { text: 'เร็วๆ นี้', class: 'bg-lavender/20 text-lavender-dark' },
-		ENDED: { text: 'จบแล้ว', class: 'bg-coral/10 text-coral-dark' }
+		ONGOING: { text: m.status_ongoing(), class: 'bg-mint/20 text-mint-dark' },
+		UPCOMING: { text: m.status_upcoming(), class: 'bg-lavender/20 text-lavender-dark' },
+		ENDED: { text: m.status_ended(), class: 'bg-coral/10 text-coral-dark' }
 	};
 
 	// --- Live countdown clock (requestAnimationFrame) ---
@@ -153,10 +154,10 @@
 <a
 	href="/{page.data.lang}/chat"
 	data-sveltekit-preload-data="hover"
-	aria-label="เปิด AI Chat"
+	aria-label={m.home_chat_aria_label()}
 	class="group fixed right-4 z-[55] mobile-chat-fab flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-coral to-coral-dark text-white shadow-xl shadow-coral/40 transition-all duration-300 active:scale-95 md:hidden"
 >
-	<span class="sr-only">เปิด AI Chat</span>
+	{m.home_chat_aria_label()}
 	<svg class="h-5 w-5 transition-transform duration-300 group-active:scale-95" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
 		<path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
 		<path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.142-4.03 7.5-9 7.5a10.55 10.55 0 0 1-3.72-.66L3 20.25l1.46-3.98A6.82 6.82 0 0 1 3 12c0-4.142 4.03-7.5 9-7.5s9 3.358 9 7.5Z" />
@@ -165,7 +166,7 @@
 
 <!-- Hero Section: Cosmic Observatory (light theme) -->
 <section class="relative -mx-4 min-h-dvh overflow-hidden px-4 md:-mt-24 md:pt-24 flex items-center justify-center">
-	<!-- light gradient base (ตาม theme project) -->
+	<!-- light gradient base (per project theme) -->
 	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
 	<!-- soft pastel glows -->
 	<div class="absolute -top-10 -left-10 w-72 h-72 sm:w-96 sm:h-96 bg-coral/20 rounded-full blur-[40px] sm:blur-[80px] animate-float pointer-events-none will-change-transform"></div>
@@ -191,22 +192,21 @@
 	<div class="relative z-10 text-center max-w-3xl mx-auto px-4 py-20 sm:py-24">
 		<div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/60 backdrop-blur-sm border border-lavender/20 mb-6 sm:mb-8 animate-slide-up">
 			<span class="w-2 h-2 bg-coral rounded-full"></span>
-			<span class="text-xs sm:text-sm font-medium text-plum-light">ยินดีต้อนรับสู่จักรวาล GL</span>
+			<span class="text-xs sm:text-sm font-medium text-plum-light">{m.home_hero_badge()}</span>
 		</div>
 
 		<h1 class="font-[family-name:var(--font-display)] text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-plum mb-4 sm:mb-6 animate-slide-up stagger-1 leading-[1.05]">
-			ค้นพบซีรีส์
+			{m.home_hero_title_start()}
 			<span class="text-gradient">GL</span>
 			<br class="hidden sm:block" />
-			ที่คุณรัก
+			{m.home_hero_title_end()}
 		</h1>
 
 		<p class="text-base sm:text-lg md:text-xl text-plum-light max-w-xl mx-auto mb-4 leading-relaxed animate-slide-up stagger-2 px-2">
-			ติดตามตารางฉาย ข้อมูลซีรีส์ และลิงก์รับชม<br class="hidden md:block" />
-			ที่อัปเดตแบบเรียลไทม์
+			{@html m.home_hero_subtitle()}
 		</p>
 		<p class="mx-auto mb-7 max-w-2xl px-3 text-sm leading-7 text-plum-light/85 sm:mb-10 sm:text-base animate-slide-up stagger-3">
-			GL-Orbit รวมตารางฉายซีรีส์ Girls' Love จากแพลตฟอร์มยอดนิยม เช่น YouTube, iQIYI, GagaOOLala และ WeTV พร้อมเวลาออกอากาศตาม timezone ไทย ข้อมูลนักแสดง และสถานะ Uncut ในที่เดียว
+			{m.home_hero_description()}
 		</p>
 
 		<div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up stagger-4 px-4 sm:px-0">
@@ -215,33 +215,33 @@
 				class="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold text-base sm:text-lg shadow-xl shadow-coral/25 hover:shadow-2xl hover:shadow-coral/30 hover:scale-105 transition-all duration-300 touch-target flex items-center justify-center gap-2"
 			>
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-				ดูตารางฉาย
+				{m.home_cta_schedule()}
 			</a>
 			<a
 				href="/{page.data.lang}/series"
 				class="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl glass-card-strong text-plum font-semibold text-base sm:text-lg hover:bg-white/90 hover:scale-105 transition-all duration-300 touch-target flex items-center justify-center gap-2"
 			>
-				สำรวจซีรีส์
+				{m.home_cta_explore()}
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
 			</a>
 		</div>
 
 		<p class="mt-5 text-sm text-plum-light/80 animate-slide-up stagger-4">
-			อยากรู้ว่า GL-Orbit ช่วยติดตามซีรีส์ GL อย่างไร?
+			{m.home_hero_guide_prompt()}
 			<a href="/{page.data.lang}/about" class="font-semibold text-coral-dark underline decoration-coral/30 underline-offset-4 transition hover:text-coral">
-				อ่านคู่มือฉบับเต็ม
+				{m.home_hero_guide_link()}
 			</a>
 		</p>
 	</div>
 
 	<!-- scroll hint -->
 	<div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 hidden sm:flex flex-col items-center gap-1.5 text-plum-light/50 animate-float">
-		<span class="text-[10px] uppercase tracking-[0.25em]">เลื่อนลง</span>
+		<span class="text-[10px] uppercase tracking-[0.25em]">{m.home_scroll_hint()}</span>
 		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
 	</div>
 </section>
 
-<!-- Countdown: ซีรีส์ที่จะฉายภายใน 24 ชั่วโมง (สูงสุด 3 เรื่อง, หายไปเมื่อถึงเวลาฉาย) -->
+<!-- Countdown: series airing within 24 hours (max 3, disappears at air time) -->
 {#if activeCountdowns.length > 0}
 	<section class="relative py-10 sm:py-14 -mx-4 px-4 overflow-hidden">
 		<div class="absolute inset-0 bg-gradient-to-b from-coral/5 via-transparent to-lavender/5 pointer-events-none"></div>
@@ -257,12 +257,12 @@
 						<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">Live Countdown</span>
 					</div>
 					<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum">
-						ใกล้<span class="text-coral">ฉายแล้ว</span>
+						<span>{m.home_countdown_title_plain()}</span><span class="text-coral">{m.home_countdown_title_accent()}</span>
 					</h2>
 					<p class="text-sm sm:text-base text-plum-light mt-1">นับถอยหลังสู่ตอนใหม่ · ภายใน 24 ชั่วโมง</p>
 				</div>
 				<a href="/{page.data.lang}/countdown" class="hidden sm:flex items-center gap-2 text-coral-dark font-medium hover:gap-3 transition-all text-sm touch-target">
-					ดูทั้งหมด
+					{m.common_see_all()}
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
 				</a>
 			</div>
@@ -274,7 +274,7 @@
 						class="group block animate-slide-up fill-mode-both {stagger80Class(i)}"
 					>
 						<article class="glass-card-strong rounded-[1.75rem] p-5 sm:p-6 relative overflow-hidden hover:-translate-y-1.5 transition-all duration-500 hover:shadow-2xl hover:shadow-coral/20 h-full flex flex-col">
-							<!-- playful lightning badge: ใกล้ฉายมาก -->
+							<!-- playful lightning badge: airing very soon -->
 							<div class="absolute top-3.5 right-3.5 z-10">
 								<div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-coral to-coral-dark shadow-lg shadow-coral/50 flex items-center justify-center rotate-[8deg]">
 									<svg class="w-5 h-5 text-white -rotate-[8deg]" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
@@ -307,7 +307,7 @@
 								</div>
 							</div>
 
-							<!-- orbital halo + HH:MM:SS (จอแสดงผลหลัก — ไม่มีวัน เพราะใกล้ฉายภายใน 24 ชม.) -->
+							<!-- orbital halo + HH:MM:SS (main display — no day, airing within 24h) -->
 							<div class="relative flex-1 flex items-center justify-center py-5">
 								<!-- วงแหวนโคจร + ดาวเทียม (สัญลักษณ์ของ GL-Orbit) — static เท่านั้น, ไม่ spin เพื่อลด GPU load -->
 								<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-44 sm:h-44 pointer-events-none">
@@ -315,13 +315,13 @@
 								</div>
 
 								<div class="relative text-center">
-									<p class="text-[11px] font-semibold uppercase tracking-wider text-plum-light/70 mb-2">ออกอากาศในอีก</p>
+									<p class="text-[11px] font-semibold uppercase tracking-wider text-plum-light/70 mb-2">{m.home_countdown_airing_in()}</p>
 									<div class="flex items-start justify-center gap-1.5 sm:gap-2 font-[family-name:var(--font-display)]">
-										{@render timeUnit(pad(c.hours), 'ชม.')}
+										{@render timeUnit(pad(c.hours), m.home_countdown_hours_short())}
 										<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-3xl sm:text-4xl font-bold text-coral/60">:</span>
-										{@render timeUnit(pad(c.minutes), 'นาที')}
+										{@render timeUnit(pad(c.minutes), m.home_countdown_minutes_short())}
 										<span aria-hidden="true" class="pt-2 sm:pt-2.5 text-3xl sm:text-4xl font-bold text-coral/60">:</span>
-										{@render timeUnit(pad(c.seconds), 'วิ')}
+										{@render timeUnit(pad(c.seconds), m.home_countdown_seconds_short())}
 									</div>
 								</div>
 							</div>
@@ -332,7 +332,7 @@
 
 			<div class="text-center mt-7 sm:mt-9 sm:hidden">
 				<a href="/{page.data.lang}/countdown" class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold hover:shadow-xl hover:shadow-coral/25 hover:scale-105 transition-all text-sm sm:text-base touch-target">
-					ดูเพิ่มเติม
+					{m.common_load_more()}
 					<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
 				</a>
 			</div>
@@ -360,7 +360,7 @@
 					<span class="text-[11px] font-bold uppercase tracking-[0.2em] text-coral-dark">กำลังฉาย</span>
 				</div>
 				<h2 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-plum mb-2">
-					ซีรีส์<span class="text-coral">แนะนำ</span>
+					<span>{m.home_featured_title_plain()}</span><span class="text-coral">{m.home_featured_title_accent()}</span>
 				</h2>
 				<p class="text-sm sm:text-base text-plum-light">ซีรีส์ GL ที่น่าติดตามในตอนนี้</p>
 			</div>
@@ -393,8 +393,8 @@
 						<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
 					</div>
 				</div>
-				<h3 class="font-semibold text-plum mb-1">ยังไม่มีซีรีส์</h3>
-				<p class="text-sm text-plum-light">ซีรีส์จะปรากฏที่นี่เมื่อมีข้อมูลในระบบ</p>
+				<h3 class="font-semibold text-plum mb-1">{m.home_featured_empty_title()}</h3>
+				<p class="text-sm text-plum-light">{m.home_featured_empty_desc()}</p>
 			</div>
 		{:else}
 			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -472,8 +472,8 @@
 						<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
 					</div>
 				</div>
-				<h3 class="font-semibold text-plum mb-1">ไม่มีตารางฉายเร็วๆ นี้</h3>
-				<p class="text-sm text-plum-light">ตารางฉายจะปรากฏเมื่อมีซีรีส์ที่กำหนดฉาย</p>
+				<h3 class="font-semibold text-plum mb-1">{m.home_schedule_empty_title()}</h3>
+				<p class="text-sm text-plum-light">{m.home_schedule_empty_desc()}</p>
 			</div>
 		{:else}
 			<div class="relative">
@@ -536,7 +536,7 @@
 		<div class="text-center mt-8 sm:mt-10">
 			<a href="/{page.data.lang}/calendar" class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold hover:shadow-xl hover:shadow-coral/25 hover:scale-105 transition-all text-sm sm:text-base touch-target">
 				<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-				ดูตารางฉายทั้งหมด
+				{m.home_schedule_cta()}
 			</a>
 		</div>
 	</div>
