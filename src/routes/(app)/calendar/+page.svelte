@@ -263,7 +263,6 @@
 			{#each viewButtons as btn, index}
 				{#if index === 2}
 					<div class="hidden lg:block mx-1 h-7 w-px bg-lavender/25" aria-hidden="true"></div>
-					<span class="hidden lg:inline px-1 text-[10px] font-bold uppercase tracking-wide text-plum-light/60">เดือน</span>
 				{/if}
 				{@const active = viewMode === btn.key}
 				<button
