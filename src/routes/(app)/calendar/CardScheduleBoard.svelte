@@ -14,6 +14,10 @@
 		'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
 		'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
 	];
+	const thaiMonthsShort = [
+		'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+		'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
+	];
 
 	const dayColors: Record<string, string> = {
 		'จันทร์': 'from-coral/15 to-coral/5',
@@ -30,7 +34,7 @@
 	}
 
 	function formatDayDate(date: Date): string {
-		return `${date.getDate()} ${thaiMonths[date.getMonth()].slice(0, 3)}`;
+		return `${date.getDate()} ${thaiMonthsShort[date.getMonth()]}`;
 	}
 
 	function isToday(date: Date): boolean {
@@ -143,7 +147,7 @@
 					{/if}
 					{date.getDate()}
 				</div>
-				<div class="text-[10px] text-plum-light">{thaiMonths[date.getMonth()].slice(0, 3)}</div>
+				<div class="text-[10px] text-plum-light">{thaiMonthsShort[date.getMonth()]}</div>
 			</div>
 			<div class="flex-1 p-2 space-y-2 {events.length === 0 ? 'flex flex-col items-center justify-center' : ''}">
 				{#if events.length > 0}
