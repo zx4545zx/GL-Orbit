@@ -12,7 +12,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 
 	const id = params.id;
 	const body = await request.json();
-	const { titleEn, titleTh, studioId, posterUrl, status, genreIds } = body;
+	const { titleEn, titleTh, studioId, posterUrl, status, genreIds, descriptionTh, descriptionEn } = body;
 
 	if (!titleEn) {
 		return json({ success: false, error: 'กรุณากรอกชื่อซีรีส์ (EN)' }, { status: 400 });
@@ -34,6 +34,8 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 		.set({
 			titleEn,
 			titleTh: titleTh ?? null,
+			descriptionTh: descriptionTh ?? null,
+			descriptionEn: descriptionEn ?? null,
 			studioId: studioId ?? null,
 			posterUrl: posterUrl ?? null,
 			status: status ?? 'UPCOMING'
@@ -43,6 +45,8 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 			id: series.id,
 			titleEn: series.titleEn,
 			titleTh: series.titleTh,
+			descriptionTh: series.descriptionTh,
+			descriptionEn: series.descriptionEn,
 			studioId: series.studioId,
 			posterUrl: series.posterUrl,
 			status: series.status
