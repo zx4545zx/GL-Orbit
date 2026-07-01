@@ -1,4 +1,5 @@
 <script lang="ts">
+import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
 	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, jsonLdScript } from '$lib/seo.js';
@@ -98,7 +99,7 @@
 			extraArtists = [...extraArtists, ...result.items];
 		} catch (e) {
 			if ((e as Error).name !== 'AbortError') {
-				loadMoreError = 'โหลดเพิ่มไม่สำเร็จ ลองอีกครั้ง';
+				loadMoreError = m.artist_list_load_error();
 			}
 		} finally {
 			loadMoreLoading = false;
@@ -130,9 +131,9 @@
 	<!-- Title -->
 	<div class="text-center mb-6 sm:mb-8">
 		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
-			นักแสดง<span class="text-coral">ทั้งหมด</span>
+			<span>{m.artist_heading_plain()}</span><span class="text-coral">{m.artist_heading_accent()}</span>
 		</h1>
-		<p class="text-sm sm:text-base text-plum-light">รวบรวมนักแสดงซีรีส์ GL พร้อมผลงานและโซเชียลมีเดีย</p>
+		<p class="text-sm sm:text-base text-plum-light">{m.artist_list_subtitle()}</p>
 	</div>
 
 	<!-- Search -->
@@ -146,12 +147,12 @@
 					type="text"
 					bind:value={searchQuery}
 					oninput={scheduleSearchUpdate}
-					placeholder="ค้นหาชื่อนักแสดง..."
-					aria-label="ค้นหานักแสดง"
+					placeholder={m.artist_search_placeholder()}
+					aria-label={m.artist_search_label()}
 					class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base"
 				/>
 				{#if searchQuery}
-					<button onclick={clearSearch} class="p-1 rounded-lg hover:bg-lavender/20 transition-colors flex-shrink-0" aria-label="ล้างการค้นหา">
+					<button onclick={clearSearch} class="p-1 rounded-lg hover:bg-lavender/20 transition-colors flex-shrink-0" aria-label={m.common_search_clear()}>
 						<svg class="w-4 h-4 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
 						</svg>
@@ -181,9 +182,9 @@
 						<h3 class="font-semibold text-plum text-sm sm:text-base line-clamp-1">{a.nickname}</h3>
 						{#if a.fullNameEn}<p class="text-xs sm:text-sm text-plum-light line-clamp-1 mt-0.5">{a.fullNameEn}</p>{/if}
 						{#if a.seriesCount > 0}
-							<span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[11px] font-semibold">{a.seriesCount} ผลงาน</span>
+							<span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[11px] font-semibold">{a.seriesCount} {m.artist_works_label()}</span>
 						{:else}
-							<span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-full bg-lavender/10 text-plum-light/70 text-[11px] font-medium">ยังไม่มีผลงาน</span>
+							<span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-full bg-lavender/10 text-plum-light/70 text-[11px] font-medium">{m.artist_no_works()}</span>
 						{/if}
 					</div>
 				</a>
@@ -204,9 +205,9 @@
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 					</svg>
-					กำลังโหลด...
+					{m.common_loading()}
 				{:else}
-					ดูเพิ่มเติม
+					{m.common_load_more()}
 				{/if}
 			</button>
 
@@ -224,12 +225,12 @@
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
 				</svg>
 			</div>
-			<h3 class="font-semibold text-plum mb-1">ไม่พบนักแสดง</h3>
+			<h3 class="font-semibold text-plum mb-1">{m.artist_list_empty_title()}</h3>
 			<p class="text-sm text-plum-light">
 				{#if searchQuery}
-					ลองค้นหาด้วยคำอื่น หรือ <button onclick={clearSearch} class="text-coral-dark font-medium hover:underline">ล้างการค้นหา</button>
+					{m.artist_list_empty_search_prompt()}<button onclick={clearSearch} class="text-coral-dark font-medium hover:underline">{m.common_search_clear()}</button>
 				{:else}
-					ยังไม่มีนักแสดงในระบบ
+					{m.artist_list_empty_category()}
 				{/if}
 			</p>
 		</div>

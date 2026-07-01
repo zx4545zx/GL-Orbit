@@ -1,4 +1,5 @@
 <script lang="ts">
+import { m } from '$lib/i18n/paraglide.js';
 
 	import { localizedHref } from '$lib/i18n/link.js';	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
@@ -10,10 +11,10 @@
 
 	const artist = $derived(data.artist);
 
-	const seoTitle = $derived(`${artist.nickname} | นักแสดง | GL-Orbit`);
+	const seoTitle = $derived(m.artist_detail_seo_title({ name: artist.nickname }));
 	const seoDescription = $derived(
 		truncateSeo(
-			`${artist.nickname}${artist.fullNameEn ? ` (${artist.fullNameEn})` : ''}${artist.fullNameTh ? ` · ${artist.fullNameTh}` : ''} — นักแสดงซีรีส์ GL พร้อมลิงก์โซเชียลมีเดียและผลงานซีรีส์ทั้งหมด`
+			m.artist_detail_seo_description({ name: artist.nickname })
 		)
 	);
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, `/artists/${artist.id}`));
@@ -31,17 +32,17 @@
 				knowsFor: artist.series.map((s) => s.titleEn)
 			},
 			buildBreadcrumbJsonLd(page.url.origin, [
-				{ name: 'หน้าแรก', path: '/' },
-				{ name: 'นักแสดง', path: '/artists' },
+				{ name: m.nav_home(), path: '/' },
+				{ name: m.nav_artists(), path: '/artists' },
 				{ name: artist.nickname, path: `/artists/${artist.id}` }
 			])
 		])
 	);
 
 	const statusConfig: Record<string, { text: string; cls: string }> = {
-		ONGOING: { text: 'กำลังฉาย', cls: 'bg-mint/20 text-mint-dark' },
-		UPCOMING: { text: 'เร็วๆ นี้', cls: 'bg-lavender/20 text-lavender-dark' },
-		ENDED: { text: 'จบแล้ว', cls: 'bg-coral/10 text-coral-dark' }
+		ONGOING: { text: m.status_ongoing(), cls: 'bg-mint/20 text-mint-dark' },
+		UPCOMING: { text: m.status_upcoming(), cls: 'bg-lavender/20 text-lavender-dark' },
+		ENDED: { text: m.status_ended(), cls: 'bg-coral/10 text-coral-dark' }
 	};
 
 	// Cute icon badges inspired by the home cards: tilted gradient blocks + tiny orbit dot.
@@ -118,14 +119,14 @@
 				class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-coral/30 hover:bg-white/80 hover:text-coral-dark sm:text-base touch-target"
 			>
 				<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-				<span class="font-medium">กลับ</span>
+				<span class="font-medium">{m.common_back()}</span>
 			</button>
 
 			<ShareButton
 				title={`${artist.nickname}${artist.fullNameEn ? ` (${artist.fullNameEn})` : ''}`}
-				text={`ฝากรู้จัก «${artist.nickname}» นักแสดงซีรีส์ GL บน GL-Orbit — โซเชียลและผลงาน`}
+				text={m.artist_share_text({ name: artist.nickname })}
 				url={canonicalUrl}
-				ariaLabel="แชร์นักแสดงนี้"
+				ariaLabel={m.artist_share_aria_label()}
 			/>
 		</div>
 
@@ -181,16 +182,16 @@
 				<div class="mt-4 flex flex-wrap items-center justify-center gap-2">
 					<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-card-strong text-xs sm:text-sm font-medium text-coral-dark">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-						นักแสดง
+						{m.common_cast()}
 					</span>
 					<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-card-strong text-xs sm:text-sm font-medium text-lavender-dark">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>
-						{artist.series.length} ผลงาน
+						{artist.series.length} {m.artist_works_label()}
 					</span>
 					{#if artist.socials.length > 0}
 						<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-card-strong text-xs sm:text-sm font-medium text-mint-dark">
 							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-							{artist.socials.length} ช่องทาง
+							{artist.socials.length} {m.artist_socials_label()}
 						</span>
 					{/if}
 				</div>
@@ -208,10 +209,10 @@
 						</div>
 						<div>
 							<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-mint-dark/70">Social signals</p>
-							<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">โซเชียลมีเดีย</h2>
+							<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">{m.artist_socials_heading()}</h2>
 						</div>
 					</div>
-					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{artist.socials.length} ช่องทาง</span>
+					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{artist.socials.length} {m.artist_socials_label()}</span>
 				</div>
 				<div class="grid gap-3 sm:grid-cols-2">
 					{#each artist.socials as social (social.id)}
@@ -261,10 +262,10 @@
 						</div>
 						<div>
 							<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark/70">Filmography</p>
-							<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">ผลงาน</h2>
+							<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">{m.artist_works_heading()}</h2>
 						</div>
 					</div>
-					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{artist.series.length} เรื่อง</span>
+					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{artist.series.length} {m.artist_works_count_label()}</span>
 				</div>
 				<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
 					{#each artist.series as s (s.id)}
@@ -304,10 +305,10 @@
 		{:else}
 			<section class="mt-8">
 				<div class="glass-card-strong rounded-[2rem] p-8 text-center shadow-xl shadow-lavender/10">
-					<p class="font-[family-name:var(--font-display)] text-xl font-bold text-plum">ยังไม่มีผลงานในระบบ</p>
-					<p class="mt-1 text-sm text-plum-light">กลับไปเริ่มสำรวจจากหน้าแรกของ GL-Orbit</p>
+					<p class="font-[family-name:var(--font-display)] text-xl font-bold text-plum">{m.artist_detail_empty_title()}</p>
+					<p class="mt-1 text-sm text-plum-light">{m.artist_detail_empty_desc()}</p>
 					<a href="/{page.data.lang}/" class="mt-4 inline-flex rounded-full bg-gradient-to-r from-coral to-coral-dark px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-coral/25 transition-all hover:scale-[1.02] hover:shadow-xl touch-target">
-						กลับหน้าแรก
+						{m.artist_detail_empty_back_home()}
 					</a>
 				</div>
 			</section>
