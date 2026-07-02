@@ -281,7 +281,7 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 
 	const scheduleByDay = Array.from(scheduleByDayMap.entries()).map(([day, itemsMap]) => ({
 		day,
-		dayIndex: (dayOrder.indexOf(day) + 6) % 7,
+		dayIndex: dayOrder.indexOf(day),
 		items: Array.from(itemsMap.values()).map((item) => ({
 			time: item.time,
 			series: item.series,

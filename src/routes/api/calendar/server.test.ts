@@ -78,6 +78,34 @@ describe('GET /api/calendar', () => {
     expect(body).toHaveProperty('scheduleByDay');
   });
 
+  it('maps Friday Thailand schedules to Friday week column index', async () => {
+    mockGetDb.mockResolvedValue(makeMockDb([
+      {
+        id: 'schedule-1',
+        airDate: new Date('2026-06-05T13:00:00.000Z'), // Friday 20:00 in Thailand
+        isUncut: false,
+        streamLink: null,
+        episodeNumber: 1,
+        episodeTitle: null,
+        seriesId: 'series-1',
+        seriesTitleEn: 'Series A',
+        seriesTitleTh: 'ซีรีส์ A',
+        seriesPosterUrl: null,
+        platformName: 'YouTube'
+      }
+    ]));
+    const { GET } = await import('./+server.js');
+    const response = await GET({
+      url: new URL('http://localhost/api/calendar?startDate=2026-06-01&endDate=2026-06-08')
+    } as never) as Response;
+
+    expect(response.status).toBe(200);
+    const body = await jsonBody(response) as { scheduleByDay: Array<{ day: string; dayIndex: number }> };
+    expect(body.scheduleByDay).toEqual([
+      expect.objectContaining({ day: 'ศุกร์', dayIndex: 4 })
+    ]);
+  });
+
   it('returns 400 when year is provided without month', async () => {
     const { GET } = await import('./+server.js');
     const response = await GET({

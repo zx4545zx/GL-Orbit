@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types.js';
 import { redirect } from '@sveltejs/kit';
 import { destroySession } from '$lib/server/auth/session.js';
 
-export const POST: RequestHandler = async ({ cookies, locals }) => {
+export const POST: RequestHandler = async ({ cookies, locals, params }) => {
 	const sessionCookie = cookies.get('session');
 	if (sessionCookie) {
 		await destroySession(sessionCookie);
@@ -12,5 +12,5 @@ export const POST: RequestHandler = async ({ cookies, locals }) => {
 	locals.user = null;
 	locals.session = null;
 
-	throw redirect(303, '/');
+	throw redirect(303, `/${params.lang}/`);
 };

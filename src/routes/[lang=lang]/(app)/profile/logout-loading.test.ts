@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync('src/routes/(app)/profile/+page.svelte', 'utf-8');
+const source = readFileSync('src/routes/[lang=lang]/(app)/profile/+page.svelte', 'utf-8');
 
 describe('profile logout loading state', () => {
 	it('adds a loading flag and disables the logout button', () => {
@@ -9,8 +9,8 @@ describe('profile logout loading state', () => {
 		expect(source).toContain('disabled={isLoggingOut}');
 	});
 
-	it('shows Thai loading text and spinner while logging out', () => {
-		expect(source).toContain('กำลังออกจากระบบ...');
+	it('shows loading text and spinner while logging out', () => {
+		expect(source).toContain('m.profile_logout_loading()');
 		expect(source).toContain('animate-spin');
 	});
 
@@ -18,7 +18,7 @@ describe('profile logout loading state', () => {
 		const logoutSource = source.slice(source.indexOf('async function handleLogout'));
 		const normalized = logoutSource.replace(/\s+/g, ' ');
 
-		expect(normalized).toContain("await fetch('/logout', { method: 'POST' });");
+		expect(normalized).toContain("await fetch(localizedHref('/logout', page.data.lang), { method: 'POST' });");
 		expect(normalized).toContain("await goto(localizedHref('/', page.data.lang), { invalidateAll: true });");
 		expect(normalized).not.toContain('user.set(null)');
 	});

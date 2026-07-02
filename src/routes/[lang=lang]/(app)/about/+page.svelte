@@ -4,161 +4,138 @@
 	import { page } from '$app/state';	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
 
 	const ABOUT_SEO_TITLE = m.about_hero_title();
-	const ABOUT_SEO_DESCRIPTION = 'รู้จัก GL-Orbit ศูนย์รวมตารางฉายซีรีส์ Girls\' Love ข้อมูลนักแสดง แพลตฟอร์มรับชม เวอร์ชัน Uncut และคำแนะนำสำหรับแฟนคลับ GL';
+	const ABOUT_SEO_DESCRIPTION = m.about_seo_description();
 
 	const homepageGuideCards = [
 		{
-			title: 'ติดตามตารางฉาย GL แบบไม่พลาดตอนใหม่',
-			description:
-				'GL-Orbit รวมตารางฉายซีรีส์ GL และ Girls\' Love series ไว้ในที่เดียว พร้อมข้อมูลวัน เวลา แพลตฟอร์ม และสถานะ Uncut เพื่อช่วยให้แฟนคลับวางแผนดูตอนใหม่ได้ง่ายขึ้น'
+			title: m.about_guide_card_1_title(),
+			description: m.about_guide_card_1_desc()
 		},
 		{
-			title: 'ค้นหาซีรีส์ นักแสดง และสตูดิโอที่เกี่ยวข้อง',
-			description:
-				'หน้าแรกเชื่อมต่อไปยังฐานข้อมูลซีรีส์ รายชื่อนักแสดง และรายละเอียดผลงาน เพื่อให้ผู้ใช้สำรวจจักรวาล GL ได้ต่อเนื่องจากเรื่องที่กำลังฉายไปจนถึงเรื่องที่กำลังจะมา'
+			title: m.about_guide_card_2_title(),
+			description: m.about_guide_card_2_desc()
 		},
 		{
-			title: 'เช็กลิงก์รับชม แพลตฟอร์ม และเวอร์ชัน Uncut',
-			description:
-				'ข้อมูลของแต่ละตอนออกแบบให้ช่วยตอบคำถามสำคัญของผู้ชม เช่น ฉายที่ไหน เวลาใด มีเวอร์ชัน Uncut หรือไม่ และควรกลับมาเช็กตารางอีกครั้งเมื่อไร'
+			title: m.about_guide_card_3_title(),
+			description: m.about_guide_card_3_desc()
 		}
 	] as const;
 
 	const homepageFaqs = [
 		{
-			question: 'GL-Orbit เหมาะกับใคร?',
-			answer:
-				'เหมาะกับแฟนซีรีส์ Girls\' Love ทั้งคนที่ติดตามอยู่แล้วและผู้ชมใหม่ที่อยากเริ่มสำรวจซีรีส์ GL ผ่านตารางฉาย รายชื่อซีรีส์ นักแสดง สตูดิโอ และแพลตฟอร์มสตรีมมิ่งที่เกี่ยวข้อง'
+			question: m.about_faq_q_1(),
+			answer: m.about_faq_a_1()
 		},
 		{
-			question: 'ตารางฉายใน GL-Orbit ช่วยอะไร?',
-			answer:
-				'ตารางฉายช่วยรวมข้อมูลตอนใหม่ไว้ในรูปแบบที่อ่านง่าย ผู้ใช้สามารถดูซีรีส์ที่กำลังจะออกอากาศ รายการที่ใกล้ฉาย และรายละเอียดเวลาออกอากาศโดยไม่ต้องค้นหาจากหลายแหล่งพร้อมกัน'
+			question: m.about_faq_q_2(),
+			answer: m.about_faq_a_2()
 		},
 		{
-			question: 'คำว่า Uncut บนเว็บไซต์หมายถึงอะไร?',
-			answer:
-				'ป้าย Uncut ใช้บอกว่าตอนหรือรอบฉายนั้นมีเวอร์ชันที่ไม่ตัดทอน ซึ่งเป็นข้อมูลที่แฟนซีรีส์ GL มักต้องการตรวจสอบก่อนเลือกช่องทางรับชมบน streaming platform ต่าง ๆ'
+			question: m.about_faq_q_3(),
+			answer: m.about_faq_a_3()
 		},
 		{
-			question: 'ทำไมควรกลับมาเช็ก GL-Orbit เป็นประจำ?',
-			answer:
-				'ตารางฉายและข้อมูลแพลตฟอร์มอาจเปลี่ยนได้ตามประกาศของผู้ผลิตหรือผู้ให้บริการสตรีมมิ่ง การกลับมาเช็ก GL-Orbit ช่วยให้ผู้ชมเห็นข้อมูลล่าสุดและไม่พลาดตอนสำคัญ'
+			question: m.about_faq_q_4(),
+			answer: m.about_faq_a_4()
 		},
 		{
-			question: 'เว็บไซต์นี้ต่างจากรายการแนะนำซีรีส์ทั่วไปอย่างไร?',
-			answer:
-				'GL-Orbit ไม่ได้เป็นแค่ลิสต์แนะนำ แต่ทำหน้าที่เป็นศูนย์กลางข้อมูลสำหรับการติดตามซีรีส์ GL ทั้งตารางฉาย countdown รายชื่อนักแสดง ลิงก์รับชม และบริบทของแต่ละเรื่องในชุมชนแฟนคลับ'
+			question: m.about_faq_q_5(),
+			answer: m.about_faq_a_5()
 		},
 		{
-			question: 'ซีรีส์ GL ไทยกับต่างประเทศต่างกันอย่างไร?',
-			answer:
-				'ซีรีส์ GL ไทยมักมีจังหวะเล่าเรื่องและสไตล์การนำเสนอเฉพาะตัว ขณะที่ซีรีส์จากเกาหลี จีน หรือญี่ปุ่นมีรูปแบบและความยาวตอนที่แตกต่างกัน GL-Orbit รวบรวมซีรีส์ GL จากหลายประเทศไว้ด้วยกันเพื่อให้ผู้ชมเลือกติดตามได้ตามความชอบ'
+			question: m.about_faq_q_6(),
+			answer: m.about_faq_a_6()
 		},
 		{
-			question: 'ใช้งาน GL-Orbit ฟรีหรือไม่?',
-			answer:
-				'การดูตารางฉาย รายชื่อซีรีส์ และข้อมูลนักแสดงบน GL-Orbit ไม่มีค่าใช้จ่าย ส่วนการรับชมตอนจริงขึ้นอยู่กับนโยบายของแพลตฟอร์มสตรีมมิ่งแต่ละแห่ง ซึ่งอาจมีทั้งช่องทางฟรีและแบบสมัครสมาชิก'
+			question: m.about_faq_q_7(),
+			answer: m.about_faq_a_7()
 		}
 	] as const;
 
 	const glKnowledgeCards = [
 		{
-			title: 'ซีรีส์ GL คืออะไร',
-			description:
-				'GL หรือ Girls\' Love คือซีรีส์ที่เล่าเรื่องความสัมพันธ์ระหว่างผู้หญิงด้วยกัน มีต้นกำเนิดจากวัฒนธรรมมังงะและอนิเมะ Yuri ของญี่ปุ่น ก่อนขยายมาสู่ละครและซีรีส์คนแสดงในหลายประเทศ ทั้งไทย เกาหลี จีน ญี่ปุ่น และไต้หวัน ทำให้แฟนคลับมีซีรีส์ GL ให้ติดตามตลอดทั้งปี'
+			title: m.about_gl101_card_1_title(),
+			description: m.about_gl101_card_1_desc()
 		},
 		{
-			title: 'ทำไมซีรีส์ GL จึงได้รับความนิยม',
-			description:
-				'ความนิยมของซีรีส์ GL เติบโตขึ้นจากการเล่าเรื่องที่หลากหลาย ความเคมีของนักแสดง และชุมชนแฟนคลับที่แข็งแกร่งบนโซเชียลมีเดีย ซีรีส์หลายเรื่องกลายเป็นปรากฏการณ์ที่มีผู้พูดคุยและแชร์ต่ออย่างกว้างขวาง จนสตูดิโอและแพลตฟอร์มสตรีมมิ่งให้ความสำคัญกับคอนเทนต์ประเภทนี้มากขึ้นอย่างต่อเนื่อง'
+			title: m.about_gl101_card_2_title(),
+			description: m.about_gl101_card_2_desc()
 		},
 		{
-			title: 'ซีรีส์ GL ไทยที่โดดเด่น',
-			description:
-				'ประเทศไทยเป็นหนึ่งในตลาดที่ผลิตซีรีส์ GL ที่ได้รับความนิยมในระดับสากล โดยมีสตูดิโอและค่ายหนังไทยหลายรายที่สร้างผลงานคุณภาพ ดึงดูดผู้ชมทั้งในประเทศและต่างประเทศ GL-Orbit รวบรวมข้อมูลของซีรีส์ GL ทั้งไทยและนานาชาติไว้ในที่เดียว เพื่อให้ผู้ชมตามเรื่องโปรดได้สะดวกยิ่งขึ้น'
+			title: m.about_gl101_card_3_title(),
+			description: m.about_gl101_card_3_desc()
 		},
 		{
-			title: 'GL กับ Yuri ต่างกันอย่างไร',
-			description:
-				'Yuri เป็นคำที่นิยมใช้ในวงการมังงะและอนิเมะเพื่อเล่าเรื่องความสัมพันธ์เดียวกัน ส่วน GL (Girls\' Love) เป็นคำที่ใช้กว้างขวางในวงการซีรีส์คนแสดง แม้ความหมายจะใกล้เคียงกัน แต่ในบริบทของการติดตามซีรีส์บน GL-Orbit จะเน้นที่ละครและซีรีส์คนแสดงเป็นหลัก'
+			title: m.about_gl101_card_4_title(),
+			description: m.about_gl101_card_4_desc()
 		}
 	] as const;
 
 	const platformCards = [
 		{
-			name: 'YouTube',
-			description:
-				'แหล่งรับชมซีรีส์ GL ที่เข้าถึงง่ายที่สุด หลายสตูดิโอเผยแพร่ตอนอย่างเป็นทางการผ่านช่อง YouTube ของตนเอง พร้อมคำบรรยายหลายภาษา GL-Orbit ช่วยระบุเวลาลงตอนใหม่เพื่อให้แฟนคลับไม่พลาด'
+			name: m.about_platform_1_name(),
+			description: m.about_platform_1_desc()
 		},
 		{
-			name: 'iQIYI',
-			description:
-				'แพลตฟอร์มสตรีมมิ่งระดับสากลที่มีคลังซีรีส์ GL และซีรีส์เอเชียจำนวนมาก มักมีเวอร์ชันพิเศษและคุณภาพรับชมที่สูง ผู้ชมสามารถใช้ GL-Orbit เช็กสถานะและตารางฉายของซีรีส์ที่อยู่บน iQIYI'
+			name: m.about_platform_2_name(),
+			description: m.about_platform_2_desc()
 		},
 		{
-			name: 'GagaOOLala',
-			description:
-				'แพลตฟอร์มที่เน้นคอนเทนต์ LGBTQ+ และ Boys\' Love / Girls\' Love โดยเฉพาะ เป็นหนึ่งในจุดหมายสำคัญสำหรับแฟนซีรีส์ GL ที่ต้องการความหลากหลายของเรื่องจากหลายประเทศ'
+			name: m.about_platform_3_name(),
+			description: m.about_platform_3_desc()
 		},
 		{
-			name: 'WeTV',
-			description:
-				'แพลตฟอร์มสตรีมมิ่งที่มีซีรีส์เอเชียและซีรีส์ไทยจำนวนมาก รวมถึงผลงานซีรีส์ GL ที่ผลิตร่วมกับสตูดิโอไทย ผู้ชมสามารถตรวจสอบตอนใหม่และเวลาฉายผ่านตารางของ GL-Orbit'
+			name: m.about_platform_4_name(),
+			description: m.about_platform_4_desc()
 		},
 		{
-			name: 'ช่องทางทางการของสตูดิโอ',
-			description:
-				'นอกจากแพลตฟอร์มหลักแล้ว ซีรีส์ GL บางเรื่องเผยแพร่ผ่านเว็บไซต์หรือแอปของสตูดิโอโดยตรง GL-Orbit รวบรวมข้อมูลแพลตฟอร์มเหล่านี้ไว้เพื่อให้ผู้ชมเข้าถึงลิงก์รับชมที่ถูกต้องและเป็นปัจจุบัน'
+			name: m.about_platform_5_name(),
+			description: m.about_platform_5_desc()
 		}
 	] as const;
 
 
 	const LAST_UPDATED = '2026-06-30';
-	const LAST_UPDATED_LABEL = '30 มิถุนายน 2026';
+	const LAST_UPDATED_LABEL = m.about_last_updated_date();
 
 	const aiAnswerBlocks = [
 		{
-			question: '{m.about_guide_title()}?',
-			answer:
-				'GL-Orbit คือเว็บศูนย์กลางสำหรับแฟนซีรีส์ Girls\' Love ที่รวมตารางฉาย ข้อมูลซีรีส์ นักแสดง สตูดิโอ แพลตฟอร์มรับชม และสถานะ Uncut ไว้ในที่เดียว เพื่อช่วยให้ผู้ชมติดตามตอนใหม่และค้นพบซีรีส์ GL เรื่องถัดไปได้ง่ายขึ้น'
+			question: m.about_ai_q_1(),
+			answer: m.about_ai_a_1()
 		},
 		{
-			question: 'GL-Orbit ช่วยติดตามตารางฉายซีรีส์ GL อย่างไร?',
-			answer:
-				'GL-Orbit แสดงข้อมูลตอนใหม่ของซีรีส์ GL ในรูปแบบที่อ่านง่าย เช่น วันฉาย เวลาออกอากาศ แพลตฟอร์มรับชม และป้าย Uncut ผู้ใช้จึงสามารถเช็กเรื่องที่กำลังจะฉาย วางแผนดูตอนใหม่ และกลับมาตรวจสอบตารางได้จากจุดเดียว'
+			question: m.about_ai_q_2(),
+			answer: m.about_ai_a_2()
 		},
 		{
-			question: 'ดูซีรีส์ GL ได้ที่ไหน?',
-			answer:
-				'ซีรีส์ GL มักเผยแพร่บนแพลตฟอร์มทางการ เช่น YouTube, iQIYI, GagaOOLala, WeTV และช่องทางของสตูดิโอผู้ผลิตโดยตรง GL-Orbit ช่วยรวบรวมข้อมูลแพลตฟอร์มเหล่านี้ เพื่อให้แฟนคลับเลือกช่องทางรับชมที่ถูกต้องและเป็นปัจจุบัน'
+			question: m.about_ai_q_3(),
+			answer: m.about_ai_a_3()
 		},
 		{
-			question: 'Uncut ในซีรีส์ GL หมายถึงอะไร?',
-			answer:
-				'Uncut หมายถึงเวอร์ชันของตอนหรือรอบฉายที่ไม่ตัดทอนเนื้อหา ป้ายนี้ช่วยให้แฟนซีรีส์ GL ตรวจสอบก่อนรับชมว่าแพลตฟอร์มนั้นมีเวอร์ชันเต็มหรือไม่ โดยเฉพาะเมื่อแต่ละช่องทางอาจเผยแพร่เวอร์ชันต่างกัน'
+			question: m.about_ai_q_4(),
+			answer: m.about_ai_a_4()
 		}
 	] as const;
 
 	const howToSteps = [
 		{
-			name: 'เช็กตอนที่ใกล้ฉาย',
-			text: 'เริ่มจาก Live Countdown เพื่อดูว่ามีตอนใหม่ของซีรีส์ GL เรื่องใดกำลังจะออกอากาศใน 24 ชั่วโมงข้างหน้า',
+			name: m.about_howto_step_1_name(),
+			text: m.about_howto_step_1_text(),
 			path: '/countdown'
 		},
 		{
-			name: 'เปิดตารางฉาย',
-			text: 'ไปที่หน้าปฏิทินเพื่อดูภาพรวมรายวัน รายสัปดาห์ และรายการที่มีป้าย Uncut ก่อนเลือกช่องทางรับชม',
+			name: m.about_howto_step_2_name(),
+			text: m.about_howto_step_2_text(),
 			path: '/calendar'
 		},
 		{
-			name: 'สำรวจเรื่องที่น่าสนใจ',
-			text: 'ใช้หน้าซีรีส์เพื่อค้นหาเรื่องกำลังฉาย เรื่องที่กำลังจะมา และเรื่องที่จบแล้ว พร้อมข้อมูลนักแสดงและสตูดิโอ',
+			name: m.about_howto_step_3_name(),
+			text: m.about_howto_step_3_text(),
 			path: '/series'
 		},
 		{
-			name: 'กลับมาอัปเดตซ้ำ',
-			text: 'ตาราง streaming platform และเวลาเผยแพร่อาจเปลี่ยนตามประกาศล่าสุด การ bookmark หน้าแรกช่วยให้ตรวจสอบข้อมูลได้เร็วขึ้น',
+			name: m.about_howto_step_4_name(),
+			text: m.about_howto_step_4_text(),
 			path: '/'
 		}
 	] as const;
@@ -219,14 +196,14 @@
 					url: absoluteUrl(page.url.origin, '/icons/gl-orbit-icon.png')
 				}
 			},
-			articleSection: ['Girls\' Love series', 'ตารางฉายซีรีส์ GL', 'แพลตฟอร์มสตรีมมิ่ง', 'FAQ'],
-			keywords: ['ซีรีส์ GL', 'Girls\' Love', 'ตารางฉายซีรีส์ GL', 'ดูซีรีส์ GL ที่ไหน', 'Uncut GL']
+			articleSection: [m.about_article_section_1(), m.about_article_section_2(), m.about_article_section_3(), m.about_article_section_4()],
+			keywords: [m.about_keyword_1(), m.about_keyword_2(), m.about_keyword_3(), m.about_keyword_4(), m.about_keyword_5()]
 		},
 		{
 			'@context': 'https://schema.org',
 			'@type': 'HowTo',
-			name: 'วิธีใช้ GL-Orbit เพื่อติดตามซีรีส์ GL',
-			description: 'ขั้นตอนเริ่มต้นสำหรับใช้ GL-Orbit เพื่อตรวจตารางฉาย ค้นหาซีรีส์ และกลับมาเช็กข้อมูลล่าสุด',
+			name: m.about_howto_name(),
+			description: m.about_howto_description(),
 			totalTime: 'PT5M',
 			step: howToSteps.map((step, index) => ({
 				'@type': 'HowToStep',
@@ -283,10 +260,10 @@
 		</p>
 		<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
 			<a href="/{page.data.lang}/calendar" class="touch-target inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-coral to-coral-dark px-6 py-3 font-semibold text-white shadow-xl shadow-coral/20 transition hover:scale-105">
-				ดูตารางฉาย
+				{m.about_cta_schedule()}
 			</a>
 			<a href="/{page.data.lang}/" class="touch-target inline-flex items-center justify-center rounded-2xl glass-card-strong px-6 py-3 font-semibold text-plum transition hover:scale-105">
-				กลับหน้าแรก
+				{m.about_cta_home()}
 			</a>
 		</div>
 	</div>
@@ -333,21 +310,11 @@
 			<h2 class="edi-title">{m.about_guide_title()}</h2>
 		</header>
 		<div class="edi-lede">
-			<p class="edi-prose dropcap">
-				GL-Orbit คือเว็บศูนย์กลางสำหรับแฟนซีรีส์ Girls' Love หรือ GL series ที่ต้องการติดตามข่าวสารแบบเป็นระบบ ตั้งแต่ตารางฉายตอนใหม่ รายละเอียดซีรีส์ นักแสดง สตูดิโอ ไปจนถึงช่องทางรับชมบน streaming platform ต่าง ๆ จุดตั้งต้นของเว็บคือการทำให้การตามซีรีส์ GL ง่ายขึ้นสำหรับผู้ชมไทยและแฟนต่างประเทศที่อยากรู้ว่าเรื่องไหนกำลังฉาย เรื่องไหนกำลังจะมา และควรดูตอนใหม่เมื่อไร
-			</p>
-			<blockquote class="edi-pullquote">
-				เริ่มจากตารางฉาย ไปจนถึงเรื่องที่กำลังจะมา — ทุกอย่างของจักรวาล GL รวมอยู่ในที่เดียว
-			</blockquote>
-			<p class="edi-prose">
-				หน้าแรกของ GL-Orbit ออกแบบให้เป็นแผงควบคุมของจักรวาล GL ผู้ใช้สามารถเริ่มจากตารางฉายประจำวัน ดู countdown ของตอนที่ใกล้ออกอากาศ สำรวจซีรีส์แนะนำ แล้วคลิกต่อไปยังหน้ารายละเอียดเพื่อดูข้อมูลเพิ่มเติม เช่น สถานะเรื่อง จำนวนตอน แพลตฟอร์มรับชม และป้าย Uncut ที่ช่วยบอกว่ารอบนั้นมีเวอร์ชันไม่ตัดทอนหรือไม่
-			</p>
-			<p class="edi-prose">
-				เราให้ความสำคัญกับข้อมูลที่อ่านง่ายและเป็นประโยชน์จริง ไม่ใช่แค่รายชื่อเรื่องแบบสั้น ๆ เพราะแฟนคลับมักต้องการบริบทมากกว่านั้น ทั้งชื่อไทย ชื่ออังกฤษ ศิลปินที่เกี่ยวข้อง และเวลาฉายที่สัมพันธ์กับ timezone ของผู้ชม การกลับมาเช็ก GL-Orbit เป็นประจำจึงช่วยลดโอกาสพลาดตอนสำคัญและช่วยให้ค้นพบซีรีส์ GL เรื่องใหม่ได้ต่อเนื่อง
-			</p>
-			<p class="edi-prose">
-				สำหรับผู้ชมที่ติดตามหลายเรื่องพร้อมกัน GL-Orbit ช่วยลดความสับสนจากประกาศที่กระจายอยู่บนหลายแพลตฟอร์ม ไม่ว่าจะเป็น YouTube, iQIYI, GagaOOLala, WeTV หรือช่องทางทางการของสตูดิโอ ผู้ใช้สามารถใช้หน้าแรกเป็นจุดเริ่มต้นเพื่อดูภาพรวม แล้วค่อยเจาะลึกไปยังรายละเอียดของแต่ละซีรีส์เมื่อต้องการตรวจสอบวันฉาย รายชื่อตอน นักแสดง หรือสถานะของเรื่องนั้น ๆ
-			</p>
+			<p class="edi-prose dropcap">{m.about_hero_lede_1()}</p>
+			<blockquote class="edi-pullquote">{m.about_pullquote()}</blockquote>
+			<p class="edi-prose">{m.about_hero_lede_2()}</p>
+			<p class="edi-prose">{m.about_hero_lede_3()}</p>
+			<p class="edi-prose">{m.about_hero_lede_4()}</p>
 		</div>
 
 		<!-- pillars (3 things GL-Orbit does) -->

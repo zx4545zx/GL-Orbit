@@ -41,6 +41,26 @@
 	const currentUser = $derived(page.data.user);
 
 	let unreadCount = $state(0);
+	let profileMenuOpen = $state(false);
+	let profileMenuRoot = $state<HTMLDivElement | null>(null);
+
+	function toggleProfileMenu() {
+		profileMenuOpen = !profileMenuOpen;
+	}
+
+	function handleWindowClick(event: MouseEvent) {
+		if (profileMenuRoot && event.target instanceof Node && !profileMenuRoot.contains(event.target)) {
+			profileMenuOpen = false;
+		}
+	}
+
+	function closeProfileMenu() {
+		profileMenuOpen = false;
+	}
+
+	function handleWindowKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') profileMenuOpen = false;
+	}
 
 	$effect(() => {
 		if (!currentUser) {
@@ -72,8 +92,10 @@
 	});
 </script>
 
+<svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
+
 <nav class="fixed top-[var(--pwa-safe-top)] left-0 right-0 z-50 hidden md:block transition-transform duration-300 ease-out {navHidden ? '-translate-y-full' : 'translate-y-0'}">
-	<div class="bg-white mx-2 sm:mx-4 mt-2 sm:mt-4 rounded-2xl shadow-lg shadow-lavender/25 border border-lavender/15 overflow-hidden">
+	<div class="bg-white mx-2 sm:mx-4 mt-2 sm:mt-4 rounded-2xl shadow-lg shadow-lavender/25 border border-lavender/15">
 		<div class="grid grid-cols-[minmax(12rem,1fr)_auto_minmax(12rem,1fr)] items-center gap-3 px-4 sm:px-6 py-3 sm:py-4">
 			<!-- Logo -->
 			<a href="/{page.data.lang}/" class="justify-self-start flex items-center gap-2 group touch-target">
@@ -111,36 +133,75 @@
 			<div class="justify-self-end flex items-center gap-2 xl:gap-3 min-w-0">
 				<LanguageSwitcher variant="icon" className="hidden lg:inline-flex" />
 				{#if currentUser}
-					{#if currentUser.role === 'ADMIN'}
-						<a
-							href="/{page.data.lang}/admin/series"
-							aria-label={m.nav_admin()}
-							title={m.nav_admin()}
-							class="px-3 xl:px-4 py-2 rounded-xl text-sm font-medium text-plum-light hover:bg-lavender/20 hover:text-plum transition-all touch-target flex items-center justify-center gap-2 whitespace-nowrap"
-						>
-							<svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 12h9.75M10.5 18h9.75M3.75 6h.008v.008H3.75V6Zm0 6h.008v.008H3.75V12Zm0 6h.008v.008H3.75V18Z" />
-							</svg>
-							<span class="hidden xl:inline">{m.nav_admin()}</span>
-						</a>
-					{/if}
 					<NotificationDropdown
 						unreadCount={unreadCount}
 						onMarkAllRead={() => { unreadCount = 0; }}
 					/>
-					<a
-						href="/{page.data.lang}/profile"
-						class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-lavender/20 transition-all touch-target"
-					>
-						{#if currentUser.avatarUrl}
-							<img src={currentUser.avatarUrl} alt="" width={28} height={28} loading="eager" decoding="async" class="w-7 h-7 rounded-full object-cover" />
-						{:else}
-							<div class="w-7 h-7 rounded-full bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center">
-								<span class="text-xs font-bold text-coral-dark">{(currentUser.displayName || currentUser.username).charAt(0).toUpperCase()}</span>
+					<div bind:this={profileMenuRoot} class="relative">
+						<button
+							type="button"
+							onclick={toggleProfileMenu}
+							aria-haspopup="menu"
+							aria-expanded={profileMenuOpen}
+							class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-lavender/20 transition-all touch-target"
+						>
+							{#if currentUser.avatarUrl}
+								<img src={currentUser.avatarUrl} alt="" width={28} height={28} loading="eager" decoding="async" class="w-7 h-7 rounded-full object-cover" />
+							{:else}
+								<div class="w-7 h-7 rounded-full bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center">
+									<span class="text-xs font-bold text-coral-dark">{(currentUser.displayName || currentUser.username).charAt(0).toUpperCase()}</span>
+								</div>
+							{/if}
+							<span class="hidden 2xl:inline text-sm font-medium text-plum whitespace-nowrap">{currentUser.displayName || currentUser.username}</span>
+							<svg class="h-4 w-4 text-plum-light transition-transform duration-200 {profileMenuOpen ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+							</svg>
+						</button>
+
+						{#if profileMenuOpen}
+							<div
+								role="menu"
+								class="absolute right-0 top-full z-[60] mt-2 w-56 overflow-hidden rounded-2xl border border-white/60 bg-white/90 p-2 shadow-2xl shadow-lavender/25 backdrop-blur-xl"
+							>
+								<a
+									href="/{page.data.lang}/profile"
+									role="menuitem"
+									onclick={closeProfileMenu}
+									class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-plum transition-all hover:bg-lavender/15 hover:text-coral-dark"
+								>
+									<svg class="h-5 w-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+									</svg>
+									{m.menus_profile_title()}
+								</a>
+								{#if currentUser.role === 'ADMIN'}
+									<a
+										href="/{page.data.lang}/admin/series"
+										role="menuitem"
+										onclick={closeProfileMenu}
+										class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-plum transition-all hover:bg-lavender/15 hover:text-coral-dark"
+									>
+										<svg class="h-5 w-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 12h9.75M10.5 18h9.75M3.75 6h.008v.008H3.75V6Zm0 6h.008v.008H3.75V12Zm0 6h.008v.008H3.75V18Z" />
+										</svg>
+										{m.nav_admin()}
+									</a>
+								{/if}
+								<form method="POST" action="/{page.data.lang}/logout">
+									<button
+										type="submit"
+										role="menuitem"
+										class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-coral-dark transition-all hover:bg-coral/10"
+									>
+										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+										</svg>
+										{m.nav_logout()}
+									</button>
+								</form>
 							</div>
 						{/if}
-						<span class="hidden 2xl:inline text-sm font-medium text-plum whitespace-nowrap">{currentUser.displayName || currentUser.username}</span>
-					</a>
+					</div>
 				{:else}
 					<div class="flex items-center gap-2">
 						<a
