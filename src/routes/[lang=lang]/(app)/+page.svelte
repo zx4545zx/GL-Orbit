@@ -221,7 +221,7 @@ import { m } from '$lib/i18n/paraglide.js';
 				{m.home_cta_schedule()}
 			</a>
 			<a
-				href="/{page.data.lang}/series"
+				href="/{page.data.lang}/explore/series"
 				class="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl glass-card-strong text-plum font-semibold text-base sm:text-lg hover:bg-white/90 hover:scale-105 transition-all duration-300 touch-target flex items-center justify-center gap-2"
 			>
 				{m.home_cta_explore()}
