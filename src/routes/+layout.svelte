@@ -158,4 +158,6 @@
 	{/key}
 </div>
 
-<PushPrompt />
+{#if page.data.user}
+	<PushPrompt />
+{/if}
