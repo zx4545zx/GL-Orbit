@@ -177,9 +177,9 @@
 									{/if}
 								</div>
 								<div class="space-y-1">
-									<div class="flex items-center justify-between">
+									<div class="flex flex-col gap-1">
 										<span class="text-sm font-bold text-coral-dark">{event.time}</span>
-										<span class="text-[10px] px-1.5 py-0.5 rounded-md border {platformClass(event.platforms[0])}">{event.platforms[0]}</span>
+										<span class="text-[10px] px-1.5 py-0.5 rounded-md border w-fit {platformClass(event.platforms[0])}">{event.platforms[0]}</span>
 									</div>
 									<h3 class="font-semibold text-plum text-xs leading-snug line-clamp-2 min-h-[2rem]" title={event.series}>{event.series}</h3>
 									<div class="text-[10px] text-plum-light font-medium">{event.episode}</div>
