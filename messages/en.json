@@ -57,6 +57,8 @@
   "home_schedule_cta": "View full schedule",
   "filter_all": "All",
   "common_loading": "Loading...",
+  "route_loading_title": "Changing page",
+  "route_loading_desc": "Loading data. Please wait a moment.",
   "common_back": "Back",
   "common_today": "Today",
   "common_episodes": "Episodes",

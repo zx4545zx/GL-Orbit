@@ -57,6 +57,8 @@
   "home_schedule_cta": "ดูตารางฉายทั้งหมด",
   "filter_all": "ทั้งหมด",
   "common_loading": "กำลังโหลด...",
+  "route_loading_title": "กำลังเปลี่ยนหน้า",
+  "route_loading_desc": "กำลังโหลดข้อมูล รอสักครู่นะคะ",
   "common_back": "ย้อนกลับ",
   "common_today": "วันนี้",
   "common_episodes": "ตอน",

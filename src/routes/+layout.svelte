@@ -3,7 +3,7 @@
 	import { navigating, page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { DEFAULT_OG_IMAGE, defaultSeoDescription, defaultSeoTitle, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, siteLocale, SITE_NAME, absoluteUrl } from '$lib/seo.js';
-	import { availableLanguageTags, setLanguageTag, type AvailableLanguageTag } from '$lib/i18n/paraglide.js';
+	import { availableLanguageTags, setLanguageTag, type AvailableLanguageTag, m } from '$lib/i18n/paraglide.js';
 	import PushPrompt from '$lib/components/PushPrompt.svelte';
 
 	let { children } = $props();
@@ -146,8 +146,8 @@
 					<div class="h-6 w-6 rounded-full border-2 border-coral/20 border-t-coral animate-spin"></div>
 				</div>
 			</div>
-			<p class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">กำลังเปลี่ยนหน้า</p>
-			<p class="mt-1 text-sm text-plum-light">กำลังโหลดข้อมูล รอสักครู่นะคะ</p>
+			<p class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{m.route_loading_title()}</p>
+			<p class="mt-1 text-sm text-plum-light">{m.route_loading_desc()}</p>
 		</div>
 	</div>
 {/if}
