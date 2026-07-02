@@ -11,6 +11,9 @@ export default defineConfig({
 		sveltekit(),
 		SvelteKitPWA({
 			registerType: 'autoUpdate',
+			strategies: 'injectManifest',
+			srcDir: 'src',
+			filename: 'service-worker.ts',
 			manifest: {
 				name: 'GL-Orbit',
 				short_name: 'GL-Orbit',
@@ -43,7 +46,7 @@ export default defineConfig({
 					}
 				]
 			},
-			workbox: {
+			injectManifest: {
 				globPatterns: ['**/*.{html,css,js,woff2}']
 			}
 		})

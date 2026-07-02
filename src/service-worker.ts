@@ -1,84 +1,45 @@
 /// <reference types="@sveltejs/kit" />
-/// <reference no-default-lib="true"/>
-/// <reference lib="esnext" />
 /// <reference lib="webworker" />
+import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
+import { clientsClaim } from 'workbox-core';
 
-import { build, files, version } from '$service-worker';
+declare const self: ServiceWorkerGlobalScope;
 
-const sw = self as unknown as ServiceWorkerGlobalScope;
-
-const CACHE = `cache-${version}`;
-const IMAGE_CACHE = 'image-cache-v1';
-const MAX_RUNTIME_IMAGES = 120;
-
-const ASSETS = [
-	...build,
-	...files
-];
-
-function isCacheableImageResponse(response: Response) {
-	return response.ok || response.type === 'opaque';
-}
-
-async function trimImageCache() {
-	const cache = await caches.open(IMAGE_CACHE);
-	const keys = await cache.keys();
-
-	if (keys.length <= MAX_RUNTIME_IMAGES) return;
-
-	await Promise.all(keys.slice(0, keys.length - MAX_RUNTIME_IMAGES).map((request) => cache.delete(request)));
-}
-
-async function cacheFirstImage(request: Request) {
-	const cached = await caches.match(request, { cacheName: IMAGE_CACHE });
-	if (cached) return cached;
-
-	const response = await fetch(request);
-
-	if (isCacheableImageResponse(response)) {
-		const cache = await caches.open(IMAGE_CACHE);
-		await cache.put(request, response.clone());
-		void trimImageCache();
-	}
-
-	return response;
-}
-
-sw.addEventListener('install', (event) => {
-	event.waitUntil(
-		caches.open(CACHE).then((cache) => cache.addAll(ASSETS))
-	);
+self.addEventListener('message', (event) => {
+	if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
-sw.addEventListener('activate', (event) => {
+// `__WB_MANIFEST` is injected by workbox during the build
+const manifest = self.__WB_MANIFEST;
+precacheAndRoute(manifest);
+
+cleanupOutdatedCaches();
+clientsClaim();
+
+self.addEventListener('push', (event) => {
+	const data = event.data?.json() ?? {};
 	event.waitUntil(
-		caches.keys().then((keys) => {
-			return Promise.all(
-				keys
-					.filter((key) => key !== CACHE && key !== IMAGE_CACHE)
-					.map((key) => caches.delete(key))
-			);
+		self.registration.showNotification(data.title ?? 'GL-Orbit', {
+			body: data.body ?? '',
+			icon: '/icons/pwa-192x192.png',
+			badge: '/icons/pwa-192x192.png',
+			data: data.data ?? {}
 		})
 	);
 });
 
-sw.addEventListener('fetch', (event) => {
-	if (event.request.method !== 'GET') return;
-
-	const url = new URL(event.request.url);
-	const canCacheRuntimeImage =
-		event.request.destination === 'image' &&
-		(url.protocol === 'http:' || url.protocol === 'https:') &&
-		!event.request.headers.has('range');
-
-	if (canCacheRuntimeImage) {
-		event.respondWith(cacheFirstImage(event.request));
-		return;
-	}
-
-	event.respondWith(
-		caches.match(event.request).then((cached) => {
-			return cached || fetch(event.request);
+self.addEventListener('notificationclick', (event) => {
+	event.notification.close();
+	const url: string = event.notification.data?.url ?? '/notifications';
+	event.waitUntil(
+		self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+			const client = clients.find((c) => c.url.includes(self.location.origin));
+			if (client) {
+				client.navigate(url);
+				client.focus();
+			} else {
+				self.clients.openWindow(url);
+			}
 		})
 	);
 });
