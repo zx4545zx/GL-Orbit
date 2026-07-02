@@ -466,7 +466,7 @@
 									{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
 									{@const isTodayDate = formatDateLocal(dateObj) === formatDateLocal(new Date())}
 									{@const dayOfWeek = dateObj.getDay()}
-									<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[32px] sm:min-w-[44px] {isTodayDate ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
+									<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[32px] sm:min-w-[44px] align-top {isTodayDate ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
 										<div class="font-bold">{day}</div>
 										<div class="text-[8px] sm:text-[10px] opacity-70">{weekDays[dayOfWeek]}</div>
 									</th>
