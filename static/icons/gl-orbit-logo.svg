@@ -2,11 +2,6 @@
   <title id="title">GL-Orbit Soft Heart Orbit logo</title>
   <desc id="desc">A soft coral heart with a lavender orbit ring and a small mint satellite dot.</desc>
   <defs>
-    <linearGradient id="bg" x1="96" y1="64" x2="432" y2="448" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFF5F7"/>
-      <stop offset="0.56" stop-color="#F4ECFF"/>
-      <stop offset="1" stop-color="#ECFDF5"/>
-    </linearGradient>
     <linearGradient id="heart" x1="168" y1="152" x2="348" y2="352" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FF8DB4"/>
       <stop offset="1" stop-color="#FF6B9D"/>
@@ -22,7 +17,6 @@
     </filter>
   </defs>
   <rect width="512" height="512" fill="#FFF5F7"/>
-  <rect x="48" y="48" width="416" height="416" rx="112" fill="url(#bg)"/>
   <path d="M108 274C136 192 212 146 292 158C350 167 396 202 414 250" stroke="url(#orbit)" stroke-width="18" stroke-linecap="round"/>
   <path d="M404 238C378 318 302 366 221 354C165 345 120 311 100 265" stroke="url(#orbit)" stroke-width="18" stroke-linecap="round" opacity="0.72"/>
   <g filter="url(#softShadow)">

@@ -100,6 +100,10 @@ function isWhite([red, green, blue, alpha]: Rgba) {
 	return alpha === 255 && red >= 250 && green >= 250 && blue >= 250;
 }
 
+function isSplashBackground([red, green, blue, alpha]: Rgba) {
+	return alpha === 255 && Math.abs(red - 255) <= 1 && Math.abs(green - 245) <= 1 && Math.abs(blue - 247) <= 1;
+}
+
 describe('app icon backgrounds', () => {
 	const iconPaths = [
 		'static/icons/pwa-192x192.png',
@@ -118,5 +122,24 @@ describe('app icon backgrounds', () => {
 		];
 
 		expect(corners.some(isWhite), `${iconPath} has a white canvas corner`).toBe(false);
+	});
+
+	it.each(iconPaths)('%s uses the splash background color around the outer icon area', (iconPath) => {
+		const image = readRgbaPng(join(process.cwd(), iconPath));
+		const outerSamples = [
+			image.pixel(0, 0),
+			image.pixel(image.width - 1, 0),
+			image.pixel(0, image.height - 1),
+			image.pixel(image.width - 1, image.height - 1),
+			image.pixel(Math.floor(image.width * 0.5), Math.floor(image.height * 0.05)),
+			image.pixel(Math.floor(image.width * 0.95), Math.floor(image.height * 0.5)),
+			image.pixel(Math.floor(image.width * 0.5), Math.floor(image.height * 0.95)),
+			image.pixel(Math.floor(image.width * 0.05), Math.floor(image.height * 0.5))
+		];
+
+		expect(
+			outerSamples.every(isSplashBackground),
+			`${iconPath} outer area should match #FFF5F7 so it blends into the splash screen`
+		).toBe(true);
 	});
 });
