@@ -67,9 +67,6 @@
 					<h1 class="font-[family-name:var(--font-display)] text-2xl font-black leading-tight text-plum sm:text-3xl">
 						{m.menus_title()}
 					</h1>
-					<p class="mt-0.5 line-clamp-1 text-xs font-medium text-plum-light sm:text-sm">
-						{m.menus_seo_description()}
-					</p>
 				</div>
 			</div>
 		</header>
@@ -151,9 +148,6 @@
 					<h2 class="font-[family-name:var(--font-display)] text-lg font-black leading-tight text-plum transition-colors group-hover:text-coral-dark sm:text-xl">
 						{m.nav_chat()}
 					</h2>
-					<p class="mt-1 line-clamp-1 text-sm leading-5 text-plum-light">
-						{m.chat_empty_title()}
-					</p>
 				</div>
 				<div class="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-lavender-dark shadow-md shadow-lavender/15 transition-all duration-300 group-hover:translate-x-1 group-hover:bg-lavender-dark group-hover:text-white">
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
