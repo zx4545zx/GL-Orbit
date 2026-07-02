@@ -338,6 +338,7 @@
   "push_prompt_later": "ภายหลัง",
   "push_prompt_blocked": "กรุณาอนุญาตการแจ้งเตือนในการตั้งค่าเบราว์เซอร์",
   "push_prompt_success": "เปิดรับการแจ้งเตือนแล้ว",
+  "push_prompt_enabling": "กำลังดำเนินการ...",
   "push_prompt_error": "ไม่สามารถเปิดการแจ้งเตือนได้ กรุณาลองใหม่",
   "push_prompt_unsupported": "เบราว์เซอร์นี้ไม่รองรับการแจ้งเตือน push",
   "schedule_context_title": "ตารางฉายที่เกี่ยวข้อง",
