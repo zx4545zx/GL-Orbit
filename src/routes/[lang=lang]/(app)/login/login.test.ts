@@ -16,7 +16,7 @@ describe('login success state sync', () => {
 	});
 
 	it('keeps the existing login error/loading behavior intact', () => {
-		expect(source).toContain('กำลังเข้าสู่ระบบ...');
+		expect(source).toContain('m.login_submit_loading()');
 		expect(source).toContain('disabled={isLoading}');
 	});
 });

@@ -17,6 +17,6 @@ describe('register success state sync', () => {
 
 	it('keeps field error handling and the existing loading label', () => {
 		expect(source).toContain('fieldErrors.email');
-		expect(source).toContain('กำลังสมัครสมาชิก...');
+		expect(source).toContain('m.register_submit_loading()');
 	});
 });
