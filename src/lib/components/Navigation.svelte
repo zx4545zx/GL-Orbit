@@ -110,15 +110,16 @@ import LanguageSwitcher from './LanguageSwitcher.svelte';
 		<div class="grid grid-cols-[minmax(12rem,1fr)_auto_minmax(12rem,1fr)] items-center gap-3 px-4 sm:px-6 py-3 sm:py-4">
 			<!-- Logo -->
 			<a href="/{page.data.lang}/" class="justify-self-start flex items-center gap-2 group touch-target">
-				<div class="relative w-8 h-8 sm:w-10 sm:h-10">
-					<div class="absolute inset-0 bg-gradient-to-br from-coral via-lavender to-mint rounded-xl"></div>
-					<div class="absolute inset-[2px] bg-white rounded-[0.625rem] flex items-center justify-center">
-						<span class="text-base sm:text-lg font-bold text-gradient">G</span>
-					</div>
-					<!-- ดาวเทียมโคจร (GL-Orbit) -->
-					<div class="absolute inset-0 animate-[spin_9s_linear_infinite] pointer-events-none">
-						<span class="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-coral shadow-[0_0_5px_rgba(255,107,157,0.9)]"></span>
-					</div>
+				<div class="relative w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-md shadow-lavender/20 transition-transform duration-300 group-hover:scale-105">
+					<img
+						src="/icons/gl-orbit-logo.svg"
+						alt=""
+						width="40"
+						height="40"
+						loading="eager"
+						decoding="async"
+						class="h-full w-full rounded-xl object-contain"
+					/>
 				</div>
 				<span class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum tracking-tight">
 					GL-Orbit
