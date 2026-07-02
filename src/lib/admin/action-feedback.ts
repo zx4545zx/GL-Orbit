@@ -44,7 +44,16 @@ function successLabel(method: string) {
 function addToast(type: ToastType, title: string, message?: string) {
 	const id = nextId++;
 	adminToasts.update((toasts) => [{ id, type, title, message }, ...toasts].slice(0, 4));
+	if (type !== 'loading') {
+		setTimeout(() => {
+			adminToasts.update((toasts) => toasts.filter((toast) => toast.id !== id));
+		}, type === 'success' ? 1800 : 4200);
+	}
 	return id;
+}
+
+export function addFeedback({ type, message }: { type: ToastType; message: string }) {
+	addToast(type, type === 'success' ? 'สำเร็จ' : type === 'error' ? 'ผิดพลาด' : 'กำลังดำเนินการ', message);
 }
 
 function updateToast(id: number, type: ToastType, title: string, message?: string) {
