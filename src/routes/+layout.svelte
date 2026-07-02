@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { DEFAULT_OG_IMAGE, defaultSeoDescription, defaultSeoTitle, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, siteLocale, SITE_NAME, absoluteUrl } from '$lib/seo.js';
 	import { availableLanguageTags, setLanguageTag, type AvailableLanguageTag } from '$lib/i18n/paraglide.js';
+	import PushPrompt from '$lib/components/PushPrompt.svelte';
 
 	let { children } = $props();
 
@@ -156,3 +157,5 @@
 		{@render children()}
 	{/key}
 </div>
+
+<PushPrompt />

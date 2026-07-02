@@ -30,7 +30,7 @@
 				errorMessage = data.error || m.login_error_default();
 				return;
 			}
-			await goto(localizedHref('/profile', page.data.lang), { invalidateAll: true });
+			await goto(`${localizedHref('/profile', page.data.lang)}?push=1`, { invalidateAll: true });
 		} catch {
 			errorMessage = m.login_error_default();
 		} finally {

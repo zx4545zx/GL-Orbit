@@ -11,7 +11,7 @@ describe('login success state sync', () => {
 	it('invalidates SvelteKit data before navigating to profile', () => {
 		const submitSource = source.slice(source.indexOf('async function handleSubmit'));
 
-		expect(submitSource).toContain("await goto(localizedHref('/profile', page.data.lang), { invalidateAll: true });");
+		expect(submitSource).toContain("await goto(`${localizedHref('/profile', page.data.lang)}?push=1`, { invalidateAll: true });");
 		expect(submitSource).not.toContain('user.set(data.user)');
 	});
 

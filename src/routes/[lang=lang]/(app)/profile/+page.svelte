@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { m } from '$lib/i18n/paraglide.js';
-
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
-	import { localizedHref } from '$lib/i18n/link.js';	import { goto, invalidateAll } from '$app/navigation';
-	import { fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
+	import { m } from '$lib/i18n/paraglide.js';
+	import { localizedHref } from '$lib/i18n/link.js';
+	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import {
 		isPushSupported,
 		getExistingSubscription,
 		requestPushPermission,
 		unsubscribePush
 	} from '$lib/client/push-notifications.js';
-	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import type { PageData } from './$types.js';
 	import type {
 		ProfileResponse,
@@ -66,6 +66,13 @@
 		if (!isPushSupported()) return;
 		const sub = await getExistingSubscription();
 		pushEnabled = !!sub;
+
+		// Auto-prompt once after login/register if requested and never dismissed
+		if (page.url.searchParams.get('push') === '1' && !sub && Notification.permission !== 'denied') {
+			localStorage.removeItem('push-prompt-dismissed');
+			await requestPushPermission();
+			pushEnabled = !!(await getExistingSubscription());
+		}
 	});
 
 	async function togglePush() {
@@ -77,10 +84,10 @@
 				successMessage = 'ปิดการแจ้งเตือนแล้ว';
 			} else {
 				pushEnabled = await requestPushPermission();
-				successMessage = pushEnabled ? 'เปิดรับการแจ้งเตือนแล้ว' : 'ไม่สามารถเปิดการแจ้งเตือนได้';
+				successMessage = pushEnabled ? m.push_prompt_success() : m.push_prompt_error();
 			}
 		} catch {
-			errorMessage = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
+			errorMessage = m.push_prompt_error();
 		} finally {
 			pushLoading = false;
 		}

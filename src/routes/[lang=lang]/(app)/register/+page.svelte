@@ -37,7 +37,7 @@
 				if (data.fields) fieldErrors = data.fields;
 				return;
 			}
-			await goto(localizedHref('/profile', page.data.lang), { invalidateAll: true });
+			await goto(`${localizedHref('/profile', page.data.lang)}?push=1`, { invalidateAll: true });
 		} catch {
 			errorMessage = m.register_error_default();
 		} finally {
