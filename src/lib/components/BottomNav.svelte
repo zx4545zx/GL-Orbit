@@ -131,14 +131,14 @@ import NotificationBadge from './NotificationBadge.svelte';
 	class="fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300 {bottomNavHidden ? 'translate-y-full' : 'translate-y-0'}"
 >
 	<div class="bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(196,181,253,0.3)] overflow-hidden border-t border-lavender/15 safe-area-bottom">
-		<div class="flex items-center justify-around px-2">
+		<div class="flex items-stretch px-1">
 			{#each navItems as item}
 				{@const active = isActive(item.href)}
 				<a
 					href={item.href}
 					data-sveltekit-preload-data="hover"
 					aria-current={active ? 'page' : undefined}
-					class="group flex flex-col items-center justify-center gap-1 py-2 px-3 min-w-[64px] touch-target transition-all duration-300"
+					class="group flex min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 px-1 py-2 touch-target transition-all duration-300"
 				>
 					<div class="relative flex items-center justify-center">
 						{#if active}
@@ -154,7 +154,7 @@ import NotificationBadge from './NotificationBadge.svelte';
 						</div>
 					</div>
 					<span
-						class="text-[10px] font-medium leading-none transition-all duration-300 {active ? 'text-coral-dark font-semibold' : 'text-plum-light/70'}"
+						class="block max-w-full truncate text-center text-[10px] font-medium leading-none transition-all duration-300 {active ? 'text-coral-dark font-semibold' : 'text-plum-light/70'}"
 					>
 						{item.label}
 					</span>
