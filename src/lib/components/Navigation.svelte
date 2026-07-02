@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { m } from '$lib/i18n/paraglide.js';
-	import { page } from '$app/state';
-	import NotificationDropdown from './NotificationDropdown.svelte';
-	import LanguageSwitcher from './LanguageSwitcher.svelte';
+import { m } from '$lib/i18n/paraglide.js';
+import { page } from '$app/state';
+import { onMount } from 'svelte';
+import { connectNotificationStream } from '$lib/client/notification-stream.js';
+import NotificationDropdown from './NotificationDropdown.svelte';
+import LanguageSwitcher from './LanguageSwitcher.svelte';
 
 	let { navHidden = false }: { navHidden?: boolean } = $props();
 
@@ -68,26 +70,29 @@
 			return;
 		}
 
-		let cancelled = false;
+		let disconnect: (() => void) | undefined;
 
-		async function poll() {
+		async function init() {
 			try {
 				const res = await fetch('/api/notifications/unread-count');
-				if (!cancelled && res.ok) {
+				if (res.ok) {
 					const data = await res.json();
 					unreadCount = data.count ?? 0;
 				}
 			} catch {
-				if (!cancelled) unreadCount = 0;
+				unreadCount = 0;
 			}
+			disconnect = connectNotificationStream({
+				onCount: (count) => {
+					unreadCount = count;
+				}
+			});
 		}
 
-		poll();
-		const interval = setInterval(poll, 30000);
+		init();
 
 		return () => {
-			cancelled = true;
-			clearInterval(interval);
+			disconnect?.();
 		};
 	});
 </script>
@@ -133,10 +138,11 @@
 			<div class="justify-self-end flex items-center gap-2 xl:gap-3 min-w-0">
 				<LanguageSwitcher variant="icon" className="hidden lg:inline-flex" />
 				{#if currentUser}
-					<NotificationDropdown
-						unreadCount={unreadCount}
-						onMarkAllRead={() => { unreadCount = 0; }}
-					/>
+				<NotificationDropdown
+					unreadCount={unreadCount}
+					onMarkAllRead={() => { unreadCount = 0; }}
+					onUnreadCountChange={(count) => { unreadCount = count; }}
+				/>
 					<div bind:this={profileMenuRoot} class="relative">
 						<button
 							type="button"

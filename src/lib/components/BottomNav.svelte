@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { m } from '$lib/i18n/paraglide.js';
-	import { navigating, page } from '$app/state';
-	import NotificationBadge from './NotificationBadge.svelte';
+import { m } from '$lib/i18n/paraglide.js';
+import { navigating, page } from '$app/state';
+import { onMount } from 'svelte';
+import { connectNotificationStream } from '$lib/client/notification-stream.js';
+import NotificationBadge from './NotificationBadge.svelte';
 
 	let { bottomNavHidden = false }: { bottomNavHidden?: boolean } = $props();
 
@@ -14,26 +16,29 @@
 			return;
 		}
 
-		let cancelled = false;
+		let disconnect: (() => void) | undefined;
 
-		async function poll() {
+		async function init() {
 			try {
 				const res = await fetch('/api/notifications/unread-count');
-				if (!cancelled && res.ok) {
+				if (res.ok) {
 					const data = await res.json();
 					unreadCount = data.count ?? 0;
 				}
 			} catch {
-				if (!cancelled) unreadCount = 0;
+				unreadCount = 0;
 			}
+			disconnect = connectNotificationStream({
+				onCount: (count) => {
+					unreadCount = count;
+				}
+			});
 		}
 
-		poll();
-		const interval = setInterval(poll, 30000);
+		init();
 
 		return () => {
-			cancelled = true;
-			clearInterval(interval);
+			disconnect?.();
 		};
 	});
 

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
+	import { connectNotificationStream } from '$lib/client/notification-stream.js';
 	import type { PageData } from './$types.js';
 	import type { NotificationItem, NotificationsListResponse } from '$lib/types.js';
 	import { m } from '$lib/i18n/paraglide.js';
@@ -21,6 +23,18 @@
 		hasMore = data.hasMore;
 		loadError = '';
 		initialLoading = false;
+	});
+
+	onMount(() => {
+		const disconnect = connectNotificationStream({
+			onNotification: (item) => {
+				if (!notifications.some((n) => n.id === item.id)) {
+					notifications = [item, ...notifications];
+					offset += 1;
+				}
+			}
+		});
+		return disconnect;
 	});
 
 	function formatRelativeTime(dateStr: string): string {

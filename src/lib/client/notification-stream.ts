@@ -1,7 +1,7 @@
 import type { NotificationItem } from '$lib/types.js';
 
 export interface NotificationStreamCallbacks {
-	onNotification: (item: NotificationItem) => void;
+	onNotification?: (item: NotificationItem) => void;
 	onCount?: (count: number) => void;
 	onConnected?: () => void;
 }
@@ -15,7 +15,7 @@ export function connectNotificationStream(callbacks: NotificationStreamCallbacks
 
 	source.addEventListener('notification', (event) => {
 		const item: NotificationItem = JSON.parse(event.data);
-		callbacks.onNotification(item);
+		callbacks.onNotification?.(item);
 	});
 
 	source.addEventListener('count', (event) => {

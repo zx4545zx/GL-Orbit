@@ -1,15 +1,18 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
-
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { connectNotificationStream } from '$lib/client/notification-stream.js';
 	import type { NotificationItem } from '$lib/types.js';
 
 	let {
 		unreadCount = 0,
-		onMarkAllRead
+		onMarkAllRead,
+		onUnreadCountChange
 	}: {
 		unreadCount: number;
 		onMarkAllRead?: () => void;
+		onUnreadCountChange?: (count: number) => void;
 	} = $props();
 
 	let isOpen = $state(false);
@@ -87,6 +90,7 @@
 				const data = await res.json();
 				notifications = [];
 				onMarkAllRead?.();
+				onUnreadCountChange?.(0);
 			}
 		} catch {
 			// Fail silent
@@ -104,6 +108,23 @@
 			document.addEventListener('click', handleClickOutside);
 			return () => document.removeEventListener('click', handleClickOutside);
 		}
+	});
+
+	onMount(() => {
+		const disconnect = connectNotificationStream({
+			onNotification: (item) => {
+				if (!notifications.some((n) => n.id === item.id)) {
+					notifications = [item, ...notifications];
+				}
+				if (!item.isRead) {
+					onUnreadCountChange?.(unreadCount + 1);
+				}
+			},
+			onCount: (count) => {
+				onUnreadCountChange?.(count);
+			}
+		});
+		return disconnect;
 	});
 </script>
 
