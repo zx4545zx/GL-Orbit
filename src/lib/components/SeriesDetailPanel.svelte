@@ -160,11 +160,11 @@
 			{#if detail.platforms.length > 0}
 				<div class="flex flex-wrap gap-2">
 					{#each detail.platforms as platform}
-						<span class="rounded-xl border border-white/70 bg-white/60 px-2.5 py-1.5 text-xs font-medium text-plum shadow-sm flex items-center gap-1.5">
+						<span class="rounded-xl border border-white/70 bg-white/60 px-2.5 py-1.5 text-xs font-medium text-plum shadow-sm flex items-center gap-1.5 max-w-full min-w-0">
 							{#if platform.logo}
 								<img src={platform.logo} alt={platform.name} width={16} height={16} loading="lazy" class="w-4 h-4 rounded-full object-cover border border-lavender/30" />
 							{/if}
-							{platform.name}
+							<span class="truncate">{platform.name}</span>
 						</span>
 					{/each}
 				</div>

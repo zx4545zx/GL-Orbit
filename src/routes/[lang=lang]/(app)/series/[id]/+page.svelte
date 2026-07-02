@@ -238,7 +238,7 @@ import { m } from '$lib/i18n/paraglide.js';
 				</div>
 			</div>
 
-			<div class="glass-card-strong relative z-0 space-y-4 rounded-[2rem] p-5 shadow-2xl shadow-lavender/10 sm:space-y-6 sm:p-7 md:col-span-2">
+			<div class="glass-card-strong relative z-0 min-w-0 space-y-4 rounded-[2rem] p-5 shadow-2xl shadow-lavender/10 sm:space-y-6 sm:p-7 md:col-span-2">
 				<div class="pointer-events-none absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/50 via-transparent to-lavender/10"></div>
 				<div class="relative">
 					<div class="mb-3 flex flex-wrap items-center gap-2 sm:gap-3">
@@ -287,11 +287,11 @@ import { m } from '$lib/i18n/paraglide.js';
 				{#if series.platforms.length > 0}
 					<div class="flex flex-wrap gap-2 sm:gap-3">
 						{#each series.platforms as platform}
-							<span class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl glass-card text-xs sm:text-sm font-medium text-plum flex items-center gap-2">
+							<span class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl glass-card text-xs sm:text-sm font-medium text-plum flex items-center gap-2 max-w-full min-w-0">
 								{#if platform.logo}
-									<img src={platform.logo} alt={platform.name} width={20} height={20} loading="lazy" decoding="async" class="w-5 h-5 rounded-full object-cover border border-lavender/30" />
+									<img src={platform.logo} alt={platform.name} width={20} height={20} loading="lazy" decoding="async" class="w-5 h-5 rounded-full object-cover border border-lavender/30 shrink-0" />
 								{/if}
-								{platform.name}
+								<span class="truncate">{platform.name}</span>
 							</span>
 						{/each}
 					</div>
