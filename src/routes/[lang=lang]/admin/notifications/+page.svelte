@@ -47,8 +47,8 @@
 
 	<form onsubmit={handleSubmit} class="bg-white rounded-2xl border border-gray-200 p-6 space-y-5">
 		<div>
-			<label class="block text-sm font-medium text-plum mb-1.5">ซีรีส์</label>
-			<select bind:value={seriesId} required class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-coral">
+			<label for="seriesId" class="block text-sm font-medium text-plum mb-1.5">ซีรีส์</label>
+			<select id="seriesId" bind:value={seriesId} required class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-coral">
 				<option value="" disabled>เลือกซีรีส์</option>
 				{#each data.series as s}
 					<option value={s.id}>{s.titleEn}</option>
@@ -57,7 +57,7 @@
 		</div>
 
 		<div>
-			<label class="block text-sm font-medium text-plum mb-1.5">ผู้รับ</label>
+			<label for="recipientType" class="block text-sm font-medium text-plum mb-1.5">ผู้รับ</label>
 			<div class="flex gap-4">
 				<label class="flex items-center gap-2 text-sm text-gray-700">
 					<input type="radio" bind:group={recipientType} value="followers" />
@@ -71,8 +71,9 @@
 		</div>
 
 		<div>
-			<label class="block text-sm font-medium text-plum mb-1.5">ข้อความ</label>
+			<label for="message" class="block text-sm font-medium text-plum mb-1.5">ข้อความ</label>
 			<textarea
+				id="message"
 				bind:value={message}
 				required
 				maxlength={MESSAGE_MAX}
