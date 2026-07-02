@@ -4,6 +4,13 @@
 	import { page } from '$app/state';
 	import { localizedHref } from '$lib/i18n/link.js';	import { goto, invalidateAll } from '$app/navigation';
 	import { fly } from 'svelte/transition';
+	import { onMount } from 'svelte';
+	import {
+		isPushSupported,
+		getExistingSubscription,
+		requestPushPermission,
+		unsubscribePush
+	} from '$lib/client/push-notifications.js';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import type { PageData } from './$types.js';
 	import type {
@@ -51,6 +58,33 @@
 	let currentPassword = $state('');
 	let newPassword = $state('');
 	let confirmNewPassword = $state('');
+
+	let pushEnabled = $state(false);
+	let pushLoading = $state(false);
+
+	onMount(async () => {
+		if (!isPushSupported()) return;
+		const sub = await getExistingSubscription();
+		pushEnabled = !!sub;
+	});
+
+	async function togglePush() {
+		pushLoading = true;
+		try {
+			if (pushEnabled) {
+				await unsubscribePush();
+				pushEnabled = false;
+				successMessage = 'ปิดการแจ้งเตือนแล้ว';
+			} else {
+				pushEnabled = await requestPushPermission();
+				successMessage = pushEnabled ? 'เปิดรับการแจ้งเตือนแล้ว' : 'ไม่สามารถเปิดการแจ้งเตือนได้';
+			}
+		} catch {
+			errorMessage = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
+		} finally {
+			pushLoading = false;
+		}
+	}
 
 	// Auto-dismiss success/error after a few seconds
 	$effect(() => {
@@ -440,8 +474,30 @@
 												<span class="text-sm text-plum-light shrink-0">{m.profile_joined_on()}</span>
 												<span class="text-sm font-medium text-plum text-right">{new Date(profileUser.createdAt).toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
 											</div>
-										</div>
 									</div>
+								</div>
+
+								{#if isPushSupported()}
+									<div class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6">
+										<div class="flex items-center gap-2 mb-4">
+											<svg class="w-4 h-4 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+											<h2 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">การแจ้งเตือน</h2>
+										</div>
+										<p class="text-sm text-plum-light mb-4">รับแจ้งเตือนเมื่อมีซีรีส์ใหม่หรือข่าวสารจาก GL-Orbit</p>
+										<button
+											onclick={togglePush}
+											disabled={pushLoading}
+											class="w-full py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 touch-target flex items-center justify-center gap-2 {pushEnabled ? 'bg-coral/10 text-coral-dark hover:bg-coral/20' : 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25 hover:shadow-xl'}"
+										>
+											{#if pushLoading}
+												<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+												กำลังดำเนินการ...
+											{:else}
+												{pushEnabled ? 'ปิดการแจ้งเตือน' : 'เปิดรับการแจ้งเตือน'}
+											{/if}
+										</button>
+									</div>
+								{/if}
 							</div>
 						{:else if accountSection === 'profile'}
 							<div in:fly={{ y: 8, duration: 200 }} class="space-y-3">
