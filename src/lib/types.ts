@@ -11,11 +11,19 @@ export interface PublicUser {
 export interface NotificationItem {
 	id: string;
 	seriesId: string;
-	type: 'new_episode' | 'status_change';
+	type: 'new_episode' | 'status_change' | 'announcement';
 	message: string;
 	isRead: boolean;
 	createdAt: string;
 	seriesTitle: string;
+}
+
+export interface PushSubscriptionInput {
+	endpoint: string;
+	keys: {
+		p256dh: string;
+		auth: string;
+	};
 }
 
 export interface UnreadCountResponse {
