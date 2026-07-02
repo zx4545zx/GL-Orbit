@@ -6,10 +6,10 @@ import { dedupeCountdownRows } from './countdown.js';
 import { toThailandTime } from '$lib/server/timezone.js';
 import type { HomeApiResponse } from '$lib/types/home.js';
 
-const CACHE_KEY = 'query:home';
 const CACHE_TTL = 30_000;
 
-export async function getHomeData(): Promise<HomeApiResponse> {
+export async function getHomeData(lang: 'th' | 'en' = 'th'): Promise<HomeApiResponse> {
+	const CACHE_KEY = `query:home:${lang}`;
 	const cached = getCached<HomeApiResponse>(CACHE_KEY, CACHE_TTL);
 	if (cached) {
 		return cached;
@@ -86,7 +86,7 @@ export async function getHomeData(): Promise<HomeApiResponse> {
 			.limit(20)
 	]);
 
-	const dayShortNames = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+	const dayFormatter = new Intl.DateTimeFormat(lang === 'th' ? 'th-TH' : 'en-US', { weekday: 'short' });
 
 	const result: HomeApiResponse = {
 		featuredSeries: featuredSeries.map((s) => ({
@@ -99,12 +99,11 @@ export async function getHomeData(): Promise<HomeApiResponse> {
 		})),
 		upcomingSchedule: upcomingSchedules.map((s) => {
 			const d = toThailandTime(s.airDate);
-			const dayName = dayShortNames[d.getUTCDay()];
 			const hours = String(d.getUTCHours()).padStart(2, '0');
 			const minutes = String(d.getUTCMinutes()).padStart(2, '0');
 			const timeStr = `${hours}:${minutes}`;
 			return {
-				day: dayName + '.',
+				day: dayFormatter.format(d).replace(/\.$/, ''),
 				time: timeStr,
 				series: s.seriesTitleEn,
 				seriesId: s.seriesId,

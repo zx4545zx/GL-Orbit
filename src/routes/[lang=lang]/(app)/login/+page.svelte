@@ -52,8 +52,8 @@
 
 	<div class="relative w-full max-w-sm sm:max-w-md">
 		<div class="text-center mb-6 sm:mb-8">
-			<div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coral to-lavender mb-4 shadow-lg shadow-coral/25">
-				<span class="text-xl sm:text-2xl font-bold text-white">G</span>
+			<div class="w-14 h-14 sm:w-16 sm:h-16 mb-4 mx-auto">
+				<img src="/icons/gl-orbit-logo.svg" alt="GL-Orbit" class="w-full h-full" />
 			</div>
 			<h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum mb-2">{m.login_title()}</h1>
 			<p class="text-sm sm:text-base text-plum-light">{m.login_subtitle()}</p>

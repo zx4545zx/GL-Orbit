@@ -59,10 +59,8 @@
 			<div class="pointer-events-none absolute -right-12 -top-14 h-32 w-32 rounded-full border border-coral/25"></div>
 			<div class="pointer-events-none absolute right-0 top-8 h-20 w-20 rounded-full border border-dashed border-lavender/40"></div>
 			<div class="relative flex items-center gap-3.5">
-				<div class="relative grid h-14 w-14 shrink-0 place-items-center rounded-[1.25rem] bg-gradient-to-br from-coral via-lavender to-mint shadow-lg shadow-coral/20" aria-hidden="true">
-					<div class="absolute inset-[2px] rounded-[1.1rem] bg-white/90"></div>
-					<span class="relative font-[family-name:var(--font-display)] text-xl font-black text-gradient">G</span>
-					<span class="absolute -top-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-coral shadow-[0_0_12px_rgba(255,107,157,0.9)]"></span>
+				<div class="h-14 w-14 shrink-0 overflow-hidden rounded-[1.25rem] shadow-lg shadow-lavender/25">
+					<img src="/icons/gl-orbit-logo.svg" alt="GL-Orbit" class="h-full w-full" />
 				</div>
 				<div class="min-w-0 flex-1">
 					<p class="text-[10px] font-black uppercase tracking-[0.34em] text-coral-dark/70">GL-Orbit</p>
