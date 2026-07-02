@@ -8,6 +8,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	const userId = locals.user.id;
 	let cleanup: (() => void) | undefined;
+	let keepAlive: ReturnType<typeof setInterval> | undefined;
 
 	const stream = new ReadableStream<Uint8Array>({
 		start(controller) {
@@ -20,9 +21,20 @@ export const GET: RequestHandler = async ({ locals }) => {
 				controller.enqueue(hello);
 			} catch {
 				cleanup?.();
+				return;
 			}
+
+			// Keep connection alive every 30s; EventSource ignores comment lines
+			keepAlive = setInterval(() => {
+				try {
+					controller.enqueue(new TextEncoder().encode(':keepalive\n\n'));
+				} catch {
+					cleanup?.();
+				}
+			}, 30000);
 		},
 		cancel() {
+			if (keepAlive) clearInterval(keepAlive);
 			cleanup?.();
 		}
 	});

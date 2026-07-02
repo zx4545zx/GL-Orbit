@@ -13,8 +13,10 @@ function mockDb(overrides: Record<string, unknown> = {}) {
 		select: vi.fn().mockReturnThis(),
 		from: vi.fn().mockReturnThis(),
 		where: vi.fn().mockReturnThis(),
+		groupBy: vi.fn().mockReturnThis(),
 		insert: vi.fn().mockReturnThis(),
-		values: vi.fn().mockResolvedValue([])
+		values: vi.fn().mockReturnThis(),
+		returning: vi.fn().mockResolvedValue([])
 	};
 	return { ...defaultDb, ...overrides };
 }
@@ -53,7 +55,10 @@ describe('createFollowerNotifications', () => {
 				{ userId: 'actor-1' },
 				{ userId: 'user-2' }
 			]),
-			values: vi.fn().mockResolvedValue([])
+			returning: vi.fn().mockResolvedValue([
+				{ id: 'n1', userId: 'user-1', seriesId: 'series-1', type: 'status_change', message: 'Status changed', isRead: false, createdAt: new Date() },
+				{ id: 'n2', userId: 'user-2', seriesId: 'series-1', type: 'status_change', message: 'Status changed', isRead: false, createdAt: new Date() }
+			])
 		});
 		vi.mocked(getDb).mockResolvedValue(db as any);
 
@@ -68,7 +73,10 @@ describe('createFollowerNotifications', () => {
 				{ userId: 'user-1' },
 				{ userId: 'user-2' }
 			]),
-			values: vi.fn().mockResolvedValue([])
+			returning: vi.fn().mockResolvedValue([
+				{ id: 'n1', userId: 'user-1', seriesId: 'series-1', type: 'new_episode', message: 'New episode!', isRead: false, createdAt: new Date() },
+				{ id: 'n2', userId: 'user-2', seriesId: 'series-1', type: 'new_episode', message: 'New episode!', isRead: false, createdAt: new Date() }
+			])
 		});
 		vi.mocked(getDb).mockResolvedValue(db as any);
 

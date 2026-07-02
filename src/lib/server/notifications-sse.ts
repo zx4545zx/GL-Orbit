@@ -42,3 +42,33 @@ export function broadcastUnreadCount(userId: string, count: number) {
 		}
 	}
 }
+
+export function broadcastNotificationRead(userId: string, notificationId: string) {
+	const set = controllers.get(userId);
+	if (!set) return;
+	const data = new TextEncoder().encode(
+		`event: read\ndata: ${JSON.stringify({ notificationId })}\n\n`
+	);
+	for (const c of set) {
+		try {
+			c.enqueue(data);
+		} catch {
+			set.delete(c);
+		}
+	}
+}
+
+export function broadcastNotificationsCleared(userId: string) {
+	const set = controllers.get(userId);
+	if (!set) return;
+	const data = new TextEncoder().encode(
+		`event: cleared\ndata: ${JSON.stringify({ ok: true })}\n\n`
+	);
+	for (const c of set) {
+		try {
+			c.enqueue(data);
+		} catch {
+			set.delete(c);
+		}
+	}
+}

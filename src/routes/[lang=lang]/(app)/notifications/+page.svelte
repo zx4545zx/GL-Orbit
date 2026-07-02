@@ -32,6 +32,16 @@
 					notifications = [item, ...notifications];
 					offset += 1;
 				}
+			},
+			onCount: (count) => {
+				// badge-only update; keep list intact
+			},
+			onRead: (id) => {
+				const target = notifications.find((n) => n.id === id);
+				if (target) target.isRead = true;
+			},
+			onCleared: () => {
+				notifications = notifications.map((n) => ({ ...n, isRead: true }));
 			}
 		});
 		return disconnect;
@@ -61,7 +71,8 @@
 	}
 
 	async function markRead(n: NotificationItem) {
-		goto(`/series/${n.seriesId}`);
+		const wasUnread = !n.isRead;
+		n.isRead = true;
 		try {
 			await fetch('/api/notifications', {
 				method: 'POST',
@@ -71,6 +82,7 @@
 		} catch {
 			// Fail silent — notification will still open
 		}
+		goto(`/series/${n.seriesId}`);
 	}
 
 	async function loadMore() {

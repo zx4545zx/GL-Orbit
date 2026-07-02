@@ -67,7 +67,12 @@
 	}
 
 	async function markRead(n: NotificationItem) {
-		goto(`/series/${n.seriesId}`);
+		const wasUnread = !n.isRead;
+		// optimistic update before navigating
+		n.isRead = true;
+		if (wasUnread) {
+			onUnreadCountChange?.(Math.max(0, unreadCount - 1));
+		}
 		try {
 			await fetch('/api/notifications', {
 				method: 'POST',
@@ -77,6 +82,7 @@
 		} catch {
 			// Fail silent — notification will still open
 		}
+		goto(`/series/${n.seriesId}`);
 	}
 
 	async function markAllRead() {
@@ -122,6 +128,19 @@
 			},
 			onCount: (count) => {
 				onUnreadCountChange?.(count);
+			},
+			onRead: (id) => {
+				const target = notifications.find((n) => n.id === id);
+				if (target && !target.isRead) {
+					target.isRead = true;
+					onUnreadCountChange?.(Math.max(0, unreadCount - 1));
+				}
+			},
+			onCleared: () => {
+				for (const n of notifications) {
+					n.isRead = true;
+				}
+				onUnreadCountChange?.(0);
 			}
 		});
 		return disconnect;

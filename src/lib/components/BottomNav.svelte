@@ -29,8 +29,14 @@ import NotificationBadge from './NotificationBadge.svelte';
 				unreadCount = 0;
 			}
 			disconnect = connectNotificationStream({
+				onNotification: () => {
+					unreadCount += 1;
+				},
 				onCount: (count) => {
 					unreadCount = count;
+				},
+				onCleared: () => {
+					unreadCount = 0;
 				}
 			});
 		}
