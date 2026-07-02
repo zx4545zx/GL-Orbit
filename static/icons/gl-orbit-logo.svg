@@ -21,6 +21,7 @@
       <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#FF6B9D" flood-opacity="0.14"/>
     </filter>
   </defs>
+  <rect width="512" height="512" fill="#FFF5F7"/>
   <rect x="48" y="48" width="416" height="416" rx="112" fill="url(#bg)"/>
   <path d="M108 274C136 192 212 146 292 158C350 167 396 202 414 250" stroke="url(#orbit)" stroke-width="18" stroke-linecap="round"/>
   <path d="M404 238C378 318 302 366 221 354C165 345 120 311 100 265" stroke="url(#orbit)" stroke-width="18" stroke-linecap="round" opacity="0.72"/>
