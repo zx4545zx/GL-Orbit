@@ -124,7 +124,7 @@
 				aria-selected={active}
 				aria-label="{day} {date.getDate()}"
 				onclick={() => selectMobileDay(i)}
-				class="flex-1 flex flex-col items-center justify-center py-2 rounded-xl text-xs font-medium transition-all duration-200 touch-target min-w-0 {active ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/50'}"
+				class="flex-1 flex flex-col items-center justify-start py-2 rounded-xl text-xs font-medium transition-all duration-200 touch-target min-w-0 {active ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/50'}"
 			>
 				<span class="font-bold">{weekDayNamesShort[i]}</span>
 				<span class="text-[10px] opacity-80 mt-0.5 truncate w-full px-1 text-center">{date.getDate()}</span>
