@@ -213,7 +213,7 @@ import { m } from '$lib/i18n/paraglide.js';
 		</button>
 
 		<!-- Hero -->
-		<div class="relative z-10 mb-10 grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-3 sm:mb-12">
+		<div class="relative z-40 mb-10 grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-3 sm:mb-12">
 			<div class="relative z-20 md:col-span-1">
 				<div class="relative mx-auto max-w-xs sm:max-w-none">
 					<div class="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-coral/30 via-lavender/25 to-mint/20 blur-xl"></div>
