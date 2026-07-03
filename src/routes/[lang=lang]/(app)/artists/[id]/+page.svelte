@@ -123,7 +123,7 @@ import { m } from '$lib/i18n/paraglide.js';
 			</button>
 
 			<ShareButton
-				title={`${artist.nickname}${artist.fullNameEn ? ` (${artist.fullNameEn})` : ''}`}
+				title={m.artist_share_title({ name: artist.nickname })}
 				text={m.artist_share_text({ name: artist.nickname })}
 				url={canonicalUrl}
 				ariaLabel={m.artist_share_aria_label()}
