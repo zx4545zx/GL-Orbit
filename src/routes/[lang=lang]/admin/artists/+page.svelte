@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { adminFetch } from '$lib/admin/action-feedback.js';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
+	import ImageUpload from '$lib/components/admin/ImageUpload.svelte';
 
 	interface Artist {
 		id: string;
@@ -18,6 +19,7 @@
 	let showCreate = $state(false);
 	let createLoading = $state(false);
 	let createError = $state('');
+	let createProfileImageUrl = $state('');
 	let deleteTarget = $state<Artist | null>(null);
 	let showConfirm = $state(false);
 
@@ -52,7 +54,7 @@
 		const nickname = fd.get('nickname')?.toString().trim() ?? '';
 		const fullNameEn = fd.get('fullNameEn')?.toString().trim() ?? '';
 		const fullNameTh = fd.get('fullNameTh')?.toString().trim() || null;
-		const profileImageUrl = fd.get('profileImageUrl')?.toString().trim() || null;
+		const profileImageUrl = createProfileImageUrl.trim() || null;
 		if (!nickname) {
 			createError = 'กรุณากรอกชื่อเล่น';
 			return;
@@ -76,6 +78,8 @@
 				return;
 			}
 			showCreate = false;
+			createProfileImageUrl = '';
+			form.reset();
 			goto(`/admin/artists/${json.id}`);
 		} catch {
 			createError = 'เกิดข้อผิดพลาดในการเชื่อมต่อ';
@@ -134,8 +138,7 @@
 					<input id="artist-create-fullname-th" name="fullNameTh" placeholder="ชื่อเต็มภาษาไทย (ถ้ามี)" class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
 				</div>
 				<div>
-					<label for="artist-create-image" class="block text-sm font-medium text-plum mb-1">URL รูปโปรไฟล์</label>
-					<input id="artist-create-image" name="profileImageUrl" type="url" class="w-full px-4 py-2.5 rounded-xl border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm sm:text-base" />
+					<ImageUpload bind:url={createProfileImageUrl} type="profiles" label="รูปโปรไฟล์" />
 				</div>
 				{#if createError}<p class="text-sm text-coral-dark">{createError}</p>{/if}
 				<div class="flex gap-2 pt-2">

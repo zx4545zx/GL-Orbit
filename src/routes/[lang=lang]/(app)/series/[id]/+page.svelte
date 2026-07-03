@@ -21,9 +21,12 @@ import { m } from '$lib/i18n/paraglide.js';
 	};
 
 	const s = $derived(series ? statusConfig[series.status] : null);
-	const seoTitle = $derived(`${title}${series.titleTh && series.titleEn && title !== series.titleEn ? ` (${series.titleEn})` : ''} | GL-Orbit`);
+	const titleEnSuffix = $derived(
+		series.titleTh && series.titleEn && title !== series.titleEn ? ` (${series.titleEn})` : ''
+	);
+	const seoTitle = $derived(m.series_detail_seo_title({ title, titleEnSuffix }));
 	const seoDescription = $derived(truncateSeo(
-		description || m.series_detail_seo_fallback({ title, studio: series.studio })
+		description || m.series_detail_seo_fallback({ title })
 	));
 	const canonicalUrl = $derived(absoluteUrl(page.url.origin, `/series/${series.id}`));
 	const seriesJsonLd = $derived(safeJsonLd([
