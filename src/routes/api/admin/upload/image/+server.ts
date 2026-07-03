@@ -1,6 +1,8 @@
 import { json, error } from '@sveltejs/kit';
-import { uploadImage } from '$lib/server/r2.js';
+import { ImageUploadValidationError, uploadImage } from '$lib/server/r2.js';
 import type { RequestHandler } from './$types.js';
+
+const MAX_REQUEST_BYTES = 4 * 1024 * 1024;
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user || locals.user.role !== 'ADMIN') {
@@ -8,6 +10,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	try {
+		const contentLength = Number(request.headers.get('content-length') ?? '0');
+		if (contentLength > MAX_REQUEST_BYTES) {
+			return json({ success: false, error: 'ไฟล์หลังบีบอัดต้องไม่เกิน 4 MB' }, { status: 413 });
+		}
+
 		const formData = await request.formData();
 		const file = formData.get('file');
 		const type = formData.get('type');
@@ -24,6 +31,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ success: true, url: result.url, key: result.key });
 	} catch (err) {
 		const message = err instanceof Error ? err.message : 'อัปโหลดไม่สำเร็จ';
-		return json({ success: false, error: message }, { status: 500 });
+		const status = err instanceof ImageUploadValidationError ? 400 : 500;
+		return json({ success: false, error: message }, { status });
 	}
 };

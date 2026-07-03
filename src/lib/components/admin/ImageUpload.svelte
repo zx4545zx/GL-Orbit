@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { adminFetch } from '$lib/admin/action-feedback.js';
-
 	let {
 		url = $bindable(''),
 		label = 'รูปภาพ',
@@ -17,14 +15,22 @@
 
 	let loading = $state(false);
 	let error = $state('');
-	let inputRef = $state<HTMLInputElement | null>(null);
+	let uploadMessage = $state('');
+	let inputRef: HTMLInputElement | undefined;
 	let showManual = $state(false);
 
-	const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+	const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+	const ACCEPT_ATTRIBUTE = 'image/jpeg,image/png,image/webp';
 	const MAX_FILE_SIZE = 5 * 1024 * 1024;
+	const MAX_UPLOAD_SIZE = 4 * 1024 * 1024;
 
 	function clearError() {
 		error = '';
+		uploadMessage = '';
+	}
+
+	function pickFile() {
+		inputRef?.click();
 	}
 
 	async function compressFile(file: File): Promise<Blob> {
@@ -42,13 +48,17 @@
 				}
 
 				let { width, height } = img;
-				if (width > maxWidth) {
-					height = Math.round((height * maxWidth) / width);
-					width = maxWidth;
+				const longestSide = Math.max(width, height);
+				if (longestSide > maxWidth) {
+					const scale = maxWidth / longestSide;
+					width = Math.round(width * scale);
+					height = Math.round(height * scale);
 				}
 
 				canvas.width = width;
 				canvas.height = height;
+				ctx.fillStyle = '#ffffff';
+				ctx.fillRect(0, 0, width, height);
 				ctx.drawImage(img, 0, 0, width, height);
 
 				canvas.toBlob(
@@ -79,7 +89,7 @@
 		clearError();
 
 		if (!ACCEPTED_TYPES.includes(file.type)) {
-			error = 'รองรับเฉพาะ JPEG, PNG, WebP, GIF';
+			error = 'รองรับเฉพาะ JPEG, PNG, WebP';
 			return;
 		}
 
@@ -91,6 +101,11 @@
 		loading = true;
 		try {
 			const compressed = await compressFile(file);
+			if (compressed.size > MAX_UPLOAD_SIZE) {
+				error = 'ไฟล์หลังบีบอัดต้องไม่เกิน 4 MB';
+				return;
+			}
+
 			const uploadFile = new File([compressed], file.name.replace(/\.[^.]+$/, '.jpg'), {
 				type: 'image/jpeg'
 			});
@@ -99,7 +114,7 @@
 			formData.append('file', uploadFile);
 			formData.append('type', type);
 
-			const res = await adminFetch('/api/admin/upload/image', {
+			const res = await fetch('/api/admin/upload/image', {
 				method: 'POST',
 				credentials: 'include',
 				body: formData
@@ -112,6 +127,7 @@
 			}
 
 			url = json.url;
+			uploadMessage = 'อัปโหลดแล้ว — อย่าลืมกดบันทึกข้อมูล';
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'อัปโหลดไม่สำเร็จ';
 		} finally {
@@ -131,6 +147,7 @@
 
 	const isProfile = $derived(type === 'profiles');
 	const aspectClass = $derived(isProfile ? 'aspect-square' : 'aspect-[2/3]');
+	const roundedClass = $derived(isProfile ? 'rounded-full' : 'rounded-2xl');
 	const placeholderIcon = $derived(
 		isProfile
 			? 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
@@ -141,7 +158,7 @@
 <div class="space-y-2">
 	<span class="block text-sm font-medium text-plum">{label}</span>
 
-	<div class="relative w-full max-w-[160px] {aspectClass} rounded-2xl overflow-hidden bg-lavender/10 border border-lavender/20">
+	<div class="relative w-full max-w-[160px] {aspectClass} {roundedClass} overflow-hidden bg-lavender/10 border border-lavender/20">
 		{#if url}
 			<img src={url} alt={label} class="w-full h-full object-cover" />
 		{:else}
@@ -163,13 +180,13 @@
 	</div>
 
 	<div class="flex flex-wrap items-center gap-2">
-		<label class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-coral text-white text-xs font-semibold cursor-pointer hover:bg-coral-dark transition-colors touch-target">
+		<input bind:this={inputRef} type="file" accept={ACCEPT_ATTRIBUTE} class="sr-only" onchange={handleFileChange} disabled={loading} />
+		<button type="button" onclick={pickFile} disabled={loading} class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-coral text-white text-xs font-semibold hover:bg-coral-dark transition-colors touch-target disabled:opacity-60">
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
 			</svg>
 			เลือกรูป
-			<input bind:this={inputRef} type="file" accept="image/*" class="hidden" onchange={handleFileChange} disabled={loading} />
-		</label>
+		</button>
 		{#if url}
 			<button type="button" onclick={clearImage} class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl glass-card text-plum text-xs font-semibold hover:bg-white/80 transition-colors touch-target">
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,6 +212,9 @@
 	{#if error}
 		<p class="text-xs text-coral-dark">{error}</p>
 	{/if}
+	{#if uploadMessage}
+		<p class="text-xs text-mint-dark">{uploadMessage}</p>
+	{/if}
 
-	<p class="text-[10px] text-plum-light">รองรับ JPEG, PNG, WebP, GIF · สูงสุด 5 MB · บีบอัดอัตโนมัติ</p>
+	<p class="text-[10px] text-plum-light">รองรับ JPEG, PNG, WebP · ไฟล์ต้นฉบับสูงสุด 5 MB · บีบอัดอัตโนมัติ</p>
 </div>
