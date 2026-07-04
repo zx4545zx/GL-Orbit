@@ -314,7 +314,7 @@ import Picture from '$lib/components/Picture.svelte';
 						<span class="rounded-full border border-white/70 bg-white/65 px-3 py-1.5 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl sm:text-sm">{series.studio}{#if series.year} • {series.year}{/if}</span>
 					</div>
 
-					<h1 class="max-w-full break-words font-[family-name:var(--font-display)] text-[clamp(2.35rem,5.4vw,5.35rem)] font-extrabold leading-[1.05] tracking-[-0.045em] text-plum [overflow-wrap:anywhere]">
+					<h1 class="max-w-full break-words font-[family-name:var(--font-display)] text-[clamp(1.9rem,3.6vw,3.65rem)] font-extrabold leading-[1.16] tracking-[-0.025em] text-plum [overflow-wrap:anywhere]">
 						{series.titleEn}
 					</h1>
 					{#if series.titleTh}
