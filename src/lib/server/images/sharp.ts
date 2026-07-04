@@ -5,18 +5,15 @@ export type Variant = { width: number; ext: ImageExt; buffer: Buffer };
 
 export async function generateVariants(input: Buffer, type: ImageType): Promise<Variant[]> {
 	const { widths, formats } = IMAGE_VARIANTS[type];
-	const meta = await sharp(input).metadata();
-	const sourceWidth = meta.width ?? Math.max(...widths);
 	const variants: Variant[] = [];
 
 	for (const width of widths) {
-		const w = Math.min(width, sourceWidth);
 		for (const ext of formats) {
 			const buffer = await encode(
-				sharp(input).rotate().resize({ width: w, withoutEnlargement: true }),
+				sharp(input).rotate().resize({ width }),
 				ext
 			);
-			variants.push({ width: w, ext, buffer });
+			variants.push({ width, ext, buffer });
 		}
 	}
 	return variants;

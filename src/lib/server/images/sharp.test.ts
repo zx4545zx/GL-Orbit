@@ -21,13 +21,12 @@ describe('generateVariants', () => {
 		expect(variants.filter((v) => v.ext === 'jpg')).toHaveLength(3);
 	});
 
-	it('respects withoutEnlargement when source smaller than requested', async () => {
+	it('generates exactly the configured widths regardless of source size', async () => {
 		const small = await sharp({ create: { width: 400, height: 400, channels: 3, background: '#fff' } })
 			.jpeg().toBuffer();
 		const variants = await generateVariants(small, 'profiles');
-		// source 400px → all requested (320, 640) clamp to ≤400; 640 becomes 400
-		const widths = [...new Set(variants.map((v) => v.width))].sort((a, b) => a - b);
-		expect(widths[widths.length - 1]).toBeLessThanOrEqual(400);
+		// widths should be exactly the configured widths, not clamped to source
+		expect(variants.map((v) => v.width)).toEqual([320, 320, 320, 640, 640, 640]);
 	});
 
 	it('each variant buffer is a valid image of correct format', async () => {
