@@ -410,8 +410,8 @@ import Picture from '$lib/components/Picture.svelte';
 
 				<div class="grid grid-cols-2 gap-2 sm:grid-cols-6 sm:gap-3">
 					{#each galleryCandidates as image, index}
-						<figure class="group relative overflow-hidden rounded-2xl border border-white/70 bg-white/60 shadow-xl shadow-lavender/15 {index === 0 ? 'col-span-2 sm:col-span-3 sm:row-span-2' : 'sm:col-span-3 lg:col-span-2'}">
-							<Picture src={image.src} type="posters" sizes={index === 0 ? '(max-width: 768px) 100vw, 640px' : '(max-width: 768px) 50vw, 360px'} alt={image.alt} width={index === 0 ? 640 : 360} height={index === 0 ? 360 : 203} loading="lazy" class="aspect-video h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+						<figure class="group relative overflow-hidden rounded-2xl border border-white/70 bg-white/60 shadow-xl shadow-lavender/15 perf-card {index === 0 ? 'col-span-2 sm:col-span-3 sm:row-span-2' : 'sm:col-span-3 lg:col-span-2'}">
+							<Picture src={image.src} type="posters" sizes={index === 0 ? '(max-width: 768px) 100vw, 640px' : '(max-width: 768px) 50vw, 360px'} alt={image.alt} width={index === 0 ? 640 : 360} height={index === 0 ? 360 : 203} loading="lazy" decoding="async" class="aspect-video h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
 							<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-75"></div>
 							<figcaption class="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78 sm:bottom-3 sm:left-3 sm:right-3">
 								<span>{image.label}</span>
