@@ -4,8 +4,9 @@ import { m } from '$lib/i18n/paraglide.js';
 	import { page } from '$app/state';	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
 	import WatchedButton from '$lib/components/WatchedButton.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
-	import { absoluteUrl, buildBreadcrumbJsonLd, jsonLdScript, safeJsonLd, truncateSeo } from '$lib/seo.js';
+	import { buildBreadcrumbJsonLd, buildCanonicalUrl, jsonLdScript, localizedPath, safeJsonLd, truncateSeo } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 
 	let { data }: { data: PageData } = $props();
 
@@ -28,7 +29,9 @@ import { m } from '$lib/i18n/paraglide.js';
 	const seoDescription = $derived(truncateSeo(
 		description || m.series_detail_seo_fallback({ title })
 	));
-	const canonicalUrl = $derived(absoluteUrl(page.url.origin, `/series/${series.id}`));
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalPath = $derived(`/series/${series.id}`);
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
 	const seriesJsonLd = $derived(safeJsonLd([
 		{
 			'@context': 'https://schema.org',
@@ -44,9 +47,9 @@ import { m } from '$lib/i18n/paraglide.js';
 			actor: series.artists.map((artist) => ({ '@type': 'Person', name: artist.name }))
 		},
 		buildBreadcrumbJsonLd(page.url.origin, [
-			{ name: m.nav_home(), path: '/' },
-			{ name: m.series_breadcrumb_all(), path: '/series' },
-			{ name: series.titleEn, path: `/series/${series.id}` }
+			{ name: m.nav_home(), path: localizedPath(currentLang, '') },
+			{ name: m.series_breadcrumb_all(), path: localizedPath(currentLang, '/series') },
+			{ name: series.titleEn, path: localizedPath(currentLang, canonicalPath) }
 		])
 	]));
 

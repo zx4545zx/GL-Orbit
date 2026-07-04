@@ -2,8 +2,9 @@
 import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
-	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, jsonLdScript } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, buildCanonicalUrl, jsonLdScript, localizedPath } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { ArtistListItem } from '$lib/server/queries/artist-list.js';
 
 	let { data }: { data: PageData } = $props();
@@ -14,6 +15,9 @@ import { m } from '$lib/i18n/paraglide.js';
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
 	let loadMoreController: AbortController | null = null;
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, data.seo.canonicalPath));
+	const localizedJsonLd = $derived(data.seo.jsonLd.replaceAll(`${page.url.origin}/artists`, `${page.url.origin}${localizedPath(currentLang, '/artists')}`));
 
 	const allArtists = $derived([...data.artists.items, ...extraArtists]);
 	const total = $derived(data.artists.total);
@@ -112,12 +116,12 @@ import { m } from '$lib/i18n/paraglide.js';
 	<title>{data.seo.title}</title>
 	<meta name="description" content={data.seo.description} />
 	<meta name="robots" content={data.seo.robots} />
-	<link rel="canonical" href={`${page.url.origin}${data.seo.canonicalPath}`} />
+	<link rel="canonical" href={canonicalUrl} />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="GL-Orbit" />
 	<meta property="og:title" content={data.seo.ogTitle} />
 	<meta property="og:description" content={data.seo.ogDescription} />
-	<meta property="og:url" content={`${page.url.origin}${data.seo.canonicalPath}`} />
+	<meta property="og:url" content={canonicalUrl} />
 	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
 	<meta property="og:image:width" content={OG_IMAGE_WIDTH} />
 	<meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
@@ -125,7 +129,7 @@ import { m } from '$lib/i18n/paraglide.js';
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={data.seo.ogTitle} />
 	<meta name="twitter:description" content={data.seo.ogDescription} />
-	{@html jsonLdScript(data.seo.jsonLd)}
+	{@html jsonLdScript(localizedJsonLd)}
 </svelte:head>
 
 <div class="py-6 sm:py-8 max-w-6xl mx-auto" aria-busy={loading}>

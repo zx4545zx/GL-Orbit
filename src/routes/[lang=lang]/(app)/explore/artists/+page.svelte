@@ -2,6 +2,19 @@
 	import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
+	import {
+		DEFAULT_OG_IMAGE,
+		OG_IMAGE_HEIGHT,
+		OG_IMAGE_TYPE,
+		OG_IMAGE_WIDTH,
+		absoluteUrl,
+		buildBreadcrumbJsonLd,
+		buildCanonicalUrl,
+		buildWebPageJsonLd,
+		jsonLdScript,
+		safeJsonLd
+	} from '$lib/seo.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { PageData } from './$types.js';
 	import type { ArtistListItem } from '$lib/server/queries/artist-list.js';
 
@@ -26,6 +39,19 @@
 	let loading = $state(false);
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalPath = '/explore/artists';
+	const SEO_TITLE = m.explore_artists_seo_title();
+	const SEO_DESCRIPTION = m.explore_artists_seo_description();
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
+	const jsonLd = $derived(safeJsonLd([
+		buildWebPageJsonLd(page.url.origin, `/${currentLang}${canonicalPath}`, SEO_TITLE, SEO_DESCRIPTION, currentLang),
+		buildBreadcrumbJsonLd(page.url.origin, [
+			{ name: m.nav_home(), path: `/${currentLang}` },
+			{ name: m.nav_artists(), path: `/${currentLang}/artists` },
+			{ name: m.nav_explore(), path: `/${currentLang}${canonicalPath}` }
+		])
+	]));
 
 	const allArtists = $derived([...data.artists.items, ...extraArtists]);
 	const total = $derived(data.artists.total);
@@ -99,8 +125,21 @@
 </script>
 
 <svelte:head>
-	<title>{m.explore_artists_seo_title()}</title>
-	<meta name="description" content={m.explore_artists_seo_description()} />
+	<title>{SEO_TITLE}</title>
+	<meta name="description" content={SEO_DESCRIPTION} />
+	<meta name="robots" content="index, follow" />
+	<link rel="canonical" href={canonicalUrl} />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={SEO_TITLE} />
+	<meta property="og:description" content={SEO_DESCRIPTION} />
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+	<meta property="og:image:width" content={OG_IMAGE_WIDTH} />
+	<meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
+	<meta property="og:image:type" content={OG_IMAGE_TYPE} />
+	<meta name="twitter:title" content={SEO_TITLE} />
+	<meta name="twitter:description" content={SEO_DESCRIPTION} />
+	{@html jsonLdScript(jsonLd)}
 </svelte:head>
 
 <!-- Search -->

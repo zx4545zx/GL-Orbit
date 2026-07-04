@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
 
-	import { page } from '$app/state';	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
+	import { page } from '$app/state';	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildCanonicalUrl, buildWebPageJsonLd, jsonLdScript, localizedPath, safeJsonLd, schemaLanguage } from '$lib/seo.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 
 	const ABOUT_SEO_TITLE = m.about_hero_title();
 	const ABOUT_SEO_DESCRIPTION = m.about_seo_description();
@@ -140,16 +141,18 @@
 		}
 	] as const;
 
-	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/about'));
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalPath = '/about';
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
 	const aboutJsonLd = $derived(safeJsonLd([
-		buildWebPageJsonLd(page.url.origin, '/about', ABOUT_SEO_TITLE, ABOUT_SEO_DESCRIPTION),
+		buildWebPageJsonLd(page.url.origin, localizedPath(currentLang, canonicalPath), ABOUT_SEO_TITLE, ABOUT_SEO_DESCRIPTION, currentLang),
 		{
 			'@context': 'https://schema.org',
 			'@type': 'AboutPage',
 			name: ABOUT_SEO_TITLE,
 			description: ABOUT_SEO_DESCRIPTION,
 			url: canonicalUrl,
-			inLanguage: 'th-TH',
+			inLanguage: schemaLanguage(currentLang),
 			isPartOf: {
 				'@type': 'WebSite',
 				name: SITE_NAME,
@@ -162,24 +165,12 @@
 		},
 		{
 			'@context': 'https://schema.org',
-			'@type': 'FAQPage',
-			mainEntity: homepageFaqs.map((faq) => ({
-				'@type': 'Question',
-				name: faq.question,
-				acceptedAnswer: {
-					'@type': 'Answer',
-					text: faq.answer
-				}
-			}))
-		},
-		{
-			'@context': 'https://schema.org',
 			'@type': 'Article',
 			headline: ABOUT_SEO_TITLE,
 			description: ABOUT_SEO_DESCRIPTION,
 			datePublished: LAST_UPDATED,
 			dateModified: LAST_UPDATED,
-			inLanguage: 'th-TH',
+			inLanguage: schemaLanguage(currentLang),
 			mainEntityOfPage: canonicalUrl,
 			image: absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE),
 			author: {
@@ -199,23 +190,9 @@
 			articleSection: [m.about_article_section_1(), m.about_article_section_2(), m.about_article_section_3(), m.about_article_section_4()],
 			keywords: [m.about_keyword_1(), m.about_keyword_2(), m.about_keyword_3(), m.about_keyword_4(), m.about_keyword_5()]
 		},
-		{
-			'@context': 'https://schema.org',
-			'@type': 'HowTo',
-			name: m.about_howto_name(),
-			description: m.about_howto_description(),
-			totalTime: 'PT5M',
-			step: howToSteps.map((step, index) => ({
-				'@type': 'HowToStep',
-				position: index + 1,
-				name: step.name,
-				text: step.text,
-				url: absoluteUrl(page.url.origin, step.path)
-			}))
-		},
 		buildBreadcrumbJsonLd(page.url.origin, [
-			{ name: m.about_breadcrumb_home(), path: '/' },
-			{ name: m.about_breadcrumb_about(), path: '/about' }
+			{ name: m.about_breadcrumb_home(), path: localizedPath(currentLang, '') },
+			{ name: m.about_breadcrumb_about(), path: localizedPath(currentLang, canonicalPath) }
 		])
 	]));
 </script>

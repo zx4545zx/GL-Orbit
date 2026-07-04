@@ -10,10 +10,13 @@ import { m } from '$lib/i18n/paraglide.js';
 		SITE_NAME,
 		absoluteUrl,
 		buildBreadcrumbJsonLd,
+		buildCanonicalUrl,
 		buildWebPageJsonLd,
 		jsonLdScript,
+		localizedPath,
 		safeJsonLd
 	} from '$lib/seo.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { PageData } from './$types.js';
 	import type { CountdownItem } from '$lib/types/home.js';
 
@@ -40,12 +43,14 @@ import { m } from '$lib/i18n/paraglide.js';
 	const SEO_TITLE = m.countdown_seo_title();
 	const SEO_DESCRIPTION = m.countdown_seo_description();
 
-	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/countdown'));
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalPath = '/countdown';
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
 	const jsonLd = $derived(safeJsonLd([
-		buildWebPageJsonLd(page.url.origin, '/countdown', SEO_TITLE, SEO_DESCRIPTION),
+		buildWebPageJsonLd(page.url.origin, localizedPath(currentLang, canonicalPath), SEO_TITLE, SEO_DESCRIPTION, currentLang),
 		buildBreadcrumbJsonLd(page.url.origin, [
-			{ name: m.nav_home(), path: '/' },
-			{ name: m.countdown_breadcrumb(), path: '/countdown' }
+			{ name: m.nav_home(), path: localizedPath(currentLang, '') },
+			{ name: m.countdown_breadcrumb(), path: localizedPath(currentLang, canonicalPath) }
 		])
 	]));
 

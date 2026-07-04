@@ -9,8 +9,47 @@ export const OG_IMAGE_WIDTH = '1200';
 export const OG_IMAGE_HEIGHT = '630';
 export const OG_IMAGE_TYPE = 'image/svg+xml';
 
+const SEO_LANGUAGE_TAGS: AvailableLanguageTag[] = ['th', 'en'];
+
 export function absoluteUrl(origin: string, path: string): string {
 	return new URL(path, origin).toString();
+}
+
+export function localizedPath(lang: AvailableLanguageTag, path: string): string {
+	const normalizedPath = path === '' || path === '/' ? '' : path.startsWith('/') ? path : `/${path}`;
+	return `/${lang}${normalizedPath}`;
+}
+
+export function stripLanguageFromPath(pathname: string): string {
+	const segments = pathname.split('/').filter(Boolean);
+	const [firstSegment, ...rest] = segments;
+
+	if (SEO_LANGUAGE_TAGS.includes(firstSegment as AvailableLanguageTag)) {
+		return rest.length > 0 ? `/${rest.join('/')}` : '';
+	}
+
+	return pathname === '/' ? '' : pathname;
+}
+
+export function buildCanonicalUrl(origin: string, lang: AvailableLanguageTag, path: string): string {
+	return absoluteUrl(origin, localizedPath(lang, path));
+}
+
+export function buildLanguageAlternates(origin: string, path: string): Array<{ hreflang: string; href: string }> {
+	return [
+		...SEO_LANGUAGE_TAGS.map((lang) => ({
+			hreflang: lang,
+			href: buildCanonicalUrl(origin, lang, path)
+		})),
+		{
+			hreflang: 'x-default',
+			href: buildCanonicalUrl(origin, 'th', path)
+		}
+	];
+}
+
+export function schemaLanguage(lang: AvailableLanguageTag): string {
+	return lang === 'en' ? 'en-US' : 'th-TH';
 }
 
 export function safeJsonLd(data: unknown): string {
@@ -68,7 +107,7 @@ export function buildWebPageJsonLd(
 		name,
 		description,
 		url: absoluteUrl(origin, path),
-		inLanguage: `${lang}-${lang.toUpperCase()}`,
+		inLanguage: schemaLanguage(lang),
 		isPartOf: {
 			'@type': 'WebSite',
 			name: SITE_NAME,

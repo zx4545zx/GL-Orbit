@@ -2,8 +2,9 @@
 import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';
-	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, defaultSeoDescription, defaultSeoTitle, jsonLdScript, safeJsonLd } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildCanonicalUrl, buildWebPageJsonLd, defaultSeoDescription, defaultSeoTitle, jsonLdScript, localizedPath, safeJsonLd, schemaLanguage } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { CountdownItem, FeaturedSeriesItem, UpcomingScheduleItem } from '$lib/types/home.js';
 
 	let { data }: { data: PageData } = $props();
@@ -58,18 +59,19 @@ import { m } from '$lib/i18n/paraglide.js';
 		return floatDelayClasses[Math.min(index, floatDelayClasses.length - 1)];
 	}
 
-	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/'));
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, ''));
 	const homeJsonLd = $derived(safeJsonLd([
-		buildWebPageJsonLd(page.url.origin, '/', pageTitle, pageDescription),
+		buildWebPageJsonLd(page.url.origin, localizedPath(currentLang, ''), pageTitle, pageDescription, currentLang),
 		{
 			'@context': 'https://schema.org',
 			'@type': 'WebSite',
 			name: SITE_NAME,
 			url: canonicalUrl,
-			inLanguage: page.data.lang === 'th' ? 'th-TH' : 'en-US',
+			inLanguage: schemaLanguage(currentLang),
 			potentialAction: {
 				'@type': 'SearchAction',
-				target: `${absoluteUrl(page.url.origin, '/series')}?search={search_term_string}`,
+				target: `${absoluteUrl(page.url.origin, localizedPath(currentLang, '/series'))}?search={search_term_string}`,
 				'query-input': 'required name=search_term_string'
 			}
 		},
@@ -80,9 +82,9 @@ import { m } from '$lib/i18n/paraglide.js';
 			url: canonicalUrl,
 			logo: absoluteUrl(page.url.origin, '/icons/gl-orbit-icon.png'),
 			description: pageDescription,
-			inLanguage: page.data.lang === 'th' ? 'th-TH' : 'en-US'
+			inLanguage: schemaLanguage(currentLang)
 		},
-		buildBreadcrumbJsonLd(page.url.origin, [{ name: m.nav_home(), path: '/' }])
+		buildBreadcrumbJsonLd(page.url.origin, [{ name: m.nav_home(), path: localizedPath(currentLang, '') }])
 	]));
 
 	const statusConfig: Record<string, { text: string; class: string }> = {

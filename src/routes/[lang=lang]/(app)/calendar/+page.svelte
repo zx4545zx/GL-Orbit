@@ -2,8 +2,9 @@
 	import { tick } from 'svelte';
 	import { navigating, page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, buildBreadcrumbJsonLd, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, buildBreadcrumbJsonLd, buildCanonicalUrl, buildWebPageJsonLd, jsonLdScript, localizedPath, safeJsonLd } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { CalendarEvent, CalendarApiResponse } from '$lib/types/calendar.js';
 	import { getViewUrl } from './calendar.js';
 	import CalendarWeekHeader from './CalendarWeekHeader.svelte';
@@ -240,12 +241,14 @@
 
 	const seoTitle = m.calendar_seo_title();
 	const seoDescription = m.calendar_seo_description();
-	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/calendar'));
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalPath = '/calendar';
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
 	const calendarJsonLd = $derived(safeJsonLd([
-		buildWebPageJsonLd(page.url.origin, '/calendar', seoTitle, seoDescription),
+		buildWebPageJsonLd(page.url.origin, localizedPath(currentLang, canonicalPath), seoTitle, seoDescription, currentLang),
 		buildBreadcrumbJsonLd(page.url.origin, [
-			{ name: m.nav_home(), path: '/' },
-			{ name: m.calendar_breadcrumb(), path: '/calendar' }
+			{ name: m.nav_home(), path: localizedPath(currentLang, '') },
+			{ name: m.calendar_breadcrumb(), path: localizedPath(currentLang, canonicalPath) }
 		])
 	]));
 

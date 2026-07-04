@@ -3,9 +3,10 @@ import { m } from '$lib/i18n/paraglide.js';
 
 	import { localizedHref } from '$lib/i18n/link.js';	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { absoluteUrl, jsonLdScript, safeJsonLd, truncateSeo, buildBreadcrumbJsonLd } from '$lib/seo.js';
+	import { buildCanonicalUrl, jsonLdScript, safeJsonLd, truncateSeo, buildBreadcrumbJsonLd, localizedPath } from '$lib/seo.js';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import type { PageData } from './$types.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 
 	let { data }: { data: PageData } = $props();
 
@@ -17,7 +18,9 @@ import { m } from '$lib/i18n/paraglide.js';
 			m.artist_detail_seo_description({ name: artist.nickname })
 		)
 	);
-	const canonicalUrl = $derived(absoluteUrl(page.url.origin, `/artists/${artist.id}`));
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalPath = $derived(`/artists/${artist.id}`);
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
 	const jsonLd = $derived(
 		safeJsonLd([
 			{
@@ -32,9 +35,9 @@ import { m } from '$lib/i18n/paraglide.js';
 				knowsFor: artist.series.map((s) => s.titleEn)
 			},
 			buildBreadcrumbJsonLd(page.url.origin, [
-				{ name: m.nav_home(), path: '/' },
-				{ name: m.nav_artists(), path: '/artists' },
-				{ name: artist.nickname, path: `/artists/${artist.id}` }
+				{ name: m.nav_home(), path: localizedPath(currentLang, '') },
+				{ name: m.nav_artists(), path: localizedPath(currentLang, '/artists') },
+				{ name: artist.nickname, path: localizedPath(currentLang, canonicalPath) }
 			])
 		])
 	);
