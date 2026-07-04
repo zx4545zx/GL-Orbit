@@ -474,7 +474,7 @@ import Picture from '$lib/components/Picture.svelte';
 											<span class="rounded-full border border-coral/30 bg-coral/15 px-2 py-0.5 text-[10px] font-bold text-coral-light whitespace-nowrap">{m.common_today()}</span>
 										{/if}
 										{#if hasUncut(item.schedules)}
-											<span class="hidden rounded-full border border-amber-300/30 bg-amber-300/15 px-2 py-0.5 text-[10px] font-bold text-amber-100 sm:inline-flex">Uncut</span>
+											<span class="hidden rounded-full border border-amber-300/30 bg-amber-300/15 px-2 py-0.5 text-[10px] font-bold text-amber-100 sm:inline-flex">{m.common_uncut()}</span>
 										{/if}
 										<span class="text-xs font-semibold text-white/65 sm:text-sm whitespace-nowrap">{firstAirDate(item)}</span>
 										{#if hasEpisodeContent}
@@ -497,7 +497,7 @@ import Picture from '$lib/components/Picture.svelte';
 													<p class="text-xs font-bold uppercase tracking-[0.22em] text-lavender-light/75">Trailer</p>
 													<p class="mt-1 text-sm text-white/65">{m.series_trailer_external_notice()}</p>
 													<a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 rounded-full bg-coral px-4 py-2 text-sm font-bold text-white shadow-lg shadow-coral/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-coral-dark touch-target">
-														เปิด Trailer
+														{m.series_trailer_open()}
 														<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
 													</a>
 												</div>
@@ -517,7 +517,7 @@ import Picture from '$lib/components/Picture.svelte';
 														<div class="flex items-center gap-1.5">
 															<span class="truncate text-sm font-semibold text-white sm:text-base">{sch.platform}</span>
 															{#if sch.isUncut}
-																<span class="flex-shrink-0 rounded-md border border-amber-200/25 bg-amber-200/15 px-1.5 py-0.5 text-[9px] font-bold text-amber-100">Uncut</span>
+																<span class="flex-shrink-0 rounded-md border border-amber-200/25 bg-amber-200/15 px-1.5 py-0.5 text-[9px] font-bold text-amber-100">{m.common_uncut()}</span>
 															{/if}
 														</div>
 														<div class="text-xs text-white/50">{sch.airDate}</div>
@@ -525,7 +525,7 @@ import Picture from '$lib/components/Picture.svelte';
 												</div>
 												{#if hasStreamLink}
 													<a href={sch.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-coral to-coral-dark px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-coral/20 transition-all duration-200 hover:from-coral-dark hover:to-coral touch-target sm:text-sm">
-														ดูเลย
+														{m.series_watch_now()}
 														<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
 													</a>
 												{/if}
