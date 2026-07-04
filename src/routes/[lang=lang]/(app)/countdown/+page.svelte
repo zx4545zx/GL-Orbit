@@ -1,5 +1,6 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
+import Picture from '$lib/components/Picture.svelte';
 
 	import { page } from '$app/state';	import {
 		DEFAULT_OG_IMAGE,
@@ -191,9 +192,13 @@ import { m } from '$lib/i18n/paraglide.js';
 							<!-- header: poster + meta -->
 							<div class="relative flex items-center gap-3 mb-3 pr-12">
 								<div class="flex-shrink-0 w-11 h-14 sm:w-12 sm:h-16 rounded-xl overflow-hidden bg-lavender/10 ring-1 ring-white/60">
-									<img
+									<Picture
 										src={c.poster}
+										type="posters"
+										sizes="3rem"
 										alt={c.title}
+										width={88}
+										height={112}
 										class="w-full h-full object-cover"
 										loading="lazy"
 										decoding="async"

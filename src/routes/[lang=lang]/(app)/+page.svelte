@@ -1,5 +1,6 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
+import Picture from '$lib/components/Picture.svelte';
 
 	import { page } from '$app/state';
 	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, SITE_NAME, absoluteUrl, buildBreadcrumbJsonLd, buildCanonicalUrl, buildWebPageJsonLd, defaultSeoDescription, defaultSeoTitle, jsonLdScript, localizedPath, safeJsonLd, schemaLanguage } from '$lib/seo.js';
@@ -293,12 +294,15 @@ import { m } from '$lib/i18n/paraglide.js';
 							<!-- header: poster + meta -->
 							<div class="relative flex items-center gap-3 mb-3 pr-12">
 								<div class="flex-shrink-0 w-11 h-14 sm:w-12 sm:h-16 rounded-xl overflow-hidden bg-lavender/10 ring-1 ring-white/60">
-									<img
+									<Picture
 										src={c.poster}
+										type="posters"
+										sizes="3rem"
 										alt={c.title}
-										class="w-full h-full object-cover"
+										width={88}
+										height={112}
 										loading="lazy"
-										decoding="async"
+										class="w-full h-full object-cover"
 									/>
 								</div>
 								<div class="min-w-0 flex-1">
@@ -409,15 +413,16 @@ import { m } from '$lib/i18n/paraglide.js';
 							<!-- glow halo behind poster -->
 							<div class="absolute -inset-2 bg-gradient-to-br from-coral/20 via-lavender/15 to-mint/15 rounded-[1.75rem] blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
 							<div class="relative aspect-[3/4] overflow-hidden ring-1 ring-white/40">
-								<img
+								<Picture
 									src={series.poster}
+									type="posters"
+									sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
 									alt={series.title}
-									class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
 									width={400}
 									height={533}
 									loading={i === 0 ? 'eager' : 'lazy'}
-									decoding="async"
 									fetchpriority={i === 0 ? 'high' : 'auto'}
+									class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
 								/>
 								<div class="absolute inset-0 bg-gradient-to-t from-plum via-plum/20 to-transparent"></div>
 

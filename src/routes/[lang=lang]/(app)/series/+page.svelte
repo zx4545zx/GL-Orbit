@@ -1,5 +1,6 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
+import Picture from '$lib/components/Picture.svelte';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
 	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, buildCanonicalUrl, jsonLdScript, localizedPath } from '$lib/seo.js';
@@ -252,8 +253,10 @@ import { m } from '$lib/i18n/paraglide.js';
 				<a href="/{page.data.lang}/series/{s.id}" class="group">
 					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/20 transition-all duration-500 hover:-translate-y-2">
 						<div class="relative aspect-[3/4] overflow-hidden">
-							<img
+							<Picture
 								src={s.poster}
+								type="posters"
+								sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
 								alt={s.title}
 								width={400}
 								height={533}

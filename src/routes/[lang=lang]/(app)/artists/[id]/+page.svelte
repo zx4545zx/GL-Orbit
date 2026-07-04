@@ -4,6 +4,7 @@ import { m } from '$lib/i18n/paraglide.js';
 	import { localizedHref } from '$lib/i18n/link.js';	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { buildCanonicalUrl, jsonLdScript, safeJsonLd, truncateSeo, buildBreadcrumbJsonLd, localizedPath } from '$lib/seo.js';
+	import Picture from '$lib/components/Picture.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import type { PageData } from './$types.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
@@ -278,11 +279,13 @@ import { m } from '$lib/i18n/paraglide.js';
 							class="group glass-card overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-lavender/20 focus-visible:outline-2 focus-visible:outline-coral"
 						>
 							<div class="relative aspect-[2/3] overflow-hidden">
-								<img
+								<Picture
 									src={s.posterUrl}
+									type="posters"
+									sizes="(max-width: 640px) 40vw, 200px"
 									alt={s.titleEn}
-									width={300}
-									height={450}
+									width={200}
+									height={300}
 									class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
 									loading="lazy"
 									decoding="async"

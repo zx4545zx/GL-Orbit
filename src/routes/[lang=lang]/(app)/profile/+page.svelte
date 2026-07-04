@@ -183,11 +183,13 @@
 	<a href="/{page.data.lang}/series/{s.id}" class="group block">
 		<div class="glass-card rounded-2xl overflow-hidden hover:shadow-2xl {libraryView === 'watched' ? 'hover:shadow-mint/25' : 'hover:shadow-lavender/25'} transition-all duration-500 hover:-translate-y-1">
 			<div class="relative aspect-[3/4] overflow-hidden">
-				<img
+				<Picture
 					src={s.poster}
+					type="posters"
+					sizes="(max-width: 640px) 30vw, 120px"
 					alt={s.title}
-					width={400}
-					height={533}
+					width={120}
+					height={160}
 					class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
 					loading="lazy"
 					decoding="async"

@@ -37,6 +37,9 @@
     "vitest": "^4.1.8"
   },
   "dependencies": {
+    "@fontsource/dm-sans": "^5.2.8",
+    "@fontsource/mali": "^5.2.8",
+    "@fontsource/syne": "^5.2.7",
     "@inlang/paraglide-sveltekit": "^0.16.1",
     "@neondatabase/serverless": "^1.0.0",
     "aws4fetch": "^1.0.20",

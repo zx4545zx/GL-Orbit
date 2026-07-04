@@ -9,6 +9,7 @@
 	import { getViewUrl } from './calendar.js';
 	import CalendarWeekHeader from './CalendarWeekHeader.svelte';
 	import CardScheduleBoard from './CardScheduleBoard.svelte';
+	import Picture from '$lib/components/Picture.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 
 	let { data }: { data: PageData } = $props();
@@ -481,9 +482,13 @@
 								<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
 									<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-2 sm:px-3 py-2 sm:py-3 border-r border-lavender/10 align-top w-28 sm:w-32 md:w-44 lg:w-52">
 										<div class="flex flex-col items-center gap-1.5 md:gap-2">
-											<img
+											<Picture
 												src={monthSeriesPosters[seriesName] ?? '/placeholders/poster.svg'}
+												type="posters"
+												sizes="(max-width: 768px) 33vw, 200px"
 												alt=""
+												width={200}
+												height={300}
 												class="w-14 h-20 sm:w-16 sm:h-22 md:w-20 md:h-28 rounded-lg object-cover shadow-md flex-shrink-0 bg-white/50"
 												loading="lazy"
 											/>
@@ -613,9 +618,13 @@
 							{#each selectedEvents as event}
 								<div class="glass-card-strong rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:shadow-lg transition-all">
 									<div class="flex gap-3 sm:gap-4">
-										<img
+										<Picture
 											src={event.posterUrl}
-											alt="{event.series}"
+											type="posters"
+											sizes="4rem"
+											alt={event.series}
+											width={64}
+											height={90}
 											class="w-14 h-20 sm:w-20 sm:h-28 rounded-lg sm:rounded-xl object-cover shadow-sm flex-shrink-0 bg-white/50"
 											loading="lazy"
 										/>
@@ -707,9 +716,13 @@
 						<div class="divide-y divide-lavender/10">
 							{#each day.items as item}
 								<div class="px-4 sm:px-6 py-4 sm:py-5 flex items-center gap-3 sm:gap-5 hover:bg-white/40 transition-colors group">
-									<img
+									<Picture
 										src={item.posterUrl}
-										alt="{item.series}"
+										type="posters"
+										sizes="4rem"
+										alt={item.series}
+										width={64}
+										height={90}
 										class="w-10 h-14 sm:w-12 sm:h-16 rounded-lg object-cover shadow-sm flex-shrink-0 bg-white/50"
 										loading="lazy"
 									/>
