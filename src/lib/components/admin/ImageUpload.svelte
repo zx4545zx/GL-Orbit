@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Picture from '$lib/components/Picture.svelte';
+
 	let {
 		url = $bindable(''),
 		label = 'รูปภาพ',
@@ -159,9 +161,9 @@
 	<span class="block text-sm font-medium text-plum">{label}</span>
 
 	<div class="relative w-full max-w-[160px] {aspectClass} {roundedClass} overflow-hidden bg-lavender/10 border border-lavender/20">
-		{#if url}
-			<img src={url} alt={label} class="w-full h-full object-cover" />
-		{:else}
+			{#if url}
+				<Picture src={url} type={type} sizes="160px" alt={label} class="w-full h-full object-cover" />
+			{:else}
 			<div class="w-full h-full flex flex-col items-center justify-center text-lavender-dark/50 gap-1 p-2">
 				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={placeholderIcon} />
