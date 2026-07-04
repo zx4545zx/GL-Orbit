@@ -6,6 +6,7 @@
 	import { m } from '$lib/i18n/paraglide.js';
 	import { localizedHref } from '$lib/i18n/link.js';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
+	import Picture from '$lib/components/Picture.svelte';
 	import {
 		isPushSupported,
 		getExistingSubscription,
@@ -281,7 +282,7 @@
 							<div class="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full p-1.5 sm:p-2 bg-cream shadow-xl">
 								<div class="w-full h-full rounded-full overflow-hidden bg-cream">
 									{#if profileUser.avatarUrl}
-										<img src={profileUser.avatarUrl} alt="" width={160} height={160} loading="eager" decoding="async" class="w-full h-full object-cover" />
+										<Picture src={profileUser.avatarUrl} type="profiles" sizes="160px" alt="" width={160} height={160} loading="eager" class="w-full h-full object-cover" />
 									{:else}
 										<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-coral/20 to-lavender/20">
 											<span class="text-4xl sm:text-5xl md:text-6xl font-bold text-coral-dark font-[family-name:var(--font-display)]">
@@ -527,7 +528,7 @@
 												<label for="coverUrl" class="block text-sm font-medium text-plum mb-1.5">{m.profile_cover_url()} <span class="text-plum-light font-normal">({m.profile_cover_url_hint()})</span></label>
 												<input id="coverUrl" name="coverUrl" type="url" bind:value={coverUrl} placeholder="https://example.com/cover.jpg" class="w-full px-3 sm:px-4 py-2.5 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target" />
 												{#if coverUrl}
-													<div class="mt-2 rounded-xl overflow-hidden border border-lavender/20 aspect-[3/1]"><img src={coverUrl} alt={m.profile_cover_preview_alt()} class="w-full h-full object-cover" loading="lazy" decoding="async" /></div>
+													<div class="mt-2 rounded-xl overflow-hidden border border-lavender/20 aspect-[3/1]"><Picture src={coverUrl} type="posters" sizes="(max-width: 768px) 100vw, 960px" alt={m.profile_cover_preview_alt()} width={960} height={320} loading="lazy" class="w-full h-full object-cover" /></div>
 												{/if}
 											</div>
 											<button type="submit" disabled={isLoadingProfile} class="w-full py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-60 text-sm sm:text-base touch-target flex items-center justify-center gap-2">

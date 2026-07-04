@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
+	import Picture from '$lib/components/Picture.svelte';
 	import type { SeriesDetail } from '$lib/server/queries/series-detail.js';
 	import { localizeSeries } from '$lib/i18n/series.js';
 	import { languageTag } from '$lib/i18n/paraglide.js';
@@ -116,7 +117,7 @@
 		<div class="flex flex-col gap-4">
 			<div class="flex items-start gap-4">
 				<div class="w-24 shrink-0">
-					<img src={detail.poster} alt={detail.titleEn} width={200} height={300} class="w-full rounded-xl shadow-md" loading="lazy" />
+					<Picture src={detail.poster} type="posters" sizes="(max-width: 768px) 50vw, 320px" alt={detail.titleEn} width={200} height={300} loading="lazy" class="w-full rounded-xl shadow-md" />
 				</div>
 				<div class="min-w-0">
 					<div class="mb-2 flex flex-wrap items-center gap-2">
@@ -179,7 +180,7 @@
 					{#each detail.artists as artist}
 						<a href={`/artists/${artist.id}`} class="glass-card relative overflow-hidden rounded-xl p-2.5 transition hover:-translate-y-1 hover:shadow-md hover:shadow-lavender/20">
 							<div class="flex items-center gap-2.5">
-								<img src={artist.image} alt={artist.name} width={44} height={44} loading="lazy" class="h-10 w-10 shrink-0 rounded-xl border border-white/70 object-cover shadow-sm" />
+								<Picture src={artist.image} type="profiles" sizes="96px" alt={artist.name} width={44} height={44} loading="lazy" class="h-10 w-10 shrink-0 rounded-xl border border-white/70 object-cover shadow-sm" />
 								<div class="min-w-0">
 									<div class="truncate text-sm font-bold text-plum">{artist.name}</div>
 									<div class="truncate text-xs font-medium text-plum-light">{artist.role}</div>
@@ -217,7 +218,7 @@
 									<div class="flex items-center gap-2.5 min-w-0">
 										{#if item.coverUrl}
 											<div class="relative h-10 w-14 shrink-0 overflow-hidden rounded-xl border border-white/70 bg-lavender/10">
-												<img src={item.coverUrl} alt={m.series_episode_cover_alt({ episode: item.episode })} width={112} height={63} loading="lazy" class="h-full w-full object-cover" />
+												<Picture src={item.coverUrl} type="posters" sizes="(max-width: 768px) 50vw, 200px" alt={m.series_episode_cover_alt({ episode: item.episode })} width={112} height={63} loading="lazy" class="h-full w-full object-cover" />
 												<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/70 to-transparent px-1.5 py-0.5">
 													<span class="text-[9px] font-bold text-white">{item.episode}</span>
 												</div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
+import Picture from '$lib/components/Picture.svelte';
 
 	import { page } from '$app/state';	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
 	import WatchedButton from '$lib/components/WatchedButton.svelte';
@@ -221,7 +222,7 @@ import { m } from '$lib/i18n/paraglide.js';
 				<div class="relative mx-auto max-w-xs sm:max-w-none">
 					<div class="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-coral/30 via-lavender/25 to-mint/20 blur-xl"></div>
 					<div class="glass-card group relative overflow-hidden rounded-2xl shadow-2xl shadow-lavender/20 sm:rounded-3xl">
-						<img src={series.poster} alt={series.titleEn} width={400} height={600} class="w-full aspect-[2/3] object-cover transition-transform duration-700 group-hover:scale-105" loading="eager" decoding="async" fetchpriority="high" />
+						<Picture src={series.poster} type="posters" sizes="(max-width: 768px) 100vw, 480px" alt={series.titleEn} width={400} height={600} loading="eager" fetchpriority="high" class="w-full aspect-[2/3] object-cover transition-transform duration-700 group-hover:scale-105" />
 						<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-plum/45 via-transparent to-white/10"></div>
 					</div>
 				</div>
@@ -323,7 +324,7 @@ import { m } from '$lib/i18n/paraglide.js';
 						>
 							<div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-coral/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
 							<div class="relative flex items-center gap-3 sm:gap-4">
-								<img src={artist.image} alt={artist.name} width={56} height={56} loading="lazy" decoding="async" class="h-12 w-12 flex-shrink-0 rounded-2xl border border-white/70 object-cover shadow-sm shadow-lavender/15 transition-transform duration-300 group-hover:rotate-[-2deg] group-hover:scale-105 sm:h-14 sm:w-14" />
+									<Picture src={artist.image} type="profiles" sizes="96px" alt={artist.name} width={56} height={56} loading="lazy" class="h-12 w-12 flex-shrink-0 rounded-2xl border border-white/70 object-cover shadow-sm shadow-lavender/15 transition-transform duration-300 group-hover:rotate-[-2deg] group-hover:scale-105 sm:h-14 sm:w-14" />
 								<div class="min-w-0">
 									<div class="truncate text-sm font-bold text-plum sm:text-base">{artist.name}</div>
 									<div class="text-xs font-medium text-plum-light sm:text-sm">{artist.role}</div>
@@ -374,7 +375,7 @@ import { m } from '$lib/i18n/paraglide.js';
 									<div class="flex items-center gap-3 sm:gap-4 min-w-0">
 										{#if item.coverUrl}
 											<div class="relative h-12 w-16 flex-shrink-0 overflow-hidden rounded-2xl border border-white/70 bg-lavender/10 shadow-sm shadow-lavender/10 sm:h-14 sm:w-20">
-												<img src={item.coverUrl} alt={m.series_episode_cover_alt({ episode: item.episode })} width={160} height={90} loading="lazy" decoding="async" class="h-full w-full object-cover" />
+												<Picture src={item.coverUrl} type="posters" sizes="(max-width: 768px) 50vw, 200px" alt={m.series_episode_cover_alt({ episode: item.episode })} width={160} height={90} loading="lazy" class="h-full w-full object-cover" />
 												<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/70 to-transparent px-2 py-1">
 													<span class="text-[10px] font-bold text-white">EP {item.episode}</span>
 												</div>

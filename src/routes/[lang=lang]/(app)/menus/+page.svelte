@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { availableLanguageTags, type AvailableLanguageTag, m } from '$lib/i18n/paraglide.js';
 	import { localizedHref, switchLanguageHref } from '$lib/i18n/link.js';
+	import Picture from '$lib/components/Picture.svelte';
 
 	const currentUser = $derived(page.data.user);
 	const currentLang = $derived(
@@ -83,7 +84,7 @@
 					<div class="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-coral/16 to-transparent"></div>
 					<div class="relative h-14 w-14 shrink-0 overflow-hidden rounded-[1.15rem] bg-gradient-to-br from-coral/20 to-lavender/25 ring-2 ring-white/80 sm:h-16 sm:w-16">
 						{#if currentUser.avatarUrl}
-							<img src={currentUser.avatarUrl} alt="" class="h-full w-full object-cover" loading="eager" decoding="async" />
+							<Picture src={currentUser.avatarUrl} type="profiles" sizes="96px" alt="" loading="eager" class="h-full w-full object-cover" />
 						{:else}
 							<div class="grid h-full w-full place-items-center">
 								<span class="font-[family-name:var(--font-display)] text-2xl font-black text-coral-dark">

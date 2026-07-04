@@ -1,5 +1,6 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
+import Picture from '$lib/components/Picture.svelte';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
 	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, buildCanonicalUrl, jsonLdScript, localizedPath } from '$lib/seo.js';
@@ -182,7 +183,7 @@ import { m } from '$lib/i18n/paraglide.js';
 				<a href="/{page.data.lang}/artists/{a.id}" class="group">
 					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/20 transition-all duration-500 hover:-translate-y-2 p-4 sm:p-5 text-center">
 						<div class="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-3">
-							<img src={a.profileImageUrl} alt={a.nickname} width={112} height={112} class="w-full h-full rounded-full object-cover bg-gray-100 group-hover:scale-110 transition-transform duration-700 ring-2 ring-lavender/20" loading="lazy" decoding="async" />
+							<Picture src={a.profileImageUrl} type="profiles" sizes="(max-width: 640px) 40vw, 200px" alt={a.nickname} width={112} height={112} class="w-full h-full rounded-full object-cover bg-gray-100 group-hover:scale-110 transition-transform duration-700 ring-2 ring-lavender/20" loading="lazy" />
 						</div>
 						<h3 class="font-semibold text-plum text-sm sm:text-base line-clamp-1">{a.nickname}</h3>
 						{#if a.fullNameEn}<p class="text-xs sm:text-sm text-plum-light line-clamp-1 mt-0.5">{a.fullNameEn}</p>{/if}

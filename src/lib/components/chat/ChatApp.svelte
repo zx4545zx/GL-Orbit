@@ -3,6 +3,7 @@
 	import { m } from '$lib/i18n/paraglide.js';
 	import { page } from '$app/state';	import { replaceState } from '$app/navigation';
 	import ChatMarkdown from '$lib/components/ChatMarkdown.svelte';
+	import Picture from '$lib/components/Picture.svelte';
 	import ChatContextPanel from './ChatContextPanel.svelte';
 	import type { ChatContextPayload } from './ChatContext.js';
 
@@ -285,7 +286,7 @@
 		{#if currentUser}
 			<div class="flex items-center gap-2 border-b border-black/10 px-4 py-3">
 				{#if currentUser.avatarUrl}
-					<img src={currentUser.avatarUrl} alt="" class="h-8 w-8 rounded-full object-cover" />
+					<Picture src={currentUser.avatarUrl} type="profiles" sizes="64px" alt="" width={32} height={32} loading="lazy" class="h-8 w-8 rounded-full object-cover" />
 				{:else}
 					<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-coral/20 to-lavender/25 text-xs font-black text-coral-dark">
 						{(currentUser.displayName || currentUser.username || 'U').charAt(0).toUpperCase()}
