@@ -375,11 +375,11 @@ import Picture from '$lib/components/Picture.svelte';
 					<span class="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-plum-light shadow-lg shadow-lavender/10 backdrop-blur-xl">{series.artists.length} {m.common_people()}</span>
 				</div>
 
-				<div class="flex snap-x gap-3 overflow-x-auto pb-3 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
+				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
 					{#each series.artists as artist}
 						<a
 							href={`/artists/${artist.id}`}
-							class="group relative min-w-[16rem] snap-start overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/65 p-3 shadow-xl shadow-lavender/15 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-coral sm:min-w-0 sm:p-4"
+							class="group relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/65 p-3 shadow-xl shadow-lavender/15 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-coral sm:p-4"
 						>
 							<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,107,157,0.2),transparent_42%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
 							<div class="relative flex items-center gap-3 sm:gap-4">
