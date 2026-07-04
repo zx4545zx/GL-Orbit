@@ -10,8 +10,7 @@
 ## Design Decisions
 
 ### Threshold
-- มือถือ: 4 บรรทัด
-- Desktop (sm ขึ้นไป): 6 บรรทัด
+- ทุก viewport: 4 บรรทัด
 
 ### Behavior
 - ใช้ CSS `-webkit-line-clamp` ตัดข้อความ

@@ -102,7 +102,7 @@ With the new collapsible block:
 	<div class="relative rounded-2xl border border-white/60 bg-white/45 p-4 shadow-sm shadow-lavender/5">
 		<p
 			bind:this={descriptionEl}
-			class="text-sm leading-relaxed text-plum-light sm:text-base {isDescriptionExpanded ? '' : 'line-clamp-4 sm:line-clamp-6'} motion-safe:transition-all motion-safe:duration-300 ease-out"
+			class="text-sm leading-relaxed text-plum-light sm:text-base {isDescriptionExpanded ? '' : 'line-clamp-4'} motion-safe:transition-all motion-safe:duration-300 ease-out"
 		>
 			{description}
 		</p>
@@ -167,7 +167,7 @@ git commit -m "feat: add read-more toggle to series synopsis"
 | Spec Requirement | Task |
 |------------------|------|
 | Modify only Series Detail page | Task 1 |
-| Mobile threshold 4 lines / Desktop 6 lines | Task 1, Step 4 |
+| Threshold always 4 lines | Task 1, Step 4 |
 | CSS line-clamp + ResizeObserver | Task 1, Steps 2–3 |
 | Button only on real overflow | Task 1, Steps 2–3 |
 | Toggle labels `...ดูเพิ่มเติม` / `ย่อ` | Task 1, Step 4 |

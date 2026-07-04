@@ -291,7 +291,7 @@ import Picture from '$lib/components/Picture.svelte';
 					<div class="relative rounded-2xl border border-white/60 bg-white/45 p-4 shadow-sm shadow-lavender/5">
 						<p
 							bind:this={descriptionEl}
-							class="text-sm leading-relaxed text-plum-light sm:text-base {isDescriptionExpanded ? '' : 'line-clamp-4 sm:line-clamp-6'} motion-safe:transition-all motion-safe:duration-300 ease-out"
+							class="text-sm leading-relaxed text-plum-light sm:text-base {isDescriptionExpanded ? '' : 'line-clamp-4'} motion-safe:transition-all motion-safe:duration-300 ease-out"
 						>
 							{description}
 						</p>
