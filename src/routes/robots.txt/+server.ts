@@ -1,13 +1,19 @@
+import { availableLanguageTags } from '$lib/i18n/paraglide.js';
 import type { RequestHandler } from './$types.js';
 
-const privatePaths = [
+const globalPrivatePaths = [
+	'/api/'
+] as const;
+
+const localizedPrivatePaths = [
 	'/admin/',
-	'/api/',
 	'/login',
 	'/register',
 	'/profile',
 	'/notifications'
 ] as const;
+
+const legacyPrivatePaths = localizedPrivatePaths;
 
 const aiCrawlers = [
 	'GPTBot',
@@ -16,14 +22,26 @@ const aiCrawlers = [
 	'ClaudeBot',
 	'anthropic-ai',
 	'Google-Extended',
-	'Bingbot'
+	'Applebot-Extended',
+	'Bytespider',
+	'CCBot'
 ] as const;
+
+function disallowedPaths(): string[] {
+	return [
+		...globalPrivatePaths,
+		...legacyPrivatePaths,
+		...availableLanguageTags.flatMap((lang) =>
+			localizedPrivatePaths.map((path) => `/${lang}${path}`)
+		)
+	];
+}
 
 function crawlerGroup(userAgent: string): string[] {
 	return [
 		`User-agent: ${userAgent}`,
 		'Allow: /',
-		...privatePaths.map((path) => `Disallow: ${path}`),
+		...disallowedPaths().map((path) => `Disallow: ${path}`),
 		''
 	];
 }
@@ -32,7 +50,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	const origin = url.origin;
 	const body = [
 		'# GL-Orbit robots.txt',
-		'# Public discovery pages are crawlable. Admin, API, auth, profile, and notification routes are not crawl targets.',
+		'# Public localized discovery pages are crawlable. Admin, API, auth, profile, and notification routes are not crawl targets.',
 		'',
 		...crawlerGroup('*'),
 		'# AI search and assistant crawlers: allow public pages for citation and discovery.',
