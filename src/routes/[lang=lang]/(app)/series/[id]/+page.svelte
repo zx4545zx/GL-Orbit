@@ -108,6 +108,37 @@ import Picture from '$lib/components/Picture.svelte';
 		}
 	});
 
+	// --- Read-more description state ---
+	let isDescriptionExpanded = $state(false);
+	let descriptionHasOverflow = $state(false);
+	let descriptionEl: HTMLParagraphElement | undefined = $state();
+	const showReadMoreButton = $derived(descriptionHasOverflow || isDescriptionExpanded);
+
+	function measureDescriptionOverflow() {
+		if (!descriptionEl) {
+			descriptionHasOverflow = false;
+			return;
+		}
+		descriptionHasOverflow = descriptionEl.scrollHeight > descriptionEl.clientHeight;
+	}
+
+	$effect(() => {
+		if (!descriptionEl) return;
+
+		measureDescriptionOverflow();
+
+		const observer = new ResizeObserver(() => {
+			if (!isDescriptionExpanded) {
+				measureDescriptionOverflow();
+			}
+		});
+		observer.observe(descriptionEl);
+
+		return () => {
+			observer.disconnect();
+		};
+	});
+
 	function scheduleSummary(item: { schedules: { platform: string; airDate: string }[] }): string {
 		const valid = item.schedules.filter((s) => s.platform !== 'TBA');
 		if (valid.length === 0) return 'TBA';
@@ -257,7 +288,23 @@ import Picture from '$lib/components/Picture.svelte';
 				</div>
 
 				{#if description}
-					<p class="relative rounded-2xl border border-white/60 bg-white/45 p-4 text-sm leading-relaxed text-plum-light shadow-sm shadow-lavender/5 sm:text-base">{description}</p>
+					<div class="relative rounded-2xl border border-white/60 bg-white/45 p-4 shadow-sm shadow-lavender/5">
+						<p
+							bind:this={descriptionEl}
+							class="text-sm leading-relaxed text-plum-light sm:text-base {isDescriptionExpanded ? '' : 'line-clamp-4 sm:line-clamp-6'} motion-safe:transition-all motion-safe:duration-300 ease-out"
+						>
+							{description}
+						</p>
+						{#if showReadMoreButton}
+							<button
+								type="button"
+								onclick={() => (isDescriptionExpanded = !isDescriptionExpanded)}
+								class="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-coral-dark transition-colors hover:text-coral touch-target"
+							>
+								{isDescriptionExpanded ? 'ย่อ' : '...ดูเพิ่มเติม'}
+							</button>
+						{/if}
+					</div>
 				{/if}
 
 				{#if series.genres.length > 0}

@@ -30,7 +30,7 @@ ALTER TABLE "series" ADD COLUMN "description_en" text;
 6. `src/lib/components/admin/SeriesMainSection.svelte` — add two textarea fields
 7. `src/routes/api/admin/series/+server.ts` — accept both fields on create
 8. `src/routes/api/admin/series/[id]/+server.ts` — accept and persist both fields on update
-9. `src/routes/(app)/series/[id]/+page.svelte` — no change needed if `series.description` is populated by the query
+9. `src/routes/[lang=lang]/(app)/series/[id]/+page.svelte` — no change needed if `series.description` is populated by the query
 
 ## Migration Plan
 1. Run `npm run db:generate` to generate the migration.
