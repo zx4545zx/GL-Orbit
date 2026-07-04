@@ -287,13 +287,13 @@ import Picture from '$lib/components/Picture.svelte';
 			<section class="relative z-10 grid gap-6 pb-10 md:grid-cols-[minmax(18rem,0.84fr)_minmax(0,1.35fr)] md:items-end md:gap-10 lg:gap-14">
 				<div class="relative mx-auto w-full max-w-[22rem] md:max-w-none">
 					<div class="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-coral/45 via-lavender/25 to-mint/15 blur-2xl"></div>
-					<div class="group relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/35 shadow-2xl shadow-lavender/25 backdrop-blur-2xl md:rounded-[2.4rem]">
+					<div class="group relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/35 shadow-2xl shadow-lavender/25 backdrop-blur-2xl md:rounded-[2.4rem] mobile-glass mobile-shadow-lg perf-card gpu-layer">
 						<Picture src={series.poster} type="posters" sizes="(max-width: 768px) 88vw, 430px" alt={series.titleEn} width={480} height={720} loading="eager" fetchpriority="high" class="aspect-[2/3] w-full object-cover transition-transform duration-700 group-hover:scale-[1.035]" />
 						<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-white/5"></div>
 
 					</div>
 
-					<div class="relative z-20 -mt-5 rounded-[1.75rem] border border-white/70 bg-white/65 p-2.5 shadow-2xl shadow-lavender/20 backdrop-blur-2xl">
+					<div class="relative z-20 -mt-5 rounded-[1.75rem] border border-white/70 bg-white/65 p-2.5 shadow-2xl shadow-lavender/20 backdrop-blur-2xl mobile-glass mobile-shadow perf-card">
 						<div class="grid grid-cols-2 gap-2">
 							<FavoriteButton seriesId={series.id} className="w-full justify-start bg-white/90 text-plum" />
 							<WatchedButton seriesId={series.id} className="w-full justify-start bg-white/90 text-plum" />
