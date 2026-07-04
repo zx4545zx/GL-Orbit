@@ -291,7 +291,6 @@ import Picture from '$lib/components/Picture.svelte';
 						<Picture src={series.poster} type="posters" sizes="(max-width: 768px) 88vw, 430px" alt={series.titleEn} width={480} height={720} loading="eager" fetchpriority="high" class="aspect-[2/3] w-full object-cover transition-transform duration-700 group-hover:scale-[1.035]" />
 						<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-white/5"></div>
 						<div class="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3">
-							<span class="rounded-full border border-white/20 bg-black/35 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-white/85 backdrop-blur-xl">GL-Orbit</span>
 							{#if s}
 								<span class="rounded-full border border-white/20 bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur-xl">{s.text}</span>
 							{/if}
