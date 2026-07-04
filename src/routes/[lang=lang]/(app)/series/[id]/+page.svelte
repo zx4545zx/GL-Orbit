@@ -55,7 +55,17 @@ import Picture from '$lib/components/Picture.svelte';
 	]));
 
 
-	const coverCandidate = $derived(series?.poster ?? null);
+	const coverCandidate = $derived(series?.coverUrl ?? series?.poster ?? null);
+	const officialGalleryCandidates = $derived(
+		series
+			? series.gallery.map((image, index) => ({
+					src: image.imageUrl,
+					alt: image.caption ?? `${series.titleEn} gallery ${index + 1}`,
+					label: 'Gallery',
+					title: image.caption ?? ''
+				}))
+			: []
+	);
 	const episodeCoverCandidates = $derived(
 		series
 			? series.schedule
@@ -63,12 +73,12 @@ import Picture from '$lib/components/Picture.svelte';
 					.map((item) => ({
 						src: item.coverUrl as string,
 						alt: m.series_episode_cover_alt({ episode: item.episode }),
-						episode: item.episode,
+						label: `EP ${item.episode}`,
 						title: item.title
 					}))
 			: []
 	);
-	const galleryCandidates = $derived(episodeCoverCandidates.slice(0, 7));
+	const galleryCandidates = $derived((officialGalleryCandidates.length > 0 ? officialGalleryCandidates : episodeCoverCandidates).slice(0, 7));
 	const primaryMeta = $derived([
 		{ label: m.common_episodes(), value: series?.episodes ?? null },
 		{ label: m.common_year(), value: series?.year ?? null },
@@ -395,7 +405,7 @@ import Picture from '$lib/components/Picture.svelte';
 			</section>
 		{/if}
 
-		<!-- Scene gallery: forward-compatible with future series.gallery; currently derived from episode covers when available. -->
+		<!-- Scene gallery: uses official series gallery first, then falls back to episode covers. -->
 		{#if galleryCandidates.length >= 3}
 			<section class="relative z-10 mb-10 sm:mb-12">
 				<div class="mb-4 text-center sm:mb-6">
@@ -409,7 +419,7 @@ import Picture from '$lib/components/Picture.svelte';
 							<Picture src={image.src} type="posters" sizes={index === 0 ? '(max-width: 768px) 100vw, 640px' : '(max-width: 768px) 50vw, 360px'} alt={image.alt} width={index === 0 ? 640 : 360} height={index === 0 ? 360 : 203} loading="lazy" class="aspect-video h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
 							<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-75"></div>
 							<figcaption class="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78 sm:bottom-3 sm:left-3 sm:right-3">
-								<span>EP {image.episode}</span>
+								<span>{image.label}</span>
 								<span class="truncate text-right normal-case tracking-normal">{image.title}</span>
 							</figcaption>
 						</figure>
