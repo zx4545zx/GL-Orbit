@@ -168,7 +168,7 @@
 			<div class="rounded-[1.75rem] border border-white/70 bg-white/80 p-4 shadow-2xl shadow-lavender/10 backdrop-blur-xl sm:p-6">
 				{#key data.full.series.id}
 					{#if activeTab === 'main'}
-						<SeriesMainSection series={data.full.series} genres={data.full.genres} reference={data.reference} onrefresh={refresh} />
+						<SeriesMainSection series={data.full.series} genres={data.full.genres} gallery={data.full.gallery} reference={data.reference} onrefresh={refresh} />
 					{:else if activeTab === 'cast'}
 						<SeriesCastSection seriesId={data.full.series.id} cast={data.full.artists} reference={data.reference} onrefresh={refresh} />
 					{:else if activeTab === 'episodes'}

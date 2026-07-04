@@ -26,6 +26,12 @@ export const editorApi = {
 	// ── ข้อมูลหลักของซีรีส์ ──────────────────────────────
 	updateSeries: (id: string, body: Record<string, unknown>) =>
 		req<{ success: boolean }>(`/api/admin/series/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+	addGalleryImage: (seriesId: string, body: { imageUrl: string; caption: string | null }) =>
+		req(`/api/admin/series/${seriesId}/gallery`, { method: 'POST', body: JSON.stringify(body) }),
+	reorderGalleryImages: (seriesId: string, imageIds: string[]) =>
+		req(`/api/admin/series/${seriesId}/gallery`, { method: 'PUT', body: JSON.stringify({ imageIds }) }),
+	removeGalleryImage: (seriesId: string, imageId: string) =>
+		req(`/api/admin/series/${seriesId}/gallery/${imageId}`, { method: 'DELETE' }),
 
 	// ── นักแสดง (cast) ──────────────────────────────────
 	addArtist: (seriesId: string, artistId: string, roleName: string | null) =>
