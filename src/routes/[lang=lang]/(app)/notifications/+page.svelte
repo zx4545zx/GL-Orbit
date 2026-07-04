@@ -73,6 +73,7 @@
 	async function markRead(n: NotificationItem) {
 		const wasUnread = !n.isRead;
 		n.isRead = true;
+		goto(`/series/${n.seriesId}`);
 		try {
 			await fetch('/api/notifications', {
 				method: 'POST',
@@ -82,7 +83,6 @@
 		} catch {
 			// Fail silent — notification will still open
 		}
-		goto(`/series/${n.seriesId}`);
 	}
 
 	async function loadMore() {

@@ -16,7 +16,8 @@ describe('deterministic chat SQL shortcuts', () => {
 		const result = getDeterministicChatSql('ตารางฉายวันนี้มีอะไรบ้าง?');
 
 		expect(result?.intent).toBe('schedule_today');
-		expect(result?.sql).toMatch(/FROM series_schedules ss[\s\S]*s\.status = 'ONGOING'/);
+		expect(result?.sql).toMatch(/s\.status IN \('ONGOING', 'UPCOMING'\)/);
+		expect(result?.sql).not.toMatch(/s\.status\s*=\s*'ENDED'/);
 	});
 
 	it('recognizes tomorrow and this-week schedule questions', () => {

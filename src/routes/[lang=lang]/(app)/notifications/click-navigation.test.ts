@@ -7,7 +7,7 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const notificationsPagePath = resolve(__dirname, '+page.svelte');
 const dropdownPath = resolve(
 	__dirname,
-	'../../../lib/components/NotificationDropdown.svelte'
+	'../../../../lib/components/NotificationDropdown.svelte'
 );
 
 function extractFunctionBody(source: string, fnName: string): string[] {

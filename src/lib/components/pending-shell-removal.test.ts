@@ -4,8 +4,8 @@ import { join } from 'path';
 
 const componentsDir = 'src/lib/components';
 
-describe('PendingShell removal — (app)/+layout.svelte', () => {
-	const content = readFileSync('src/routes/(app)/+layout.svelte', 'utf-8');
+	describe('PendingShell removal — (app)/+layout.svelte', () => {
+	const content = readFileSync('src/routes/[lang=lang]/(app)/+layout.svelte', 'utf-8');
 
 	it('no longer imports any PendingShell components', () => {
 		expect(content).not.toMatch(/PendingShell/);
@@ -27,7 +27,7 @@ describe('PendingShell removal — (app)/+layout.svelte', () => {
 });
 
 describe('PendingShell removal — admin/+layout.svelte', () => {
-	const content = readFileSync('src/routes/admin/+layout.svelte', 'utf-8');
+	const content = readFileSync('src/routes/[lang=lang]/admin/+layout.svelte', 'utf-8');
 
 	it('no longer imports any Admin*PendingShell components', () => {
 		expect(content).not.toMatch(/PendingShell/);
@@ -49,7 +49,7 @@ describe('PendingShell removal — admin/+layout.svelte', () => {
 });
 
 describe('PendingShell removal — calendar/+page.svelte', () => {
-	const content = readFileSync('src/routes/(app)/calendar/+page.svelte', 'utf-8');
+	const content = readFileSync('src/routes/[lang=lang]/(app)/calendar/+page.svelte', 'utf-8');
 
 	it('no longer imports CalendarPendingShell', () => {
 		expect(content).not.toMatch(/CalendarPendingShell/);
