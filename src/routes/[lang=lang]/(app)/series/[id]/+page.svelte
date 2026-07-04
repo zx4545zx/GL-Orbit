@@ -274,9 +274,9 @@ import Picture from '$lib/components/Picture.svelte';
 				<div class="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,107,157,0.22),transparent_34%),radial-gradient(circle_at_74%_28%,rgba(196,181,253,0.24),transparent_38%),linear-gradient(90deg,rgba(255,245,247,0.96),rgba(255,245,247,0.62),rgba(240,230,255,0.94))]"></div>
 			</div>
 		{/if}
-		<div class="pointer-events-none absolute inset-0 noise-overlay opacity-80"></div>
-		<div class="pointer-events-none absolute left-1/2 top-24 h-72 w-72 -translate-x-1/2 rounded-full bg-coral/25 blur-3xl motion-safe:animate-float"></div>
-		<div class="pointer-events-none absolute bottom-24 right-0 h-80 w-80 rounded-full bg-mint/20 blur-3xl motion-safe:animate-float-delayed"></div>
+		<div class="pointer-events-none absolute inset-0 noise-overlay opacity-40 md:opacity-80"></div>
+		<div class="pointer-events-none absolute left-1/2 top-24 h-48 w-48 -translate-x-1/2 rounded-full bg-coral/25 blur-2xl motion-safe:animate-float gpu-layer reduced-motion-orb md:h-72 md:w-72 md:blur-3xl md:opacity-100 opacity-60"></div>
+		<div class="pointer-events-none absolute bottom-24 right-0 h-52 w-52 rounded-full bg-mint/20 blur-2xl motion-safe:animate-float-delayed gpu-layer reduced-motion-orb md:h-80 md:w-80 md:blur-3xl md:opacity-100 opacity-50"></div>
 
 		<div class="relative mx-auto max-w-7xl px-4 pt-5 sm:pt-8 md:px-6">
 			<button onclick={() => history.back()} class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/65 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-lg shadow-lavender/15 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-coral/40 hover:bg-white/85 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
