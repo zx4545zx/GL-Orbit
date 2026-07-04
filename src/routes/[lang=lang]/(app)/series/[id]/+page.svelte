@@ -369,26 +369,50 @@ import Picture from '$lib/components/Picture.svelte';
 			<section class="relative z-10 mb-10 sm:mb-12">
 				<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
 					<div>
-						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark/70">Cast constellation</p>
-						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">{m.common_cast()}</h2>
+						<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-coral-light/70">Cast constellation</p>
+						<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-white sm:text-4xl">{m.common_cast()}</h2>
 					</div>
-					<span class="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl">{series.artists.length} {m.common_people()}</span>
+					<span class="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-white/65 shadow-lg shadow-black/10 backdrop-blur-xl">{series.artists.length} {m.common_people()}</span>
 				</div>
-				<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+
+				<div class="flex snap-x gap-3 overflow-x-auto pb-3 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
 					{#each series.artists as artist}
 						<a
 							href={`/artists/${artist.id}`}
-							class="group glass-card relative overflow-hidden rounded-2xl p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-lavender/20 focus-visible:outline-2 focus-visible:outline-coral sm:p-4"
+							class="group relative min-w-[16rem] snap-start overflow-hidden rounded-[1.5rem] border border-white/12 bg-white/[0.07] p-3 shadow-xl shadow-black/15 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/[0.11] focus-visible:outline-2 focus-visible:outline-coral sm:min-w-0 sm:p-4"
 						>
-							<div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-coral/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+							<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,107,157,0.2),transparent_42%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
 							<div class="relative flex items-center gap-3 sm:gap-4">
-									<Picture src={artist.image} type="profiles" sizes="96px" alt={artist.name} width={56} height={56} loading="lazy" class="h-12 w-12 flex-shrink-0 rounded-2xl border border-white/70 object-cover shadow-sm shadow-lavender/15 transition-transform duration-300 group-hover:rotate-[-2deg] group-hover:scale-105 sm:h-14 sm:w-14" />
+								<Picture src={artist.image} type="profiles" sizes="96px" alt={artist.name} width={64} height={64} loading="lazy" class="h-14 w-14 flex-shrink-0 rounded-2xl border border-white/20 object-cover shadow-lg shadow-black/20 transition-transform duration-300 group-hover:rotate-[-2deg] group-hover:scale-105 sm:h-16 sm:w-16" />
 								<div class="min-w-0">
-									<div class="truncate text-sm font-bold text-plum sm:text-base">{artist.name}</div>
-									<div class="text-xs font-medium text-plum-light sm:text-sm">{artist.role}</div>
+									<div class="truncate text-sm font-extrabold text-white sm:text-base">{artist.name}</div>
+									<div class="mt-1 text-xs font-medium text-white/58 sm:text-sm">{artist.role}</div>
 								</div>
 							</div>
 						</a>
+					{/each}
+				</div>
+			</section>
+		{/if}
+
+		<!-- Scene gallery: forward-compatible with future series.gallery; currently derived from episode covers when available. -->
+		{#if galleryCandidates.length >= 3}
+			<section class="relative z-10 mb-10 sm:mb-12">
+				<div class="mb-4 text-center sm:mb-6">
+					<p class="text-[10px] font-bold uppercase tracking-[0.34em] text-mint-light/65">Scene reel</p>
+					<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-white sm:text-4xl">Gallery</h2>
+				</div>
+
+				<div class="grid grid-cols-2 gap-2 sm:grid-cols-6 sm:gap-3">
+					{#each galleryCandidates as image, index}
+						<figure class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] shadow-xl shadow-black/20 {index === 0 ? 'col-span-2 sm:col-span-3 sm:row-span-2' : 'sm:col-span-3 lg:col-span-2'}">
+							<Picture src={image.src} type="posters" sizes={index === 0 ? '(max-width: 768px) 100vw, 640px' : '(max-width: 768px) 50vw, 360px'} alt={image.alt} width={index === 0 ? 640 : 360} height={index === 0 ? 360 : 203} loading="lazy" class="aspect-video h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+							<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-75"></div>
+							<figcaption class="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78 sm:bottom-3 sm:left-3 sm:right-3">
+								<span>EP {image.episode}</span>
+								<span class="truncate text-right normal-case tracking-normal">{image.title}</span>
+							</figcaption>
+						</figure>
 					{/each}
 				</div>
 			</section>
