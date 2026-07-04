@@ -495,5 +495,7 @@
   "about_keyword_4": "ดูซีรีส์ GL ที่ไหน",
   "about_keyword_5": "Uncut GL",
   "about_howto_name": "วิธีใช้ GL-Orbit เพื่อติดตามซีรีส์ GL",
-  "about_howto_description": "ขั้นตอนเริ่มต้นสำหรับใช้ GL-Orbit เพื่อตรวจตารางฉาย ค้นหาซีรีส์ และกลับมาเช็กข้อมูลล่าสุด"
+  "about_howto_description": "ขั้นตอนเริ่มต้นสำหรับใช้ GL-Orbit เพื่อตรวจตารางฉาย ค้นหาซีรีส์ และกลับมาเช็กข้อมูลล่าสุด",
+  "series_description_read_more": "...ดูเพิ่มเติม",
+  "series_description_collapse": "ย่อ"
 }

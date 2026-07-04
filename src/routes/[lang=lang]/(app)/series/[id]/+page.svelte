@@ -301,7 +301,7 @@ import Picture from '$lib/components/Picture.svelte';
 								onclick={() => (isDescriptionExpanded = !isDescriptionExpanded)}
 								class="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-coral-dark transition-colors hover:text-coral touch-target"
 							>
-								{isDescriptionExpanded ? 'ย่อ' : '...ดูเพิ่มเติม'}
+								{isDescriptionExpanded ? m.series_description_collapse() : m.series_description_read_more()}
 							</button>
 						{/if}
 					</div>

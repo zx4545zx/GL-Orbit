@@ -495,5 +495,7 @@
   "about_keyword_4": "where to watch GL series",
   "about_keyword_5": "Uncut GL",
   "about_howto_name": "How to use GL-Orbit to track GL series",
-  "about_howto_description": "Steps to use GL-Orbit for checking schedules, finding series, and verifying the latest updates"
+  "about_howto_description": "Steps to use GL-Orbit for checking schedules, finding series, and verifying the latest updates",
+  "series_description_read_more": "Read more",
+  "series_description_collapse": "Show less"
 }
