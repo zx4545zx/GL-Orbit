@@ -75,7 +75,7 @@
 
 				<div class="relative h-32 w-24 flex-shrink-0 overflow-hidden rounded-2xl bg-lavender/10 shadow-xl shadow-plum/10 ring-1 ring-white/80 sm:h-40 sm:w-28">
 					{#if heroPoster}
-						<img src={heroPoster} alt={data.full.series.titleEn} class="h-full w-full object-cover" />
+						<img src={heroPoster} alt={data.full.series.titleEn} width={480} height={720} loading="lazy" decoding="async" class="h-full w-full object-cover" />
 					{:else}
 						<div class="flex h-full w-full items-center justify-center text-lavender-dark/50">
 							<svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>
