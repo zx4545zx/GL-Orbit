@@ -1,5 +1,14 @@
 import 'dotenv/config';
 import { AwsClient } from 'aws4fetch';
+import { generateVariants } from './images/sharp.js';
+import {
+	IMAGE_VARIANTS,
+	buildVariantKey,
+	buildVariantUrl,
+	mimeForExt,
+	type ImageExt,
+	type ImageType
+} from '$lib/images/config.js';
 
 const endpoint = process.env.R2_ENDPOINT;
 const accessKeyId = process.env.R2_ACCESS_KEY_ID;
@@ -19,10 +28,6 @@ export class ImageUploadValidationError extends Error {
 		super(message);
 		this.name = 'ImageUploadValidationError';
 	}
-}
-
-export function generateImageKey(type: 'posters' | 'profiles', ext: string): string {
-	return `images/${type}/${crypto.randomUUID()}.${ext}`;
 }
 
 async function detectImage(file: File): Promise<{ mime: string; ext: string } | null> {
@@ -61,9 +66,49 @@ async function detectImage(file: File): Promise<{ mime: string; ext: string } | 
 	return null;
 }
 
+function objectBaseEndpoint(): string {
+	const baseEndpoint = endpoint!.replace(/\/+$/, '');
+	return baseEndpoint.endsWith(`/${bucketName}`)
+		? baseEndpoint
+		: `${baseEndpoint}/${bucketName}`;
+}
+
+/** PUT a single object to R2 with immutable cache headers. Exported for backfill reuse. */
+export async function putObject(key: string, body: Buffer, contentType: string): Promise<void> {
+	if (!endpoint || !bucketName) throw new Error('Cloudflare R2 is not configured');
+
+	const objectUrl = `${objectBaseEndpoint()}/${key}`;
+	// Wrap in a fresh ArrayBuffer-backed Uint8Array so it satisfies DOM `BodyInit`
+	// (node's Buffer<ArrayBufferLike> doesn't match BufferSource under TS 5.8 libs).
+	const bodyView = new Uint8Array(body);
+	const signed = await aws.sign(objectUrl, {
+		method: 'PUT',
+		body: bodyView,
+		headers: {
+			'Content-Type': contentType,
+			'Cache-Control': 'public, max-age=31536000, immutable'
+		}
+	});
+
+	const res = await fetch(signed);
+	if (!res.ok) {
+		const text = await res.text().catch(() => 'Unknown error');
+		throw new Error(`Upload failed: ${res.status} ${text}`);
+	}
+}
+
+/** HEAD an object to check existence (used by backfill for idempotency). */
+export async function objectExists(key: string): Promise<boolean> {
+	if (!endpoint || !bucketName) return false;
+	const objectUrl = `${objectBaseEndpoint()}/${key}`;
+	const signed = await aws.sign(objectUrl, { method: 'HEAD' });
+	const res = await fetch(signed);
+	return res.ok;
+}
+
 export async function uploadImage(
 	file: File,
-	type: 'posters' | 'profiles'
+	type: ImageType
 ): Promise<{ url: string; key: string }> {
 	if (!endpoint || !accessKeyId || !secretAccessKey || !bucketName || !publicUrl) {
 		throw new Error('Cloudflare R2 is not configured');
@@ -79,25 +124,17 @@ export async function uploadImage(
 		throw new ImageUploadValidationError('ไฟล์ต้องมีขนาดไม่เกิน 4 MB');
 	}
 
-	const baseEndpoint = endpoint.replace(/\/+$/, '');
-	const objectBase = baseEndpoint.endsWith(`/${bucketName}`) ? baseEndpoint : `${baseEndpoint}/${bucketName}`;
-	const key = generateImageKey(type, detected.ext);
-	const objectUrl = `${objectBase}/${key}`;
+	const input = Buffer.from(await file.arrayBuffer());
+	const variants = await generateVariants(input, type);
+	const id = crypto.randomUUID();
 
-	const signed = await aws.sign(objectUrl, {
-		method: 'PUT',
-		body: file,
-		headers: {
-			'Content-Type': detected.mime
-		}
-	});
+	// PUT all variants in parallel (variant keys are content-addressed by uuid → immutable)
+	await Promise.all(
+		variants.map((v) => putObject(buildVariantKey(type, id, v.width, v.ext), v.buffer, mimeForExt(v.ext)))
+	);
 
-	const res = await fetch(signed);
-	if (!res.ok) {
-		const text = await res.text().catch(() => 'Unknown error');
-		throw new Error(`Upload failed: ${res.status} ${text}`);
-	}
-
-	const basePublicUrl = publicUrl.replace(/\/$/, '');
-	return { url: `${basePublicUrl}/${key}`, key };
+	const fallback = IMAGE_VARIANTS[type].fallback;
+	const canonicalKey = buildVariantKey(type, id, fallback, 'jpg');
+	const canonicalUrl = buildVariantUrl(publicUrl, type, id, fallback, 'jpg');
+	return { url: canonicalUrl, key: canonicalKey };
 }
