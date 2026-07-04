@@ -258,10 +258,10 @@ import Picture from '$lib/components/Picture.svelte';
 {:else}
 	<div class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[radial-gradient(circle_at_18%_8%,rgba(255,107,157,0.20),transparent_34%),radial-gradient(circle_at_86%_16%,rgba(196,181,253,0.24),transparent_36%),radial-gradient(circle_at_18%_82%,rgba(110,231,183,0.14),transparent_32%),linear-gradient(135deg,#FFF5F7_0%,#F0E6FF_48%,#E8F4FD_100%)] pb-[calc(2rem+var(--bottom-nav-reserved-space))] text-plum md:mb-0 md:-mt-24 md:pb-12 md:pt-24">
 		{#if coverCandidate}
-			<div class="absolute inset-x-0 top-0 h-[42rem] overflow-hidden opacity-70">
+			<div class="absolute inset-0 overflow-hidden opacity-45">
 				<Picture src={coverCandidate} type="posters" sizes="100vw" alt="" width={1080} height={1620} loading="eager" fetchpriority="high" class="h-full w-full scale-110 object-cover blur-2xl" />
-				<div class="absolute inset-0 bg-gradient-to-b from-cream/45 via-cream/82 to-cream"></div>
-				<div class="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,107,157,0.22),transparent_34%),radial-gradient(circle_at_74%_28%,rgba(196,181,253,0.24),transparent_38%),linear-gradient(90deg,rgba(255,245,247,0.96),rgba(255,245,247,0.56),rgba(240,230,255,0.94))]"></div>
+				<div class="absolute inset-0 bg-gradient-to-b from-cream/55 via-cream/78 to-cream/92"></div>
+				<div class="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,107,157,0.22),transparent_34%),radial-gradient(circle_at_74%_28%,rgba(196,181,253,0.24),transparent_38%),linear-gradient(90deg,rgba(255,245,247,0.96),rgba(255,245,247,0.62),rgba(240,230,255,0.94))]"></div>
 			</div>
 		{/if}
 		<div class="pointer-events-none absolute inset-0 noise-overlay opacity-80"></div>
