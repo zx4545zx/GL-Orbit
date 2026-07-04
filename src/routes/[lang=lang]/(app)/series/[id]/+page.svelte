@@ -327,7 +327,7 @@ import Picture from '$lib/components/Picture.svelte';
 					{/if}
 
 					{#if description}
-						<div class="mt-6 max-w-4xl rounded-[1.7rem] border border-white/70 bg-white/70 p-4 shadow-2xl shadow-lavender/15 backdrop-blur-2xl sm:p-5">
+						<div class="mt-6 max-w-4xl rounded-[1.7rem] border border-white/70 bg-white/70 p-4 shadow-2xl shadow-lavender/15 backdrop-blur-2xl sm:p-5 mobile-glass mobile-shadow perf-card">
 							<p
 								bind:this={descriptionEl}
 								class="font-[family-name:var(--font-thai)] text-sm leading-8 text-plum-light sm:text-base sm:leading-9 {isDescriptionExpanded ? '' : 'line-clamp-2'} motion-safe:transition-all motion-safe:duration-300 ease-out"
@@ -344,7 +344,7 @@ import Picture from '$lib/components/Picture.svelte';
 
 					<div class="mt-6 grid grid-cols-3 gap-2 sm:max-w-2xl sm:gap-3">
 						{#each primaryMeta as item}
-							<div class="rounded-2xl border border-white/70 bg-white/65 p-3 text-center shadow-lg shadow-lavender/10 backdrop-blur-xl">
+							<div class="rounded-2xl border border-white/70 bg-white/65 p-3 text-center shadow-lg shadow-lavender/10 backdrop-blur-xl mobile-glass mobile-shadow perf-card">
 								<div class="text-2xl font-black text-coral-dark sm:text-3xl">{item.value}</div>
 								<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light/70 sm:text-xs">{item.label}</div>
 							</div>
@@ -371,7 +371,7 @@ import Picture from '$lib/components/Picture.svelte';
 
 		<!-- Artists -->
 		{#if series.artists.length > 0}
-			<section class="relative z-10 mb-10 sm:mb-12">
+			<section class="relative z-10 mb-10 sm:mb-12 perf-section">
 				<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
 					<div>
 						<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-coral-light/70">Cast constellation</p>
@@ -384,7 +384,7 @@ import Picture from '$lib/components/Picture.svelte';
 					{#each series.artists as artist}
 						<a
 							href={`/artists/${artist.id}`}
-							class="group relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/65 p-3 shadow-xl shadow-lavender/15 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-coral sm:p-4"
+							class="group relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/65 p-3 shadow-xl shadow-lavender/15 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-coral sm:p-4 mobile-glass mobile-shadow perf-card"
 						>
 							<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,107,157,0.2),transparent_42%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
 							<div class="relative flex items-center gap-3 sm:gap-4">
@@ -402,7 +402,7 @@ import Picture from '$lib/components/Picture.svelte';
 
 		<!-- Scene gallery: uses official series gallery first, then falls back to episode covers. -->
 		{#if galleryCandidates.length >= 3}
-			<section class="relative z-10 mb-10 sm:mb-12">
+			<section class="relative z-10 mb-10 sm:mb-12 perf-section">
 				<div class="mb-4 text-center sm:mb-6">
 					<p class="text-[10px] font-bold uppercase tracking-[0.34em] text-mint-dark/70">Scene reel</p>
 					<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-plum sm:text-4xl">Gallery</h2>
@@ -425,7 +425,7 @@ import Picture from '$lib/components/Picture.svelte';
 
 		<!-- Schedule with collapsible rows -->
 		{#if series.schedule.length > 0}
-			<section class="relative z-10">
+			<section class="relative z-10 perf-section">
 				<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
 					<div>
 						<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-lavender-dark/75">Episode orbit</p>
@@ -441,7 +441,7 @@ import Picture from '$lib/components/Picture.svelte';
 						{/if}
 					</button>
 				</div>
-				<div class="overflow-hidden rounded-[2rem] border border-white/70 bg-white/70 shadow-2xl shadow-lavender/15 backdrop-blur-2xl">
+				<div class="overflow-hidden rounded-[2rem] border border-white/70 bg-white/70 shadow-2xl shadow-lavender/15 backdrop-blur-2xl mobile-glass mobile-shadow-lg perf-card">
 					<div class="divide-y divide-lavender/15">
 						{#each series.schedule as item}
 							{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA')}
