@@ -54,6 +54,27 @@ import Picture from '$lib/components/Picture.svelte';
 		])
 	]));
 
+
+	const coverCandidate = $derived(series?.poster ?? null);
+	const episodeCoverCandidates = $derived(
+		series
+			? series.schedule
+					.filter((item) => Boolean(item.coverUrl))
+					.map((item) => ({
+						src: item.coverUrl as string,
+						alt: m.series_episode_cover_alt({ episode: item.episode }),
+						episode: item.episode,
+						title: item.title
+					}))
+			: []
+	);
+	const galleryCandidates = $derived(episodeCoverCandidates.slice(0, 7));
+	const primaryMeta = $derived([
+		{ label: m.common_episodes(), value: series?.episodes ?? null },
+		{ label: m.common_year(), value: series?.year ?? null },
+		{ label: m.common_cast(), value: series?.artists.length ?? null }
+	].filter((item) => item.value !== null));
+
 	// --- Collapsible schedule state ---
 	let expandedEpisodes = $state(new Set<number>());
 	let initializedSeriesId = $state<string | null>(null);
@@ -235,123 +256,113 @@ import Picture from '$lib/components/Picture.svelte';
 		</div>
 	</div>
 {:else}
-	<div class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[radial-gradient(circle_at_15%_8%,rgba(255,107,157,0.14),transparent_34%),radial-gradient(circle_at_88%_18%,rgba(196,181,253,0.20),transparent_32%),radial-gradient(circle_at_10%_78%,rgba(110,231,183,0.12),transparent_30%)] px-4 pb-[calc(1.5rem+var(--bottom-nav-reserved-space))] pt-6 sm:pb-[calc(2rem+var(--bottom-nav-reserved-space))] sm:pt-8 md:mb-0 md:-mt-24 md:pb-8 md:pt-32">
-		<div class="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-coral/15 blur-3xl"></div>
-		<div class="pointer-events-none absolute right-0 top-20 h-64 w-64 rounded-full bg-lavender/20 blur-3xl animate-float"></div>
-		<div class="pointer-events-none absolute bottom-20 left-0 h-56 w-56 rounded-full bg-mint/15 blur-3xl animate-float-delayed"></div>
-		<div class="relative mx-auto max-w-6xl">
-
-		<!-- Back button -->
-		<button onclick={() => history.back()} class="relative z-10 mb-6 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-coral/30 hover:bg-white/80 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
-			<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-			<span>{m.common_back()}</span>
-		</button>
-
-		<!-- Hero -->
-		<div class="relative z-40 mb-10 grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-3 sm:mb-12">
-			<div class="relative z-20 md:col-span-1">
-				<div class="relative mx-auto max-w-xs sm:max-w-none">
-					<div class="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-coral/30 via-lavender/25 to-mint/20 blur-xl"></div>
-					<div class="glass-card group relative overflow-hidden rounded-2xl shadow-2xl shadow-lavender/20 sm:rounded-3xl">
-						<Picture src={series.poster} type="posters" sizes="(max-width: 768px) 100vw, 480px" alt={series.titleEn} width={400} height={600} loading="eager" fetchpriority="high" class="w-full aspect-[2/3] object-cover transition-transform duration-700 group-hover:scale-105" />
-						<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-plum/45 via-transparent to-white/10"></div>
-					</div>
-				</div>
-				<div class="relative z-30 mt-4 overflow-visible rounded-[1.75rem] border border-white/70 bg-white/55 p-2.5 shadow-xl shadow-lavender/15 backdrop-blur-2xl">
-					<div class="pointer-events-none absolute inset-0 rounded-[1.75rem] bg-[radial-gradient(circle_at_20%_0%,rgba(255,107,157,0.16),transparent_42%),radial-gradient(circle_at_90%_95%,rgba(110,231,183,0.18),transparent_38%)]"></div>
-					<div class="relative grid grid-cols-2 gap-2">
-						<FavoriteButton seriesId={series.id} className="w-full justify-start" />
-						<WatchedButton seriesId={series.id} className="w-full justify-start" />
-						<div class="col-span-2">
-							<ShareButton
-								title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`}
-								text={m.series_share_text({ title })}
-								url={canonicalUrl}
-								ariaLabel={m.series_share_aria_label()}
-								variant="command"
-								className="w-full justify-start"
-							/>
-						</div>
-					</div>
-				</div>
+	<div class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[#08070b] pb-[calc(2rem+var(--bottom-nav-reserved-space))] text-white md:mb-0 md:-mt-24 md:pb-12 md:pt-24">
+		{#if coverCandidate}
+			<div class="absolute inset-x-0 top-0 h-[42rem] overflow-hidden opacity-70">
+				<Picture src={coverCandidate} type="posters" sizes="100vw" alt="" width={1080} height={1620} loading="eager" fetchpriority="high" class="h-full w-full scale-110 object-cover blur-2xl" />
+				<div class="absolute inset-0 bg-gradient-to-b from-plum/65 via-[#08070b]/82 to-[#08070b]"></div>
+				<div class="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,107,157,0.32),transparent_34%),radial-gradient(circle_at_74%_28%,rgba(196,181,253,0.24),transparent_38%),linear-gradient(90deg,rgba(8,7,11,0.92),rgba(8,7,11,0.42),rgba(8,7,11,0.9))]"></div>
 			</div>
+		{/if}
+		<div class="pointer-events-none absolute inset-0 noise-overlay opacity-80"></div>
+		<div class="pointer-events-none absolute left-1/2 top-24 h-72 w-72 -translate-x-1/2 rounded-full bg-coral/20 blur-3xl motion-safe:animate-float"></div>
+		<div class="pointer-events-none absolute bottom-24 right-0 h-80 w-80 rounded-full bg-mint/10 blur-3xl motion-safe:animate-float-delayed"></div>
 
-			<div class="glass-card-strong relative z-0 min-w-0 space-y-4 rounded-[2rem] p-5 shadow-2xl shadow-lavender/10 sm:space-y-6 sm:p-7 md:col-span-2">
-				<div class="pointer-events-none absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/50 via-transparent to-lavender/10"></div>
-				<div class="relative">
-					<div class="mb-3 flex flex-wrap items-center gap-2 sm:gap-3">
-						<span class="rounded-full px-3 py-1.5 text-xs font-bold shadow-sm backdrop-blur-md sm:text-sm {s?.bg} {s?.class}">{s?.text}</span>
-						<span class="rounded-full border border-white/70 bg-white/60 px-3 py-1.5 text-xs font-semibold text-plum-light shadow-sm shadow-lavender/5 backdrop-blur-md sm:text-sm">{series.studio}{#if series.year} • {series.year}{/if}</span>
+		<div class="relative mx-auto max-w-7xl px-4 pt-5 sm:pt-8 md:px-6">
+			<button onclick={() => history.back()} class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-2 text-sm font-semibold text-white/80 shadow-lg shadow-black/20 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-coral/40 hover:bg-white/15 hover:text-white sm:mb-8 sm:text-base touch-target">
+				<svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+				<span>{m.common_back()}</span>
+			</button>
+
+			<section class="relative z-10 grid gap-6 pb-10 md:grid-cols-[minmax(18rem,0.84fr)_minmax(0,1.35fr)] md:items-end md:gap-10 lg:gap-14">
+				<div class="relative mx-auto w-full max-w-[22rem] md:max-w-none">
+					<div class="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-coral/45 via-lavender/25 to-mint/15 blur-2xl"></div>
+					<div class="group relative overflow-hidden rounded-[2rem] border border-white/20 bg-white/10 shadow-2xl shadow-black/45 backdrop-blur-2xl md:rounded-[2.4rem]">
+						<Picture src={series.poster} type="posters" sizes="(max-width: 768px) 88vw, 430px" alt={series.titleEn} width={480} height={720} loading="eager" fetchpriority="high" class="aspect-[2/3] w-full object-cover transition-transform duration-700 group-hover:scale-[1.035]" />
+						<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-white/5"></div>
+						<div class="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3">
+							<span class="rounded-full border border-white/20 bg-black/35 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-white/85 backdrop-blur-xl">GL-Orbit</span>
+							{#if s}
+								<span class="rounded-full border border-white/20 bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur-xl">{s.text}</span>
+							{/if}
+						</div>
 					</div>
-					<h1 class="font-[family-name:var(--font-display)] text-3xl font-extrabold leading-tight text-gradient sm:text-4xl md:text-5xl">{series.titleEn}</h1>
-					<p class="mt-2 text-base font-medium text-plum-light sm:text-xl">{series.titleTh}</p>
+
+					<div class="relative z-20 -mt-5 rounded-[1.75rem] border border-white/15 bg-black/35 p-2.5 shadow-2xl shadow-black/30 backdrop-blur-2xl">
+						<div class="grid grid-cols-2 gap-2">
+							<FavoriteButton seriesId={series.id} className="w-full justify-start bg-white/90 text-plum" />
+							<WatchedButton seriesId={series.id} className="w-full justify-start bg-white/90 text-plum" />
+							<div class="col-span-2">
+								<ShareButton
+									title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`}
+									text={m.series_share_text({ title })}
+									url={canonicalUrl}
+									ariaLabel={m.series_share_aria_label()}
+									variant="command"
+									className="w-full justify-start bg-white/90 text-plum"
+								/>
+							</div>
+						</div>
+					</div>
 				</div>
 
-				{#if description}
-					<div class="relative rounded-2xl border border-white/60 bg-white/45 p-4 shadow-sm shadow-lavender/5">
-						<p
-							bind:this={descriptionEl}
-							class="text-sm leading-relaxed text-plum-light sm:text-base {isDescriptionExpanded ? '' : 'line-clamp-2'} motion-safe:transition-all motion-safe:duration-300 ease-out"
-						>
-							{description}
-						</p>
-						{#if showReadMoreButton}
-							<button
-								type="button"
-								onclick={() => (isDescriptionExpanded = !isDescriptionExpanded)}
-								class="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-coral-dark transition-colors hover:text-coral touch-target"
-							>
-								{isDescriptionExpanded ? m.series_description_collapse() : m.series_description_read_more()}
-							</button>
+				<div class="min-w-0 pb-1 md:pb-8">
+					<div class="mb-4 flex flex-wrap items-center gap-2">
+						{#if s}
+							<span class="rounded-full border border-white/15 bg-white/12 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-black/20 backdrop-blur-xl sm:text-sm">{s.text}</span>
 						{/if}
+						<span class="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/75 backdrop-blur-xl sm:text-sm">{series.studio}{#if series.year} • {series.year}{/if}</span>
 					</div>
-				{/if}
 
-				{#if series.genres.length > 0}
-					<div class="rounded-2xl border border-white/70 bg-white/50 p-3 shadow-sm shadow-lavender/10 backdrop-blur-xl">
-						<div class="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-plum-light">
-							<span class="h-2 w-2 rounded-full bg-coral shadow-sm shadow-coral/40"></span>
-							{m.series_genres_label()}
-						</div>
-						<div class="flex flex-wrap gap-2">
-							{#each series.genres as genre}
-								<span class="rounded-full border border-lavender/20 bg-gradient-to-r from-lavender/15 to-coral/10 px-3 py-1.5 text-xs font-semibold text-plum shadow-sm shadow-lavender/5 sm:text-sm">{genre}</span>
-							{/each}
-						</div>
-					</div>
-				{/if}
+					<h1 class="font-[family-name:var(--font-display)] text-[clamp(3rem,8vw,7.5rem)] font-extrabold leading-[0.92] tracking-[-0.07em] text-white drop-shadow-2xl">
+						{series.titleEn}
+					</h1>
+					{#if series.titleTh}
+						<p class="mt-4 max-w-3xl font-[family-name:var(--font-thai)] text-xl font-semibold text-white/82 sm:text-2xl md:text-3xl">{series.titleTh}</p>
+					{/if}
 
-				<div class="relative grid grid-cols-3 gap-2 sm:gap-4">
-					<div class="rounded-2xl border border-coral/15 bg-gradient-to-br from-white/70 to-coral/10 p-3 text-center shadow-sm shadow-coral/10 sm:p-4">
-						<div class="text-2xl font-extrabold text-coral-dark sm:text-3xl">{series.episodes}</div>
-						<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">{m.common_episodes()}</div>
-					</div>
-					{#if series.year}
-						<div class="rounded-2xl border border-lavender/20 bg-gradient-to-br from-white/70 to-lavender/15 p-3 text-center shadow-sm shadow-lavender/10 sm:p-4">
-							<div class="text-2xl font-extrabold text-lavender-dark sm:text-3xl">{series.year}</div>
-							<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">{m.common_year()}</div>
+					{#if description}
+						<div class="mt-6 max-w-4xl rounded-[1.7rem] border border-white/12 bg-white/[0.08] p-4 shadow-2xl shadow-black/20 backdrop-blur-2xl sm:p-5">
+							<p
+								bind:this={descriptionEl}
+								class="font-[family-name:var(--font-thai)] text-sm leading-8 text-white/76 sm:text-base sm:leading-9 {isDescriptionExpanded ? '' : 'line-clamp-2'} motion-safe:transition-all motion-safe:duration-300 ease-out"
+							>
+								{description}
+							</p>
+							{#if showReadMoreButton}
+								<button type="button" onclick={() => (isDescriptionExpanded = !isDescriptionExpanded)} class="mt-3 inline-flex items-center gap-1 rounded-full bg-coral/15 px-3 py-1.5 text-sm font-bold text-coral-light transition-colors hover:bg-coral/25 hover:text-white touch-target">
+									{isDescriptionExpanded ? m.series_description_collapse() : m.series_description_read_more()}
+								</button>
+							{/if}
 						</div>
 					{/if}
-					<div class="rounded-2xl border border-mint/20 bg-gradient-to-br from-white/70 to-mint/10 p-3 text-center shadow-sm shadow-mint/10 sm:p-4">
-						<div class="text-2xl font-extrabold text-mint-dark sm:text-3xl">{series.artists.length}</div>
-						<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light sm:text-xs">{m.common_cast()}</div>
-					</div>
-				</div>
 
-				{#if series.platforms.length > 0}
-					<div class="flex flex-wrap gap-2 sm:gap-3">
-						{#each series.platforms as platform}
-							<span class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl glass-card text-xs sm:text-sm font-medium text-plum flex items-center gap-2 max-w-full min-w-0">
-								{#if platform.logo}
-									<img src={platform.logo} alt={platform.name} width={20} height={20} loading="lazy" decoding="async" class="w-5 h-5 rounded-full object-cover border border-lavender/30 shrink-0" />
-								{/if}
-								<span class="truncate">{platform.name}</span>
-							</span>
+					<div class="mt-6 grid grid-cols-3 gap-2 sm:max-w-2xl sm:gap-3">
+						{#each primaryMeta as item}
+							<div class="rounded-2xl border border-white/12 bg-white/[0.08] p-3 text-center shadow-lg shadow-black/10 backdrop-blur-xl">
+								<div class="text-2xl font-black text-white sm:text-3xl">{item.value}</div>
+								<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/50 sm:text-xs">{item.label}</div>
+							</div>
 						{/each}
 					</div>
-				{/if}
-			</div>
-		</div>
+
+					{#if series.genres.length > 0 || series.platforms.length > 0}
+						<div class="mt-5 flex flex-wrap gap-2">
+							{#each series.genres as genre}
+								<span class="rounded-full border border-coral/25 bg-coral/10 px-3 py-1.5 text-xs font-bold text-coral-light shadow-lg shadow-coral/10 sm:text-sm">{genre}</span>
+							{/each}
+							{#each series.platforms as platform}
+								<span class="inline-flex max-w-full items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/80 backdrop-blur-xl sm:text-sm">
+									{#if platform.logo}
+										<img src={platform.logo} alt={platform.name} width={20} height={20} loading="lazy" decoding="async" class="h-5 w-5 shrink-0 rounded-full border border-white/20 object-cover" />
+									{/if}
+									<span class="truncate">{platform.name}</span>
+								</span>
+							{/each}
+						</div>
+					{/if}
+				</div>
+			</section>
 
 		<!-- Artists -->
 		{#if series.artists.length > 0}
