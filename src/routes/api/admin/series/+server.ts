@@ -71,7 +71,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	const body = await request.json();
-	const { titleEn, titleTh, studioId, posterUrl, status, genreIds, descriptionTh, descriptionEn } = body;
+	const { titleEn, titleTh, studioId, posterUrl, coverUrl, status, genreIds, descriptionTh, descriptionEn } = body;
 
 	if (!titleEn) {
 		return json({ success: false, error: 'กรุณากรอกชื่อซีรีส์ (EN)' }, { status: 400 });
@@ -86,6 +86,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		descriptionEn: descriptionEn ?? null,
 		studioId: studioId ?? null,
 		posterUrl: posterUrl ?? null,
+		coverUrl: coverUrl ?? null,
 		status: status ?? 'UPCOMING'
 	}).returning({
 		id: series.id,
@@ -95,6 +96,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		descriptionEn: series.descriptionEn,
 		studioId: series.studioId,
 		posterUrl: series.posterUrl,
+		coverUrl: series.coverUrl,
 		status: series.status
 	});
 

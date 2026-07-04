@@ -9,6 +9,7 @@ import {
 	episodes,
 	episodeSchedules,
 	seriesSchedules,
+	seriesGalleryImages,
 	platforms
 } from './db/schema.js';
 import type { Db } from './db/index.js';
@@ -111,6 +112,19 @@ export async function getSeriesFull(db: Db, id: string) {
 			}))
 	}));
 
+	const galleryRows = await db
+		.select({
+			id: seriesGalleryImages.id,
+			seriesId: seriesGalleryImages.seriesId,
+			imageUrl: seriesGalleryImages.imageUrl,
+			caption: seriesGalleryImages.caption,
+			sortOrder: seriesGalleryImages.sortOrder,
+			createdAt: seriesGalleryImages.createdAt
+		})
+		.from(seriesGalleryImages)
+		.where(eq(seriesGalleryImages.seriesId, id))
+		.orderBy(asc(seriesGalleryImages.sortOrder), asc(seriesGalleryImages.createdAt));
+
 	// weekly schedules (recurring)
 	const schedRows = await db
 		.select({
@@ -134,12 +148,14 @@ export async function getSeriesFull(db: Db, id: string) {
 			descriptionTh: s.descriptionTh,
 			descriptionEn: s.descriptionEn,
 			posterUrl: s.posterUrl,
+			coverUrl: s.coverUrl,
 			status: s.status,
 			studioId: s.studioId
 		},
 		studio,
 		genres: genreRows,
 		artists: artistRows,
+		gallery: galleryRows,
 		episodes: episodesOut,
 		schedules: schedRows
 	};

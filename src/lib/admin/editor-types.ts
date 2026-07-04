@@ -36,6 +36,7 @@ export interface SeriesCore {
 	descriptionTh: string | null;
 	descriptionEn: string | null;
 	posterUrl: string | null;
+	coverUrl: string | null;
 	status: SeriesStatus;
 	studioId: string | null;
 }
@@ -72,11 +73,21 @@ export interface WeeklySchedule {
 	isUncut: boolean;
 }
 
+export interface SeriesGalleryImage {
+	id: string;
+	seriesId: string;
+	imageUrl: string;
+	caption: string | null;
+	sortOrder: number;
+	createdAt: Date;
+}
+
 export interface SeriesFull {
 	series: SeriesCore;
 	studio: StudioRef | null;
 	genres: GenreRef[];
 	artists: CastMember[];
+	gallery: SeriesGalleryImage[];
 	episodes: Episode[];
 	schedules: WeeklySchedule[];
 }
