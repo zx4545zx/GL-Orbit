@@ -79,8 +79,18 @@ export const series = pgTable('series', {
 	descriptionTh: text('description_th'),
 	descriptionEn: text('description_en'),
 	posterUrl: text('poster_url'),
+	coverUrl: text('cover_url'),
 	status: seriesStatusEnum('status').notNull().default('UPCOMING'),
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
+});
+
+export const seriesGalleryImages = pgTable('series_gallery_images', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
+	imageUrl: text('image_url').notNull(),
+	caption: text('caption'),
+	sortOrder: integer('sort_order').notNull().default(0),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });
 
 export const seriesArtists = pgTable('series_artists', {
