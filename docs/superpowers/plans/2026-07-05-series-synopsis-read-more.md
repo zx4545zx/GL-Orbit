@@ -102,7 +102,7 @@ With the new collapsible block:
 	<div class="relative rounded-2xl border border-white/60 bg-white/45 p-4 shadow-sm shadow-lavender/5">
 		<p
 			bind:this={descriptionEl}
-			class="text-sm leading-relaxed text-plum-light sm:text-base {isDescriptionExpanded ? '' : 'line-clamp-4'} motion-safe:transition-all motion-safe:duration-300 ease-out"
+			class="text-sm leading-relaxed text-plum-light sm:text-base {isDescriptionExpanded ? '' : 'line-clamp-2'} motion-safe:transition-all motion-safe:duration-300 ease-out"
 		>
 			{description}
 		</p>
@@ -139,7 +139,7 @@ Expected: No TypeScript or Svelte errors.
    - Expected: No read-more button is shown.
 
 3. Open a series with a long Thai description (after the bilingual description work is complete).
-   - Expected: On mobile, the description is truncated to 4 lines; on desktop (`sm` and up), it is truncated to 6 lines.
+   - Expected: The description is truncated to 2 lines on all viewports.
    - Expected: The `...ดูเพิ่มเติม` button appears.
    - Click the button: text expands smoothly, button label changes to `ย่อ`.
    - Click again: text returns to the clamped state.
@@ -167,7 +167,7 @@ git commit -m "feat: add read-more toggle to series synopsis"
 | Spec Requirement | Task |
 |------------------|------|
 | Modify only Series Detail page | Task 1 |
-| Threshold always 4 lines | Task 1, Step 4 |
+| Threshold always 2 lines | Task 1, Step 4 |
 | CSS line-clamp + ResizeObserver | Task 1, Steps 2–3 |
 | Button only on real overflow | Task 1, Steps 2–3 |
 | Toggle labels `...ดูเพิ่มเติม` / `ย่อ` | Task 1, Step 4 |

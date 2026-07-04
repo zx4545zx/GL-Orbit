@@ -10,7 +10,7 @@
 ## Design Decisions
 
 ### Threshold
-- ทุก viewport: 4 บรรทัด
+- ทุก viewport: 2 บรรทัด
 
 ### Behavior
 - ใช้ CSS `-webkit-line-clamp` ตัดข้อความ
