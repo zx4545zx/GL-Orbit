@@ -423,88 +423,80 @@ import Picture from '$lib/components/Picture.svelte';
 			<section class="relative z-10">
 				<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
 					<div>
-						<p class="text-[10px] font-bold uppercase tracking-[0.24em] text-lavender-dark/70">Episode orbit</p>
-						<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum sm:text-3xl">{m.common_schedule()}</h2>
+						<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-lavender-light/70">Episode orbit</p>
+						<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-white sm:text-4xl">{m.common_schedule()}</h2>
 					</div>
-					<div class="flex items-center gap-2">
-						<button onclick={toggleAll} class="rounded-full border border-coral/30 bg-coral/5 pl-2 pr-3 py-1 text-xs font-semibold text-coral-dark shadow-sm hover:bg-coral/15 hover:border-coral/50 transition-all duration-200 active:scale-95 touch-target whitespace-nowrap flex items-center gap-1" aria-label={allExpanded ? m.common_collapse_all() : m.common_expand_all()}>
-							{#if allExpanded}
-								<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 15 12 7 20 15"/><line x1="4" y1="19" x2="20" y2="19"/></svg>
-								<span>{m.common_collapse_all()}</span>
-							{:else}
-								<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 9 12 17 20 9"/><line x1="4" y1="5" x2="20" y2="5"/></svg>
-								<span>{m.common_expand_all()}</span>
-							{/if}
-						</button>
-					</div>
+					<button onclick={toggleAll} class="inline-flex items-center gap-1 rounded-full border border-coral/30 bg-coral/10 py-1 pl-2 pr-3 text-xs font-bold text-coral-light shadow-lg shadow-coral/10 transition-all duration-200 hover:border-coral/50 hover:bg-coral/20 active:scale-95 touch-target whitespace-nowrap" aria-label={allExpanded ? m.common_collapse_all() : m.common_expand_all()}>
+						{#if allExpanded}
+							<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 15 12 7 20 15"/><line x1="4" y1="19" x2="20" y2="19"/></svg>
+							<span>{m.common_collapse_all()}</span>
+						{:else}
+							<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 9 12 17 20 9"/><line x1="4" y1="5" x2="20" y2="5"/></svg>
+							<span>{m.common_expand_all()}</span>
+						{/if}
+					</button>
 				</div>
-				<div class="glass-card-strong overflow-hidden rounded-[1.75rem] shadow-xl shadow-lavender/10 sm:rounded-[2rem]">
-					<div class="divide-y divide-lavender/10">
+				<div class="overflow-hidden rounded-[2rem] border border-white/12 bg-white/[0.07] shadow-2xl shadow-black/20 backdrop-blur-2xl">
+					<div class="divide-y divide-white/10">
 						{#each series.schedule as item}
 							{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA')}
 							{@const hasEpisodeMedia = Boolean(item.trailerUrl)}
 							{@const hasEpisodeContent = hasSchedules || hasEpisodeMedia}
 							{@const trailerEmbedUrl = youtubeEmbedUrl(item.trailerUrl)}
-							<div class="transition-all duration-300 {hasEpisodeContent ? 'hover:bg-white/45 cursor-pointer' : ''}"
+							<div class="transition-all duration-300 {hasEpisodeContent ? 'hover:bg-white/[0.08] cursor-pointer' : ''}"
 								role="button"
 								tabindex={hasEpisodeContent ? 0 : undefined}
 								onclick={hasEpisodeContent ? () => toggleEpisode(item.episode) : undefined}
 								onkeydown={hasEpisodeContent ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleEpisode(item.episode); } } : undefined}
 								aria-expanded={hasEpisodeContent ? expandedEpisodes.has(item.episode) : undefined}
 							>
-								<!-- Collapsed row -->
-								<div class="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
-									<div class="flex items-center gap-3 sm:gap-4 min-w-0">
+								<div class="flex items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
+									<div class="flex min-w-0 items-center gap-3 sm:gap-4">
 										{#if item.coverUrl}
-											<div class="relative h-12 w-16 flex-shrink-0 overflow-hidden rounded-2xl border border-white/70 bg-lavender/10 shadow-sm shadow-lavender/10 sm:h-14 sm:w-20">
-												<Picture src={item.coverUrl} type="posters" sizes="(max-width: 768px) 50vw, 200px" alt={m.series_episode_cover_alt({ episode: item.episode })} width={160} height={90} loading="lazy" class="h-full w-full object-cover" />
-												<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/70 to-transparent px-2 py-1">
-													<span class="text-[10px] font-bold text-white">EP {item.episode}</span>
+											<div class="relative h-14 w-24 flex-shrink-0 overflow-hidden rounded-2xl border border-white/12 bg-white/10 shadow-lg shadow-black/20 sm:h-16 sm:w-28">
+												<Picture src={item.coverUrl} type="posters" sizes="(max-width: 768px) 40vw, 220px" alt={m.series_episode_cover_alt({ episode: item.episode })} width={220} height={124} loading="lazy" class="h-full w-full object-cover" />
+												<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1">
+													<span class="text-[10px] font-black text-white">EP {item.episode}</span>
 												</div>
 											</div>
 										{:else}
-											<div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-coral/20 to-lavender/20 shadow-sm shadow-lavender/10 sm:h-12 sm:w-12">
-												<span class="text-xs sm:text-sm font-bold text-coral-dark">{item.episode}</span>
+											<div class="grid h-12 w-12 flex-shrink-0 place-items-center rounded-2xl border border-white/12 bg-white/10 shadow-lg shadow-black/10 sm:h-14 sm:w-14">
+												<span class="text-sm font-black text-coral-light">{item.episode}</span>
 											</div>
 										{/if}
 										<div class="min-w-0">
-											<div class="truncate text-sm font-bold text-plum sm:text-base">{item.title}</div>
-											<div class="mt-0.5 truncate text-xs font-medium text-plum-light sm:text-sm">{scheduleSummary(item)}</div>
+											<div class="truncate text-sm font-extrabold text-white sm:text-base">{item.title}</div>
+											<div class="mt-1 truncate text-xs font-medium text-white/55 sm:text-sm">{scheduleSummary(item)}</div>
 										</div>
 									</div>
-									<div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+									<div class="flex flex-shrink-0 items-center gap-2 sm:gap-3">
 										{#if isToday(item.schedules)}
-											<span class="px-2 py-0.5 rounded-full bg-coral/15 text-coral-dark text-[10px] font-bold border border-coral/20 whitespace-nowrap">{m.common_today()}</span>
+											<span class="rounded-full border border-coral/30 bg-coral/15 px-2 py-0.5 text-[10px] font-bold text-coral-light whitespace-nowrap">{m.common_today()}</span>
 										{/if}
-										<span class="text-xs sm:text-sm font-medium text-coral-dark whitespace-nowrap">{firstAirDate(item)}</span>
+										{#if hasUncut(item.schedules)}
+											<span class="hidden rounded-full border border-amber-300/30 bg-amber-300/15 px-2 py-0.5 text-[10px] font-bold text-amber-100 sm:inline-flex">Uncut</span>
+										{/if}
+										<span class="text-xs font-semibold text-white/65 sm:text-sm whitespace-nowrap">{firstAirDate(item)}</span>
 										{#if hasEpisodeContent}
-											<!-- Chevron icon -->
-											<svg class="w-4 h-4 sm:w-5 sm:h-5 text-plum-light transition-transform duration-200 {expandedEpisodes.has(item.episode) ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<svg class="h-4 w-4 text-white/55 transition-transform duration-200 sm:h-5 sm:w-5 {expandedEpisodes.has(item.episode) ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
 											</svg>
 										{/if}
 									</div>
 								</div>
-								<!-- Expanded sub-list -->
+
 								{#if hasEpisodeContent && expandedEpisodes.has(item.episode)}
-									<div class="px-4 sm:px-6 pb-3 sm:pb-4 space-y-3 animate-fade-in">
+									<div class="space-y-3 px-4 pb-4 sm:px-6 sm:pb-5 animate-fade-in">
 										{#if item.trailerUrl}
 											{#if trailerEmbedUrl}
-												<div class="overflow-hidden rounded-2xl border border-lavender/20 bg-plum/5 shadow-sm shadow-lavender/10">
-													<iframe
-														src={trailerEmbedUrl}
-														title={`Trailer ${item.title}`}
-														class="aspect-video w-full"
-														loading="lazy"
-														allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-														allowfullscreen
-													></iframe>
+												<div class="overflow-hidden rounded-2xl border border-white/12 bg-black/40 shadow-xl shadow-black/20">
+													<iframe src={trailerEmbedUrl} title={`Trailer ${item.title}`} class="aspect-video w-full" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 												</div>
 											{:else}
-												<div class="rounded-2xl border border-lavender/20 bg-gradient-to-br from-white/70 to-lavender/10 p-4 shadow-sm shadow-lavender/10">
-													<p class="text-xs font-bold uppercase tracking-[0.22em] text-lavender-dark/75">Trailer</p>
-													<p class="mt-1 text-sm text-plum-light">{m.series_trailer_external_notice()}</p>
-													<a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 rounded-full bg-plum px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-plum/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-coral-dark touch-target">
+												<div class="rounded-2xl border border-white/12 bg-white/[0.08] p-4 shadow-lg shadow-black/10">
+													<p class="text-xs font-bold uppercase tracking-[0.22em] text-lavender-light/75">Trailer</p>
+													<p class="mt-1 text-sm text-white/65">{m.series_trailer_external_notice()}</p>
+													<a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 rounded-full bg-coral px-4 py-2 text-sm font-bold text-white shadow-lg shadow-coral/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-coral-dark touch-target">
 														เปิด Trailer
 														<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
 													</a>
@@ -514,35 +506,27 @@ import Picture from '$lib/components/Picture.svelte';
 
 										{#each item.schedules as sch}
 											{@const hasStreamLink = sch.streamLink && sch.streamLink.length > 0}
-											<div class="flex items-center justify-between gap-3 py-2 px-3 sm:px-4 rounded-xl bg-white/50">
-												<div class="flex items-center gap-2 sm:gap-3 min-w-0">
+											<div class="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.08] px-3 py-2 sm:px-4">
+												<div class="flex min-w-0 items-center gap-2 sm:gap-3">
 													{#if sch.platformLogo}
-														<img src={sch.platformLogo} alt={sch.platform} width={28} height={28} loading="lazy" decoding="async" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover flex-shrink-0 border border-lavender/30" />
+														<img src={sch.platformLogo} alt={sch.platform} width={28} height={28} loading="lazy" decoding="async" class="h-6 w-6 flex-shrink-0 rounded-full border border-white/20 object-cover sm:h-7 sm:w-7" />
 													{:else}
-														<div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-lavender/20 flex items-center justify-center flex-shrink-0 border border-lavender/30">
-															<span class="text-[10px] font-bold text-lavender-dark">{sch.platform.charAt(0)}</span>
-														</div>
+														<div class="grid h-6 w-6 flex-shrink-0 place-items-center rounded-full border border-white/15 bg-white/10 sm:h-7 sm:w-7"><span class="text-[10px] font-bold text-lavender-light">{sch.platform.charAt(0)}</span></div>
 													{/if}
 													<div class="min-w-0">
 														<div class="flex items-center gap-1.5">
-															<span class="text-sm sm:text-base font-medium text-plum truncate">{sch.platform}</span>
+															<span class="truncate text-sm font-semibold text-white sm:text-base">{sch.platform}</span>
 															{#if sch.isUncut}
-																<span class="flex-shrink-0 px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[9px] font-bold border border-amber-200">Uncut</span>
+																<span class="flex-shrink-0 rounded-md border border-amber-200/25 bg-amber-200/15 px-1.5 py-0.5 text-[9px] font-bold text-amber-100">Uncut</span>
 															{/if}
 														</div>
-														<div class="text-xs text-plum-light">{sch.airDate}</div>
+														<div class="text-xs text-white/50">{sch.airDate}</div>
 													</div>
 												</div>
 												{#if hasStreamLink}
-													<a href={sch.streamLink}
-														target="_blank"
-														rel="noopener noreferrer"
-														class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-coral to-coral-dark hover:from-coral-dark hover:to-coral transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0 touch-target"
-													>
+													<a href={sch.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-coral to-coral-dark px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-coral/20 transition-all duration-200 hover:from-coral-dark hover:to-coral touch-target sm:text-sm">
 														ดูเลย
-														<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-														</svg>
+														<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
 													</a>
 												{/if}
 											</div>
