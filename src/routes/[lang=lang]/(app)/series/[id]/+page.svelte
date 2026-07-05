@@ -55,7 +55,6 @@ import Picture from '$lib/components/Picture.svelte';
 	]));
 
 
-	const coverCandidate = $derived(series?.coverUrl ?? series?.poster ?? null);
 	const officialGalleryCandidates = $derived(
 		series
 			? series.gallery.map((image, index) => ({
@@ -87,6 +86,7 @@ import Picture from '$lib/components/Picture.svelte';
 
 	// --- Collapsible schedule state ---
 	let expandedEpisodes = $state(new Set<number>());
+	let activatedTrailers = $state(new Set<number>());
 	let initializedSeriesId = $state<string | null>(null);
 
 	const episodeHasContent = $derived(
@@ -108,9 +108,9 @@ import Picture from '$lib/components/Picture.svelte';
 
 	function toggleAll() {
 		if (allExpanded) {
-			expandedEpisodes = new Set();
+			expandedEpisodes = new Set<number>();
 		} else {
-			expandedEpisodes = new Set(episodeHasContent);
+			expandedEpisodes = new Set<number>(Array.from(episodeHasContent) as number[]);
 		}
 	}
 
@@ -124,17 +124,16 @@ import Picture from '$lib/components/Picture.svelte';
 		expandedEpisodes = new Set(expandedEpisodes);
 	}
 
+	function activateTrailer(ep: number, event: MouseEvent) {
+		event.stopPropagation();
+		activatedTrailers.add(ep);
+		activatedTrailers = new Set(activatedTrailers);
+	}
+
 	$effect(() => {
 		if (series && initializedSeriesId !== series.id) {
-			const nextExpanded = new Set<number>();
-			for (const item of series.schedule) {
-				const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA');
-				const hasMedia = Boolean(item.trailerUrl);
-				if (hasSchedules || hasMedia) {
-					nextExpanded.add(item.episode);
-				}
-			}
-			expandedEpisodes = nextExpanded;
+			expandedEpisodes = new Set<number>();
+			activatedTrailers = new Set<number>();
 			initializedSeriesId = series.id;
 		}
 	});
@@ -266,17 +265,10 @@ import Picture from '$lib/components/Picture.svelte';
 		</div>
 	</div>
 {:else}
-	<div class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[radial-gradient(circle_at_18%_8%,rgba(255,107,157,0.20),transparent_34%),radial-gradient(circle_at_86%_16%,rgba(196,181,253,0.24),transparent_36%),radial-gradient(circle_at_18%_82%,rgba(110,231,183,0.14),transparent_32%),linear-gradient(135deg,#FFF5F7_0%,#F0E6FF_48%,#E8F4FD_100%)] pb-[calc(2rem+var(--bottom-nav-reserved-space))] text-plum md:mb-0 md:-mt-24 md:pb-12 md:pt-24">
-		{#if coverCandidate}
-			<div class="absolute inset-0 overflow-hidden opacity-45">
-				<Picture src={coverCandidate} type="posters" sizes="100vw" alt="" width={1080} height={1620} loading="eager" fetchpriority="high" class="h-full w-full scale-110 object-cover blur-2xl" />
-				<div class="absolute inset-0 bg-gradient-to-b from-cream/55 via-cream/78 to-cream/92"></div>
-				<div class="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,107,157,0.22),transparent_34%),radial-gradient(circle_at_74%_28%,rgba(196,181,253,0.24),transparent_38%),linear-gradient(90deg,rgba(255,245,247,0.96),rgba(255,245,247,0.62),rgba(240,230,255,0.94))]"></div>
-			</div>
-		{/if}
-		<div class="pointer-events-none absolute inset-0 noise-overlay opacity-40 md:opacity-80"></div>
-		<div class="pointer-events-none absolute left-1/2 top-24 h-48 w-48 -translate-x-1/2 rounded-full bg-coral/25 blur-2xl motion-safe:animate-float gpu-layer reduced-motion-orb md:h-72 md:w-72 md:blur-3xl md:opacity-100 opacity-60"></div>
-		<div class="pointer-events-none absolute bottom-24 right-0 h-52 w-52 rounded-full bg-mint/20 blur-2xl motion-safe:animate-float-delayed gpu-layer reduced-motion-orb md:h-80 md:w-80 md:blur-3xl md:opacity-100 opacity-50"></div>
+	<div class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[linear-gradient(180deg,#FFF5F7_0%,#F7EEFF_42%,#F9FFFC_100%)] pb-[calc(2rem+var(--bottom-nav-reserved-space))] text-plum md:mb-0 md:-mt-24 md:pb-12 md:pt-24">
+		<div class="pointer-events-none absolute left-[-4rem] top-10 h-40 w-40 rounded-full bg-coral/10 blur-2xl md:h-72 md:w-72 md:bg-coral/15"></div>
+		<div class="pointer-events-none absolute right-[-5rem] top-48 h-44 w-44 rounded-full bg-lavender/14 blur-2xl md:h-80 md:w-80 md:bg-lavender/18"></div>
+		<div class="pointer-events-none absolute bottom-24 left-1/4 h-36 w-36 rounded-full bg-mint/10 blur-2xl md:h-72 md:w-72"></div>
 
 		<div class="relative mx-auto max-w-7xl px-4 pt-5 sm:pt-8 md:px-6">
 			<button onclick={() => history.back()} class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/65 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-lg shadow-lavender/15 backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-coral/40 hover:bg-white/85 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
@@ -285,18 +277,18 @@ import Picture from '$lib/components/Picture.svelte';
 			</button>
 
 			<section class="relative z-10 grid gap-6 pb-10 md:grid-cols-[minmax(18rem,0.84fr)_minmax(0,1.35fr)] md:items-end md:gap-10 lg:gap-14">
-				<div class="relative mx-auto w-full max-w-[22rem] md:max-w-none">
-					<div class="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-coral/45 via-lavender/25 to-mint/15 blur-2xl"></div>
-					<div class="group relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/35 shadow-2xl shadow-lavender/25 backdrop-blur-2xl md:rounded-[2.4rem] mobile-glass mobile-shadow-lg perf-card gpu-layer">
-						<Picture src={series.poster} type="posters" sizes="(max-width: 768px) 88vw, 430px" alt={series.titleEn} width={480} height={720} loading="eager" fetchpriority="high" class="aspect-[2/3] w-full object-cover transition-transform duration-700 group-hover:scale-[1.035]" />
-						<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-white/5"></div>
+				<div class="relative mx-auto w-full max-w-[21rem] md:max-w-none">
+					<div class="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-coral/18 via-lavender/16 to-mint/10 blur-xl md:-inset-4 md:blur-2xl"></div>
+					<div class="group relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/72 shadow-[0_18px_48px_-28px_rgba(139,92,246,0.45)] md:rounded-[2.25rem] md:shadow-2xl md:shadow-lavender/20 perf-card">
+						<Picture src={series.poster} type="posters" sizes="(max-width: 768px) 84vw, 430px" alt={series.titleEn} width={480} height={720} loading="eager" fetchpriority="high" class="aspect-[2/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" />
+						<div class="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-plum/42 to-transparent"></div>
 
 					</div>
 
-					<div class="relative z-20 -mt-5 rounded-[1.75rem] border border-white/70 bg-white/65 p-2.5 shadow-2xl shadow-lavender/20 backdrop-blur-2xl mobile-glass mobile-shadow perf-card">
+					<div class="relative z-20 -mt-4 rounded-[1.5rem] border border-white/80 bg-white/86 p-2 shadow-[0_12px_34px_-24px_rgba(139,92,246,0.55)] md:-mt-5 md:rounded-[1.75rem] md:p-2.5">
 						<div class="grid grid-cols-2 gap-2">
-							<FavoriteButton seriesId={series.id} className="w-full justify-start bg-white/90 text-plum" />
-							<WatchedButton seriesId={series.id} className="w-full justify-start bg-white/90 text-plum" />
+							<FavoriteButton seriesId={series.id} className="w-full justify-start bg-white/95 text-plum" />
+							<WatchedButton seriesId={series.id} className="w-full justify-start bg-white/95 text-plum" />
 							<div class="col-span-2">
 								<ShareButton
 									title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`}
@@ -304,7 +296,7 @@ import Picture from '$lib/components/Picture.svelte';
 									url={canonicalUrl}
 									ariaLabel={m.series_share_aria_label()}
 									variant="command"
-									className="w-full justify-start bg-white/90 text-plum"
+									className="w-full justify-start bg-white/95 text-plum"
 								/>
 							</div>
 						</div>
@@ -327,7 +319,7 @@ import Picture from '$lib/components/Picture.svelte';
 					{/if}
 
 					{#if description}
-						<div class="mt-6 max-w-4xl rounded-[1.7rem] border border-white/70 bg-white/70 p-4 shadow-2xl shadow-lavender/15 backdrop-blur-2xl sm:p-5 mobile-glass mobile-shadow perf-card">
+						<div class="mt-6 max-w-4xl rounded-[1.5rem] border border-white/80 bg-white/82 p-4 shadow-[0_14px_38px_-30px_rgba(139,92,246,0.45)] sm:p-5 md:rounded-[1.7rem]">
 							<p
 								bind:this={descriptionEl}
 								class="font-[family-name:var(--font-thai)] text-sm leading-8 text-plum-light sm:text-base sm:leading-9 {isDescriptionExpanded ? '' : 'line-clamp-2'} motion-safe:transition-all motion-safe:duration-300 ease-out"
@@ -344,9 +336,9 @@ import Picture from '$lib/components/Picture.svelte';
 
 					<div class="mt-6 grid grid-cols-3 gap-2 sm:max-w-2xl sm:gap-3">
 						{#each primaryMeta as item}
-							<div class="rounded-2xl border border-white/70 bg-white/65 p-3 text-center shadow-lg shadow-lavender/10 backdrop-blur-xl mobile-glass mobile-shadow perf-card">
+							<div class="rounded-2xl border border-white/80 bg-white/78 p-3 text-center shadow-[0_10px_28px_-24px_rgba(139,92,246,0.45)] perf-card">
 								<div class="text-2xl font-black text-coral-dark sm:text-3xl">{item.value}</div>
-								<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-plum-light/70 sm:text-xs">{item.label}</div>
+								<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-plum-light/65 sm:text-xs">{item.label}</div>
 							</div>
 						{/each}
 					</div>
@@ -380,11 +372,11 @@ import Picture from '$lib/components/Picture.svelte';
 					<span class="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-plum-light shadow-lg shadow-lavender/10 backdrop-blur-xl">{series.artists.length} {m.common_people()}</span>
 				</div>
 
-				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+				<div class="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">
 					{#each series.artists as artist}
 						<a
 							href={`/artists/${artist.id}`}
-							class="group relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/65 p-3 shadow-xl shadow-lavender/15 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-coral sm:p-4 mobile-glass mobile-shadow perf-card"
+							class="group relative min-w-[16rem] snap-start overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/78 p-3 shadow-[0_12px_32px_-26px_rgba(139,92,246,0.5)] transition-colors duration-200 hover:border-coral/30 hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-coral sm:min-w-0 sm:p-4 perf-card"
 						>
 							<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,107,157,0.2),transparent_42%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
 							<div class="relative flex items-center gap-3 sm:gap-4">
@@ -410,8 +402,8 @@ import Picture from '$lib/components/Picture.svelte';
 
 				<div class="grid grid-cols-2 gap-2 sm:grid-cols-6 sm:gap-3">
 					{#each galleryCandidates as image, index}
-						<figure class="group relative overflow-hidden rounded-2xl border border-white/70 bg-white/60 shadow-xl shadow-lavender/15 perf-card {index === 0 ? 'col-span-2 sm:col-span-3 sm:row-span-2' : 'sm:col-span-3 lg:col-span-2'}">
-							<Picture src={image.src} type="posters" sizes={index === 0 ? '(max-width: 768px) 100vw, 640px' : '(max-width: 768px) 50vw, 360px'} alt={image.alt} width={index === 0 ? 640 : 360} height={index === 0 ? 360 : 203} loading="lazy" decoding="async" class="aspect-video h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+						<figure class="group relative overflow-hidden rounded-2xl border border-white/80 bg-white/70 shadow-[0_12px_34px_-28px_rgba(139,92,246,0.5)] perf-card {index === 0 ? 'col-span-2 sm:col-span-3 sm:row-span-2' : 'sm:col-span-3 lg:col-span-2'}">
+							<Picture src={image.src} type="posters" sizes={index === 0 ? '(max-width: 768px) 92vw, 640px' : '(max-width: 768px) 46vw, 360px'} alt={image.alt} width={index === 0 ? 640 : 360} height={index === 0 ? 360 : 203} loading="lazy" decoding="async" class="aspect-video h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
 							<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-75"></div>
 							<figcaption class="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78 sm:bottom-3 sm:left-3 sm:right-3">
 								<span>{image.label}</span>
@@ -441,14 +433,14 @@ import Picture from '$lib/components/Picture.svelte';
 						{/if}
 					</button>
 				</div>
-				<div class="overflow-hidden rounded-[2rem] border border-white/70 bg-white/70 shadow-2xl shadow-lavender/15 backdrop-blur-2xl mobile-glass mobile-shadow-lg perf-card">
+				<div class="overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/80 shadow-[0_16px_42px_-30px_rgba(139,92,246,0.5)] md:rounded-[2rem] perf-card">
 					<div class="divide-y divide-lavender/15">
 						{#each series.schedule as item}
 							{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA')}
 							{@const hasEpisodeMedia = Boolean(item.trailerUrl)}
 							{@const hasEpisodeContent = hasSchedules || hasEpisodeMedia}
 							{@const trailerEmbedUrl = youtubeEmbedUrl(item.trailerUrl)}
-							<div class="transition-all duration-300 {hasEpisodeContent ? 'hover:bg-white/70 cursor-pointer' : ''}"
+							<div class="transition-colors duration-200 {hasEpisodeContent ? 'hover:bg-white/75 cursor-pointer' : ''}"
 								role="button"
 								tabindex={hasEpisodeContent ? 0 : undefined}
 								onclick={hasEpisodeContent ? () => toggleEpisode(item.episode) : undefined}
@@ -494,14 +486,24 @@ import Picture from '$lib/components/Picture.svelte';
 									<div class="space-y-3 px-4 pb-4 sm:px-6 sm:pb-5 animate-fade-in">
 										{#if item.trailerUrl}
 											{#if trailerEmbedUrl}
-												<div class="overflow-hidden rounded-2xl border border-white/12 bg-black/40 shadow-xl shadow-black/20">
-													<iframe src={trailerEmbedUrl} title={`Trailer ${item.title}`} class="aspect-video w-full" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-												</div>
+												{#if activatedTrailers.has(item.episode)}
+													<div class="overflow-hidden rounded-2xl border border-white/70 bg-plum/90 shadow-[0_18px_44px_-28px_rgba(45,27,46,0.55)]">
+														<iframe src={trailerEmbedUrl} title={`Trailer ${item.title}`} class="aspect-video w-full" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+													</div>
+												{:else}
+													<button type="button" onclick={(event) => activateTrailer(item.episode, event)} class="flex w-full items-center justify-between gap-3 rounded-2xl border border-coral/15 bg-coral/8 px-4 py-3 text-left shadow-[0_10px_28px_-24px_rgba(255,107,157,0.55)] transition-colors hover:bg-coral/12 touch-target">
+														<span>
+															<span class="block text-xs font-bold uppercase tracking-[0.18em] text-coral-dark">Trailer</span>
+															<span class="mt-1 block text-sm font-semibold text-plum">แตะเพื่อโหลดวิดีโอ</span>
+														</span>
+														<svg class="h-5 w-5 flex-shrink-0 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-5.197-3.03A1 1 0 008 9.002v5.996a1 1 0 001.555.832l5.197-2.966a1 1 0 000-1.696z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+													</button>
+												{/if}
 											{:else}
-												<div class="rounded-2xl border border-white/70 bg-white/65 p-4 shadow-lg shadow-lavender/10">
+												<div class="rounded-2xl border border-white/80 bg-white/72 p-4 shadow-[0_10px_28px_-24px_rgba(139,92,246,0.45)]">
 													<p class="text-xs font-bold uppercase tracking-[0.22em] text-lavender-dark/75">Trailer</p>
 													<p class="mt-1 text-sm text-plum-light">{m.series_trailer_external_notice()}</p>
-													<a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 rounded-full bg-coral px-4 py-2 text-sm font-bold text-white shadow-lg shadow-coral/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-coral-dark touch-target">
+													<a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 rounded-full bg-coral px-4 py-2 text-sm font-bold text-white shadow-[0_12px_28px_-18px_rgba(255,107,157,0.7)] transition-colors hover:bg-coral-dark touch-target">
 														{m.series_trailer_open()}
 														<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
 													</a>

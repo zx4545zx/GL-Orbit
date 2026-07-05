@@ -167,6 +167,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+@media (max-width: 767px) {
+  body {
+    background-attachment: scroll;
+  }
+}
+
 /* Fluid typography utilities */
 .text-fluid-xs { font-size: var(--text-fluid-xs); }
 .text-fluid-sm { font-size: var(--text-fluid-sm); }
