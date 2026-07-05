@@ -376,11 +376,11 @@ import Picture from '$lib/components/Picture.svelte';
 					<span class="rounded-full border border-white/50 bg-white/50 px-3 py-1 text-xs font-semibold text-plum-light">{series.artists.length} {m.common_people()}</span>
 				</div>
 
-				<div class="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">
+				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
 					{#each series.artists as artist}
 						<a
 							href={`/artists/${artist.id}`}
-							class="relative min-w-[16rem] snap-start overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/78 p-3 hover:border-coral/30 hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-coral sm:min-w-0 sm:p-4 perf-card"
+							class="relative overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/78 p-3 hover:border-coral/30 hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-coral sm:p-4 perf-card"
 						>
 							<div class="relative flex items-center gap-3 sm:gap-4">
 								<Picture src={artist.image} type="profiles" sizes="96px" alt={artist.name} width={64} height={64} loading="lazy" class="h-14 w-14 flex-shrink-0 rounded-2xl border border-white/70 object-cover sm:h-16 sm:w-16" />
