@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { adminFetch } from '$lib/admin/action-feedback.js';
+	import ImageUpload from '$lib/components/admin/ImageUpload.svelte';
 
 	type AdminShip = {
 		id: string;
@@ -184,9 +185,9 @@
 					</select>
 				</label>
 			</div>
-			<label class="block text-sm font-medium text-gray-700">รูปภาพ
-				<input bind:value={form.imageUrl} class="mt-1 w-full rounded-xl border-gray-200 px-3 py-2 shadow-sm" placeholder="https://..." />
-			</label>
+			<div class="rounded-2xl border border-gray-100 bg-gray-50/60 p-4">
+				<ImageUpload bind:url={form.imageUrl} type="posters" label="รูปภาพ Ship" />
+			</div>
 			<label class="block text-sm font-medium text-gray-700">คำอธิบาย
 				<textarea bind:value={form.description} rows="4" class="mt-1 w-full rounded-xl border-gray-200 px-3 py-2 shadow-sm"></textarea>
 			</label>
