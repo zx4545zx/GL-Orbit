@@ -144,26 +144,22 @@
 			</div>
 
 			{#if data.ship.series.length > 0}
-				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 					{#each data.ship.series as item}
 						{@const status = statusConfig[item.status]}
-						<a href="/{page.data.lang}/series/{item.id}" class="group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/76 p-3 shadow-lg shadow-lavender/10 transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/92 hover:shadow-2xl hover:shadow-coral/10 focus-visible:outline-2 focus-visible:outline-coral">
-							<div class="relative overflow-hidden rounded-[1.35rem] bg-lavender/10">
-								<Picture src={item.posterUrl} type="posters" sizes="(max-width: 640px) 88vw, (max-width: 1024px) 44vw, 300px" alt={item.title} width={300} height={450} loading="lazy" class="aspect-[2/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.035]" />
-								<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/75 to-transparent px-3 pb-3 pt-10">
-									<span class="rounded-full border px-2.5 py-1 text-[10px] font-bold backdrop-blur-md {status.border} {status.bg} {status.class}">{status.text}</span>
+						<a href="/{page.data.lang}/series/{item.id}" class="group block overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/72 p-2 shadow-lg shadow-lavender/10 transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/92 hover:shadow-2xl hover:shadow-coral/10 focus-visible:outline-2 focus-visible:outline-coral">
+							<div class="relative overflow-hidden rounded-[1.45rem] bg-lavender/10">
+								<Picture src={item.posterUrl} type="posters" sizes="(max-width: 640px) 88vw, (max-width: 1024px) 44vw, 24vw" alt={item.title} width={360} height={540} loading="lazy" class="aspect-[2/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
+								<div class="absolute left-3 top-3">
+									<span class="rounded-full border px-2.5 py-1 text-[10px] font-bold shadow-sm backdrop-blur-md {status.border} {status.bg} {status.class}">{status.text}</span>
 								</div>
-							</div>
-							<div class="flex min-w-0 flex-1 flex-col p-1 pt-4">
-								<p class="mb-2 text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark">Orbit work</p>
-								<h3 class="text-xl font-black leading-tight text-plum">{item.title}</h3>
-								{#if item.titleTh}
-									<p class="mt-2 text-sm font-medium leading-6 text-plum-light">{item.titleTh}</p>
-								{/if}
-								<p class="mt-auto inline-flex items-center gap-2 pt-4 text-xs font-black text-coral-dark">
-									เปิดหน้าซีรีส์
-									<svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-								</p>
+								<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/88 via-plum/42 to-transparent px-4 pb-4 pt-20 text-white">
+									<p class="mb-1 text-[9px] font-black uppercase tracking-[0.22em] text-white/70">Orbit work</p>
+									<h3 class="text-lg font-black leading-tight drop-shadow-sm">{item.title}</h3>
+									{#if item.titleTh}
+										<p class="mt-1 line-clamp-1 text-xs font-semibold text-white/78">{item.titleTh}</p>
+									{/if}
+								</div>
 							</div>
 						</a>
 					{/each}
