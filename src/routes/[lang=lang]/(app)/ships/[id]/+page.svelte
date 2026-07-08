@@ -117,7 +117,9 @@
 				<div class="relative mx-auto grid h-24 w-24 place-items-center rounded-full border border-white/80 bg-[radial-gradient(circle,rgba(255,255,255,0.95),rgba(196,181,253,0.18))] shadow-xl shadow-lavender/15">
 					<div class="absolute h-16 w-16 rounded-full border border-coral/20"></div>
 					<div class="absolute h-10 w-10 rounded-full border border-mint/25"></div>
-					<span class="font-[family-name:var(--font-display)] text-4xl font-black text-coral-dark">×</span>
+					<svg class="relative h-9 w-9 text-coral-dark drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+						<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08A6.01 6.01 0 0 1 16.5 3C19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+					</svg>
 				</div>
 
 				<a href="/{page.data.lang}/artists/{data.ship.artist2.id}" class="group relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/78 p-4 shadow-sm shadow-lavender/10 transition-all duration-300 hover:-translate-y-1 hover:border-lavender/30 hover:bg-white/92 focus-visible:outline-2 focus-visible:outline-coral sm:p-5">
