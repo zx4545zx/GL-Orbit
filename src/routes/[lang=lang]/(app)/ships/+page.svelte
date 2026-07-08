@@ -139,7 +139,7 @@
 	{/if}
 
 	{#if allShips.length > 0}
-		<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+		<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
 			{#each allShips as ship (ship.id)}
 				<a href="/{page.data.lang}/ships/{ship.slug}" class="glass-card group overflow-hidden rounded-[1.75rem] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
 					<div class="aspect-[4/3] overflow-hidden bg-lavender/10">

@@ -10,7 +10,7 @@
 
 	let { data }: { data: PageData } = $props();
 	let extraShips = $state<ShipListItem[]>([]);
-	let searchQuery = $state(data.filters.search);
+	let searchQuery = $state('');
 	let loading = $state(false);
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
@@ -103,7 +103,7 @@
 	{#if loading}<p class="text-center text-plum-light">{m.common_loading()}</p>{/if}
 
 	{#if allShips.length > 0}
-		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 			{#each allShips as ship (ship.id)}
 				<a href="/{page.data.lang}/ships/{ship.slug}" class="glass-card overflow-hidden rounded-[1.5rem] transition hover:-translate-y-1 hover:shadow-lg">
 					<Picture src={ship.imageUrl} type="posters" alt={ship.name} class="aspect-[4/3] w-full object-cover" />
