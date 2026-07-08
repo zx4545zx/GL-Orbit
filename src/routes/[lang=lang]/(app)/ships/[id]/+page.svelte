@@ -9,11 +9,6 @@
 	let { data }: { data: PageData } = $props();
 	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
 	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, data.seo.canonicalPath));
-	const shipMeta = $derived([
-		{ label: 'ศิลปินในคู่นี้', value: '2 คน' },
-		{ label: 'ผลงานในจักรวาล', value: `${data.ship.series.length} เรื่อง` },
-		{ label: 'แฮชแท็กแฟนด้อม', value: data.ship.hashtags.length > 0 ? `${data.ship.hashtags.length} แท็ก` : 'รออัปเดต' }
-	]);
 	const statusConfig: Record<string, { text: string; class: string; bg: string; border: string }> = {
 		UPCOMING: { text: m.status_upcoming(), class: 'text-lavender-dark', bg: 'bg-lavender/10', border: 'border-lavender/25' },
 		ONGOING: { text: m.status_ongoing(), class: 'text-mint-dark', bg: 'bg-mint/15', border: 'border-mint/25' },
@@ -47,35 +42,16 @@
 
 				<div class="relative flex min-h-full flex-col justify-between gap-8">
 					<div>
-						<div class="mb-5 flex flex-wrap items-center gap-2">
-							<span class="rounded-full border border-coral/25 bg-coral/10 px-3 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-coral-dark">Ship orbit</span>
-							{#if data.ship.isFeatured}
-								<span class="rounded-full border border-mint/25 bg-mint/15 px-3 py-1.5 text-xs font-bold text-mint-dark">Featured</span>
-							{/if}
-							<span class="rounded-full border border-white/70 bg-white/76 px-3 py-1.5 text-xs font-semibold text-plum-light">{data.ship.series.length} ผลงานร่วมกัน</span>
-						</div>
-
-						<p class="mb-3 font-[family-name:var(--font-thai)] text-base font-semibold text-plum-light sm:text-lg">{data.ship.artist1.name} × {data.ship.artist2.name}</p>
+						<p class="mb-3 font-[family-name:var(--font-thai)] text-base font-semibold text-coral-dark sm:text-lg">{data.ship.artist1.name} × {data.ship.artist2.name}</p>
 						<h1 class="max-w-4xl break-words font-[family-name:var(--font-display)] text-[clamp(2.75rem,8vw,7rem)] font-black leading-[0.86] tracking-[-0.07em] text-plum [overflow-wrap:anywhere]">
 							{data.ship.name}
 						</h1>
 					</div>
 
-					<div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_17rem] xl:items-end">
-						<div class="rounded-[1.6rem] border border-white/80 bg-white/76 p-4 backdrop-blur-xl sm:p-5">
-							<p class="font-[family-name:var(--font-thai)] text-sm leading-8 text-plum-light sm:text-base sm:leading-9">
-								{data.ship.description || 'ยังไม่มีคำบรรยายสำหรับคู่นี้ แต่เรื่องราวยังคงถูกต่อเติมผ่านทุกผลงานที่เชื่อมโยงกัน'}
-							</p>
-						</div>
-
-						<div class="grid grid-cols-3 gap-2 xl:grid-cols-1">
-							{#each shipMeta as item}
-								<div class="rounded-2xl border border-white/80 bg-white/72 p-3 text-center shadow-sm shadow-lavender/10 xl:text-left">
-									<div class="font-[family-name:var(--font-display)] text-2xl font-black text-coral-dark sm:text-3xl">{item.value}</div>
-									<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-plum-light/65 sm:text-xs">{item.label}</div>
-								</div>
-							{/each}
-						</div>
+					<div class="max-w-3xl rounded-[1.6rem] border border-white/80 bg-white/76 p-4 backdrop-blur-xl sm:p-5">
+						<p class="font-[family-name:var(--font-thai)] text-sm leading-8 text-plum-light sm:text-base sm:leading-9">
+							{data.ship.description || 'ยังไม่มีคำบรรยายสำหรับคู่นี้ แต่เรื่องราวยังคงถูกต่อเติมผ่านทุกผลงานที่เชื่อมโยงกัน'}
+						</p>
 					</div>
 
 					{#if data.ship.hashtags.length > 0}
