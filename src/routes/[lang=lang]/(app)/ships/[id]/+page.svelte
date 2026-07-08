@@ -9,13 +9,10 @@
 	let { data }: { data: PageData } = $props();
 	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
 	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, data.seo.canonicalPath));
-	const startedYear = $derived(
-		data.ship.startedAt ? new Date(data.ship.startedAt).getFullYear() : null
-	);
 	const shipMeta = $derived([
-		{ label: 'ผลงานร่วมกัน', value: data.ship.series.length || '—' },
-		{ label: 'สถานะ', value: data.ship.isFeatured ? 'Featured' : 'Ship' },
-		{ label: 'เริ่มโคจร', value: startedYear ?? '—' }
+		{ label: 'ศิลปินในคู่นี้', value: '2 คน' },
+		{ label: 'ผลงานในจักรวาล', value: `${data.ship.series.length} เรื่อง` },
+		{ label: 'แฮชแท็กแฟนด้อม', value: data.ship.hashtags.length > 0 ? `${data.ship.hashtags.length} แท็ก` : 'รออัปเดต' }
 	]);
 	const statusConfig: Record<string, { text: string; class: string; bg: string; border: string }> = {
 		UPCOMING: { text: m.status_upcoming(), class: 'text-lavender-dark', bg: 'bg-lavender/10', border: 'border-lavender/25' },
