@@ -48,6 +48,12 @@
 		expandedEpisodes = new Set(expandedEpisodes);
 	}
 
+	function handleEpisodeKeydown(event: KeyboardEvent, ep: number, enabled: boolean) {
+		if (!enabled || (event.key !== 'Enter' && event.key !== ' ')) return;
+		event.preventDefault();
+		toggleEpisode(ep);
+	}
+
 	$effect(() => {
 		if (initializedId !== detail.id) {
 			const next = new Set<number>();
@@ -212,6 +218,7 @@
 								role="button"
 								tabindex={hasEpisodeContent ? 0 : undefined}
 								onclick={hasEpisodeContent ? () => toggleEpisode(item.episode) : undefined}
+								onkeydown={(event) => handleEpisodeKeydown(event, item.episode, hasEpisodeContent)}
 								aria-expanded={hasEpisodeContent ? expandedEpisodes.has(item.episode) : undefined}
 							>
 								<div class="flex items-center justify-between px-3 py-2.5">
