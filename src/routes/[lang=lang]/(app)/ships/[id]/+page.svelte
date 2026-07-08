@@ -31,132 +31,174 @@
 	{@html jsonLdScript(data.seo.jsonLd)}
 </svelte:head>
 
-<article class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden pb-[calc(2rem+var(--bottom-nav-reserved-space))] text-plum md:mb-0 md:-mt-24 md:pb-12 md:pt-24">
+<article class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[radial-gradient(circle_at_12%_10%,rgba(255,107,157,0.18),transparent_28%),radial-gradient(circle_at_88%_8%,rgba(196,181,253,0.22),transparent_30%),radial-gradient(circle_at_50%_86%,rgba(110,231,183,0.12),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,245,247,0.92))] pb-[calc(2.5rem+var(--bottom-nav-reserved-space))] text-plum md:mb-0 md:-mt-24 md:pb-14 md:pt-24">
+	<div class="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(45,27,46,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(45,27,46,0.035)_1px,transparent_1px)] bg-[size:4.5rem_4.5rem] opacity-45"></div>
+	<div class="pointer-events-none absolute -right-24 top-20 h-72 w-72 rounded-full bg-lavender/18 blur-3xl"></div>
+	<div class="pointer-events-none absolute -left-20 bottom-16 h-64 w-64 rounded-full bg-coral/12 blur-3xl"></div>
+
 	<div class="relative mx-auto max-w-7xl px-4 pt-5 sm:pt-8 md:px-6">
-		<button onclick={() => history.back()} class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/75 px-3.5 py-2 text-sm font-semibold text-plum-light hover:border-coral/40 hover:bg-white/90 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
+		<button onclick={() => history.back()} class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/75 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl transition-all duration-300 hover:-translate-x-0.5 hover:border-coral/40 hover:bg-white/90 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
 			<svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
 			<span>{m.common_back()}</span>
 		</button>
 
-		<section class="relative z-10 grid gap-6 pb-10 md:grid-cols-[minmax(18rem,0.84fr)_minmax(0,1.35fr)] md:items-stretch md:gap-10 lg:gap-14">
-			<div class="relative mx-auto w-full max-w-[21rem] md:max-w-none">
-				<div class="relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/72 md:rounded-[2.25rem] perf-card">
-					<Picture src={data.ship.imageUrl} type="posters" sizes="(max-width: 768px) 84vw, 430px" alt={data.ship.name} width={480} height={720} loading="eager" fetchpriority="high" class="aspect-[2/3] w-full object-cover" />
-				</div>
-			</div>
+		<section class="relative z-10 mb-10 grid gap-5 lg:grid-cols-[minmax(0,1.04fr)_minmax(19rem,0.96fr)] lg:items-stretch lg:gap-8">
+			<div class="glass-card-strong relative overflow-hidden rounded-[2rem] border border-white/80 p-5 shadow-2xl shadow-lavender/10 sm:p-7 lg:p-9">
+				<div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full border border-coral/20"></div>
+				<div class="pointer-events-none absolute bottom-8 right-12 h-24 w-24 rounded-full border border-mint/25"></div>
+				<div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-coral via-lavender to-mint"></div>
 
-			<div class="relative min-w-0 pb-1 md:overflow-hidden">
-				<div class="md:absolute md:inset-0 md:flex md:flex-col md:overflow-hidden">
-					<div class="flex-shrink-0">
-						<div class="mb-4 flex flex-wrap items-center gap-2">
-							<span class="rounded-full border border-coral/25 bg-coral/10 px-3 py-1.5 text-xs font-bold text-coral-dark sm:text-sm">Ship</span>
+				<div class="relative flex min-h-full flex-col justify-between gap-8">
+					<div>
+						<div class="mb-5 flex flex-wrap items-center gap-2">
+							<span class="rounded-full border border-coral/25 bg-coral/10 px-3 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-coral-dark">Ship orbit</span>
 							{#if data.ship.isFeatured}
-								<span class="rounded-full border border-mint/25 bg-mint/15 px-3 py-1.5 text-xs font-bold text-mint-dark sm:text-sm">Featured</span>
+								<span class="rounded-full border border-mint/25 bg-mint/15 px-3 py-1.5 text-xs font-bold text-mint-dark">Featured</span>
 							{/if}
-							<span class="rounded-full border border-white/70 bg-white/75 px-3 py-1.5 text-xs font-semibold text-plum-light sm:text-sm">{data.ship.artist1.name} × {data.ship.artist2.name}</span>
+							<span class="rounded-full border border-white/70 bg-white/76 px-3 py-1.5 text-xs font-semibold text-plum-light">{data.ship.series.length} ผลงานร่วมกัน</span>
 						</div>
 
-						<h1 class="max-w-full break-words font-[family-name:var(--font-display)] text-[clamp(1.9rem,3.6vw,3.65rem)] font-extrabold leading-[1.16] tracking-[-0.025em] text-plum [overflow-wrap:anywhere]">
+						<p class="mb-3 font-[family-name:var(--font-thai)] text-base font-semibold text-plum-light sm:text-lg">{data.ship.artist1.name} × {data.ship.artist2.name}</p>
+						<h1 class="max-w-4xl break-words font-[family-name:var(--font-display)] text-[clamp(2.75rem,8vw,7rem)] font-black leading-[0.86] tracking-[-0.07em] text-plum [overflow-wrap:anywhere]">
 							{data.ship.name}
 						</h1>
 					</div>
 
-					<div class="mt-6 max-w-4xl rounded-[1.5rem] border border-white/80 bg-white/82 p-4 sm:p-5 md:rounded-[1.7rem] md:flex-1 md:min-h-0 md:flex md:flex-col md:overflow-hidden">
-						<p class="font-[family-name:var(--font-thai)] text-sm leading-8 text-plum-light sm:text-base sm:leading-9 md:overflow-y-auto">
-							{data.ship.description || 'ยังไม่มีคำบรรยายสำหรับคู่นี้ แต่เรื่องราวยังคงถูกต่อเติมผ่านทุกผลงานที่เชื่อมโยงกัน'}
-						</p>
-					</div>
+					<div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_17rem] xl:items-end">
+						<div class="rounded-[1.6rem] border border-white/80 bg-white/76 p-4 backdrop-blur-xl sm:p-5">
+							<p class="font-[family-name:var(--font-thai)] text-sm leading-8 text-plum-light sm:text-base sm:leading-9">
+								{data.ship.description || 'ยังไม่มีคำบรรยายสำหรับคู่นี้ แต่เรื่องราวยังคงถูกต่อเติมผ่านทุกผลงานที่เชื่อมโยงกัน'}
+							</p>
+						</div>
 
-					<div class="mt-6 grid grid-cols-3 gap-2 sm:max-w-2xl sm:gap-3 md:flex-shrink-0">
-						{#each shipMeta as item}
-							<div class="rounded-2xl border border-white/80 bg-white/78 p-3 text-center perf-card">
-								<div class="text-2xl font-black text-coral-dark sm:text-3xl">{item.value}</div>
-								<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-plum-light/65 sm:text-xs">{item.label}</div>
-							</div>
-						{/each}
+						<div class="grid grid-cols-3 gap-2 xl:grid-cols-1">
+							{#each shipMeta as item}
+								<div class="rounded-2xl border border-white/80 bg-white/72 p-3 text-center shadow-sm shadow-lavender/10 xl:text-left">
+									<div class="font-[family-name:var(--font-display)] text-2xl font-black text-coral-dark sm:text-3xl">{item.value}</div>
+									<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-plum-light/65 sm:text-xs">{item.label}</div>
+								</div>
+							{/each}
+						</div>
 					</div>
 
 					{#if data.ship.hashtags.length > 0}
-						<div class="mt-5 flex flex-wrap gap-2 md:flex-shrink-0">
+						<div class="flex flex-wrap gap-2">
 							{#each data.ship.hashtags as tag}
-								<span class="rounded-full border border-lavender/25 bg-white/75 px-3 py-1.5 text-xs font-semibold text-plum-light sm:text-sm">#{tag}</span>
+								<span class="rounded-full border border-lavender/25 bg-white/78 px-3 py-1.5 text-xs font-bold text-plum-light shadow-sm shadow-lavender/5 sm:text-sm">#{tag}</span>
 							{/each}
 						</div>
 					{/if}
 				</div>
 			</div>
+
+			<div class="relative min-h-[31rem] overflow-hidden rounded-[2rem] border border-white/80 bg-plum shadow-2xl shadow-coral/10 lg:min-h-[38rem]">
+				<Picture src={data.ship.imageUrl} type="posters" sizes="(max-width: 1024px) 92vw, 520px" alt={data.ship.name} width={640} height={880} loading="eager" fetchpriority="high" class="h-full w-full object-cover opacity-92" />
+				<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,transparent_0,transparent_30%,rgba(45,27,46,0.18)_31%,rgba(45,27,46,0.76)_70%),linear-gradient(180deg,rgba(45,27,46,0.08),rgba(45,27,46,0.68))]"></div>
+				<div class="pointer-events-none absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/24"></div>
+				<div class="pointer-events-none absolute left-1/2 top-1/2 h-[50%] w-[50%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-coral/35"></div>
+				<div class="pointer-events-none absolute left-1/2 top-1/2 h-[30%] w-[30%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-mint/30"></div>
+
+				<a href="/{page.data.lang}/artists/{data.ship.artist1.id}" class="group absolute left-4 top-5 flex max-w-[78%] items-center gap-3 rounded-full border border-white/45 bg-white/82 py-2 pl-2 pr-4 text-plum shadow-xl shadow-plum/20 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white sm:left-6 sm:top-7">
+					<Picture src={data.ship.artist1.imageUrl} type="profiles" sizes="64px" alt={data.ship.artist1.name} width={64} height={64} loading="lazy" class="h-12 w-12 rounded-full border-2 border-white object-cover sm:h-14 sm:w-14" />
+					<span class="min-w-0">
+						<span class="block truncate text-sm font-black sm:text-base">{data.ship.artist1.name}</span>
+						<span class="block truncate text-[10px] font-bold uppercase tracking-[0.18em] text-coral-dark">first orbit</span>
+					</span>
+				</a>
+
+				<a href="/{page.data.lang}/artists/{data.ship.artist2.id}" class="group absolute bottom-5 right-4 flex max-w-[78%] items-center gap-3 rounded-full border border-white/45 bg-white/82 py-2 pl-2 pr-4 text-plum shadow-xl shadow-plum/20 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white sm:bottom-7 sm:right-6">
+					<Picture src={data.ship.artist2.imageUrl} type="profiles" sizes="64px" alt={data.ship.artist2.name} width={64} height={64} loading="lazy" class="h-12 w-12 rounded-full border-2 border-white object-cover sm:h-14 sm:w-14" />
+					<span class="min-w-0">
+						<span class="block truncate text-sm font-black sm:text-base">{data.ship.artist2.name}</span>
+						<span class="block truncate text-[10px] font-bold uppercase tracking-[0.18em] text-lavender-dark">second orbit</span>
+					</span>
+				</a>
+
+				<div class="absolute bottom-5 left-5 rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-white backdrop-blur-md sm:bottom-7 sm:left-7">GL-Orbit ship</div>
+			</div>
 		</section>
 
-		<section class="relative z-10 mb-10 sm:mb-12 perf-section">
-			<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
+		<section class="relative z-10 mb-10 rounded-[2rem] border border-white/80 bg-white/62 p-4 shadow-xl shadow-lavender/10 backdrop-blur-xl sm:mb-12 sm:p-5 lg:p-6">
+			<div class="mb-5 flex flex-wrap items-end justify-between gap-4">
 				<div>
-					<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-coral-light/70">Orbit pair</p>
+					<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-coral-light/70">Chemistry map</p>
 					<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-plum sm:text-4xl">ศิลปินที่โคจรรอบกัน</h2>
 				</div>
-				<span class="hidden rounded-full border border-white/50 bg-white/50 px-3 py-1 text-xs font-semibold text-plum-light sm:inline-flex">2 artists</span>
+				<span class="rounded-full border border-white/70 bg-white/72 px-3 py-1 text-xs font-semibold text-plum-light">2 artists</span>
 			</div>
 
-			<div class="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center">
-				<a href="/{page.data.lang}/artists/{data.ship.artist1.id}" class="relative overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/78 p-3 hover:border-coral/30 hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-coral sm:p-4 perf-card">
-					<div class="relative flex items-center gap-3 sm:gap-4">
-						<Picture src={data.ship.artist1.imageUrl} type="profiles" sizes="96px" alt={data.ship.artist1.name} width={80} height={80} loading="lazy" class="h-16 w-16 flex-shrink-0 rounded-2xl border border-white/70 object-cover sm:h-20 sm:w-20" />
+			<div class="relative grid gap-4 lg:grid-cols-[minmax(0,1fr)_9rem_minmax(0,1fr)] lg:items-center">
+				<div class="pointer-events-none absolute left-1/2 top-1/2 hidden h-px w-[54%] -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-coral/40 via-lavender/50 to-mint/40 lg:block"></div>
+				<a href="/{page.data.lang}/artists/{data.ship.artist1.id}" class="group relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/78 p-4 shadow-sm shadow-lavender/10 transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/92 focus-visible:outline-2 focus-visible:outline-coral sm:p-5">
+					<div class="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-coral/10 blur-2xl transition-opacity group-hover:opacity-80"></div>
+					<div class="relative flex items-center gap-4">
+						<Picture src={data.ship.artist1.imageUrl} type="profiles" sizes="112px" alt={data.ship.artist1.name} width={112} height={112} loading="lazy" class="h-20 w-20 flex-shrink-0 rounded-[1.35rem] border border-white/80 object-cover sm:h-24 sm:w-24" />
 						<div class="min-w-0">
-							<div class="truncate text-lg font-extrabold text-plum sm:text-xl">{data.ship.artist1.name}</div>
-							<div class="mt-1 text-sm font-medium text-plum-light">{data.ship.artist1.fullNameTh || data.ship.artist1.fullNameEn}</div>
-							<div class="mt-2 text-[10px] font-bold uppercase tracking-[0.22em] text-coral-dark">Artist one</div>
+							<p class="text-[10px] font-bold uppercase tracking-[0.22em] text-coral-dark">Artist one</p>
+							<h3 class="truncate text-xl font-black text-plum sm:text-2xl">{data.ship.artist1.name}</h3>
+							<p class="mt-1 text-sm font-medium text-plum-light">{data.ship.artist1.fullNameTh || data.ship.artist1.fullNameEn}</p>
 						</div>
 					</div>
 				</a>
 
-				<div class="mx-auto grid h-14 w-14 place-items-center rounded-full border border-white/80 bg-white/82 text-coral-dark shadow-sm shadow-lavender/10 md:h-16 md:w-16">
-					<span class="font-[family-name:var(--font-display)] text-2xl font-black">×</span>
+				<div class="relative mx-auto grid h-24 w-24 place-items-center rounded-full border border-white/80 bg-[radial-gradient(circle,rgba(255,255,255,0.95),rgba(196,181,253,0.18))] shadow-xl shadow-lavender/15">
+					<div class="absolute h-16 w-16 rounded-full border border-coral/20"></div>
+					<div class="absolute h-10 w-10 rounded-full border border-mint/25"></div>
+					<span class="font-[family-name:var(--font-display)] text-4xl font-black text-coral-dark">×</span>
 				</div>
 
-				<a href="/{page.data.lang}/artists/{data.ship.artist2.id}" class="relative overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/78 p-3 hover:border-lavender/30 hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-coral sm:p-4 perf-card">
-					<div class="relative flex items-center gap-3 sm:gap-4 md:flex-row-reverse md:text-right">
-						<Picture src={data.ship.artist2.imageUrl} type="profiles" sizes="96px" alt={data.ship.artist2.name} width={80} height={80} loading="lazy" class="h-16 w-16 flex-shrink-0 rounded-2xl border border-white/70 object-cover sm:h-20 sm:w-20" />
+				<a href="/{page.data.lang}/artists/{data.ship.artist2.id}" class="group relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/78 p-4 shadow-sm shadow-lavender/10 transition-all duration-300 hover:-translate-y-1 hover:border-lavender/30 hover:bg-white/92 focus-visible:outline-2 focus-visible:outline-coral sm:p-5">
+					<div class="absolute -left-8 -top-8 h-24 w-24 rounded-full bg-lavender/14 blur-2xl transition-opacity group-hover:opacity-80"></div>
+					<div class="relative flex items-center gap-4 lg:flex-row-reverse lg:text-right">
+						<Picture src={data.ship.artist2.imageUrl} type="profiles" sizes="112px" alt={data.ship.artist2.name} width={112} height={112} loading="lazy" class="h-20 w-20 flex-shrink-0 rounded-[1.35rem] border border-white/80 object-cover sm:h-24 sm:w-24" />
 						<div class="min-w-0">
-							<div class="truncate text-lg font-extrabold text-plum sm:text-xl">{data.ship.artist2.name}</div>
-							<div class="mt-1 text-sm font-medium text-plum-light">{data.ship.artist2.fullNameTh || data.ship.artist2.fullNameEn}</div>
-							<div class="mt-2 text-[10px] font-bold uppercase tracking-[0.22em] text-lavender-dark">Artist two</div>
+							<p class="text-[10px] font-bold uppercase tracking-[0.22em] text-lavender-dark">Artist two</p>
+							<h3 class="truncate text-xl font-black text-plum sm:text-2xl">{data.ship.artist2.name}</h3>
+							<p class="mt-1 text-sm font-medium text-plum-light">{data.ship.artist2.fullNameTh || data.ship.artist2.fullNameEn}</p>
 						</div>
 					</div>
 				</a>
 			</div>
 		</section>
 
-		<section class="relative z-10 perf-section">
+		<section class="relative z-10">
 			<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
 				<div>
-					<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-lavender-dark/75">Series link</p>
+					<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-lavender-dark/75">Shared reel</p>
 					<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-plum sm:text-4xl">ผลงานร่วมกัน</h2>
 				</div>
-				<span class="rounded-full border border-white/50 bg-white/50 px-3 py-1 text-xs font-semibold text-plum-light">{data.ship.series.length} เรื่อง</span>
+				<span class="rounded-full border border-white/60 bg-white/62 px-3 py-1 text-xs font-semibold text-plum-light">{data.ship.series.length} เรื่อง</span>
 			</div>
 
 			{#if data.ship.series.length > 0}
-				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-					{#each data.ship.series as item}
+				<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+					{#each data.ship.series as item, index}
 						{@const status = statusConfig[item.status]}
-						<a href="/{page.data.lang}/series/{item.id}" class="group relative overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/78 p-3 hover:border-coral/30 hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-coral sm:p-4 perf-card">
-							<div class="grid gap-3 sm:grid-cols-[5.5rem_minmax(0,1fr)] sm:items-center">
-								<Picture src={item.posterUrl} type="posters" sizes="160px" alt={item.title} width={120} height={180} loading="lazy" class="aspect-[2/3] w-full rounded-2xl border border-white/70 object-cover sm:w-22" />
-								<div class="min-w-0">
-									<div class="mb-2 flex flex-wrap gap-2">
-										<span class="rounded-full border px-2.5 py-1 text-[10px] font-bold {status.border} {status.bg} {status.class}">{status.text}</span>
+						<a href="/{page.data.lang}/series/{item.id}" class="group relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/76 p-3 shadow-lg shadow-lavender/10 transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/92 hover:shadow-2xl hover:shadow-coral/10 focus-visible:outline-2 focus-visible:outline-coral {index === 0 ? 'md:col-span-2' : ''}">
+							<div class="grid gap-4 {index === 0 ? 'sm:grid-cols-[11rem_minmax(0,1fr)] sm:items-center' : ''}">
+								<div class="relative overflow-hidden rounded-[1.35rem] bg-lavender/10">
+									<Picture src={item.posterUrl} type="posters" sizes={index === 0 ? '(max-width: 768px) 88vw, 260px' : '220px'} alt={item.title} width={220} height={330} loading="lazy" class="aspect-[2/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.035]" />
+									<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/75 to-transparent px-3 pb-3 pt-10">
+										<span class="rounded-full border px-2.5 py-1 text-[10px] font-bold backdrop-blur-md {status.border} {status.bg} {status.class}">{status.text}</span>
 									</div>
-									<h3 class="truncate text-base font-extrabold text-plum sm:text-lg">{item.title}</h3>
+								</div>
+								<div class="min-w-0 p-1">
+									<p class="mb-2 text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark">Orbit work</p>
+									<h3 class="text-xl font-black leading-tight text-plum {index === 0 ? 'sm:text-3xl' : ''}">{item.title}</h3>
 									{#if item.titleTh}
-										<p class="mt-1 truncate text-sm font-medium text-plum-light">{item.titleTh}</p>
+										<p class="mt-2 text-sm font-medium leading-6 text-plum-light">{item.titleTh}</p>
 									{/if}
-									<p class="mt-2 text-xs font-semibold text-coral-dark">เปิดหน้าซีรีส์</p>
+									<p class="mt-4 inline-flex items-center gap-2 text-xs font-black text-coral-dark">
+										เปิดหน้าซีรีส์
+										<svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+									</p>
 								</div>
 							</div>
 						</a>
 					{/each}
 				</div>
 			{:else}
-				<div class="rounded-[1.75rem] border border-white/80 bg-white/80 p-8 text-center text-plum-light perf-card sm:p-10">ยังไม่มีผลงานร่วมกันในระบบ</div>
+				<div class="rounded-[1.75rem] border border-white/80 bg-white/80 p-8 text-center text-plum-light shadow-lg shadow-lavender/10 sm:p-10">ยังไม่มีผลงานร่วมกันในระบบ</div>
 			{/if}
 		</section>
 	</div>
