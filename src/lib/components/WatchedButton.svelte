@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
+	import { onMount } from 'svelte';
 
 	import { page } from '$app/state';
 	let { seriesId, className = '' }: { seriesId: string; className?: string } = $props();
@@ -7,10 +8,19 @@
 	let watched = $state(false);
 	let loading = $state(false);
 	let checking = $state(true);
+	let mounted = $state(false);
 
 	const isLoading = $derived(checking || loading);
 
+	onMount(() => {
+		mounted = true;
+		return () => {
+			mounted = false;
+		};
+	});
+
 	$effect(() => {
+		if (!mounted) return;
 		if (!seriesId) return;
 
 		if (!page.data.user) {
@@ -18,17 +28,25 @@
 			return;
 		}
 
+		let cancelled = false;
+		checking = true;
+
 		fetch(`/api/watched?seriesId=${encodeURIComponent(seriesId)}`)
 			.then((r) => r.json())
 			.then((data) => {
+				if (cancelled) return;
 				if (data.watched !== undefined) {
 					watched = data.watched;
 				}
 				checking = false;
 			})
 			.catch(() => {
-				checking = false;
+				if (!cancelled) checking = false;
 			});
+
+		return () => {
+			cancelled = true;
+		};
 	});
 
 	async function handleToggle() {

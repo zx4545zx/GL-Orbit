@@ -9,8 +9,18 @@ import NotificationBadge from './NotificationBadge.svelte';
 
 	const currentUser = $derived(page.data.user);
 	let unreadCount = $state(0);
+	let mounted = $state(false);
+
+	onMount(() => {
+		mounted = true;
+		return () => {
+			mounted = false;
+		};
+	});
 
 	$effect(() => {
+		if (!mounted) return;
+
 		if (!currentUser) {
 			unreadCount = 0;
 			return;

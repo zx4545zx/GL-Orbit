@@ -44,6 +44,7 @@ import Picture from './Picture.svelte';
 	const currentUser = $derived(page.data.user);
 
 	let unreadCount = $state(0);
+	let mounted = $state(false);
 	let profileMenuOpen = $state(false);
 	let profileMenuRoot = $state<HTMLDivElement | null>(null);
 
@@ -65,7 +66,16 @@ import Picture from './Picture.svelte';
 		if (event.key === 'Escape') profileMenuOpen = false;
 	}
 
+	onMount(() => {
+		mounted = true;
+		return () => {
+			mounted = false;
+		};
+	});
+
 	$effect(() => {
+		if (!mounted) return;
+
 		if (!currentUser) {
 			unreadCount = 0;
 			return;
