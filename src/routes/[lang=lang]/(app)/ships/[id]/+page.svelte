@@ -147,8 +147,8 @@
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 					{#each data.ship.series as item}
 						{@const status = statusConfig[item.status]}
-						<a href="/{page.data.lang}/series/{item.id}" class="group block overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/72 p-2 shadow-lg shadow-lavender/10 transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/92 hover:shadow-2xl hover:shadow-coral/10 focus-visible:outline-2 focus-visible:outline-coral">
-							<div class="relative overflow-hidden rounded-[1.45rem] bg-lavender/10">
+						<a href="/{page.data.lang}/series/{item.id}" class="group block overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/72 shadow-lg shadow-lavender/10 transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/92 hover:shadow-2xl hover:shadow-coral/10 focus-visible:outline-2 focus-visible:outline-coral">
+							<div class="relative overflow-hidden bg-lavender/10">
 								<Picture src={item.posterUrl} type="posters" sizes="(max-width: 640px) 88vw, (max-width: 1024px) 44vw, 24vw" alt={item.title} width={360} height={540} loading="lazy" class="aspect-[2/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
 								<div class="absolute left-3 top-3">
 									<span class="rounded-full border px-2.5 py-1 text-[10px] font-bold shadow-sm backdrop-blur-md {status.border} {status.bg} {status.class}">{status.text}</span>
