@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import Picture from '$lib/components/Picture.svelte';
+	import ImageListingCard from '$lib/components/ImageListingCard.svelte';
+	import ListingSearch from '$lib/components/ListingSearch.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import { buildCanonicalUrl, jsonLdScript, localizedPath } from '$lib/seo.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
@@ -108,71 +109,65 @@
 	{@html jsonLdScript(localizedJsonLd)}
 </svelte:head>
 
-<section class="space-y-8 pb-12">
-	<header class="text-center space-y-3">
-		<p class="text-sm font-semibold text-coral-dark uppercase tracking-[0.3em]">Ships</p>
-		<h1 class="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-bold text-plum">
+<div class="py-6 sm:py-8 max-w-6xl mx-auto" aria-busy={loading}>
+	<div class="text-center mb-6 sm:mb-8">
+		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
 			<span class="text-gradient">คู่จิ้น</span> ทั้งหมด
 		</h1>
-		<p class="text-plum-light max-w-2xl mx-auto">รวม Ships คู่จิ้น GL พร้อมศิลปินและผลงานร่วมกัน</p>
-	</header>
-
-	<div class="glass-card-strong rounded-[2rem] p-4 sm:p-5 sticky top-4 z-10">
-		<label class="sr-only" for="ship-search">ค้นหา Ships</label>
-		<div class="relative">
-			<input
-				id="ship-search"
-				bind:value={searchQuery}
-				oninput={scheduleSearchUpdate}
-				type="search"
-				placeholder="ค้นหาชื่อคู่จิ้นหรือศิลปิน..."
-				class="w-full rounded-2xl border border-white/70 bg-white/80 px-5 py-4 pr-12 text-plum placeholder:text-plum-light/60 shadow-inner focus:outline-none focus:ring-2 focus:ring-coral/40"
-			/>
-			{#if searchQuery}
-				<button type="button" onclick={clearSearch} class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-2 text-plum-light hover:bg-coral/10 hover:text-coral-dark" aria-label={m.common_search_clear()}>×</button>
-			{/if}
-		</div>
+		<p class="text-sm sm:text-base text-plum-light">รวม Ships คู่จิ้น GL พร้อมศิลปินและผลงานร่วมกัน</p>
 	</div>
 
-	{#if loading}
-		<p class="text-center text-plum-light">{m.common_loading()}</p>
-	{/if}
+	<div class="mb-6 sm:mb-8">
+		<ListingSearch bind:value={searchQuery} placeholder="ค้นหาชื่อคู่จิ้นหรือศิลปิน..." ariaLabel="ค้นหา Ships" oninput={scheduleSearchUpdate} onclear={clearSearch} />
+	</div>
 
-	{#if allShips.length > 0}
-		<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-			{#each allShips as ship (ship.id)}
-				<a href="/{page.data.lang}/ships/{ship.slug}" class="glass-card group overflow-hidden rounded-[1.75rem] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-					<div class="aspect-[4/3] overflow-hidden bg-lavender/10">
-						<Picture src={ship.imageUrl} type="posters" alt={ship.name} class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-					</div>
-					<div class="space-y-3 p-5">
-						<div class="flex items-start justify-between gap-3">
-							<h2 class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum">{ship.name}</h2>
-							{#if ship.isFeatured}<span class="rounded-full bg-coral/10 px-3 py-1 text-xs font-semibold text-coral-dark">Featured</span>{/if}
-						</div>
-						<p class="text-sm text-plum-light">{ship.artist1.name} × {ship.artist2.name}</p>
-						<p class="text-sm text-plum-light line-clamp-2">{ship.description || 'ยังไม่มีคำอธิบาย'}</p>
-						<div class="flex flex-wrap gap-2 text-xs text-plum-light">
-							<span class="rounded-full bg-mint/15 px-3 py-1">{ship.seriesCount} ผลงานร่วมกัน</span>
-							{#each ship.hashtags.slice(0, 2) as tag}<span class="rounded-full bg-lavender/15 px-3 py-1">#{tag}</span>{/each}
+	<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+		{#if loading}
+			{#each Array(8) as _, i (i)}
+				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+					<div class="relative aspect-[3/4] overflow-hidden">
+						<div class="absolute inset-0 bg-lavender/10 animate-pulse"></div>
+						<div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5 space-y-2">
+							<div class="h-3 w-1/2 bg-white/20 rounded animate-pulse"></div>
+							<div class="h-5 w-3/4 bg-white/30 rounded animate-pulse"></div>
+							<div class="h-3 w-2/3 bg-white/20 rounded animate-pulse"></div>
 						</div>
 					</div>
-				</a>
+				</div>
 			{/each}
-		</div>
-	{:else}
-		<div class="glass-card rounded-[2rem] p-10 text-center">
-			<h2 class="text-2xl font-bold text-plum">ไม่พบ Ships</h2>
-			<p class="mt-2 text-plum-light">ลองค้นหาด้วยคำอื่น หรือกลับมาดูใหม่ภายหลัง</p>
+		{:else}
+			{#each allShips as ship (ship.id)}
+				<ImageListingCard
+					href={`/${page.data.lang}/ships/${ship.slug}`}
+					image={ship.imageUrl}
+					title={ship.name}
+					subtitle={`${ship.artist1.name} × ${ship.artist2.name}`}
+					eyebrow={`${ship.seriesCount} ผลงานร่วมกัน`}
+					badgeText={ship.isFeatured ? 'Featured' : ''}
+					badgeClass="bg-coral/10 text-coral-dark"
+					chips={ship.hashtags.slice(0, 2).map((tag) => `#${tag}`)}
+					alt={ship.name}
+				/>
+			{/each}
+		{/if}
+	</div>
+
+	{#if !loading && allShips.length === 0}
+		<div class="text-center py-16">
+			<div class="w-16 h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-4">
+				<svg class="w-8 h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+			</div>
+			<h3 class="font-semibold text-plum mb-1">ไม่พบ Ships</h3>
+			<p class="text-sm text-plum-light">ลองค้นหาด้วยคำอื่น หรือกลับมาดูใหม่ภายหลัง</p>
 		</div>
 	{/if}
 
-	{#if hasMore}
-		<div class="text-center">
-			<button type="button" onclick={loadMore} disabled={loadMoreLoading} class="touch-target rounded-full bg-gradient-to-r from-coral to-coral-dark px-6 py-3 font-semibold text-white shadow-lg shadow-coral/25 disabled:opacity-60">
+	{#if !loading && hasMore}
+		<div class="text-center mt-8 sm:mt-10">
+			<button type="button" onclick={loadMore} disabled={loadMoreLoading} class="px-8 py-3 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-105 transition-all text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 mx-auto">
 				{loadMoreLoading ? m.common_loading() : m.common_load_more()}
 			</button>
 			{#if loadMoreError}<p class="mt-3 text-sm text-coral-dark">{loadMoreError}</p>{/if}
 		</div>
 	{/if}
-</section>
+</div>

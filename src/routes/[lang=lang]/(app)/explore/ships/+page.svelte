@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import Picture from '$lib/components/Picture.svelte';
+	import ImageListingCard from '$lib/components/ImageListingCard.svelte';
+	import ListingSearch from '$lib/components/ListingSearch.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import { buildBreadcrumbJsonLd, buildCanonicalUrl, buildWebPageJsonLd, jsonLdScript, safeJsonLd } from '$lib/seo.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
@@ -92,30 +93,35 @@
 </svelte:head>
 
 <section class="space-y-6">
-	<div class="glass-card rounded-[1.75rem] p-4">
-		<label class="sr-only" for="explore-ship-search">ค้นหา Ships</label>
-		<div class="relative">
-			<input id="explore-ship-search" bind:value={searchQuery} oninput={scheduleSearchUpdate} type="search" placeholder="ค้นหา Ships หรือศิลปิน..." class="w-full rounded-2xl border border-white/70 bg-white/80 px-5 py-3 pr-12 text-plum placeholder:text-plum-light/60 focus:outline-none focus:ring-2 focus:ring-coral/40" />
-			{#if searchQuery}<button type="button" onclick={clearSearch} class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-2 text-plum-light hover:bg-coral/10" aria-label={m.common_search_clear()}>×</button>{/if}
-		</div>
+	<ListingSearch bind:value={searchQuery} placeholder="ค้นหา Ships หรือศิลปิน..." ariaLabel="ค้นหา Ships" oninput={scheduleSearchUpdate} onclear={clearSearch} />
+
+	<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6" aria-busy={loading}>
+		{#if loading}
+			{#each Array(8) as _, i (i)}
+				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+					<div class="relative aspect-[3/4] overflow-hidden">
+						<div class="absolute inset-0 bg-lavender/10 animate-pulse"></div>
+					</div>
+				</div>
+			{/each}
+		{:else}
+			{#each allShips as ship (ship.id)}
+				<ImageListingCard
+					href={`/${page.data.lang}/ships/${ship.slug}`}
+					image={ship.imageUrl}
+					title={ship.name}
+					subtitle={`${ship.artist1.name} × ${ship.artist2.name}`}
+					eyebrow={`${ship.seriesCount} ผลงานร่วมกัน`}
+					badgeText={ship.isFeatured ? 'Featured' : ''}
+					badgeClass="bg-coral/10 text-coral-dark"
+					chips={ship.hashtags.slice(0, 2).map((tag) => `#${tag}`)}
+					alt={ship.name}
+				/>
+			{/each}
+		{/if}
 	</div>
 
-	{#if loading}<p class="text-center text-plum-light">{m.common_loading()}</p>{/if}
-
-	{#if allShips.length > 0}
-		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-			{#each allShips as ship (ship.id)}
-				<a href="/{page.data.lang}/ships/{ship.slug}" class="glass-card overflow-hidden rounded-[1.5rem] transition hover:-translate-y-1 hover:shadow-lg">
-					<Picture src={ship.imageUrl} type="posters" alt={ship.name} class="aspect-[4/3] w-full object-cover" />
-					<div class="space-y-2 p-4">
-						<h2 class="font-[family-name:var(--font-display)] text-xl font-bold text-plum">{ship.name}</h2>
-						<p class="text-sm text-plum-light">{ship.artist1.name} × {ship.artist2.name}</p>
-						<p class="text-xs text-plum-light">{ship.seriesCount} ผลงานร่วมกัน</p>
-					</div>
-				</a>
-			{/each}
-		</div>
-	{:else}
+	{#if !loading && allShips.length === 0}
 		<div class="glass-card rounded-[1.5rem] p-8 text-center text-plum-light">ไม่พบ Ships ที่ตรงกับการค้นหา</div>
 	{/if}
 
