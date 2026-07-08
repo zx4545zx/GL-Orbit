@@ -64,9 +64,9 @@
 				</div>
 			</div>
 
-			<div class="relative min-h-[31rem] overflow-hidden rounded-[2rem] border border-white/80 bg-plum shadow-2xl shadow-coral/10 lg:min-h-[38rem]">
+			<div class="relative min-h-[31rem] overflow-hidden rounded-[2rem] border border-white/80 bg-coral/10 shadow-2xl shadow-coral/10 lg:min-h-[38rem]">
 				<Picture src={data.ship.imageUrl} type="posters" sizes="(max-width: 1024px) 92vw, 520px" alt={data.ship.name} width={640} height={880} loading="eager" fetchpriority="high" class="h-full w-full object-cover" />
-				<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,transparent_0,transparent_34%,rgba(45,27,46,0.08)_35%,rgba(45,27,46,0.38)_74%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(45,27,46,0.42))]"></div>
+				<div class="absolute inset-0 bg-[radial-gradient(circle_at_28%_16%,rgba(255,255,255,0.24),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(255,107,157,0.20),transparent_34%),radial-gradient(circle_at_50%_78%,rgba(196,181,253,0.16),transparent_42%),linear-gradient(180deg,rgba(255,245,247,0.10),rgba(255,107,157,0.18)_58%,rgba(45,27,46,0.30))]"></div>
 				<div class="pointer-events-none absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/24"></div>
 				<div class="pointer-events-none absolute left-1/2 top-1/2 h-[50%] w-[50%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-coral/35"></div>
 				<div class="pointer-events-none absolute left-1/2 top-1/2 h-[30%] w-[30%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-mint/30"></div>
