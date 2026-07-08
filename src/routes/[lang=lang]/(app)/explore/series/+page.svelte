@@ -35,8 +35,8 @@
 	];
 
 	let extraSeries = $state<SeriesListItem[]>([]);
-	let searchQuery = $state(data.filters.search);
-	let filterStatus = $state<SeriesStatusFilter>(data.filters.status);
+	let searchQuery = $state('');
+	let filterStatus = $state<SeriesStatusFilter>('ALL');
 	let loading = $state(false);
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');

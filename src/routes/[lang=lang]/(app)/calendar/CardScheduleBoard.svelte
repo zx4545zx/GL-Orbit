@@ -75,7 +75,7 @@
 		return 0;
 	})());
 
-	let selectedMobileDay = $state(defaultMobileDay);
+	let selectedMobileDay = $state(0);
 
 	$effect(() => {
 		selectedMobileDay = defaultMobileDay;

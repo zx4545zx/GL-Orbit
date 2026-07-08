@@ -14,7 +14,7 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let viewMode = $state<'grid' | 'calendar' | 'list' | 'card'>(data.params.startDate ? 'card' : 'calendar');
+	let viewMode = $state<'grid' | 'calendar' | 'list' | 'card'>('calendar');
 	let selectedDate = $state<string | null>(null);
 	let scheduleSection = $state<HTMLElement>();
 
@@ -24,6 +24,10 @@
 	const params_sd = $derived<string | null>(data.params.startDate);
 	const params_ed = $derived<string | null>(data.params.endDate);
 	const contentLoading = $derived(Boolean(navigating.to && navigating.to.url.pathname === page.url.pathname));
+
+	$effect(() => {
+		viewMode = data.params.startDate ? 'card' : 'calendar';
+	});
 
 	// Current month derived from load params
 	const currentMonth = $derived(new Date(params_y, params_m - 1, 1));

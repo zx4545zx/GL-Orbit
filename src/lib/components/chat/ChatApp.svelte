@@ -33,9 +33,9 @@
 	} = $props();
 
 	let sidebarOpen = $state(false);
-	let history = $state<Conversation[]>(conversations);
-	let current = $state<Conversation | null>(activeConversation);
-	let messages = $state<Message[]>(initialMessages);
+	let history = $state<Conversation[]>([]);
+	let current = $state<Conversation | null>(null);
+	let messages = $state<Message[]>([]);
 	let input = $state('');
 	let followupSuggestions = $state<string[]>([]);
 	let panelContext = $state<ChatContextPayload>(null);
@@ -48,6 +48,12 @@
 	let renamingId = $state<string | null>(null);
 	let renameTitle = $state('');
 	let messagesContainer = $state<HTMLDivElement | null>(null);
+
+	$effect(() => {
+		history = conversations;
+		current = activeConversation;
+		messages = initialMessages;
+	});
 
 	$effect(() => {
 		if (!messagesContainer) return;
