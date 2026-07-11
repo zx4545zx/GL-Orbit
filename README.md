@@ -11,12 +11,12 @@
 
 ## ✨ จุดเด่น
 
-- **ตารางฉายแม่นยำ** — รองรับ Timezone พร้อมระบุ Uncut version
-- **ข้อมูลซีรีส์ครบถ้วน** — สตูดิโอ นักแสดง แพลตฟอร์มสตรีมมิ่ง
+- **ตารางฉายแม่นยำ** — ดึงข้อมูลจากฐานข้อมูลจริง รองรับ Timezone พร้อมระบุ Uncut version
+- **ข้อมูลซีรีส์ครบถ้วน** — สตูดิโอ นักแสดง แพลตฟอร์มสตรีมมิ่ง แนวซีรีส์ แกลเลอรี และตอนต่าง ๆ
 - **Countdown สด** — นับถอยหลังตอนใหม่แบบเรียลไทม์ (24 ชม.)
-- **AI Chat** — ผู้ช่วยตอบคำถามเกี่ยวกับซีรีส์และตารางฉาย
+- **AI Chat** — ผู้ช่วยตอบคำถามเกี่ยวกับซีรีส์และตารางฉายจากข้อมูลในระบบ
 - **ระบบสมาชิก** — โปรไฟล์ + Favorite/Watched + การแจ้งเตือน
-- **แผงผู้ดูแลระบบ** — CRUD ซีรีส์ ตอน ตารางฉาย นักแสดง สตูดิโอ
+- **แผงผู้ดูแลระบบ** — CRUD ซีรีส์ ตอน ตารางฉาย นักแสดง สตูดิโอ แพลตฟอร์ม และข้อมูลอ้างอิงหลัก
 - **SEO & PWA** — robots/sitemap/llms.txt, Open Graph, JSON-LD, ติดตั้งเป็นแอปได้
 - **ดีไซน์โมเดิร์น** — Glassmorphism + สีพาสเทล + อนิเมชั่นลื่นไหล
 - **Pending Shells** — Skeleton UI ระหว่างโหลดหน้า ลด perceived latency
@@ -30,12 +30,12 @@
 | Framework | [SvelteKit 2.x](https://kit.svelte.dev) |
 | UI | [Svelte 5](https://svelte.dev) (Runes) + [Tailwind CSS 4](https://tailwindcss.com) |
 | Language | [TypeScript 5.8](https://www.typescriptlang.org) |
-| Database | [PostgreSQL](https://neon.tech) (Serverless) |
+| Database | [PostgreSQL](https://neon.tech) (Neon Serverless) |
 | ORM | [Drizzle ORM](https://orm.drizzle.team) |
 | Auth | Custom JWT (jose + bcryptjs) |
 | Build | [Vite 6](https://vitejs.dev) |
 | PWA | [@vite-pwa/sveltekit](https://vite-pwa-org.netlify.app/) |
-| Deploy | [Vercel](https://vercel.com) (adapter-auto) |
+| Deploy | [Vercel](https://vercel.com) |
 
 ---
 
@@ -96,49 +96,76 @@ npm run db:studio     # เปิด Drizzle Studio GUI
 
 | ตาราง | รายละเอียด |
 |-------|------------|
-| `users` | ผู้ใช้งาน (ADMIN / USER) |
-| `series` | ซีรีส์ (UPCOMING / ONGOING / ENDED) |
-| `episodes` | ตอนของซีรีส์ |
-| `studios` | สตูดิโอผลิต |
+| `users` | ผู้ใช้งาน (ADMIN / USER), โปรไฟล์ และภาษาที่ต้องการ |
+| `sessions` | JWT session ที่เก็บ token hash สำหรับ revoke session ได้ |
+| `series` | ซีรีส์ (UPCOMING / ONGOING / ENDED), ชื่อ/คำอธิบาย TH/EN, poster/cover |
+| `episodes` | ตอนของซีรีส์ พร้อม cover/trailer |
+| `episode_schedules` | ตารางฉายรายตอน พร้อมเวลา, platform, stream link และ Uncut flag |
+| `series_schedules` | ตารางฉายประจำรายสัปดาห์ (วัน+เวลา) |
+| `studios` / `studio_socials` | สตูดิโอผลิตและช่องทาง social |
 | `platforms` | แพลตฟอร์มสตรีมมิ่ง |
-| `artists` | นักแสดง/ศิลปิน |
-| `episode_schedules` | ตารางฉายรายตอน |
-| `series_schedules` | ตารางฉายประจำ (วัน+เวลา) |
+| `artists` / `artist_socials` | นักแสดง/ศิลปินและช่องทาง social |
+| `series_artists` | ความสัมพันธ์ซีรีส์กับนักแสดง พร้อม role name |
+| `genres` / `series_genres` | หมวดหมู่และความสัมพันธ์กับซีรีส์ |
+| `series_gallery_images` | รูปภาพ gallery ของซีรีส์ |
+| `favorites` / `watched` | ซีรีส์ที่ผู้ใช้ชอบและดูแล้ว |
+| `notifications` / `push_subscriptions` | การแจ้งเตือนและ Web Push subscription |
+| `chat_conversations` / `chat_conversation_messages` / `chat_messages` | ประวัติ AI Chat และบริบทการสนทนา |
+
+---
+
+## ✅ สถานะฟีเจอร์ปัจจุบัน
+
+| Feature | Status | Data Source |
+|---------|--------|-------------|
+| Series listing | Live | Neon PostgreSQL + Drizzle |
+| Series detail / editor | Live | Neon PostgreSQL + Drizzle |
+| Calendar / schedules | Live | `episode_schedules` + `episodes` + `series` + `platforms` |
+| Admin series management | Live CRUD | `series`, `series_genres`, `episodes`, `studios` |
+| Admin weekly schedules | Live CRUD | `series_schedules` |
+| Admin episode schedules | Live CRUD | `episode_schedules` |
+| Authentication | Live | JWT sessions + `sessions` table |
+| User profile | Live | `users` table |
+| Favorite / Watched | Live | `favorites`, `watched` |
+| Notifications / Push | Live | `notifications`, `push_subscriptions` |
+| AI Chat | Live | Read-only DB context + chat history tables |
+| Tests | Partial | Vitest-based tests are present for selected API/admin utilities |
 
 ---
 
 ## 🏗️ โครงสร้างโปรเจกต์
 
-```
+```txt
 src/
 ├── routes/
-│   ├── (app)/                # หน้า Public
-│   │   ├── +page.svelte           # หน้าแรก (Hero + Countdown + Featured + SEO content)
-│   │   ├── series/                # รายการ + รายละเอียดซีรีส์
-│   │   ├── artists/               # รายการ + รายละเอียดนักแสดง
-│   │   ├── calendar/              # ตารางฉายรายเดือน
-│   │   ├── countdown/             # นับถอยหลังตอนใหม่
-│   │   ├── explore/               # สำรวจซีรีส์/นักแสดง
-│   │   ├── notifications/         # การแจ้งเตือน
-│   │   ├── login/ · register/     # ยืนยันตัวตน
-│   │   └── profile/               # โปรไฟล์ + Favorite/Watched
-│   ├── (chat)/chat/             # AI Chat
-│   ├── admin/                  # แผงผู้ดูแลระบบ (CRUD ทุกตาราง)
-│   ├── api/                    # REST API (public + admin + chat)
-│   ├── robots.txt/             # SEO: robots.txt
-│   ├── sitemap.xml/            # SEO: sitemap (ดึงจาก DB)
-│   ├── llms.txt/               # SEO: llms.txt สำหรับ LLM crawler
-│   ├── og-image/               # SEO: dynamic Open Graph image
-│   └── +error.svelte           # หน้า Error
+│   ├── [lang=lang]/             # Localized routes
+│   │   ├── (app)/               # หน้า Public
+│   │   │   ├── +page.svelte     # หน้าแรก (Hero + Countdown + Featured + SEO content)
+│   │   │   ├── series/          # รายการ + รายละเอียดซีรีส์
+│   │   │   ├── artists/         # รายการ + รายละเอียดนักแสดง
+│   │   │   ├── calendar/        # ตารางฉายจากฐานข้อมูลจริง
+│   │   │   ├── countdown/       # นับถอยหลังตอนใหม่
+│   │   │   ├── explore/         # สำรวจซีรีส์/นักแสดง
+│   │   │   ├── notifications/   # การแจ้งเตือน
+│   │   │   ├── login/ · register/
+│   │   │   └── profile/         # โปรไฟล์ + Favorite/Watched
+│   │   └── admin/               # แผงผู้ดูแลระบบ (ADMIN only)
+│   ├── api/                     # REST API (public + admin + chat)
+│   ├── robots.txt/              # SEO: robots.txt
+│   ├── sitemap.xml/             # SEO: sitemap (ดึงจาก DB)
+│   ├── llms.txt/                # SEO: llms.txt สำหรับ LLM crawler
+│   ├── og-image/                # SEO: dynamic Open Graph image
+│   └── +error.svelte            # หน้า Error
 ├── lib/
-│   ├── components/             # Svelte Components + Pending Shells
+│   ├── components/              # Svelte Components + Pending Shells
 │   ├── server/
-│   │   ├── db/                     # Schema + Connection (Neon HTTP)
-│   │   └── auth/                   # JWT Session
-│   ├── seo.ts                  # Open Graph + JSON-LD helpers
-│   └── types/                  # TypeScript type definitions
-├── app.css                     # Tailwind Theme + Animations + Utilities
-└── app.html                    # HTML Template
+│   │   ├── db/                  # Schema + Connection (Neon HTTP)
+│   │   ├── auth/                # JWT Session
+│   │   └── queries/             # Server-side query layer เช่น calendar/listing
+│   ├── seo.ts                   # Open Graph + JSON-LD helpers
+│   └── types/                   # TypeScript type definitions
+├── app.css                      # Tailwind Theme + Animations + Utilities
+└── app.html                     # HTML Template
 ```
 
 ---
