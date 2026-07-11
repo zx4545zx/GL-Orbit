@@ -106,6 +106,7 @@ let schedEditIsUncut = $state(false);
 	}
 
 	async function removeEpisode(id: string) {
+		if (!window.confirm('ต้องการลบตอนนี้หรือไม่? ข้อมูลช่องทางฉายของตอนนี้จะถูกลบด้วย')) return;
 		busy = true;
 		busyText = 'กำลังลบตอน...';
 		error = '';
@@ -149,6 +150,7 @@ let schedEditIsUncut = $state(false);
 	}
 
 	async function removeSchedule(id: string) {
+		if (!window.confirm('ต้องการลบช่องทางฉายนี้หรือไม่?')) return;
 		busy = true;
 		busyText = 'กำลังลบช่องทาง...';
 		error = '';

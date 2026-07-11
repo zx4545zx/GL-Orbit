@@ -1,7 +1,7 @@
 <script lang="ts">
 
 	import { page } from '$app/state';
-	import { localizedHref } from '$lib/i18n/link.js';	import { invalidateAll, goto } from '$app/navigation';
+	import { localizedHref } from '$lib/i18n/link.js';	import { beforeNavigate, invalidateAll, goto } from '$app/navigation';
 	import SeriesMainSection from '$lib/components/admin/SeriesMainSection.svelte';
 	import SeriesCastSection from '$lib/components/admin/SeriesCastSection.svelte';
 	import SeriesEpisodesSection from '$lib/components/admin/SeriesEpisodesSection.svelte';
@@ -13,6 +13,7 @@
 
 	type TabId = 'main' | 'cast' | 'episodes' | 'schedule';
 	let activeTab = $state<TabId>('main');
+	let metadataDirty = $state(false);
 
 	const tabs: { id: TabId; label: string; subtitle: string; icon: string }[] = [
 		{ id: 'main', label: 'ข้อมูลหลัก', subtitle: 'Poster, titles, studio', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
@@ -47,6 +48,21 @@
 	async function refresh() {
 		await invalidateAll();
 	}
+
+	beforeNavigate((navigation) => {
+		if (metadataDirty && !window.confirm('ข้อมูลหลักมีการแก้ไขที่ยังไม่บันทึก ต้องการออกจากหน้านี้และละทิ้งการแก้ไขหรือไม่?')) navigation.cancel();
+	});
+
+	function switchTab(nextTab: TabId) {
+		if (nextTab !== activeTab && activeTab === 'main' && metadataDirty) {
+			if (!window.confirm('ข้อมูลหลักมีการแก้ไขที่ยังไม่บันทึก ต้องการเปลี่ยนแท็บและละทิ้งการแก้ไขหรือไม่?')) return;
+		}
+		activeTab = nextTab;
+	}
+
+	function leaveEditor() {
+		goto(localizedHref('/admin/series', page.data.lang));
+	}
 </script>
 
 <svelte:head>
@@ -69,7 +85,7 @@
 
 		<div class="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
 			<div class="flex gap-4">
-				<button onclick={() => goto(localizedHref('/admin/series', page.data.lang))} class="mt-1 hidden h-10 w-10 items-center justify-center rounded-2xl bg-white/70 text-plum shadow-sm ring-1 ring-lavender/20 transition hover:-translate-x-0.5 hover:bg-white sm:flex" aria-label="กลับ">
+				<button onclick={leaveEditor} class="mt-1 hidden h-10 w-10 items-center justify-center rounded-2xl bg-white/70 text-plum shadow-sm ring-1 ring-lavender/20 transition hover:-translate-x-0.5 hover:bg-white sm:flex" aria-label="กลับ">
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
 				</button>
 
@@ -85,7 +101,7 @@
 				</div>
 
 				<div class="min-w-0 pt-1 sm:pt-2">
-					<button onclick={() => goto(localizedHref('/admin/series', page.data.lang))} class="mb-2 inline-flex items-center gap-1 rounded-full bg-white/65 px-2.5 py-1 text-xs font-medium text-plum-light ring-1 ring-lavender/20 sm:hidden">
+					<button onclick={leaveEditor} class="mb-2 inline-flex items-center gap-1 rounded-full bg-white/65 px-2.5 py-1 text-xs font-medium text-plum-light ring-1 ring-lavender/20 sm:hidden">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
 						กลับรายการ
 					</button>
@@ -139,7 +155,7 @@
 					{@const count = tabCount(tab.id)}
 					<button
 						type="button"
-						onclick={() => (activeTab = tab.id)}
+						onclick={() => switchTab(tab.id)}
 						class="group relative overflow-hidden rounded-2xl border p-3 text-left transition-all {active
 							? 'border-coral/20 bg-white text-plum shadow-xl shadow-coral/10'
 							: 'border-white/60 bg-white/55 text-plum-light hover:border-lavender/40 hover:bg-white/80 hover:text-plum'}"
@@ -168,7 +184,7 @@
 			<div class="rounded-[1.75rem] border border-white/70 bg-white/80 p-4 shadow-2xl shadow-lavender/10 backdrop-blur-xl sm:p-6">
 				{#key data.full.series.id}
 					{#if activeTab === 'main'}
-						<SeriesMainSection series={data.full.series} genres={data.full.genres} gallery={data.full.gallery} reference={data.reference} onrefresh={refresh} />
+						<SeriesMainSection series={data.full.series} genres={data.full.genres} gallery={data.full.gallery} reference={data.reference} onrefresh={refresh} onmetadataDirtyChange={(dirty) => (metadataDirty = dirty)} />
 					{:else if activeTab === 'cast'}
 						<SeriesCastSection seriesId={data.full.series.id} cast={data.full.artists} reference={data.reference} onrefresh={refresh} />
 					{:else if activeTab === 'episodes'}

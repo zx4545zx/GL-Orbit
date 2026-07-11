@@ -15,40 +15,46 @@
 		onrefresh: () => void | Promise<void>;
 	} = $props();
 
-	const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร'];
+	const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
 
 	let platformId = $state('');
 	let dayOfWeek = $state(1);
 	let airTime = $state('20:00');
 	let isUncut = $state(false);
-	let busy = $state(false);
-	let error = $state('');
+	let addBusy = $state(false);
+	let removingId = $state<string | null>(null);
+	let addError = $state('');
+	let removeError = $state('');
+	let addOpen = $state(false);
+	let expandedId = $state<string | null>(null);
 
 	async function add() {
 		if (!platformId) {
-			error = 'กรุณาเลือกช่องทาง';
+			addError = 'กรุณาเลือกช่องทาง';
 			return;
 		}
-		busy = true;
-		error = '';
+		addBusy = true;
+		addError = '';
 		const res = await editorApi.addSchedule({ seriesId, platformId, dayOfWeek, airTime: `${airTime}:00`, isUncut });
-		busy = false;
+		addBusy = false;
 		if (!res.ok) {
-			error = res.error ?? 'เพิ่มไม่สำเร็จ';
+			addError = res.error ?? 'เพิ่มไม่สำเร็จ';
 			return;
 		}
 		platformId = '';
 		isUncut = false;
+		addOpen = false;
 		await onrefresh();
 	}
 
 	async function remove(id: string) {
-		busy = true;
-		error = '';
+		if (!window.confirm('ต้องการลบช่วงเวลาฉายนี้หรือไม่?')) return;
+		removingId = id;
+		removeError = '';
 		const res = await editorApi.removeSchedule(id);
-		busy = false;
+		removingId = null;
 		if (!res.ok) {
-			error = res.error ?? 'ลบไม่สำเร็จ';
+			removeError = res.error ?? 'ลบไม่สำเร็จ';
 			return;
 		}
 		await onrefresh();
@@ -62,9 +68,9 @@
 <div class="space-y-4">
 	<p class="text-sm text-plum-light">ตารางฉายประจำสัปดาห์ (เวลาที่ฉายซ้ำทุกสัปดาห์) — ใช้สำหรับแสดงในหน้าปฏิทิน</p>
 
+	<div class="flex items-center justify-between"><h3 class="text-sm font-semibold text-plum">ช่วงเวลาฉาย <span class="text-plum-light font-normal">({schedules.length})</span></h3><button type="button" onclick={() => (addOpen = !addOpen)} class="px-3 py-1.5 rounded-lg bg-coral text-white text-xs font-medium touch-target">{addOpen ? 'ปิด' : '+ เพิ่มช่วงเวลา'}</button></div>
 	<!-- add form -->
-	<div class="glass-card rounded-2xl p-4 space-y-3">
-		<h3 class="text-sm font-semibold text-plum">เพิ่มช่วงเวลาฉาย</h3>
+	{#if addOpen}<div class="glass-card rounded-2xl p-4 space-y-3">
 		<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
 			<div class="col-span-2 sm:col-span-1">
 				<label for="sched-platform" class="block text-xs font-medium text-plum mb-1">ช่องทาง</label>
@@ -91,14 +97,15 @@
 			</div>
 		</div>
 		<div class="flex items-center gap-3">
-			<button type="button" onclick={add} disabled={busy} class="px-4 py-2 rounded-xl bg-coral text-white font-medium hover:bg-coral-dark transition-colors text-sm touch-target disabled:opacity-50">
-				+ เพิ่มช่วงเวลา
+			<button type="button" onclick={add} disabled={addBusy} class="px-4 py-2 rounded-xl bg-coral text-white font-medium hover:bg-coral-dark transition-colors text-sm touch-target disabled:opacity-50">
+				{addBusy ? 'กำลังเพิ่ม...' : '+ เพิ่มช่วงเวลา'}
 			</button>
-			{#if error}
-				<span class="text-xs text-coral-dark">{error}</span>
+			{#if addError}
+				<span class="text-xs text-coral-dark">{addError} กรุณาตรวจสอบรายการก่อนเพิ่มอีกครั้ง</span>
 			{/if}
 		</div>
-	</div>
+	</div>{/if}
+	{#if removeError}<p class="text-xs text-coral-dark">{removeError}</p>{/if}
 
 	<!-- list -->
 	{#if schedules.length === 0}
@@ -108,7 +115,9 @@
 	{:else}
 		<div class="space-y-2">
 			{#each schedules as s (s.id)}
-				<div class="flex items-center gap-3 bg-white/70 rounded-2xl p-3 border border-lavender/15">
+				{@const open = expandedId === s.id}
+				<div class="bg-white/70 rounded-2xl border border-lavender/15 overflow-hidden">
+					<button type="button" onclick={() => (expandedId = open ? null : s.id)} class="w-full flex items-center gap-3 p-3 text-left">
 					<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-lavender/30 to-mint/20 flex flex-col items-center justify-center flex-shrink-0">
 						<span class="text-[10px] text-plum-light leading-none">วัน</span>
 						<span class="text-sm font-bold text-plum leading-none mt-0.5">{dayNames[s.dayOfWeek]}</span>
@@ -122,9 +131,9 @@
 							{/if}
 						</div>
 					</div>
-					<button type="button" onclick={() => remove(s.id)} disabled={busy} aria-label="ลบ" class="p-2 rounded-lg hover:bg-coral/10 text-plum-light hover:text-coral-dark transition-colors touch-target disabled:opacity-50 flex-shrink-0">
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+						<svg class="w-4 h-4 text-plum-light transition-transform {open ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
 					</button>
+					{#if open}<div class="border-t border-lavender/10 px-3 py-2 flex justify-end"><button type="button" onclick={() => remove(s.id)} disabled={removingId === s.id} class="text-xs text-coral-dark touch-target">{removingId === s.id ? 'กำลังลบ...' : 'ลบช่วงเวลาฉาย'}</button></div>{/if}
 				</div>
 			{/each}
 		</div>

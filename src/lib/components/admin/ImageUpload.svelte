@@ -1,16 +1,19 @@
 <script lang="ts">
 	import Picture from '$lib/components/Picture.svelte';
+	import { getMediaDisplay, type MediaPurpose } from '$lib/images/display.js';
 
 	let {
 		url = $bindable(''),
 		label = 'รูปภาพ',
 		type = 'posters',
+		purpose = 'poster',
 		maxWidth = 1200,
 		quality = 0.85
 	}: {
 		url?: string;
 		label?: string;
 		type?: 'posters' | 'profiles';
+		purpose?: MediaPurpose;
 		maxWidth?: number;
 		quality?: number;
 	} = $props();
@@ -148,7 +151,8 @@
 	}
 
 	const isProfile = $derived(type === 'profiles');
-	const aspectClass = $derived(isProfile ? 'aspect-square' : 'aspect-[2/3]');
+	const display = $derived(getMediaDisplay(purpose));
+	const aspectClass = $derived(isProfile ? 'aspect-square' : display.aspectClass);
 	const roundedClass = $derived(isProfile ? 'rounded-full' : 'rounded-2xl');
 	const placeholderIcon = $derived(
 		isProfile
@@ -160,9 +164,9 @@
 <div class="space-y-2">
 	<span class="block text-sm font-medium text-plum">{label}</span>
 
-	<div class="relative w-full max-w-[160px] {aspectClass} {roundedClass} overflow-hidden bg-lavender/10 border border-lavender/20">
+	<div class="relative w-full {purpose === 'cover' || purpose === 'gallery' ? 'max-w-sm' : 'max-w-[160px]'} {aspectClass} {roundedClass} overflow-hidden bg-lavender/10 border border-lavender/20">
 			{#if url}
-				<Picture src={url} type={type} sizes="160px" alt={label} class="w-full h-full object-cover" />
+				<Picture src={url} type={type} sizes={isProfile ? '160px' : display.sizes} alt={label} class="w-full h-full object-cover" />
 			{:else}
 			<div class="w-full h-full flex flex-col items-center justify-center text-lavender-dark/50 gap-1 p-2">
 				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
