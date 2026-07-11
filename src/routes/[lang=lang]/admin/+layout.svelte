@@ -1,10 +1,32 @@
 <script lang="ts">
 
-	import { page } from '$app/state';	import AdminActionFeedback from '$lib/components/admin/AdminActionFeedback.svelte';
+	import { page } from '$app/state';
+	import AdminActionFeedback from '$lib/components/admin/AdminActionFeedback.svelte';
 	import { slide } from 'svelte/transition';
+	import { onMount } from 'svelte';
 
 	let { children } = $props();
 	let mobileOpen = $state(false);
+	let sidebarExpanded = $state(true);
+	let resolved = $state(false);
+
+	const SIDEBAR_KEY = 'gl-orbit:admin-sidebar-expanded';
+
+	onMount(() => {
+		if (typeof window !== 'undefined') {
+			const stored = window.localStorage.getItem(SIDEBAR_KEY);
+			if (stored !== null) {
+				sidebarExpanded = stored === 'true';
+			}
+			resolved = true;
+		}
+	});
+
+	$effect(() => {
+		if (typeof window !== 'undefined' && resolved) {
+			window.localStorage.setItem(SIDEBAR_KEY, String(sidebarExpanded));
+		}
+	});
 
 	type NavItem = { href: string; label: string; hint?: string; icon: string };
 	const navSections: { title: string; items: NavItem[] }[] = $derived([
@@ -57,28 +79,47 @@
 
 <div class="min-h-dvh bg-gray-50 flex">
 	<!-- Desktop Sidebar -->
-	<aside class="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-30">
-		<div class="h-16 flex items-center px-6 border-b border-gray-100">
-			<a href={adminHome} class="text-lg font-bold text-plum tracking-tight">GL-Orbit</a>
-			<span class="ml-2 px-2 py-0.5 rounded-md bg-coral/10 text-coral-dark text-xs font-semibold">Admin</span>
+	<aside class="hidden lg:flex flex-col bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-30 {sidebarExpanded ? 'w-64' : 'w-16'} transition-[width] duration-300 ease-in-out motion-reduce:transition-none {resolved ? '' : 'transition-none'}">
+		<div class="h-16 flex items-center border-b border-gray-100 {sidebarExpanded ? 'px-6 justify-between' : 'px-2 justify-center'}">
+			{#if sidebarExpanded}
+				<div class="flex items-center">
+					<a href={adminHome} class="text-lg font-bold text-plum tracking-tight">GL-Orbit</a>
+					<span class="ml-2 px-2 py-0.5 rounded-md bg-coral/10 text-coral-dark text-xs font-semibold">Admin</span>
+				</div>
+			{/if}
+			<button
+				type="button"
+				onclick={() => sidebarExpanded = !sidebarExpanded}
+				class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors touch-target"
+				aria-label={sidebarExpanded ? 'ย่อ sidebar' : 'ขยาย sidebar'}
+			>
+				<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					{#if sidebarExpanded}
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+					{:else}
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+					{/if}
+				</svg>
+			</button>
 		</div>
 
-		<nav class="flex-1 overflow-y-auto px-3 py-4 space-y-4">
+		<nav class="flex-1 overflow-y-auto {sidebarExpanded ? 'px-3' : 'px-2'} py-4 space-y-4">
 			{#each navSections as section}
 				<div>
-					<p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-plum-light/50">{section.title}</p>
+					<p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-plum-light/50 {sidebarExpanded ? '' : 'sr-only'}">{section.title}</p>
 					<div class="space-y-1">
 						{#each section.items as item}
 							{@const active = isActive(item.href)}
 							<a
 								href={item.href}
-								class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {active ? 'bg-gradient-to-r from-coral/10 to-lavender/10 text-coral-dark shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-plum'}"
+								title={sidebarExpanded ? undefined : item.label}
+								class="flex items-center rounded-xl text-sm font-medium transition-all duration-200 {sidebarExpanded ? 'gap-3 px-3 py-2.5' : 'justify-center px-2 py-2.5'} {active ? 'bg-gradient-to-r from-coral/10 to-lavender/10 text-coral-dark shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-plum'}"
 							>
 								<svg class="w-5 h-5 flex-shrink-0 {active ? 'text-coral-dark' : 'text-gray-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={item.icon}/>
 								</svg>
-								<span class="flex-1">{item.label}</span>
-								{#if item.hint}
+								<span class="{sidebarExpanded ? 'flex-1' : 'hidden'}">{item.label}</span>
+								{#if item.hint && sidebarExpanded}
 									<span class="text-[10px] text-plum-light/50 hidden xl:inline">{item.hint}</span>
 								{/if}
 							</a>
@@ -89,9 +130,9 @@
 		</nav>
 
 		<div class="p-3 border-t border-gray-100">
-			<a href="/{page.data.lang}/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-plum transition-all">
+			<a href="/{page.data.lang}/" title={sidebarExpanded ? undefined : 'กลับหน้าหลัก'} class="flex items-center rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-plum transition-all {sidebarExpanded ? 'gap-3 px-3 py-2.5' : 'justify-center px-2 py-2.5'}">
 				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-				<span>กลับหน้าหลัก</span>
+				<span class="{sidebarExpanded ? '' : 'hidden'}">กลับหน้าหลัก</span>
 			</a>
 		</div>
 	</aside>
@@ -159,7 +200,7 @@
 	{/if}
 
 	<!-- Main Content -->
-	<main class="flex-1 lg:ml-64 pt-14 lg:pt-0 min-h-dvh overflow-x-hidden">
+	<main class="flex-1 pt-14 lg:pt-0 min-h-dvh overflow-x-hidden {sidebarExpanded ? 'lg:ml-64' : 'lg:ml-16'} transition-[margin] duration-300 ease-in-out motion-reduce:transition-none {resolved ? '' : 'transition-none'}">
 		<div class="max-w-6xl mx-auto px-4 py-6 overflow-x-hidden">
 			{@render children()}
 		</div>
