@@ -63,6 +63,23 @@ export const artists = pgTable('artists', {
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
 });
 
+export const ships = pgTable('ships', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	name: varchar('name', { length: 255 }).notNull(),
+	slug: varchar('slug', { length: 255 }).notNull().unique(),
+	artist1Id: uuid('artist_1_id').notNull().references(() => artists.id, { onDelete: 'restrict' }),
+	artist2Id: uuid('artist_2_id').notNull().references(() => artists.id, { onDelete: 'restrict' }),
+	pairKey: varchar('pair_key', { length: 80 }).notNull().unique(),
+	imageUrl: text('image_url'),
+	description: text('description'),
+	startedAt: timestamp('started_at', { withTimezone: true }),
+	hashtags: jsonb('hashtags').$type<string[]>().notNull().default([]),
+	isFeatured: boolean('is_featured').notNull().default(false),
+	isPublished: boolean('is_published').notNull().default(false),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+});
+
 export const artistSocials = pgTable('artist_socials', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	artistId: uuid('artist_id').notNull().references(() => artists.id, { onDelete: 'cascade' }),
@@ -79,8 +96,18 @@ export const series = pgTable('series', {
 	descriptionTh: text('description_th'),
 	descriptionEn: text('description_en'),
 	posterUrl: text('poster_url'),
+	coverUrl: text('cover_url'),
 	status: seriesStatusEnum('status').notNull().default('UPCOMING'),
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
+});
+
+export const seriesGalleryImages = pgTable('series_gallery_images', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
+	imageUrl: text('image_url').notNull(),
+	caption: text('caption'),
+	sortOrder: integer('sort_order').notNull().default(0),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });
 
 export const seriesArtists = pgTable('series_artists', {
@@ -89,6 +116,15 @@ export const seriesArtists = pgTable('series_artists', {
 	roleName: varchar('role_name', { length: 255 })
 }, (table) => ({
 	pk: { columns: [table.seriesId, table.artistId] }
+}));
+
+export const shipSeries = pgTable('ship_series', {
+	shipId: uuid('ship_id').notNull().references(() => ships.id, { onDelete: 'cascade' }),
+	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
+	sortOrder: integer('sort_order').notNull().default(0),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({
+	pk: { columns: [table.shipId, table.seriesId] }
 }));
 
 export const favorites = pgTable('favorites', {

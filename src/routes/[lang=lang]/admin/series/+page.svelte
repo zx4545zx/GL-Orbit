@@ -5,6 +5,7 @@
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import StatusBadge from '$lib/components/admin/StatusBadge.svelte';
 	import EntityCreateModal from '$lib/components/admin/EntityCreateModal.svelte';
+	import Picture from '$lib/components/Picture.svelte';
 	import type { SeriesStatus } from '$lib/admin/editor-types.js';
 
 	interface SeriesListItem {
@@ -164,7 +165,7 @@
 				<div class="group glass-card rounded-2xl p-3 sm:p-4 transition-all hover:shadow-md hover:shadow-lavender/10 cursor-pointer" role="button" tabindex="0" onclick={() => openSeries(item.id)} onkeydown={(e) => e.key === 'Enter' && openSeries(item.id)}>
 					<div class="flex items-center gap-3 sm:gap-4">
 						{#if item.poster}
-							<img src={item.poster} alt={item.title} width={48} height={64} loading="lazy" decoding="async" class="w-12 h-16 sm:w-14 sm:h-20 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
+							<Picture src={item.poster} type="posters" sizes="160px" alt={item.title} width={48} height={64} loading="lazy" class="w-12 h-16 sm:w-14 sm:h-20 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
 						{:else}
 							<div class="w-12 h-16 sm:w-14 sm:h-20 rounded-xl bg-lavender/10 flex items-center justify-center flex-shrink-0">
 								<svg class="w-6 h-6 text-lavender-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>

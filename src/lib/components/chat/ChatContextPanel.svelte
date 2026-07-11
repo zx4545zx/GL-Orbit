@@ -4,6 +4,7 @@
 	import SeriesDetailPanel from '$lib/components/SeriesDetailPanel.svelte';
 	import ArtistDetailPanel from '$lib/components/ArtistDetailPanel.svelte';
 	import ScheduleContextPanel from '$lib/components/ScheduleContextPanel.svelte';
+	import Picture from '$lib/components/Picture.svelte';
 	import type { ChatContextPayload } from './ChatContext.js';
 
 	// Local type aliases keep this client component from importing server modules at runtime.
@@ -153,7 +154,7 @@
 					<div class="grid gap-3">
 						{#each artistItems as artist (artist.id)}
 							<button type="button" class="group flex items-center gap-3 rounded-2xl border border-white/70 bg-white/75 p-3 text-left shadow-sm shadow-lavender/10 transition hover:-translate-y-0.5 hover:border-coral/25 hover:bg-white" onclick={() => openArtistDetail(artist.id)}>
-								<img src={artist.profileImageUrl} alt={artist.nickname} width={64} height={64} loading="lazy" class="h-16 w-16 rounded-2xl object-cover shadow-sm" />
+								<Picture src={artist.profileImageUrl} type="profiles" sizes="128px" alt={artist.nickname} width={64} height={64} loading="lazy" class="h-16 w-16 rounded-2xl object-cover shadow-sm" />
 								<span class="min-w-0 flex-1">
 									<span class="block truncate text-base font-bold text-plum">{artist.nickname}</span>
 									{#if artist.fullNameEn}<span class="block truncate text-xs text-plum-light">{artist.fullNameEn}</span>{/if}

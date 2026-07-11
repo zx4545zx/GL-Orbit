@@ -1,6 +1,6 @@
 import { eq, and, isNull, asc, inArray } from 'drizzle-orm';
 import { getDb } from '$lib/server/db/index.js';
-import { series, studios, artists, seriesArtists, episodes, episodeSchedules, platforms, genres, seriesGenres } from '$lib/server/db/schema.js';
+import { series, studios, artists, seriesArtists, episodes, episodeSchedules, platforms, genres, seriesGenres, seriesGalleryImages } from '$lib/server/db/schema.js';
 import { getCached, setCached } from '$lib/server/cache.js';
 import { formatThailandDate } from '$lib/server/timezone.js';
 
@@ -15,11 +15,13 @@ export type SeriesDetail = {
 	status: 'UPCOMING' | 'ONGOING' | 'ENDED';
 	studio: string;
 	poster: string;
+	coverUrl: string | null;
 	genres: string[];
 	episodes: number;
 	year?: number;
 	platforms: { name: string; logo: string | null }[];
 	artists: { id: string; name: string; role: string; image: string }[];
+	gallery: { id: string; imageUrl: string; caption: string | null }[];
 	schedule: {
 		episode: number;
 		title: string;
@@ -58,6 +60,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 				titleEn: series.titleEn,
 				titleTh: series.titleTh,
 				posterUrl: series.posterUrl,
+				coverUrl: series.coverUrl,
 				descriptionTh: series.descriptionTh,
 				descriptionEn: series.descriptionEn,
 				status: series.status,
@@ -89,6 +92,17 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		.innerJoin(genres, eq(seriesGenres.genreId, genres.id))
 		.where(eq(seriesGenres.seriesId, id))
 		.orderBy(asc(genres.name));
+
+
+	const galleryPromise = db
+		.select({
+			id: seriesGalleryImages.id,
+			imageUrl: seriesGalleryImages.imageUrl,
+			caption: seriesGalleryImages.caption
+		})
+		.from(seriesGalleryImages)
+		.where(eq(seriesGalleryImages.seriesId, id))
+		.orderBy(asc(seriesGalleryImages.sortOrder), asc(seriesGalleryImages.createdAt));
 
 	const episodesWithSchedulePromise = (async () => {
 		const episodesResult = await db
@@ -127,10 +141,11 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		return { episodes: episodesResult, schedule: scheduleResult };
 	})();
 
-	const [seriesResult, artistsResult, genresResult, episodesWithSchedule] = await Promise.all([
+	const [seriesResult, artistsResult, genresResult, galleryResult, episodesWithSchedule] = await Promise.all([
 		seriesPromise,
 		artistsPromise,
 		genresPromise,
+		galleryPromise,
 		episodesWithSchedulePromise
 	]);
 
@@ -177,6 +192,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		status: seriesResult.status as SeriesDetail['status'],
 		studio: seriesResult.studioName ?? 'ไม่ระบุสตูดิโอ',
 		poster: seriesResult.posterUrl ?? '/placeholders/poster.svg',
+		coverUrl: seriesResult.coverUrl ?? null,
 		descriptionTh: seriesResult.descriptionTh ?? '',
 		descriptionEn: seriesResult.descriptionEn ?? '',
 		genres: genresResult.map((g) => g.name),
@@ -189,6 +205,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 			role: a.roleName ?? 'นักแสดง',
 			image: a.profileImageUrl ?? '/placeholders/avatar.svg'
 		})),
+		gallery: galleryResult,
 		schedule
 	};
 

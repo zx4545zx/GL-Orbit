@@ -2,7 +2,7 @@
 	import '../app.css';
 	import { navigating, page } from '$app/state';
 	import { onMount } from 'svelte';
-	import { DEFAULT_OG_IMAGE, defaultSeoDescription, defaultSeoTitle, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, siteLocale, SITE_NAME, absoluteUrl } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, buildLanguageAlternates, defaultSeoDescription, defaultSeoTitle, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, siteLocale, SITE_NAME, absoluteUrl, stripLanguageFromPath } from '$lib/seo.js';
 	import { availableLanguageTags, setLanguageTag, type AvailableLanguageTag, m } from '$lib/i18n/paraglide.js';
 	import PushPrompt from '$lib/components/PushPrompt.svelte';
 
@@ -90,6 +90,8 @@
 	const locale = $derived(siteLocale(page.data.lang ?? 'th'));
 	const seoTitle = $derived(defaultSeoTitle(page.data.lang ?? 'th'));
 	const seoDescription = $derived(defaultSeoDescription(page.data.lang ?? 'th'));
+	const alternatePath = $derived(stripLanguageFromPath(page.url.pathname));
+	const alternates = $derived(buildLanguageAlternates(page.url.origin, alternatePath));
 	let showRouteOverlay = $state(false);
 
 	$effect(() => {
@@ -122,6 +124,9 @@
 	<meta name="twitter:title" content={seoTitle} />
 	<meta name="twitter:description" content={seoDescription} />
 	<meta name="twitter:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+	{#each alternates as alternate}
+		<link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
+	{/each}
 </svelte:head>
 
 {#if routeChanging}

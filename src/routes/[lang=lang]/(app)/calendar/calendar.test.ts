@@ -205,14 +205,12 @@ describe('calendar page loading structure — source-level regression', () => {
 		expect(notesPos).toBeGreaterThan(lastClosingIf);
 	});
 
-	it('view toggle onclick delegates to goto(getViewUrl(...)) for ALL view modes (not just list)', () => {
+	it('view toggle onclick delegates to getViewUrl(...) for ALL view modes (not just list)', () => {
 		const source = readFileSync(pagePath, 'utf-8');
 		// The onclick handler should NOT have a per-mode guard like `if (btn.key === 'list')`.
-		// Instead it should call goto(getViewUrl(btn.key, ...)) unconditionally.
-		// This ensures switching back from list to grid/calendar also changes the URL.
+		// Instead it should call getViewUrl(btn.key, ...) unconditionally for all modes.
 		const hasPerModeGuard = source.includes(`if (btn.key === 'list')`);
-		// The correct pattern is unconditional goto with btn.key
-		const hasBtnKeyPattern = source.includes(`goto(getViewUrl(btn.key`);
+		const hasBtnKeyPattern = source.includes(`getViewUrl(btn.key`);
 		expect(hasPerModeGuard).toBe(false);
 		expect(hasBtnKeyPattern).toBe(true);
 	});

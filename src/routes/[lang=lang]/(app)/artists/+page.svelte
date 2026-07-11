@@ -1,9 +1,12 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
+import ImageListingCard from '$lib/components/ImageListingCard.svelte';
+import ListingSearch from '$lib/components/ListingSearch.svelte';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
-	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, jsonLdScript } from '$lib/seo.js';
+	import { DEFAULT_OG_IMAGE, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, absoluteUrl, buildCanonicalUrl, jsonLdScript, localizedPath } from '$lib/seo.js';
 	import type { PageData } from './$types.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { ArtistListItem } from '$lib/server/queries/artist-list.js';
 
 	let { data }: { data: PageData } = $props();
@@ -14,6 +17,9 @@ import { m } from '$lib/i18n/paraglide.js';
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
 	let loadMoreController: AbortController | null = null;
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, data.seo.canonicalPath));
+	const localizedJsonLd = $derived(data.seo.jsonLd.replaceAll(`${page.url.origin}/artists`, `${page.url.origin}${localizedPath(currentLang, '/artists')}`));
 
 	const allArtists = $derived([...data.artists.items, ...extraArtists]);
 	const total = $derived(data.artists.total);
@@ -112,12 +118,12 @@ import { m } from '$lib/i18n/paraglide.js';
 	<title>{data.seo.title}</title>
 	<meta name="description" content={data.seo.description} />
 	<meta name="robots" content={data.seo.robots} />
-	<link rel="canonical" href={`${page.url.origin}${data.seo.canonicalPath}`} />
+	<link rel="canonical" href={canonicalUrl} />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="GL-Orbit" />
 	<meta property="og:title" content={data.seo.ogTitle} />
 	<meta property="og:description" content={data.seo.ogDescription} />
-	<meta property="og:url" content={`${page.url.origin}${data.seo.canonicalPath}`} />
+	<meta property="og:url" content={canonicalUrl} />
 	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
 	<meta property="og:image:width" content={OG_IMAGE_WIDTH} />
 	<meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
@@ -125,7 +131,7 @@ import { m } from '$lib/i18n/paraglide.js';
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={data.seo.ogTitle} />
 	<meta name="twitter:description" content={data.seo.ogDescription} />
-	{@html jsonLdScript(data.seo.jsonLd)}
+	{@html jsonLdScript(localizedJsonLd)}
 </svelte:head>
 
 <div class="py-6 sm:py-8 max-w-6xl mx-auto" aria-busy={loading}>
@@ -139,56 +145,35 @@ import { m } from '$lib/i18n/paraglide.js';
 
 	<!-- Search -->
 	<div class="mb-6 sm:mb-8">
-		<div class="relative max-w-xl mx-auto">
-			<div class="glass-card-strong rounded-2xl flex items-center px-4 py-3 gap-3 transition-all duration-300 focus-within:ring-2 focus-within:ring-coral/30 focus-within:border-coral/30">
-				<svg class="w-5 h-5 text-plum-light flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-				</svg>
-				<input
-					type="text"
-					bind:value={searchQuery}
-					oninput={scheduleSearchUpdate}
-					placeholder={m.artist_search_placeholder()}
-					aria-label={m.artist_search_label()}
-					class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base"
-				/>
-				{#if searchQuery}
-					<button onclick={clearSearch} class="p-1 rounded-lg hover:bg-lavender/20 transition-colors flex-shrink-0" aria-label={m.common_search_clear()}>
-						<svg class="w-4 h-4 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
-						</svg>
-					</button>
-				{/if}
-			</div>
-		</div>
+		<ListingSearch bind:value={searchQuery} placeholder={m.artist_search_placeholder()} ariaLabel={m.artist_search_label()} oninput={scheduleSearchUpdate} onclear={clearSearch} />
 	</div>
 
 	<!-- Artist Grid -->
-	<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+	<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
 		{#if loading}
-			{#each Array(10) as _, i (i)}
-				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden p-4 sm:p-5 text-center">
-					<div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-lavender/10 animate-pulse mx-auto mb-3"></div>
-					<div class="h-4 w-2/3 bg-lavender/10 rounded animate-pulse mx-auto mb-2"></div>
-					<div class="h-3 w-1/2 bg-lavender/10 rounded animate-pulse mx-auto"></div>
+			{#each Array(8) as _, i (i)}
+				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+					<div class="relative aspect-[3/4] overflow-hidden">
+						<div class="absolute inset-0 bg-lavender/10 animate-pulse"></div>
+						<div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5 space-y-2">
+							<div class="h-3 w-1/2 bg-white/20 rounded animate-pulse"></div>
+							<div class="h-5 w-3/4 bg-white/30 rounded animate-pulse"></div>
+							<div class="h-3 w-2/3 bg-white/20 rounded animate-pulse"></div>
+						</div>
+					</div>
 				</div>
 			{/each}
 		{:else}
 			{#each allArtists as a (a.id)}
-				<a href="/{page.data.lang}/artists/{a.id}" class="group">
-					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/20 transition-all duration-500 hover:-translate-y-2 p-4 sm:p-5 text-center">
-						<div class="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-3">
-							<img src={a.profileImageUrl} alt={a.nickname} width={112} height={112} class="w-full h-full rounded-full object-cover bg-gray-100 group-hover:scale-110 transition-transform duration-700 ring-2 ring-lavender/20" loading="lazy" decoding="async" />
-						</div>
-						<h3 class="font-semibold text-plum text-sm sm:text-base line-clamp-1">{a.nickname}</h3>
-						{#if a.fullNameEn}<p class="text-xs sm:text-sm text-plum-light line-clamp-1 mt-0.5">{a.fullNameEn}</p>{/if}
-						{#if a.seriesCount > 0}
-							<span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[11px] font-semibold">{a.seriesCount} {m.artist_works_label()}</span>
-						{:else}
-							<span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-full bg-lavender/10 text-plum-light/70 text-[11px] font-medium">{m.artist_no_works()}</span>
-						{/if}
-					</div>
-				</a>
+				<ImageListingCard
+					href={`/${page.data.lang}/artists/${a.id}`}
+					image={a.profileImageUrl}
+					imageType="profiles"
+					title={a.nickname}
+					subtitle={a.fullNameEn ?? ''}
+					eyebrow={a.seriesCount > 0 ? m.artist_works_count({ count: a.seriesCount }) : m.artist_no_works()}
+					alt={a.nickname}
+				/>
 			{/each}
 		{/if}
 	</div>

@@ -32,8 +32,8 @@
 	);
 	const buttonClass = $derived(
 		variant === 'command'
-			? `group relative isolate inline-flex min-h-[3.35rem] items-center gap-3 overflow-hidden rounded-2xl px-3 py-3 text-left text-sm transition-all duration-300 touch-target active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/35 bg-lavender/10 text-lavender-dark shadow-lg shadow-lavender/15' : 'border border-white/70 bg-white/60 text-plum hover:-translate-y-0.5 hover:border-lavender/35 hover:bg-lavender/5 hover:shadow-lg hover:shadow-lavender/10'} ${className}`
-			: `group relative isolate inline-flex items-center gap-2.5 overflow-hidden rounded-full px-3.5 py-2 text-sm font-semibold transition-all duration-300 touch-target active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/35 bg-lavender/10 text-lavender-dark shadow-lg shadow-lavender/15' : 'border border-white/70 bg-white/55 text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl hover:-translate-y-0.5 hover:border-coral/25 hover:bg-white/85 hover:text-lavender-dark hover:shadow-lg hover:shadow-lavender/15'} ${className}`
+			? `inline-flex min-h-[3.35rem] items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/60 bg-lavender/18 text-lavender-dark' : 'border border-lavender/40 bg-white/95 text-plum hover:border-lavender/60 hover:bg-lavender/8'} ${className}`
+			: `inline-flex items-center gap-2.5 rounded-full px-3.5 py-2 text-sm font-semibold touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/60 bg-lavender/18 text-lavender-dark' : 'border border-lavender/35 bg-white/95 text-plum hover:border-lavender/55 hover:bg-lavender/8 hover:text-lavender-dark'} ${className}`
 	);
 
 	const LINE_PATH =
@@ -107,9 +107,7 @@
 		class={buttonClass}
 	>
 		{#if variant === 'command'}
-			<span class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_100%,rgba(196,181,253,0.26),transparent_45%),linear-gradient(135deg,rgba(255,255,255,0.68),rgba(255,255,255,0.26))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-
-			<span class="grid h-9 w-9 shrink-0 place-items-center rounded-2xl transition-all duration-300 {menuOpen ? 'bg-lavender text-white shadow-md shadow-lavender/25' : 'bg-plum/5 text-plum-light ring-1 ring-plum/5 group-hover:bg-lavender group-hover:text-white group-hover:rotate-[-4deg]'}">
+			<span class="grid h-9 w-9 shrink-0 place-items-center rounded-2xl {menuOpen ? 'bg-lavender text-white' : 'bg-lavender/16 text-lavender-dark ring-1 ring-lavender/30'}">
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
 						stroke-linecap="round"
@@ -121,13 +119,12 @@
 			</span>
 
 			<span class="min-w-0 leading-none">
-				<span class="block text-[10px] font-bold uppercase tracking-[0.22em] opacity-55">SHARE</span>
+				<span class="block text-[10px] font-bold uppercase tracking-[0.22em] opacity-70">SHARE</span>
 				<span class="mt-1 block truncate text-xs font-bold sm:text-sm">{m.share_command_title()}</span>
 			</span>
 		{:else}
-			<span class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_0%,rgba(196,181,253,0.22),transparent_45%),linear-gradient(135deg,rgba(255,255,255,0.65),rgba(255,255,255,0.2))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-			<div class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-plum/5 text-plum-light ring-1 ring-plum/5 transition-all duration-300 group-hover:rotate-[-4deg] group-hover:bg-lavender group-hover:text-white group-hover:ring-lavender/20 {menuOpen ? 'bg-lavender text-white shadow-md shadow-lavender/25' : ''}">
-				<svg class="h-4 w-4 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<div class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-lavender/16 text-lavender-dark ring-1 ring-lavender/30 {menuOpen ? 'bg-lavender text-white' : ''}">
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
@@ -145,7 +142,7 @@
 		<div
 			role="menu"
 			aria-label={m.share_menu_label()}
-			class="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-3xl border border-white/70 bg-white/90 p-2 shadow-2xl shadow-lavender/25 backdrop-blur-xl animate-fade-in"
+			class="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-3xl border border-white/70 bg-white/95 p-2"
 		>
 			<p class="px-3 pb-2 pt-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-plum-light">{m.share_to()}</p>
 
@@ -155,7 +152,7 @@
 				rel="noopener noreferrer"
 				role="menuitem"
 				onclick={selectOption}
-				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 transition-colors touch-target"
+				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 touch-target"
 			>
 				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center share-brand-line">
 					<svg class="text-white share-icon-line" fill="currentColor" viewBox="0 0 24 24"><path d={LINE_PATH} /></svg>
@@ -169,7 +166,7 @@
 				rel="noopener noreferrer"
 				role="menuitem"
 				onclick={selectOption}
-				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 transition-colors touch-target"
+				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 touch-target"
 			>
 				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center share-brand-facebook">
 					<svg class="text-white share-icon-facebook" fill="currentColor" viewBox="0 0 24 24"><path d={FB_PATH} /></svg>
@@ -183,7 +180,7 @@
 				rel="noopener noreferrer"
 				role="menuitem"
 				onclick={selectOption}
-				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 transition-colors touch-target"
+				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 touch-target"
 			>
 				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-black">
 					<svg class="text-white share-icon-x" fill="currentColor" viewBox="0 0 24 24"><path d={X_PATH} /></svg>
@@ -198,7 +195,7 @@
 				type="button"
 				role="menuitem"
 				onclick={copyLink}
-				class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 transition-colors touch-target text-left"
+				class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 touch-target text-left"
 			>
 				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-lavender/20">
 					{#if copied}

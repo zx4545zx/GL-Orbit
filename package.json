@@ -7,6 +7,8 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "i18n:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/i18n/paraglide --silent",
     "check": "npm run i18n:compile && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "npm run i18n:compile && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -35,6 +37,9 @@
     "vitest": "^4.1.8"
   },
   "dependencies": {
+    "@fontsource/dm-sans": "^5.2.8",
+    "@fontsource/mali": "^5.2.8",
+    "@fontsource/syne": "^5.2.7",
     "@inlang/paraglide-sveltekit": "^0.16.1",
     "@neondatabase/serverless": "^1.0.0",
     "aws4fetch": "^1.0.20",
@@ -42,6 +47,7 @@
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.0",
     "jose": "^6.2.3",
+    "sharp": "^0.35.3",
     "uuid": "^11.1.0",
     "web-push": "^3.6.7"
   }

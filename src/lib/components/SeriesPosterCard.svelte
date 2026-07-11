@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
+	import Picture from '$lib/components/Picture.svelte';
 	import type { SeriesListItem } from '$lib/server/series/listing.js';
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
@@ -15,7 +16,7 @@
 <a {href} class="group">
 	<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/20 transition-all duration-500 hover:-translate-y-2">
 		<div class="relative aspect-[3/4] overflow-hidden">
-			<img src={item.poster} alt={item.title} width={400} height={533} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" decoding="async" />
+			<Picture src={item.poster} type="posters" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" alt={item.title} width={400} height={533} loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
 			<div class="absolute inset-0 bg-gradient-to-t from-plum/80 via-plum/20 to-transparent"></div>
 			<div class="absolute top-3 sm:top-4 left-3 sm:left-4">
 				<span class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-semibold backdrop-blur-md {badge.class}">{badge.text}</span>

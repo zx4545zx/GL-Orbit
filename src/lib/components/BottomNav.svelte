@@ -9,8 +9,18 @@ import NotificationBadge from './NotificationBadge.svelte';
 
 	const currentUser = $derived(page.data.user);
 	let unreadCount = $state(0);
+	let mounted = $state(false);
+
+	onMount(() => {
+		mounted = true;
+		return () => {
+			mounted = false;
+		};
+	});
 
 	$effect(() => {
+		if (!mounted) return;
+
 		if (!currentUser) {
 			unreadCount = 0;
 			return;
@@ -154,7 +164,7 @@ import NotificationBadge from './NotificationBadge.svelte';
 						</div>
 					</div>
 					<span
-						class="block max-w-full truncate text-center text-[10px] font-medium leading-none transition-all duration-300 {active ? 'text-coral-dark font-semibold' : 'text-plum-light/70'}"
+						class="block max-w-full truncate text-center text-[10px] font-medium leading-none transition-all duration-300 {active ? 'text-plum font-semibold' : 'text-plum-light'}"
 					>
 						{item.label}
 					</span>

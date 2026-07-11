@@ -1,5 +1,6 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
+import Picture from '$lib/components/Picture.svelte';
 
 	import { page } from '$app/state';	import {
 		DEFAULT_OG_IMAGE,
@@ -10,10 +11,13 @@ import { m } from '$lib/i18n/paraglide.js';
 		SITE_NAME,
 		absoluteUrl,
 		buildBreadcrumbJsonLd,
+		buildCanonicalUrl,
 		buildWebPageJsonLd,
 		jsonLdScript,
+		localizedPath,
 		safeJsonLd
 	} from '$lib/seo.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { PageData } from './$types.js';
 	import type { CountdownItem } from '$lib/types/home.js';
 
@@ -40,12 +44,14 @@ import { m } from '$lib/i18n/paraglide.js';
 	const SEO_TITLE = m.countdown_seo_title();
 	const SEO_DESCRIPTION = m.countdown_seo_description();
 
-	const canonicalUrl = $derived(absoluteUrl(page.url.origin, '/countdown'));
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalPath = '/countdown';
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
 	const jsonLd = $derived(safeJsonLd([
-		buildWebPageJsonLd(page.url.origin, '/countdown', SEO_TITLE, SEO_DESCRIPTION),
+		buildWebPageJsonLd(page.url.origin, localizedPath(currentLang, canonicalPath), SEO_TITLE, SEO_DESCRIPTION, currentLang),
 		buildBreadcrumbJsonLd(page.url.origin, [
-			{ name: m.nav_home(), path: '/' },
-			{ name: m.countdown_breadcrumb(), path: '/countdown' }
+			{ name: m.nav_home(), path: localizedPath(currentLang, '') },
+			{ name: m.countdown_breadcrumb(), path: localizedPath(currentLang, canonicalPath) }
 		])
 	]));
 
@@ -186,9 +192,13 @@ import { m } from '$lib/i18n/paraglide.js';
 							<!-- header: poster + meta -->
 							<div class="relative flex items-center gap-3 mb-3 pr-12">
 								<div class="flex-shrink-0 w-11 h-14 sm:w-12 sm:h-16 rounded-xl overflow-hidden bg-lavender/10 ring-1 ring-white/60">
-									<img
+									<Picture
 										src={c.poster}
+										type="posters"
+										sizes="3rem"
 										alt={c.title}
+										width={88}
+										height={112}
 										class="w-full h-full object-cover"
 										loading="lazy"
 										decoding="async"

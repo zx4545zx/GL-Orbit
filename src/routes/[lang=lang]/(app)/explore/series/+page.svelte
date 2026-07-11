@@ -2,6 +2,19 @@
 	import { m } from '$lib/i18n/paraglide.js';
 
 	import { page } from '$app/state';	import { goto } from '$app/navigation';
+	import {
+		DEFAULT_OG_IMAGE,
+		OG_IMAGE_HEIGHT,
+		OG_IMAGE_TYPE,
+		OG_IMAGE_WIDTH,
+		absoluteUrl,
+		buildBreadcrumbJsonLd,
+		buildCanonicalUrl,
+		buildWebPageJsonLd,
+		jsonLdScript,
+		safeJsonLd
+	} from '$lib/seo.js';
+	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { PageData } from './$types.js';
 	import type { SeriesListItem, SeriesStatusFilter } from '$lib/server/series/listing.js';
 	import SeriesPosterCard from '$lib/components/SeriesPosterCard.svelte';
@@ -22,11 +35,24 @@
 	];
 
 	let extraSeries = $state<SeriesListItem[]>([]);
-	let searchQuery = $state(data.filters.search);
-	let filterStatus = $state<SeriesStatusFilter>(data.filters.status);
+	let searchQuery = $state('');
+	let filterStatus = $state<SeriesStatusFilter>('ALL');
 	let loading = $state(false);
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const canonicalPath = '/explore/series';
+	const SEO_TITLE = m.explore_series_seo_title();
+	const SEO_DESCRIPTION = m.explore_series_seo_description();
+	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
+	const jsonLd = $derived(safeJsonLd([
+		buildWebPageJsonLd(page.url.origin, `/${currentLang}${canonicalPath}`, SEO_TITLE, SEO_DESCRIPTION, currentLang),
+		buildBreadcrumbJsonLd(page.url.origin, [
+			{ name: m.nav_home(), path: `/${currentLang}` },
+			{ name: m.nav_series(), path: `/${currentLang}/series` },
+			{ name: m.nav_explore(), path: `/${currentLang}${canonicalPath}` }
+		])
+	]));
 
 	const allSeries = $derived([...data.series.items, ...extraSeries]);
 	const total = $derived(data.series.total);
@@ -109,8 +135,21 @@
 </script>
 
 <svelte:head>
-	<title>{m.explore_series_seo_title()}</title>
-	<meta name="description" content={m.explore_series_seo_description()} />
+	<title>{SEO_TITLE}</title>
+	<meta name="description" content={SEO_DESCRIPTION} />
+	<meta name="robots" content="index, follow" />
+	<link rel="canonical" href={canonicalUrl} />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={SEO_TITLE} />
+	<meta property="og:description" content={SEO_DESCRIPTION} />
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:image" content={absoluteUrl(page.url.origin, DEFAULT_OG_IMAGE)} />
+	<meta property="og:image:width" content={OG_IMAGE_WIDTH} />
+	<meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
+	<meta property="og:image:type" content={OG_IMAGE_TYPE} />
+	<meta name="twitter:title" content={SEO_TITLE} />
+	<meta name="twitter:description" content={SEO_DESCRIPTION} />
+	{@html jsonLdScript(jsonLd)}
 </svelte:head>
 
 <!-- Search + Filter -->

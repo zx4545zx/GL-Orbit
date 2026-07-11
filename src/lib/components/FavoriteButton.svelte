@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
+	import { onMount } from 'svelte';
 
 	import { page } from '$app/state';
 	let { seriesId, className = '' }: { seriesId: string; className?: string } = $props();
@@ -7,10 +8,19 @@
 	let favorited = $state(false);
 	let loading = $state(false);
 	let checking = $state(true);
+	let mounted = $state(false);
 
 	const isLoading = $derived(checking || loading);
 
+	onMount(() => {
+		mounted = true;
+		return () => {
+			mounted = false;
+		};
+	});
+
 	$effect(() => {
+		if (!mounted) return;
 		if (!seriesId) return;
 
 		if (!page.data.user) {
@@ -18,17 +28,25 @@
 			return;
 		}
 
+		let cancelled = false;
+		checking = true;
+
 		fetch(`/api/favorites?seriesId=${encodeURIComponent(seriesId)}`)
 			.then((r) => r.json())
 			.then((data) => {
+				if (cancelled) return;
 				if (data.favorited !== undefined) {
 					favorited = data.favorited;
 				}
 				checking = false;
 			})
 			.catch(() => {
-				checking = false;
+				if (!cancelled) checking = false;
 			});
+
+		return () => {
+			cancelled = true;
+		};
 	});
 
 	async function handleToggle() {
@@ -69,11 +87,9 @@
 	disabled={isLoading}
 	aria-label={isLoading ? m.favorite_loading_aria() : favorited ? m.favorite_unmark_aria() : m.favorite_mark_aria()}
 	aria-pressed={isLoading ? undefined : favorited}
-	class="group relative isolate inline-flex min-h-[3.35rem] items-center gap-3 overflow-hidden rounded-2xl px-3 py-3 text-left text-sm transition-all duration-300 touch-target active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:pointer-events-none {isLoading ? 'border border-plum/5 bg-white/35 text-plum-light/45 shadow-inner cursor-wait' : favorited ? 'border border-coral/30 bg-coral/10 text-coral-dark shadow-lg shadow-coral/15 hover:-translate-y-0.5' : 'border border-white/70 bg-white/60 text-plum hover:-translate-y-0.5 hover:-rotate-[0.35deg] hover:border-coral/25 hover:bg-coral/5 hover:shadow-lg hover:shadow-coral/10'} {className}"
+	class="inline-flex min-h-[3.35rem] items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:pointer-events-none {isLoading ? 'border border-plum/10 bg-white/80 text-plum-light/60 cursor-wait' : favorited ? 'border border-coral/55 bg-coral/16 text-coral-dark hover:bg-coral/22' : 'border border-coral/35 bg-white/95 text-plum hover:border-coral/55 hover:bg-coral/8'} {className}"
 >
-	<span class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_0%,rgba(255,107,157,0.22),transparent_45%),linear-gradient(135deg,rgba(255,255,255,0.65),rgba(255,255,255,0.25))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-
-	<span class="grid h-9 w-9 shrink-0 place-items-center rounded-2xl transition-all duration-300 {favorited ? 'bg-coral text-white shadow-md shadow-coral/25 rotate-[-6deg]' : 'bg-plum/5 text-plum-light ring-1 ring-plum/5 group-hover:bg-coral group-hover:text-white group-hover:rotate-[-6deg]'}">
+	<span class="grid h-9 w-9 shrink-0 place-items-center rounded-2xl {favorited ? 'bg-coral text-white' : 'bg-coral/12 text-coral-dark ring-1 ring-coral/25'}">
 		{#if isLoading}
 			<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -87,7 +103,7 @@
 	</span>
 
 	<span class="min-w-0 leading-none">
-		<span class="block text-[10px] font-bold uppercase tracking-[0.22em] opacity-55">FAV</span>
+		<span class="block text-[10px] font-bold uppercase tracking-[0.22em] opacity-70">FAV</span>
 		<span class="mt-1 block truncate text-xs font-bold sm:text-sm">{isLoading ? m.favorite_loading_label() : favorited ? m.favorite_favorited_label() : m.favorite_unfavorited_label()}</span>
 	</span>
 </button>

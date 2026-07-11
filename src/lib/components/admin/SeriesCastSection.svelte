@@ -3,6 +3,7 @@
 	import type { CastMember, ReferenceData } from '$lib/admin/editor-types.js';
 	import SearchableSelect from './SearchableSelect.svelte';
 	import EntityCreateModal from './EntityCreateModal.svelte';
+	import Picture from '$lib/components/Picture.svelte';
 
 	let {
 		seriesId,
@@ -129,9 +130,9 @@
 				{#each cast as member (member.id)}
 					<div class="flex items-center gap-3 bg-white/70 rounded-2xl p-3 border border-lavender/15">
 						<div class="w-11 h-11 rounded-full overflow-hidden bg-lavender/10 flex-shrink-0">
-							{#if member.profileImageUrl}
-								<img src={member.profileImageUrl} alt={member.nickname} class="w-full h-full object-cover" />
-							{:else}
+						{#if member.profileImageUrl}
+							<Picture src={member.profileImageUrl} type="profiles" sizes="88px" alt={member.nickname} width={44} height={44} loading="lazy" class="w-full h-full object-cover" />
+						{:else}
 								<div class="w-full h-full flex items-center justify-center text-lavender-dark font-semibold text-sm">{member.nickname.charAt(0)}</div>
 							{/if}
 						</div>

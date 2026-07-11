@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync('src/routes/[lang=lang]/(app)/profile/+page.svelte', 'utf-8');
+const source = readFileSync('src/routes/[lang=lang]/(app)/menus/+page.svelte', 'utf-8');
 
 describe('profile logout loading state', () => {
 	it('adds a loading flag and disables the logout button', () => {

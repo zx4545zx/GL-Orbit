@@ -5,6 +5,7 @@ import { onMount } from 'svelte';
 import { connectNotificationStream } from '$lib/client/notification-stream.js';
 import NotificationDropdown from './NotificationDropdown.svelte';
 import LanguageSwitcher from './LanguageSwitcher.svelte';
+import Picture from './Picture.svelte';
 
 	let { navHidden = false }: { navHidden?: boolean } = $props();
 
@@ -43,6 +44,7 @@ import LanguageSwitcher from './LanguageSwitcher.svelte';
 	const currentUser = $derived(page.data.user);
 
 	let unreadCount = $state(0);
+	let mounted = $state(false);
 	let profileMenuOpen = $state(false);
 	let profileMenuRoot = $state<HTMLDivElement | null>(null);
 
@@ -64,7 +66,16 @@ import LanguageSwitcher from './LanguageSwitcher.svelte';
 		if (event.key === 'Escape') profileMenuOpen = false;
 	}
 
+	onMount(() => {
+		mounted = true;
+		return () => {
+			mounted = false;
+		};
+	});
+
 	$effect(() => {
+		if (!mounted) return;
+
 		if (!currentUser) {
 			unreadCount = 0;
 			return;
@@ -159,7 +170,7 @@ import LanguageSwitcher from './LanguageSwitcher.svelte';
 							class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-lavender/20 transition-all touch-target"
 						>
 							{#if currentUser.avatarUrl}
-								<img src={currentUser.avatarUrl} alt="" width={28} height={28} loading="eager" decoding="async" class="w-7 h-7 rounded-full object-cover" />
+								<Picture src={currentUser.avatarUrl} type="profiles" sizes="56px" alt="" width={28} height={28} loading="eager" class="w-7 h-7 rounded-full object-cover" />
 							{:else}
 								<div class="w-7 h-7 rounded-full bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center">
 									<span class="text-xs font-bold text-coral-dark">{(currentUser.displayName || currentUser.username).charAt(0).toUpperCase()}</span>

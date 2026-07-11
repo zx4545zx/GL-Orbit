@@ -38,7 +38,7 @@ describe('NotificationDropdown dropdown panel background', () => {
 // Keep the original placeholder tests as secondary smoke tests
 describe('NotificationDropdown source structure', () => {
 	it('should render bell button', () => {
-		expect(source).toContain('aria-label="การแจ้งเตือน"');
+		expect(source).toContain('aria-label={m.notifications_aria_label()}');
 	});
 
 	it('should open dropdown on click', () => {

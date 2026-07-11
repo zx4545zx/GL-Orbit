@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const layoutSource = readFileSync('src/routes/(chat)/+layout.svelte', 'utf-8');
+const layoutSource = readFileSync('src/routes/[lang=lang]/(chat)/+layout.svelte', 'utf-8');
 const chatSource = readFileSync('src/lib/components/chat/ChatApp.svelte', 'utf-8');
 
 describe('chat iOS keyboard gap regression', () => {

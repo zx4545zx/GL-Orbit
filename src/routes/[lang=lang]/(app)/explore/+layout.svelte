@@ -7,6 +7,7 @@
 	const langPrefix = $derived(`/${page.data.lang}`);
 	const tabs = $derived([
 		{ id: 'series', href: `${langPrefix}/explore/series`, label: m.nav_series(), icon: 'M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4' },
+		{ id: 'ships', href: `${langPrefix}/explore/ships`, label: m.nav_ships(), icon: 'M12 21s-6.716-4.35-9.193-7.06C.429 11.337.52 7.54 3.05 5.24 5.264 3.228 8.59 3.62 12 7.09c3.41-3.47 6.736-3.862 8.95-1.85 2.53 2.3 2.621 6.097.243 8.7C18.716 16.65 12 21 12 21z' },
 		{ id: 'artists', href: `${langPrefix}/explore/artists`, label: m.nav_artists(), icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
 	]);
 

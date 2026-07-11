@@ -4,6 +4,7 @@
 	import { adminFetch } from '$lib/admin/action-feedback.js';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import ImageUpload from '$lib/components/admin/ImageUpload.svelte';
+	import Picture from '$lib/components/Picture.svelte';
 
 	interface Artist {
 		id: string;
@@ -175,7 +176,7 @@
 				<div class="group glass-card rounded-2xl p-3 sm:p-4 transition-all hover:shadow-md hover:shadow-lavender/10 cursor-pointer" role="button" tabindex="0" onclick={() => goto(`/admin/artists/${artist.id}`)} onkeydown={(e) => e.key === 'Enter' && goto(`/admin/artists/${artist.id}`)}>
 					<div class="flex items-center gap-3 sm:gap-4">
 						{#if artist.profileImageUrl}
-							<img src={artist.profileImageUrl} alt={artist.nickname} width={48} height={48} loading="lazy" decoding="async" class="w-12 h-12 rounded-full object-cover bg-gray-100 flex-shrink-0" />
+							<Picture src={artist.profileImageUrl} type="profiles" sizes="96px" alt={artist.nickname} width={48} height={48} loading="lazy" class="w-12 h-12 rounded-full object-cover bg-gray-100 flex-shrink-0" />
 						{:else}
 							<div class="w-12 h-12 rounded-full bg-lavender/10 flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-lavender-dark/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>
 						{/if}

@@ -1,4 +1,18 @@
 @import "tailwindcss";
+@import "@fontsource/dm-sans/400.css";
+@import "@fontsource/dm-sans/500.css";
+@import "@fontsource/dm-sans/600.css";
+@import "@fontsource/dm-sans/700.css";
+@import "@fontsource/dm-sans/400-italic.css";
+@import "@fontsource/syne/400.css";
+@import "@fontsource/syne/500.css";
+@import "@fontsource/syne/600.css";
+@import "@fontsource/syne/700.css";
+@import "@fontsource/syne/800.css";
+@import "@fontsource/mali/400.css";
+@import "@fontsource/mali/500.css";
+@import "@fontsource/mali/600.css";
+@import "@fontsource/mali/700.css";
 
 @theme {
   --font-display: 'Syne', 'Mali', sans-serif;
@@ -151,6 +165,12 @@ body {
   font-size: var(--text-fluid-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 767px) {
+  body {
+    background-attachment: scroll;
+  }
 }
 
 /* Fluid typography utilities */
@@ -454,4 +474,56 @@ h1, h2, h3 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* --- Mobile scroll/perf utilities --- */
+
+@media (max-width: 767px) {
+  .mobile-glass {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: rgba(255, 255, 255, 0.8);
+  }
+
+  .mobile-no-blur {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .mobile-shadow {
+    box-shadow:
+      0 4px 6px -1px rgba(196, 181, 253, 0.08),
+      0 2px 4px -2px rgba(196, 181, 253, 0.06);
+  }
+
+  .mobile-shadow-lg {
+    box-shadow:
+      0 10px 15px -3px rgba(196, 181, 253, 0.1),
+      0 4px 6px -4px rgba(196, 181, 253, 0.08);
+  }
+}
+
+/* Hint browser to isolate heavy layers */
+.gpu-layer {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce motion for decorative orbs automatically */
+@media (prefers-reduced-motion: reduce) {
+  .reduced-motion-orb {
+    animation: none !important;
+  }
+}
+
+/* Section-level paint containment for off-screen content */
+.perf-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* Card-level layout containment to limit repaint */
+.perf-card {
+  contain: layout paint;
 }

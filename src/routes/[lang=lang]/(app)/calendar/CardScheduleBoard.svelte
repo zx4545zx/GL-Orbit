@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import Picture from '$lib/components/Picture.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import type { ScheduleDay, CalendarEvent } from '$lib/types/calendar.js';
 
@@ -74,7 +75,7 @@
 		return 0;
 	})());
 
-	let selectedMobileDay = $state(defaultMobileDay);
+	let selectedMobileDay = $state(0);
 
 	$effect(() => {
 		selectedMobileDay = defaultMobileDay;
@@ -166,9 +167,13 @@
 						>
 							<a href="/{page.data.lang}/series/{event.seriesId}" class="block">
 								<div class="relative mb-2">
-									<img
+									<Picture
 										src={event.posterUrl}
-										alt="{event.series}"
+										type="posters"
+										sizes="4rem"
+										alt={event.series}
+										width={64}
+										height={90}
 										class="w-full aspect-[2/3] rounded-lg object-cover shadow-sm bg-white/50"
 										loading="lazy"
 									/>
@@ -236,9 +241,13 @@
 					>
 						<a href="/{page.data.lang}/series/{event.seriesId}" class="flex gap-3">
 							<div class="relative flex-shrink-0">
-								<img
+								<Picture
 									src={event.posterUrl}
-									alt="{event.series}"
+									type="posters"
+									sizes="4rem"
+									alt={event.series}
+									width={64}
+									height={90}
 									class="w-20 h-28 sm:w-24 sm:h-32 rounded-lg object-cover shadow-sm bg-white/50"
 									loading="lazy"
 								/>

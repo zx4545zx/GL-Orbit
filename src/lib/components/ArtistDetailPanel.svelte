@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
+	import Picture from '$lib/components/Picture.svelte';
 	import SeriesPosterCard from '$lib/components/SeriesPosterCard.svelte';
 
 	type ArtistDetail = import('$lib/server/queries/artist-detail.js').ArtistDetail;
@@ -48,7 +49,7 @@
 			</div>
 			<div class="relative -mt-14 px-4 pb-5 text-center">
 				<div class="mx-auto h-28 w-28 rounded-full bg-gradient-to-br from-coral/35 via-cream to-lavender/35 p-1.5 shadow-xl shadow-lavender/25">
-					<img src={detail.profileImageUrl} alt={detail.nickname} width={112} height={112} loading="lazy" class="h-full w-full rounded-full object-cover bg-cream" />
+					<Picture src={detail.profileImageUrl} type="profiles" sizes="(max-width: 768px) 40vw, 320px" alt={detail.nickname} width={112} height={112} loading="lazy" class="h-full w-full rounded-full object-cover bg-cream" />
 				</div>
 				<p class="mt-3 text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark/70">Artist orbit</p>
 				<h3 class="mt-1 font-[family-name:var(--font-display)] text-3xl font-extrabold leading-tight text-gradient">{detail.nickname}</h3>
