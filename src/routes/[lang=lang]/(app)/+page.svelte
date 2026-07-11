@@ -158,18 +158,6 @@ import Picture from '$lib/components/Picture.svelte';
 	{@html jsonLdScript(homeJsonLd)}
 </svelte:head>
 
-<a
-	href="/{page.data.lang}/chat"
-	data-sveltekit-preload-data="hover"
-	aria-label={m.home_chat_aria_label()}
-	class="group fixed right-4 z-[55] mobile-chat-fab flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-coral to-coral-dark text-white shadow-xl shadow-coral/40 transition-all duration-300 active:scale-95 md:hidden"
->
-	<svg class="h-5 w-5 transition-transform duration-300 group-active:scale-95" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
-		<path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-		<path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.142-4.03 7.5-9 7.5a10.55 10.55 0 0 1-3.72-.66L3 20.25l1.46-3.98A6.82 6.82 0 0 1 3 12c0-4.142 4.03-7.5 9-7.5s9 3.358 9 7.5Z" />
-	</svg>
-</a>
-
 <!-- Hero Section: Cosmic Observatory (light theme) -->
 <section class="relative -mx-4 min-h-dvh overflow-hidden px-4 md:-mt-24 md:pt-24 flex items-center justify-center">
 	<!-- light gradient base (per project theme) -->

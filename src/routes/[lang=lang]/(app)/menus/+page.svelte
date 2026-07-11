@@ -145,33 +145,6 @@
 				</div>
 			{/if}
 
-			<a
-				href={localizedHref('/chat', page.data.lang)}
-				class="group relative flex items-center gap-4 overflow-hidden rounded-[1.65rem] border border-white/65 bg-white/76 p-4 shadow-lg shadow-lavender/16 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_45px_-18px_rgba(139,92,246,0.42)] touch-target sm:p-5"
-			>
-				<div class="pointer-events-none absolute inset-y-0 right-0 w-36 bg-gradient-to-l from-lavender/18 via-coral/8 to-transparent"></div>
-				<div class="relative grid h-12 w-12 shrink-0 place-items-center rounded-[1.15rem] bg-gradient-to-br from-lavender/20 to-coral/14 text-lavender-dark ring-1 ring-white/75 transition-all duration-300 group-hover:bg-lavender-dark group-hover:text-white sm:h-14 sm:w-14" aria-hidden="true">
-					<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-						<path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.142-4.03 7.5-9 7.5a10.55 10.55 0 0 1-3.72-.66L3 20.25l1.46-3.98A6.82 6.82 0 0 1 3 12c0-4.142 4.03-7.5 9-7.5s9 3.358 9 7.5Z" />
-					</svg>
-					<span class="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-mint shadow-[0_0_10px_rgba(110,231,183,0.75)]"></span>
-				</div>
-				<div class="relative min-w-0 flex-1">
-					<h2 class="font-[family-name:var(--font-display)] text-lg font-black leading-tight text-plum transition-colors group-hover:text-coral-dark sm:text-xl">
-						{m.nav_chat()}
-					</h2>
-					<p class="mt-1 line-clamp-1 text-sm leading-5 text-plum-light">
-						{m.chat_empty_title()}
-					</p>
-				</div>
-				<div class="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-lavender-dark shadow-md shadow-lavender/15 transition-all duration-300 group-hover:translate-x-1 group-hover:bg-lavender-dark group-hover:text-white">
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-					</svg>
-				</div>
-			</a>
-
 			{#if currentUser}
 				<div class="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
 					{#if currentUser.role === 'ADMIN'}
