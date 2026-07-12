@@ -87,13 +87,6 @@ import NotificationBadge from './NotificationBadge.svelte';
 					</svg>
 				`
 			},
-			{
-				href: `/${page.data.lang}/halo`,
-				label: m.nav_halo(),
-				icon: (active: boolean) => `
-					<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-coral-dark' : 'text-plum-light'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75 14.37 8.55l5.3.77-3.84 3.74.9 5.28L12 15.85l-4.74 2.49.9-5.28-3.84-3.74 5.3-.77L12 3.75Z" /></svg>
-				`
-			}
 		]);
 
 	const menuItem = $derived({

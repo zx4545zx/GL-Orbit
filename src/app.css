@@ -510,6 +510,15 @@ h1, h2, h3 {
 /* --- Mobile scroll/perf utilities --- */
 
 @media (max-width: 767px) {
+  /* Hide scrollbar on mobile — keep scroll functionality */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   .mobile-glass {
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: none;

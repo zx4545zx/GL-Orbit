@@ -145,6 +145,31 @@
 				</div>
 			{/if}
 
+			{#if currentUser?.role === 'ADMIN'}
+			<a
+				href={localizedHref('/halo', page.data.lang)}
+				class="group relative flex items-center gap-4 overflow-hidden rounded-[1.75rem] border border-white/65 bg-white/76 p-4 shadow-lg shadow-lavender/16 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_48px_-20px_rgba(255,107,157,0.45)] touch-target sm:p-5"
+			>
+				<div class="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-lavender/16 to-transparent"></div>
+				<div class="relative grid h-14 w-14 shrink-0 place-items-center rounded-[1.15rem] bg-gradient-to-br from-yellow-400/25 to-orange-300/30 ring-2 ring-white/80 sm:h-16 sm:w-16">
+					<svg class="h-7 w-7 text-yellow-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.75 14.37 8.55l5.3.77-3.84 3.74.9 5.28L12 15.85l-4.74 2.49.9-5.28-3.84-3.74 5.3-.77L12 3.75Z" /></svg>
+				</div>
+				<div class="relative min-w-0 flex-1">
+					<h2 class="font-[family-name:var(--font-display)] text-lg font-black leading-tight text-plum transition-colors group-hover:text-yellow-600 sm:text-xl">
+						{m.nav_halo()}
+					</h2>
+					<p class="mt-1 line-clamp-1 text-sm leading-5 text-plum-light">
+						{m.halo_tagline()}
+					</p>
+				</div>
+				<div class="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-yellow-600 shadow-md shadow-lavender/15 transition-all duration-300 group-hover:translate-x-1 group-hover:bg-yellow-500 group-hover:text-white">
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+					</svg>
+				</div>
+			</a>
+		{/if}
+
 			{#if currentUser}
 				<div class="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
 					{#if currentUser.role === 'ADMIN'}
