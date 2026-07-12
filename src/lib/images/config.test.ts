@@ -23,9 +23,10 @@ describe('isLegacyImageUrl', () => {
 });
 
 describe('isManagedImageUrl', () => {
-	it('true for any /images/{posters|profiles}/ path', () => {
+	it('true for any supported managed image path', () => {
 		expect(isManagedImageUrl(`${BASE}/profiles/${UUID}/640.jpg`)).toBe(true);
 		expect(isManagedImageUrl(`${BASE}/posters/${UUID}.jpg`)).toBe(true);
+		expect(isManagedImageUrl(`${BASE}/moments/${UUID}/1080.jpg`)).toBe(true);
 	});
 	it('false for external', () => {
 		expect(isManagedImageUrl('https://example.com/foo.jpg')).toBe(false);
@@ -56,6 +57,13 @@ describe('deriveVariantUrls', () => {
 		const v = deriveVariantUrls(`${BASE}/profiles/${UUID}/640.jpg`, 'profiles');
 		expect(v!.avif.map((e) => e.width)).toEqual([320, 640]);
 	});
+
+	it('handles moments type', () => {
+		const v = deriveVariantUrls(`${BASE}/moments/${UUID}/1080.jpg`, 'moments');
+		expect(v!.avif.map((e) => e.width)).toEqual([480, 1080]);
+		expect(v!.webp.map((e) => e.url)).toEqual([`${BASE}/moments/${UUID}/480.webp`, `${BASE}/moments/${UUID}/1080.webp`]);
+		expect(v!.jpg.map((e) => e.url)).toEqual([`${BASE}/moments/${UUID}/480.jpg`, `${BASE}/moments/${UUID}/1080.jpg`]);
+	});
 });
 
 describe('parseLegacyUrl', () => {
@@ -77,5 +85,7 @@ describe('IMAGE_VARIANTS', () => {
 		expect(IMAGE_VARIANTS.posters.fallback).toBe(1080);
 		expect(IMAGE_VARIANTS.profiles.widths).toEqual([320, 640]);
 		expect(IMAGE_VARIANTS.profiles.fallback).toBe(640);
+		expect(IMAGE_VARIANTS.moments.widths).toEqual([480, 1080]);
+		expect(IMAGE_VARIANTS.moments.fallback).toBe(1080);
 	});
 });

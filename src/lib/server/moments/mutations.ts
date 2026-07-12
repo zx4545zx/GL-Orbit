@@ -4,13 +4,14 @@ import { getDb } from '../db/index.js';
 type CreateMomentInput = {
 	authorId: string;
 	body?: string | null;
-	sourceUrl: string;
-	sourceCanonicalUrl: string;
+	sourceUrl: string | null;
+	sourceCanonicalUrl: string | null;
 	provider: 'YOUTUBE' | 'TIKTOK' | 'X' | 'OTHER';
 	externalId?: string;
 	embedStatus?: 'READY' | 'FALLBACK' | 'FAILED';
 	embedMetadata?: Record<string, unknown>;
 	imageUrls: string[];
+	pendingMediaCount: number;
 	seriesIds?: string[];
 	artistIds?: string[];
 	shipIds?: string[];
@@ -20,7 +21,8 @@ export async function createMoment(input: CreateMomentInput): Promise<{ id: stri
 	const db = await getDb();
 	const sql = db.$client;
 	const id = randomUUID();
-	const statements = [sql`INSERT INTO moments (id, author_id, body, source_url, source_canonical_url, source_provider, source_external_id, embed_status, embed_metadata) VALUES (${id}, ${input.authorId}, ${input.body ?? null}, ${input.sourceUrl}, ${input.sourceCanonicalUrl}, ${input.provider}, ${input.externalId ?? null}, ${input.embedStatus ?? 'FALLBACK'}, ${JSON.stringify(input.embedMetadata ?? {})}::jsonb)`];
+	const status = input.pendingMediaCount > 0 ? 'UPLOADING' : 'PUBLISHED';
+	const statements = [sql`INSERT INTO moments (id, author_id, body, source_url, source_canonical_url, source_provider, source_external_id, embed_status, embed_metadata, status, pending_media_count) VALUES (${id}, ${input.authorId}, ${input.body ?? null}, ${input.sourceUrl}, ${input.sourceCanonicalUrl}, ${input.provider}, ${input.externalId ?? null}, ${input.embedStatus ?? 'FALLBACK'}, ${JSON.stringify(input.embedMetadata ?? {})}::jsonb, ${status}, ${input.pendingMediaCount})`];
 	for (const [sortOrder, externalUrl] of input.imageUrls.entries()) {
 		statements.push(sql`INSERT INTO moment_media (id, moment_id, external_url, sort_order) VALUES (${randomUUID()}, ${id}, ${externalUrl}, ${sortOrder})`);
 	}
@@ -29,6 +31,53 @@ export async function createMoment(input: CreateMomentInput): Promise<{ id: stri
 	for (const shipId of input.shipIds ?? []) statements.push(sql`INSERT INTO moment_ships (moment_id, ship_id) VALUES (${id}, ${shipId})`);
 	await sql.transaction(statements);
 	return { id };
+}
+
+export type MomentMediaUploadAccess = 'OK' | 'FORBIDDEN' | 'FULL' | 'INVALID_STATE';
+
+function resultRows<T>(result: unknown): T[] {
+	if (Array.isArray(result)) return result as T[];
+	if (result && typeof result === 'object' && 'rows' in result && Array.isArray(result.rows)) return result.rows as T[];
+	return [];
+}
+
+export async function getMomentMediaUploadAccess(momentId: string, authorId: string): Promise<MomentMediaUploadAccess> {
+	const db = await getDb(); const sql = db.$client;
+	const result = await sql`SELECT m.author_id, m.status, m.pending_media_count, count(mm.id)::integer AS media_count FROM moments m LEFT JOIN moment_media mm ON mm.moment_id = m.id WHERE m.id = ${momentId} GROUP BY m.id`;
+	const [moment] = resultRows<{ author_id: string; status: string; media_count: number; pending_media_count: number }>(result);
+	if (!moment || moment.author_id !== authorId) return 'FORBIDDEN';
+	if (moment.status !== 'UPLOADING' && !(moment.status === 'PUBLISHED' && Number(moment.pending_media_count) === 0)) return 'INVALID_STATE';
+	return Number(moment.media_count) >= 4 ? 'FULL' : 'OK';
+}
+
+export async function appendMomentMedia(input: { momentId: string; authorId: string; key: string; url: string }): Promise<boolean> {
+	const db = await getDb(); const sql = db.$client;
+	const result = await sql.transaction([
+		sql`SELECT id FROM moments WHERE id = ${input.momentId} AND author_id = ${input.authorId} AND (status = 'UPLOADING' OR (status = 'PUBLISHED' AND pending_media_count = 0)) FOR UPDATE`,
+		sql`
+			WITH counts AS (
+				SELECT m.id,
+					(SELECT count(*)::integer FROM moment_media WHERE moment_id = m.id) AS media_count,
+					(SELECT count(*)::integer FROM moment_media WHERE moment_id = m.id AND source_type = 'UPLOAD') AS upload_count
+				FROM moments m
+				WHERE m.id = ${input.momentId} AND m.author_id = ${input.authorId}
+					AND (m.status = 'UPLOADING' OR (m.status = 'PUBLISHED' AND m.pending_media_count = 0))
+			)
+			INSERT INTO moment_media (id, moment_id, source_type, storage_key, external_url, sort_order)
+			SELECT ${randomUUID()}, c.id, 'UPLOAD', ${input.key}, ${input.url}, c.media_count
+			FROM counts c JOIN moments m ON m.id = c.id
+			WHERE c.media_count < 4 AND (m.status <> 'UPLOADING' OR c.upload_count < m.pending_media_count)
+			ON CONFLICT (moment_id, sort_order) DO NOTHING
+			RETURNING moment_id
+		`,
+		sql`
+			UPDATE moments m SET status = 'PUBLISHED', updated_at = now()
+			WHERE m.id = ${input.momentId} AND m.author_id = ${input.authorId} AND m.status = 'UPLOADING'
+				AND (SELECT count(*) FROM moment_media WHERE moment_id = m.id AND source_type = 'UPLOAD') = m.pending_media_count
+			RETURNING m.id
+		`
+	]);
+	return resultRows<{ moment_id: string }>(result[1]).length > 0;
 }
 
 export async function updateMoment(id: string, authorId: string, input: Pick<CreateMomentInput, 'body' | 'sourceUrl' | 'sourceCanonicalUrl' | 'provider' | 'externalId' | 'embedStatus' | 'embedMetadata' | 'imageUrls' | 'seriesIds' | 'artistIds' | 'shipIds'>): Promise<boolean> {

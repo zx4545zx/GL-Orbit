@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "moment_media_moment_sort_unique" ON "moment_media" USING btree ("moment_id","sort_order");

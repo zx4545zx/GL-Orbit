@@ -1,2 +1,23 @@
-<script lang="ts">import { m } from '$lib/i18n/paraglide.js';</script>
-<h1 class="font-display text-3xl font-extrabold">{m.halo_alerts_title()}</h1><section class="mt-5 rounded-[1.75rem] border border-white bg-white/75 p-5 shadow-[0_12px_34px_rgba(88,66,130,.08)]"><div class="flex gap-3"><span class="grid h-10 w-10 place-items-center rounded-2xl bg-coral/15 text-coral-dark">♥</span><p class="text-sm leading-6 text-plum"><strong>Mali S.</strong> liked your Moment.<br /><span class="text-xs text-plum-light">A little while ago</span></p></div></section>
+<script lang="ts">
+	import { page } from '$app/state';
+	import { m } from '$lib/i18n/paraglide.js';
+	import HaloIcon from '$lib/components/moments/HaloIcon.svelte';
+	import HaloPageHeader from '$lib/components/moments/HaloPageHeader.svelte';
+	const isThai = $derived(page.data.lang === 'th');
+	const notices = $derived([
+		{ kind: 'heart', name: 'Mali S.', copy: isThai ? 'ถูกใจ Moment ของคุณ' : 'liked your Moment.', time: isThai ? '12 นาที' : '12m', unread: true },
+		{ kind: 'comment', name: 'June', copy: isThai ? 'แสดงความคิดเห็นว่า “ซีนนี้อบอุ่นมาก”' : 'commented “This scene felt so warm.”', time: isThai ? '1 ชั่วโมง' : '1h', unread: true },
+		{ kind: 'spark', name: 'Orbit Halo', copy: isThai ? 'Moment ของคุณถูกเพิ่มเข้า #LingOrm' : 'Your Moment joined #LingOrm.', time: isThai ? 'เมื่อวาน' : 'Yesterday', unread: false }
+	]);
+</script>
+
+<HaloPageHeader kicker={isThai ? 'ล่าสุด' : 'Latest'} title={m.halo_alerts_title()} icon="bell" meta={isThai ? '2 ใหม่' : '2 new'} />
+<div>
+	{#each notices as notice}
+		<a href={`/${page.data.lang}/halo/moments/moonlit-premiere`} class="relative flex gap-3 border-b border-[#eee9ef] px-4 py-4 transition hover:bg-[#fafafa] sm:px-5">
+			{#if notice.unread}<span class="absolute left-1.5 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-coral"></span>{/if}
+			<span class="ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-coral/10 text-coral-dark"><HaloIcon name={notice.kind} size={16} /></span>
+			<span class="min-w-0 flex-1 text-sm leading-5 text-plum"><strong>{notice.name}</strong> {notice.copy}<span class="mt-1 block text-xs text-plum-light">{notice.time}</span></span>
+		</a>
+	{/each}
+</div>

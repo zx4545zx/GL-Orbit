@@ -1,2 +1,11 @@
-<script lang="ts">import { m } from '$lib/i18n/paraglide.js'; import MomentFeed from '$lib/components/moments/MomentFeed.svelte'; import { sampleMoments } from '$lib/components/moments/types.js';</script>
-<h1 class="font-display text-3xl font-extrabold">{m.halo_saved_title()}</h1><p class="mt-2 mb-5 text-sm text-plum-light">Private to you. Come back whenever the feeling calls.</p><MomentFeed moments={[{ ...sampleMoments[1], saved: true }]} />
+<script lang="ts">
+	import { page } from '$app/state';
+	import { m } from '$lib/i18n/paraglide.js';
+	import HaloPageHeader from '$lib/components/moments/HaloPageHeader.svelte';
+	import MomentFeed from '$lib/components/moments/MomentFeed.svelte';
+	import { sampleMoments } from '$lib/components/moments/types.js';
+	const isThai = $derived(page.data.lang === 'th');
+</script>
+
+<HaloPageHeader kicker={isThai ? 'เห็นเฉพาะคุณ' : 'Only you'} title={m.halo_saved_title()} description={isThai ? 'โมเมนต์ที่บันทึกไว้จะอยู่ที่นี่' : 'Moments you save appear here.'} icon="bookmark" />
+<MomentFeed moments={[{ ...sampleMoments[1], saved: true }]} />

@@ -5,7 +5,7 @@ export const userRoleEnum = pgEnum('user_role', ['ADMIN', 'USER']);
 export const seriesStatusEnum = pgEnum('series_status', ['UPCOMING', 'ONGOING', 'ENDED']);
 export const momentSourceProviderEnum = pgEnum('moment_source_provider', ['YOUTUBE', 'TIKTOK', 'X', 'OTHER']);
 export const momentEmbedStatusEnum = pgEnum('moment_embed_status', ['READY', 'FALLBACK', 'FAILED']);
-export const momentStatusEnum = pgEnum('moment_status', ['PUBLISHED', 'HIDDEN', 'DELETED']);
+export const momentStatusEnum = pgEnum('moment_status', ['UPLOADING', 'PUBLISHED', 'HIDDEN', 'DELETED']);
 export const momentMediaTypeEnum = pgEnum('moment_media_type', ['IMAGE']);
 export const momentMediaSourceEnum = pgEnum('moment_media_source', ['EXTERNAL', 'UPLOAD']);
 export const momentCommentStatusEnum = pgEnum('moment_comment_status', ['PUBLISHED', 'HIDDEN', 'DELETED']);
@@ -198,13 +198,14 @@ export const moments = pgTable('moments', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	authorId: uuid('author_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
 	body: text('body'),
-	sourceUrl: text('source_url').notNull(),
-	sourceCanonicalUrl: text('source_canonical_url').notNull(),
+	sourceUrl: text('source_url'),
+	sourceCanonicalUrl: text('source_canonical_url'),
 	sourceProvider: momentSourceProviderEnum('source_provider').notNull(),
 	sourceExternalId: varchar('source_external_id', { length: 255 }),
 	embedStatus: momentEmbedStatusEnum('embed_status').notNull().default('FALLBACK'),
 	embedMetadata: jsonb('embed_metadata').$type<{ title?: string; authorName?: string; thumbnailUrl?: string; providerName?: string }>().notNull().default({}),
 	status: momentStatusEnum('status').notNull().default('PUBLISHED'),
+	pendingMediaCount: integer('pending_media_count').notNull().default(0),
 	language: varchar('language', { length: 10 }),
 	likeCount: integer('like_count').notNull().default(0),
 	commentCount: integer('comment_count').notNull().default(0),
@@ -216,7 +217,9 @@ export const moments = pgTable('moments', {
 	feedIndex: index('moments_feed_idx').on(table.status, table.createdAt, table.id),
 	authorIndex: index('moments_author_idx').on(table.authorId, table.createdAt, table.id),
 	likeCountNonNegative: check('moments_like_count_non_negative', sql`${table.likeCount} >= 0`),
-	commentCountNonNegative: check('moments_comment_count_non_negative', sql`${table.commentCount} >= 0`)
+	commentCountNonNegative: check('moments_comment_count_non_negative', sql`${table.commentCount} >= 0`),
+	pendingMediaCountRange: check('moments_pending_media_count_range', sql`${table.pendingMediaCount} BETWEEN 0 AND 4`),
+	pendingMediaStatus: check('moments_pending_media_status', sql`${table.status} <> 'UPLOADING' OR ${table.pendingMediaCount} > 0`)
 }));
 
 export const momentMedia = pgTable('moment_media', {
@@ -228,6 +231,7 @@ export const momentMedia = pgTable('moment_media', {
 	sortOrder: integer('sort_order').notNull().default(0), createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 }, (table) => ({
 	momentIndex: index('moment_media_moment_idx').on(table.momentId, table.sortOrder),
+	momentSortUnique: uniqueIndex('moment_media_moment_sort_unique').on(table.momentId, table.sortOrder),
 	externalOnly: check('moment_media_external_only', sql`(${table.sourceType} <> 'EXTERNAL') OR (${table.externalUrl} IS NOT NULL AND ${table.storageKey} IS NULL)`)
 }));
 

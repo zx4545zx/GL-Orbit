@@ -7,7 +7,7 @@ const read = (path: string) => readFileSync(new URL(path, root), 'utf8');
 describe('Orbit Halo UI', () => {
 	it('keeps its dedicated shell separate from the information-app navigation', () => {
 		const shell = read('+layout.svelte');
-		expect(shell).toContain('grid-cols-[210px_minmax(0,740px)]');
+		expect(shell).toContain('grid-cols-[210px_minmax(0,620px)]');
 		expect(shell).toContain('safe-area-bottom');
 		expect(shell).not.toContain('Navigation.svelte');
 		expect(shell).not.toContain('BottomNav.svelte');
@@ -15,7 +15,11 @@ describe('Orbit Halo UI', () => {
 
 	it('offers source-linked composer, safe preview and detail comments', () => {
 		expect(read('../../../lib/components/moments/MomentComposer.svelte')).toContain('type="url"');
-		expect(read('../../../lib/components/moments/EmbedPreview.svelte')).toContain('rel="noreferrer"');
+		const preview = read('../../../lib/components/moments/EmbedPreview.svelte');
+		expect(preview).toContain('rel="noreferrer"');
+		expect(preview).toContain('www.youtube-nocookie.com/embed/');
+		expect(preview).toContain('platform.x.com/widgets.js');
+		expect(preview).toContain('<iframe');
 		expect(read('halo/moments/[id]/+page.svelte')).toContain('expanded');
 	});
 });

@@ -248,6 +248,37 @@ body:has(nav.translate-y-full) .mobile-chat-fab,
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* Orbit Halo — flat, feed-first social UI. */
+.halo-universe {
+  --halo-paper: #ffffff;
+  --halo-paper-deep: #f7f7f8;
+  --halo-ink: #2d1b2e;
+  --halo-muted: #746b76;
+  --halo-line: #eee9ef;
+  --halo-coral: #f25083;
+  isolation: isolate;
+  background: var(--halo-paper);
+}
+
+/* Keep ordinary document scrolling while preventing root rubber-banding. */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
+.halo-focus-ring:focus-visible {
+  outline: 3px solid rgba(255, 95, 146, .26);
+  outline-offset: 3px;
+}
+
+.halo-scrollbar {
+  scrollbar-width: none;
+}
+
+.halo-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 .chat-composer-safe {
   padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));
 }
