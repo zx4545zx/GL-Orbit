@@ -6,6 +6,7 @@ import { getDb } from '$lib/server/db/index.js';
 import { users } from '$lib/server/db/schema.js';
 import { eq } from 'drizzle-orm';
 import { contentSecurityPolicy } from '$lib/server/security/csp.js';
+import { dev } from '$app/environment';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionCookie = event.cookies.get('session');
@@ -65,6 +66,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('%lang%', locale)
 	});
-	response.headers.set('content-security-policy', contentSecurityPolicy());
+	response.headers.set('content-security-policy', contentSecurityPolicy(dev));
 	return response;
 };
