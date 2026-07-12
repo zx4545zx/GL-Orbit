@@ -9,9 +9,18 @@
 	let errorMessage = $state('');
 	let email = $state('');
 	let password = $state('');
+	const defaultDestination = $derived(localizedHref('/profile', page.data.lang));
+	function destination() {
+		const redirectTo = page.url.searchParams.get('redirectTo');
+		if (!redirectTo) return defaultDestination;
+		try {
+			const url = new URL(redirectTo, page.url.origin);
+			return url.origin === page.url.origin && url.pathname.startsWith('/') ? `${url.pathname}${url.search}${url.hash}` : defaultDestination;
+		} catch { return defaultDestination; }
+	}
 
 	$effect(() => {
-		if (page.data.user) goto(localizedHref('/profile', page.data.lang));
+		if (page.data.user) goto(destination());
 	});
 
 	async function handleSubmit(e: Event) {
@@ -30,7 +39,7 @@
 				errorMessage = data.error || m.login_error_default();
 				return;
 			}
-			await goto(`${localizedHref('/profile', page.data.lang)}?push=1`, { invalidateAll: true });
+			await goto(destination(), { invalidateAll: true });
 		} catch {
 			errorMessage = m.login_error_default();
 		} finally {

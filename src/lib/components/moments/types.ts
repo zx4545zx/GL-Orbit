@@ -6,6 +6,75 @@ export type HaloComment = {
 	reply?: HaloComment;
 };
 
+export type MomentApiItem = {
+	id: string;
+	authorId: string;
+	body: string | null;
+	sourceUrl: string | null;
+	sourceCanonicalUrl?: string | null;
+	sourceProvider: 'YOUTUBE' | 'TIKTOK' | 'X' | 'OTHER' | null;
+	likeCount: number;
+	commentCount: number;
+	createdAt: string | Date;
+	liked: boolean;
+	bookmarked: boolean;
+	author: { id: string; username: string; displayName: string | null; avatarUrl: string | null };
+	media: Array<{ id: string; momentId: string; externalUrl: string | null; altText: string | null; sortOrder: number }>;
+	seriesIds: string[];
+	artistIds: string[];
+	shipIds: string[];
+};
+
+export type ProfileMoment = {
+	id: string;
+	author: string;
+	handle: string;
+	initial: string;
+	avatarUrl: string | null;
+	time: string;
+	body: string;
+	source: string | null;
+	provider: 'YouTube' | 'TikTok' | 'X' | 'Link';
+	tags: string[];
+	likes: number;
+	commentCount: number;
+	liked: boolean;
+	bookmarked: boolean;
+	media: MomentApiItem['media'];
+};
+
+function formatMomentTime(value: string | Date): string {
+	const date = new Date(value);
+	const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+	if (seconds < 60) return 'เมื่อสักครู่';
+	if (seconds < 3600) return `${Math.floor(seconds / 60)} นาทีที่แล้ว`;
+	if (seconds < 86400) return `${Math.floor(seconds / 3600)} ชั่วโมงที่แล้ว`;
+	if (seconds < 604800) return `${Math.floor(seconds / 86400)} วันที่แล้ว`;
+	return Number.isNaN(date.getTime()) ? '' : new Intl.DateTimeFormat('th-TH', { dateStyle: 'medium' }).format(date);
+}
+
+export function toProfileMoment(moment: MomentApiItem): ProfileMoment {
+	const author = moment.author.displayName?.trim() || moment.author.username || 'ผู้ใช้ Halo';
+	const provider = ({ YOUTUBE: 'YouTube', TIKTOK: 'TikTok', X: 'X', OTHER: 'Link' } as const)[moment.sourceProvider ?? 'OTHER'];
+	return {
+		id: moment.id,
+		author,
+		handle: moment.author.username,
+		initial: author.trim().charAt(0).toUpperCase() || '✦',
+		avatarUrl: moment.author.avatarUrl,
+		time: formatMomentTime(moment.createdAt),
+		body: moment.body ?? '',
+		source: moment.sourceUrl ?? moment.sourceCanonicalUrl ?? null,
+		provider,
+		tags: [...moment.seriesIds, ...moment.artistIds, ...moment.shipIds].map((id) => `#${id}`),
+		likes: Number(moment.likeCount) || 0,
+		commentCount: Number(moment.commentCount) || 0,
+		liked: Boolean(moment.liked),
+		bookmarked: Boolean(moment.bookmarked),
+		media: moment.media
+	};
+}
+
 export type HaloMoment = {
 	id: string;
 	author: string;
