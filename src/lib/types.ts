@@ -10,12 +10,12 @@ export interface PublicUser {
 
 export interface NotificationItem {
 	id: string;
-	seriesId: string;
+	seriesId: string | null;
 	type: 'new_episode' | 'status_change' | 'announcement';
 	message: string;
 	isRead: boolean;
 	createdAt: string;
-	seriesTitle: string;
+	seriesTitle: string | null;
 }
 
 export interface PushSubscriptionInput {

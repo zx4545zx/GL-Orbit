@@ -120,6 +120,13 @@
       "when": 1783530016098,
       "tag": "0016_great_husk",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1783840346563,
+      "tag": "0017_ancient_khan",
+      "breakpoints": true
     }
   ]
 }

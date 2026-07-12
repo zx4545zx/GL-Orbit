@@ -1,7 +1,16 @@
-import { pgTable, uuid, varchar, text, timestamp, boolean, integer, time, pgEnum, jsonb } from 'drizzle-orm/pg-core';
+import { check, index, jsonb, pgEnum, pgTable, primaryKey, text, time, timestamp, uniqueIndex, uuid, varchar, boolean, integer } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 export const userRoleEnum = pgEnum('user_role', ['ADMIN', 'USER']);
 export const seriesStatusEnum = pgEnum('series_status', ['UPCOMING', 'ONGOING', 'ENDED']);
+export const momentSourceProviderEnum = pgEnum('moment_source_provider', ['YOUTUBE', 'TIKTOK', 'X', 'OTHER']);
+export const momentEmbedStatusEnum = pgEnum('moment_embed_status', ['READY', 'FALLBACK', 'FAILED']);
+export const momentStatusEnum = pgEnum('moment_status', ['PUBLISHED', 'HIDDEN', 'DELETED']);
+export const momentMediaTypeEnum = pgEnum('moment_media_type', ['IMAGE']);
+export const momentMediaSourceEnum = pgEnum('moment_media_source', ['EXTERNAL', 'UPLOAD']);
+export const momentCommentStatusEnum = pgEnum('moment_comment_status', ['PUBLISHED', 'HIDDEN', 'DELETED']);
+export const momentReportReasonEnum = pgEnum('moment_report_reason', ['SPAM', 'HARASSMENT', 'INAPPROPRIATE', 'COPYRIGHT', 'MISLEADING', 'OTHER']);
+export const momentReportStatusEnum = pgEnum('moment_report_status', ['PENDING', 'REVIEWED', 'DISMISSED', 'ACTIONED']);
 
 export const users = pgTable('users', {
 	id: uuid('id').defaultRandom().primaryKey(),
@@ -185,10 +194,102 @@ export const episodeSchedules = pgTable('episode_schedules', {
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
 });
 
+export const moments = pgTable('moments', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	authorId: uuid('author_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	body: text('body'),
+	sourceUrl: text('source_url').notNull(),
+	sourceCanonicalUrl: text('source_canonical_url').notNull(),
+	sourceProvider: momentSourceProviderEnum('source_provider').notNull(),
+	sourceExternalId: varchar('source_external_id', { length: 255 }),
+	embedStatus: momentEmbedStatusEnum('embed_status').notNull().default('FALLBACK'),
+	embedMetadata: jsonb('embed_metadata').$type<{ title?: string; authorName?: string; thumbnailUrl?: string; providerName?: string }>().notNull().default({}),
+	status: momentStatusEnum('status').notNull().default('PUBLISHED'),
+	language: varchar('language', { length: 10 }),
+	likeCount: integer('like_count').notNull().default(0),
+	commentCount: integer('comment_count').notNull().default(0),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+	deletedAt: timestamp('deleted_at', { withTimezone: true })
+}, (table) => ({
+	authorSourceUnique: uniqueIndex('moments_author_source_unique').on(table.authorId, table.sourceCanonicalUrl),
+	feedIndex: index('moments_feed_idx').on(table.status, table.createdAt, table.id),
+	authorIndex: index('moments_author_idx').on(table.authorId, table.createdAt, table.id),
+	likeCountNonNegative: check('moments_like_count_non_negative', sql`${table.likeCount} >= 0`),
+	commentCountNonNegative: check('moments_comment_count_non_negative', sql`${table.commentCount} >= 0`)
+}));
+
+export const momentMedia = pgTable('moment_media', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	momentId: uuid('moment_id').notNull().references(() => moments.id, { onDelete: 'cascade' }),
+	mediaType: momentMediaTypeEnum('media_type').notNull().default('IMAGE'),
+	sourceType: momentMediaSourceEnum('source_type').notNull().default('EXTERNAL'),
+	externalUrl: text('external_url'), storageKey: text('storage_key'), altText: varchar('alt_text', { length: 500 }),
+	sortOrder: integer('sort_order').notNull().default(0), createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({
+	momentIndex: index('moment_media_moment_idx').on(table.momentId, table.sortOrder),
+	externalOnly: check('moment_media_external_only', sql`(${table.sourceType} <> 'EXTERNAL') OR (${table.externalUrl} IS NOT NULL AND ${table.storageKey} IS NULL)`)
+}));
+
+export const momentLikes = pgTable('moment_likes', {
+	momentId: uuid('moment_id').notNull().references(() => moments.id, { onDelete: 'cascade' }),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({ pk: primaryKey({ columns: [table.momentId, table.userId] }), userIndex: index('moment_likes_user_idx').on(table.userId, table.createdAt) }));
+
+export const momentBookmarks = pgTable('moment_bookmarks', {
+	momentId: uuid('moment_id').notNull().references(() => moments.id, { onDelete: 'cascade' }),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({ pk: primaryKey({ columns: [table.momentId, table.userId] }), userIndex: index('moment_bookmarks_user_idx').on(table.userId, table.createdAt) }));
+
+export const momentComments = pgTable('moment_comments', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	momentId: uuid('moment_id').notNull().references(() => moments.id, { onDelete: 'cascade' }),
+	authorId: uuid('author_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	parentId: uuid('parent_id'), body: text('body').notNull(),
+	status: momentCommentStatusEnum('status').notNull().default('PUBLISHED'),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+	deletedAt: timestamp('deleted_at', { withTimezone: true })
+}, (table) => ({
+	momentIndex: index('moment_comments_moment_idx').on(table.momentId, table.createdAt, table.id), parentIndex: index('moment_comments_parent_idx').on(table.parentId, table.createdAt, table.id),
+	parentNotSelf: check('moment_comments_parent_not_self', sql`${table.parentId} IS NULL OR ${table.parentId} <> ${table.id}`)
+}));
+
+export const momentSeries = pgTable('moment_series', { momentId: uuid('moment_id').notNull().references(() => moments.id, { onDelete: 'cascade' }), seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }) }, (table) => ({ pk: primaryKey({ columns: [table.momentId, table.seriesId] }), entityIndex: index('moment_series_series_idx').on(table.seriesId, table.momentId) }));
+export const momentArtists = pgTable('moment_artists', { momentId: uuid('moment_id').notNull().references(() => moments.id, { onDelete: 'cascade' }), artistId: uuid('artist_id').notNull().references(() => artists.id, { onDelete: 'cascade' }) }, (table) => ({ pk: primaryKey({ columns: [table.momentId, table.artistId] }), entityIndex: index('moment_artists_artist_idx').on(table.artistId, table.momentId) }));
+export const momentShips = pgTable('moment_ships', { momentId: uuid('moment_id').notNull().references(() => moments.id, { onDelete: 'cascade' }), shipId: uuid('ship_id').notNull().references(() => ships.id, { onDelete: 'cascade' }) }, (table) => ({ pk: primaryKey({ columns: [table.momentId, table.shipId] }), entityIndex: index('moment_ships_ship_idx').on(table.shipId, table.momentId) }));
+
+export const momentReports = pgTable('moment_reports', {
+	id: uuid('id').defaultRandom().primaryKey(), reporterId: uuid('reporter_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	momentId: uuid('moment_id').references(() => moments.id, { onDelete: 'cascade' }), commentId: uuid('comment_id').references(() => momentComments.id, { onDelete: 'cascade' }),
+	reason: momentReportReasonEnum('reason').notNull(), details: text('details'), status: momentReportStatusEnum('status').notNull().default('PENDING'),
+	reviewedBy: uuid('reviewed_by').references(() => users.id, { onDelete: 'set null' }), reviewedAt: timestamp('reviewed_at', { withTimezone: true }), createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({
+	pendingIndex: index('moment_reports_pending_idx').on(table.status, table.createdAt),
+	targetExactlyOne: check('moment_reports_target_check', sql`(${table.momentId} IS NOT NULL)::int + (${table.commentId} IS NOT NULL)::int = 1`),
+	reporterMomentUnique: uniqueIndex('moment_reports_reporter_moment_unique').on(table.reporterId, table.momentId).where(sql`${table.momentId} IS NOT NULL`),
+	reporterCommentUnique: uniqueIndex('moment_reports_reporter_comment_unique').on(table.reporterId, table.commentId).where(sql`${table.commentId} IS NOT NULL`)
+}));
+
+export const momentModerationActions = pgTable('moment_moderation_actions', {
+	id: uuid('id').defaultRandom().primaryKey(), momentId: uuid('moment_id').notNull().references(() => moments.id, { onDelete: 'cascade' }),
+	actorUserId: uuid('actor_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }), action: varchar('action', { length: 20 }).notNull(), reason: text('reason'), createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({ momentIndex: index('moment_moderation_actions_moment_idx').on(table.momentId, table.createdAt) }));
+
+export const rateLimitWindows = pgTable('rate_limit_windows', {
+	key: varchar('key', { length: 255 }).primaryKey(), windowStartedAt: timestamp('window_started_at', { withTimezone: true }).notNull(), requestCount: integer('request_count').notNull().default(0), updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({ requestCountNonNegative: check('rate_limit_windows_request_count_non_negative', sql`${table.requestCount} >= 0`) }));
+
 export const notifications = pgTable('notifications', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
+	seriesId: uuid('series_id').references(() => series.id, { onDelete: 'cascade' }),
+	actorUserId: uuid('actor_user_id').references(() => users.id, { onDelete: 'set null' }),
+	momentId: uuid('moment_id').references(() => moments.id, { onDelete: 'cascade' }),
+	commentId: uuid('comment_id').references(() => momentComments.id, { onDelete: 'cascade' }),
+	metadata: jsonb('metadata').$type<Record<string, unknown>>(),
 	type: varchar('type', { length: 50 }).notNull(),
 	message: text('message').notNull(),
 	isRead: boolean('is_read').notNull().default(false),

@@ -43,7 +43,7 @@ export async function getUserNotifications(
 			seriesTitle: series.titleEn
 		})
 		.from(notifications)
-		.innerJoin(series, eq(notifications.seriesId, series.id))
+		.leftJoin(series, eq(notifications.seriesId, series.id))
 		.where(eq(notifications.userId, userId))
 		.orderBy(desc(notifications.createdAt))
 		.limit(limit)
@@ -83,10 +83,9 @@ export async function getUserNotifications(
 
 async function enrichNotification(row: typeof notifications.$inferSelect): Promise<NotificationItem> {
 	const db = await getDb();
-	const [seriesRow] = await db
-		.select({ titleEn: series.titleEn })
-		.from(series)
-		.where(eq(series.id, row.seriesId));
+	const seriesRow = row.seriesId
+		? (await db.select({ titleEn: series.titleEn }).from(series).where(eq(series.id, row.seriesId)))[0]
+		: undefined;
 
 	return {
 		id: row.id,
@@ -95,7 +94,7 @@ async function enrichNotification(row: typeof notifications.$inferSelect): Promi
 		message: row.message,
 		isRead: row.isRead,
 		createdAt: row.createdAt.toISOString(),
-		seriesTitle: seriesRow?.titleEn ?? ''
+		seriesTitle: seriesRow?.titleEn ?? null
 	};
 }
 
