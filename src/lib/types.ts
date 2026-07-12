@@ -11,11 +11,16 @@ export interface PublicUser {
 export interface NotificationItem {
 	id: string;
 	seriesId: string | null;
-	type: 'new_episode' | 'status_change' | 'announcement';
+	type: 'new_episode' | 'status_change' | 'announcement' | 'moment_like' | 'moment_comment';
 	message: string;
 	isRead: boolean;
 	createdAt: string;
 	seriesTitle: string | null;
+	momentId?: string | null;
+	commentId?: string | null;
+	actorUserId?: string | null;
+	metadata?: Record<string, unknown> | null;
+	targetUrl?: string | null;
 }
 
 export interface PushSubscriptionInput {

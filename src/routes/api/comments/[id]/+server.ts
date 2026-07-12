@@ -1,0 +1,2 @@
+import { json } from '@sveltejs/kit'; import { deleteMomentComment } from '$lib/server/moments/mutations.js'; import type { RequestHandler } from './$types.js';
+export const DELETE: RequestHandler = async ({ locals, params }) => { if (!locals.user) return json({ error: 'UNAUTHORIZED' }, { status: 401 }); await deleteMomentComment(params.id, locals.user.id, locals.user.role === 'ADMIN'); return json({ success: true }); };

@@ -3,20 +3,75 @@ import { getDb } from '../db/index.js';
 
 type CreateMomentInput = {
 	authorId: string;
+	body?: string | null;
 	sourceUrl: string;
 	sourceCanonicalUrl: string;
 	provider: 'YOUTUBE' | 'TIKTOK' | 'X' | 'OTHER';
+	externalId?: string;
+	embedStatus?: 'READY' | 'FALLBACK' | 'FAILED';
+	embedMetadata?: Record<string, unknown>;
 	imageUrls: string[];
+	seriesIds?: string[];
+	artistIds?: string[];
+	shipIds?: string[];
 };
 
 export async function createMoment(input: CreateMomentInput): Promise<{ id: string }> {
 	const db = await getDb();
 	const sql = db.$client;
 	const id = randomUUID();
-	const statements = [sql`INSERT INTO moments (id, author_id, source_url, source_canonical_url, source_provider) VALUES (${id}, ${input.authorId}, ${input.sourceUrl}, ${input.sourceCanonicalUrl}, ${input.provider})`];
+	const statements = [sql`INSERT INTO moments (id, author_id, body, source_url, source_canonical_url, source_provider, source_external_id, embed_status, embed_metadata) VALUES (${id}, ${input.authorId}, ${input.body ?? null}, ${input.sourceUrl}, ${input.sourceCanonicalUrl}, ${input.provider}, ${input.externalId ?? null}, ${input.embedStatus ?? 'FALLBACK'}, ${JSON.stringify(input.embedMetadata ?? {})}::jsonb)`];
 	for (const [sortOrder, externalUrl] of input.imageUrls.entries()) {
 		statements.push(sql`INSERT INTO moment_media (id, moment_id, external_url, sort_order) VALUES (${randomUUID()}, ${id}, ${externalUrl}, ${sortOrder})`);
 	}
+	for (const seriesId of input.seriesIds ?? []) statements.push(sql`INSERT INTO moment_series (moment_id, series_id) VALUES (${id}, ${seriesId})`);
+	for (const artistId of input.artistIds ?? []) statements.push(sql`INSERT INTO moment_artists (moment_id, artist_id) VALUES (${id}, ${artistId})`);
+	for (const shipId of input.shipIds ?? []) statements.push(sql`INSERT INTO moment_ships (moment_id, ship_id) VALUES (${id}, ${shipId})`);
 	await sql.transaction(statements);
 	return { id };
+}
+
+export async function updateMoment(id: string, authorId: string, input: Pick<CreateMomentInput, 'body' | 'sourceUrl' | 'sourceCanonicalUrl' | 'provider' | 'externalId' | 'embedStatus' | 'embedMetadata' | 'imageUrls' | 'seriesIds' | 'artistIds' | 'shipIds'>): Promise<boolean> {
+	const db = await getDb(); const sql = db.$client;
+	const owned = sql`EXISTS (SELECT 1 FROM moments WHERE id = ${id} AND author_id = ${authorId} AND status = 'PUBLISHED')`;
+	const statements = [sql`UPDATE moments SET body = ${input.body ?? null}, source_url = ${input.sourceUrl}, source_canonical_url = ${input.sourceCanonicalUrl}, source_provider = ${input.provider}, source_external_id = ${input.externalId ?? null}, embed_status = ${input.embedStatus ?? 'FALLBACK'}, embed_metadata = ${JSON.stringify(input.embedMetadata ?? {})}::jsonb, updated_at = now() WHERE id = ${id} AND author_id = ${authorId} AND status = 'PUBLISHED'`, sql`DELETE FROM moment_media WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_series WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_artists WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_ships WHERE moment_id = ${id} AND ${owned}`];
+	for (const [sortOrder, url] of input.imageUrls.entries()) statements.push(sql`INSERT INTO moment_media (id, moment_id, external_url, sort_order) SELECT ${randomUUID()}, ${id}, ${url}, ${sortOrder} WHERE ${owned}`);
+	for (const seriesId of input.seriesIds ?? []) statements.push(sql`INSERT INTO moment_series (moment_id, series_id) SELECT ${id}, ${seriesId} WHERE ${owned}`);
+	for (const artistId of input.artistIds ?? []) statements.push(sql`INSERT INTO moment_artists (moment_id, artist_id) SELECT ${id}, ${artistId} WHERE ${owned}`);
+	for (const shipId of input.shipIds ?? []) statements.push(sql`INSERT INTO moment_ships (moment_id, ship_id) SELECT ${id}, ${shipId} WHERE ${owned}`);
+	await sql.transaction(statements); return true;
+}
+
+export async function deleteMoment(id: string, actorId: string, isAdmin = false): Promise<void> {
+	const db = await getDb(); const sql = db.$client;
+	await sql.transaction([sql`UPDATE moments SET status = 'DELETED', deleted_at = now(), updated_at = now() WHERE id = ${id} AND (${isAdmin} OR author_id = ${actorId}) AND status <> 'DELETED'`]);
+}
+
+export async function setMomentLike(momentId: string, userId: string, liked: boolean): Promise<void> {
+	const db = await getDb(); const sql = db.$client;
+	const statements = liked
+		? [sql`INSERT INTO moment_likes (moment_id, user_id) VALUES (${momentId}, ${userId}) ON CONFLICT DO NOTHING`, sql`UPDATE moments SET like_count = (SELECT count(*) FROM moment_likes WHERE moment_id = ${momentId}) WHERE id = ${momentId}`]
+		: [sql`DELETE FROM moment_likes WHERE moment_id = ${momentId} AND user_id = ${userId}`, sql`UPDATE moments SET like_count = (SELECT count(*) FROM moment_likes WHERE moment_id = ${momentId}) WHERE id = ${momentId}`];
+	await sql.transaction(statements);
+}
+
+export async function setMomentBookmark(momentId: string, userId: string, bookmarked: boolean): Promise<void> {
+	const db = await getDb(); const sql = db.$client;
+	await sql.transaction([bookmarked ? sql`INSERT INTO moment_bookmarks (moment_id, user_id) VALUES (${momentId}, ${userId}) ON CONFLICT DO NOTHING` : sql`DELETE FROM moment_bookmarks WHERE moment_id = ${momentId} AND user_id = ${userId}`]);
+}
+
+export async function createMomentComment(momentId: string, authorId: string, body: string, parentId?: string): Promise<{ id: string }> {
+	const db = await getDb(); const sql = db.$client; const id = randomUUID();
+	await sql.transaction([sql`INSERT INTO moment_comments (id, moment_id, author_id, parent_id, body) SELECT ${id}, ${momentId}, ${authorId}, ${parentId ?? null}, ${body} WHERE ${parentId ?? null} IS NULL OR EXISTS (SELECT 1 FROM moment_comments WHERE id = ${parentId ?? null} AND moment_id = ${momentId} AND parent_id IS NULL)`, sql`UPDATE moments SET comment_count = (SELECT count(*) FROM moment_comments WHERE moment_id = ${momentId} AND status = 'PUBLISHED') WHERE id = ${momentId}`]);
+	return { id };
+}
+
+export async function deleteMomentComment(id: string, actorId: string, isAdmin = false): Promise<void> {
+	const db = await getDb(); const sql = db.$client;
+	await sql.transaction([sql`UPDATE moment_comments SET status = 'DELETED', deleted_at = now(), updated_at = now() WHERE id = ${id} AND (${isAdmin} OR author_id = ${actorId}) AND status <> 'DELETED'`, sql`UPDATE moments SET comment_count = (SELECT count(*) FROM moment_comments WHERE moment_id = (SELECT moment_id FROM moment_comments WHERE id = ${id}) AND status = 'PUBLISHED') WHERE id = (SELECT moment_id FROM moment_comments WHERE id = ${id})`]);
+}
+
+export async function reportMoment(momentId: string, reporterId: string, reason: string, details?: string): Promise<void> {
+	const db = await getDb(); const sql = db.$client;
+	await sql.transaction([sql`INSERT INTO moment_reports (id, reporter_id, moment_id, reason, details) VALUES (${randomUUID()}, ${reporterId}, ${momentId}, ${reason}, ${details ?? null}) ON CONFLICT DO NOTHING`]);
 }
