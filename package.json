@@ -10,14 +10,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "i18n:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/i18n/paraglide --silent",
-    "check": "yarn i18n:compile && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "yarn i18n:compile && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "check": "npm run i18n:compile && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "npm run i18n:compile && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
   },
   "devDependencies": {
-    "@inlang/paraglide-js": "1.11.8",
     "@sveltejs/adapter-vercel": "^6.3.4",
     "@sveltejs/kit": "^2.20.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
@@ -51,6 +50,5 @@
     "sharp": "^0.35.3",
     "uuid": "^11.1.0",
     "web-push": "^3.6.7"
-  },
-  "packageManager": "yarn@4.12.0+sha512.f45ab632439a67f8bc759bf32ead036a1f413287b9042726b7cc4818b7b49e14e9423ba49b18f9e06ea4941c1ad062385b1d8760a8d5091a1a31e5f6219afca8"
+  }
 }
