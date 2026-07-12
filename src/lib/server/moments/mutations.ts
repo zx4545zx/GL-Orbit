@@ -50,7 +50,7 @@ export async function deleteMoment(id: string, actorId: string, isAdmin = false)
 export async function setMomentLike(momentId: string, userId: string, liked: boolean): Promise<void> {
 	const db = await getDb(); const sql = db.$client;
 	const statements = liked
-		? [sql`INSERT INTO moment_likes (moment_id, user_id) VALUES (${momentId}, ${userId}) ON CONFLICT DO NOTHING`, sql`UPDATE moments SET like_count = (SELECT count(*) FROM moment_likes WHERE moment_id = ${momentId}) WHERE id = ${momentId}`]
+		? [sql`WITH inserted AS (INSERT INTO moment_likes (moment_id, user_id) VALUES (${momentId}, ${userId}) ON CONFLICT DO NOTHING RETURNING moment_id) INSERT INTO notifications (user_id, actor_user_id, moment_id, type, message, metadata) SELECT m.author_id, ${userId}, m.id, 'moment_like', 'New reaction to your Moment', jsonb_build_object('targetUrl', '/halo/moments/' || m.id) FROM moments m JOIN inserted ON inserted.moment_id = m.id WHERE m.author_id <> ${userId}`, sql`UPDATE moments SET like_count = (SELECT count(*) FROM moment_likes WHERE moment_id = ${momentId}) WHERE id = ${momentId}`]
 		: [sql`DELETE FROM moment_likes WHERE moment_id = ${momentId} AND user_id = ${userId}`, sql`UPDATE moments SET like_count = (SELECT count(*) FROM moment_likes WHERE moment_id = ${momentId}) WHERE id = ${momentId}`];
 	await sql.transaction(statements);
 }
@@ -62,7 +62,7 @@ export async function setMomentBookmark(momentId: string, userId: string, bookma
 
 export async function createMomentComment(momentId: string, authorId: string, body: string, parentId?: string): Promise<{ id: string }> {
 	const db = await getDb(); const sql = db.$client; const id = randomUUID();
-	await sql.transaction([sql`INSERT INTO moment_comments (id, moment_id, author_id, parent_id, body) SELECT ${id}, ${momentId}, ${authorId}, ${parentId ?? null}, ${body} WHERE ${parentId ?? null} IS NULL OR EXISTS (SELECT 1 FROM moment_comments WHERE id = ${parentId ?? null} AND moment_id = ${momentId} AND parent_id IS NULL)`, sql`UPDATE moments SET comment_count = (SELECT count(*) FROM moment_comments WHERE moment_id = ${momentId} AND status = 'PUBLISHED') WHERE id = ${momentId}`]);
+	await sql.transaction([sql`INSERT INTO moment_comments (id, moment_id, author_id, parent_id, body) SELECT ${id}, ${momentId}, ${authorId}, ${parentId ?? null}, ${body} WHERE ${parentId ?? null} IS NULL OR EXISTS (SELECT 1 FROM moment_comments WHERE id = ${parentId ?? null} AND moment_id = ${momentId} AND parent_id IS NULL)`, sql`INSERT INTO notifications (user_id, actor_user_id, moment_id, comment_id, type, message, metadata) SELECT m.author_id, ${authorId}, m.id, ${id}, 'moment_comment', 'New comment on your Moment', jsonb_build_object('targetUrl', '/halo/moments/' || m.id) FROM moments m WHERE m.id = ${momentId} AND m.author_id <> ${authorId} AND EXISTS (SELECT 1 FROM moment_comments WHERE id = ${id})`, sql`UPDATE moments SET comment_count = (SELECT count(*) FROM moment_comments WHERE moment_id = ${momentId} AND status = 'PUBLISHED') WHERE id = ${momentId}`]);
 	return { id };
 }
 
