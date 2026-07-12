@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { m } from '$lib/i18n/paraglide.js';
 	import Picture from '$lib/components/Picture.svelte';
+	import LatestMomentsLink from '$lib/components/LatestMomentsLink.svelte';
 	import { buildCanonicalUrl, jsonLdScript } from '$lib/seo.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { PageData } from './$types.js';
@@ -170,5 +171,6 @@
 				<div class="rounded-[1.75rem] border border-white/80 bg-white/80 p-8 text-center text-plum-light shadow-lg shadow-lavender/10 sm:p-10">ยังไม่มีผลงานร่วมกันในระบบ</div>
 			{/if}
 		</section>
+		<LatestMomentsLink lang={page.data.lang} entity="ship" entityId={data.ship.id} />
 	</div>
 </article>

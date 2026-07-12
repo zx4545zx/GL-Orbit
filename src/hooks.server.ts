@@ -5,6 +5,7 @@ import { availableLanguageTags, type AvailableLanguageTag } from '$lib/i18n/para
 import { getDb } from '$lib/server/db/index.js';
 import { users } from '$lib/server/db/schema.js';
 import { eq } from 'drizzle-orm';
+import { contentSecurityPolicy } from '$lib/server/security/csp.js';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionCookie = event.cookies.get('session');
@@ -61,7 +62,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 		throw redirect(302, `/${locale}${event.url.pathname}${event.url.search}`);
 	}
 
-	return resolve(event, {
+	const response = await resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('%lang%', locale)
 	});
+	response.headers.set('content-security-policy', contentSecurityPolicy());
+	return response;
 };

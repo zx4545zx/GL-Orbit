@@ -6,6 +6,7 @@ import { m } from '$lib/i18n/paraglide.js';
 	import { buildCanonicalUrl, jsonLdScript, safeJsonLd, truncateSeo, buildBreadcrumbJsonLd, localizedPath } from '$lib/seo.js';
 	import Picture from '$lib/components/Picture.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
+	import LatestMomentsLink from '$lib/components/LatestMomentsLink.svelte';
 	import type { PageData } from './$types.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 
@@ -319,5 +320,6 @@ import { m } from '$lib/i18n/paraglide.js';
 				</div>
 			</section>
 		{/if}
+		<LatestMomentsLink lang={page.data.lang} entity="artist" entityId={artist.id} />
 	</div>
 </div>
