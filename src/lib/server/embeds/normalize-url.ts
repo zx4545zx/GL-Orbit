@@ -1,4 +1,4 @@
-const trackingParameters = new Set(['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'si', 'feature']);
+const trackingParameters = new Set(['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'si', 'feature', 's']);
 
 export function normalizeUrl(rawUrl: string): string {
 	const url = new URL(rawUrl);

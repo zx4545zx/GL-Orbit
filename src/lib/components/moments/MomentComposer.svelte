@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import { m } from '$lib/i18n/paraglide.js';
 	import HaloIcon from './HaloIcon.svelte';
@@ -19,7 +20,8 @@
 	const signedIn = $derived(Boolean(page.data.user));
 	const isThai = $derived(page.data.lang === 'th');
 	const hasContent = $derived(Boolean(body.trim() || url.trim() || selectedMedia.length));
-	const canPublish = $derived(signedIn && hasContent && composerState !== 'publishing');
+	const sourceReady = $derived(!url.trim() || composerState === 'ready');
+	const canPublish = $derived(signedIn && hasContent && sourceReady && composerState !== 'publishing');
 	const copy = $derived(
 		isThai
 			? {
@@ -56,15 +58,22 @@
 		clearTimeout(previewTimer);
 		previewController?.abort();
 		if (!url.trim()) { composerState = 'idle'; linkPreview = null; return; }
+		if (!isValidSourceUrl(url.trim())) { composerState = 'error'; linkPreview = null; return; }
 		previewTimer = setTimeout(preview, 550);
 	}
 
+	function isValidSourceUrl(value: string) {
+		try { return new URL(value).protocol === 'https:'; }
+		catch { return false; }
+	}
+
 	async function preview() {
-		if (!url.trim() || !signedIn) return;
+		const sourceUrl = url.trim();
+		if (!sourceUrl || !signedIn || !isValidSourceUrl(sourceUrl)) return;
 		composerState = 'resolving';
 		previewController = new AbortController();
 		try {
-			const response = await fetch('/api/moments/preview', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ sourceUrl: url.trim() }), signal: previewController.signal });
+			const response = await fetch('/api/moments/preview', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ sourceUrl }), signal: previewController.signal });
 			if (!response.ok) throw new Error();
 			const result = await response.json() as { provider: string; metadata: { title?: string; authorName?: string; thumbnailUrl?: string; providerName?: string } };
 			linkPreview = result;
@@ -95,6 +104,11 @@
 	}
 
 	async function publish() {
+		if (!signedIn) {
+			const returnPath = `${page.url.pathname}${page.url.search}${page.url.hash}`;
+			void goto(`/${page.data.lang}/login?redirectTo=${encodeURIComponent(returnPath)}`);
+			return;
+		}
 		if (!canPublish) return;
 		composerState = 'publishing';
 		feedback = '';
@@ -120,6 +134,7 @@
 			publishedMomentId = null;
 			composerState = 'idle';
 			feedback = copy.shared;
+			await invalidateAll();
 		} catch {
 			composerState = 'error';
 			feedback = copy.failed;
@@ -166,7 +181,7 @@
 					<button type="button" onclick={addEmoji} disabled={composerState === 'publishing'} class="halo-focus-ring grid h-11 w-11 place-items-center rounded-full text-plum-light transition hover:bg-lavender/20 hover:text-lavender-dark disabled:opacity-35" aria-label={copy.emoji}><HaloIcon name="smile" size={20} /></button>
 					<button type="button" onclick={() => showUrlInput = !showUrlInput} disabled={composerState === 'publishing'} class={`halo-focus-ring grid h-11 w-11 place-items-center rounded-full transition hover:bg-coral/10 hover:text-coral-dark disabled:opacity-35 ${showUrlInput ? 'bg-coral/15 text-coral-dark' : 'text-plum-light'}`} aria-label={copy.linkLabel}><HaloIcon name="link" size={20} /></button>
 				</div>
-				<button type="button" onclick={publish} class="halo-focus-ring shrink-0 rounded-full bg-coral px-4 py-2.5 text-xs font-bold text-white transition hover:bg-coral-dark disabled:cursor-not-allowed disabled:opacity-45" disabled={!canPublish}>
+				<button type="button" onclick={publish} class="halo-focus-ring shrink-0 rounded-full bg-coral px-4 py-2.5 text-xs font-bold text-white transition hover:bg-coral-dark disabled:cursor-not-allowed disabled:opacity-45" disabled={signedIn && !canPublish}>
 					{signedIn ? copy.publish : copy.signIn}
 				</button>
 			</div>

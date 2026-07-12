@@ -24,6 +24,13 @@ describe('resolveEmbed', () => {
 		});
 	});
 
+	it('accepts X share URLs and removes their tracking parameter', async () => {
+		await expect(resolveEmbed('https://x.com/frt_ent/status/2076300075899482224?s=20')).resolves.toEqual({
+			provider: 'X', canonicalUrl: 'https://x.com/frt_ent/status/2076300075899482224', externalId: '2076300075899482224', status: 'FALLBACK',
+			metadata: { providerName: 'X' }
+		});
+	});
+
 	it('recognizes TikTok video links without fetching provider HTML', async () => {
 		await expect(resolveEmbed('https://www.tiktok.com/@member/video/7123456789012345678')).resolves.toEqual({
 			provider: 'TIKTOK', canonicalUrl: 'https://www.tiktok.com/@member/video/7123456789012345678', externalId: '7123456789012345678', status: 'FALLBACK',

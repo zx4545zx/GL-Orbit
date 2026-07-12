@@ -48,6 +48,11 @@ export default defineConfig({
 			},
 			injectManifest: {
 				globPatterns: ['**/*.{html,css,js,woff2}']
+			},
+			devOptions: {
+				enabled: true,
+				type: 'module',
+				navigateFallback: '/'
 			}
 		})
 	]

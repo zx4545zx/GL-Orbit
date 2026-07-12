@@ -9,7 +9,12 @@ export async function parseMomentRequest(request: Request) {
 	const embed = parsed.value.sourceUrl
 		? await resolveEmbed(parsed.value.sourceUrl)
 		: { canonicalUrl: null, provider: 'OTHER' as const, externalId: undefined, status: 'FALLBACK' as const, metadata: {} };
-	const ids = (name: string, max: number) => Array.isArray(body[name]) && body[name].length <= max && body[name].every((id) => typeof id === 'string') ? body[name] as string[] : null;
+	const ids = (name: string, max: number) => {
+		if (typeof body[name] === 'undefined') return [];
+		return Array.isArray(body[name]) && body[name].length <= max && body[name].every((id) => typeof id === 'string')
+			? body[name] as string[]
+			: null;
+	};
 	const seriesIds = ids('seriesIds', 3); const artistIds = ids('artistIds', 6); const shipIds = ids('shipIds', 3);
 	if (!seriesIds || !artistIds || !shipIds) return null;
 	return { ...parsed.value, sourceCanonicalUrl: embed.canonicalUrl, provider: embed.provider, externalId: embed.externalId, embedStatus: embed.status, embedMetadata: embed.metadata, seriesIds, artistIds, shipIds };

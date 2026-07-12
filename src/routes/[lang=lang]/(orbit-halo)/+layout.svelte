@@ -3,8 +3,9 @@
 	import { m } from '$lib/i18n/paraglide.js';
 	import { tick } from 'svelte';
 	import HaloIcon from '$lib/components/moments/HaloIcon.svelte';
+	import type { LayoutData } from './$types.js';
 
-	let { children } = $props();
+	let { children, data }: { children: import('svelte').Snippet; data: LayoutData } = $props();
 	const base = $derived(`/${page.data.lang}/halo`);
 	const user = $derived(page.data.user);
 	const items = $derived([
@@ -84,14 +85,16 @@
 		<main class="min-w-0 border-[#eee9ef] pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:border-x md:pb-0">{@render children()}</main>
 
 		<aside class="sticky top-[var(--pwa-safe-top)] hidden h-dvh px-7 py-3 lg:block">
-			<label class="flex h-11 items-center gap-3 rounded-full bg-[#f7f7f8] px-4 text-plum-light focus-within:ring-1 focus-within:ring-coral">
-				<HaloIcon name="explore" size={17} /><span class="sr-only">Search</span><input type="search" placeholder={m.halo_explore()} class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-plum-light" />
-			</label>
+			<form action={`${base}/explore`} method="GET" class="flex h-11 items-center gap-3 rounded-full bg-[#f7f7f8] px-4 text-plum-light focus-within:ring-1 focus-within:ring-coral">
+				<HaloIcon name="explore" size={17} /><label class="sr-only" for="halo-sidebar-search">Search</label><input id="halo-sidebar-search" name="search" type="search" placeholder={m.halo_explore()} class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-plum-light" />
+			</form>
 			<section class="mt-4 overflow-hidden rounded-2xl bg-[#f7f7f8]">
 				<h2 class="px-4 pb-3 pt-4 font-display text-xl font-extrabold">{m.halo_community()}</h2>
-				<a href={`${base}/explore`} class="block px-4 py-3 transition hover:bg-plum/[.045]"><span class="block text-[11px] text-plum-light">Trending</span><strong class="block text-sm">#LingOrm</strong><span class="text-[11px] text-plum-light">428 moments</span></a>
-				<a href={`${base}/explore`} class="block px-4 py-3 transition hover:bg-plum/[.045]"><span class="block text-[11px] text-plum-light">Series</span><strong class="block text-sm">#TheSecretOfUs</strong><span class="text-[11px] text-plum-light">316 moments</span></a>
-				<a href={`${base}/explore`} class="block px-4 py-3 transition hover:bg-plum/[.045]"><span class="block text-[11px] text-plum-light">Rising</span><strong class="block text-sm">#PlutoSeries</strong><span class="text-[11px] text-plum-light">184 moments</span></a>
+				{#each data.haloDiscovery as item}
+					<a href={`${base}?${item.kind}Id=${encodeURIComponent(item.id)}`} class="block px-4 py-3 transition hover:bg-plum/[.045]"><span class="block text-[11px] capitalize text-plum-light">{item.kind}</span><strong class="block truncate text-sm">#{item.label}</strong><span class="text-[11px] text-plum-light">{item.momentCount} moments</span></a>
+				{:else}
+					<p class="px-4 pb-4 text-xs leading-5 text-plum-light">{page.data.lang === 'th' ? 'ยังไม่มีหัวข้อที่กำลังได้รับความสนใจ' : 'Nothing is trending yet.'}</p>
+				{/each}
 			</section>
 			<p class="mt-4 px-3 text-[11px] leading-5 text-plum-light">{m.halo_community_copy()}</p>
 		</aside>
