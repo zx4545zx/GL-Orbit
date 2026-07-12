@@ -66,3 +66,4 @@ config/
 .neon
 .mcp
 .slim/deepwork/
+.yarn/install-state.gz
