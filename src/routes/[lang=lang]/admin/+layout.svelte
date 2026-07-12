@@ -49,6 +49,7 @@
 		{
 			title: 'การติดต่อสื่อสาร',
 			items: [
+				{ href: `/${page.data.lang}/admin/moments`, label: 'Moderate Moments', hint: 'ตรวจรายงาน Halo', icon: 'M12 9v4m0 4h.01M10.29 3.86l-8.1 14A2 2 0 003.92 21h16.16a2 2 0 001.73-3.14l-8.1-14a2 2 0 00-3.42 0z' },
 				{
 					href: `/${page.data.lang}/admin/notifications`,
 					label: 'แจ้งเตือน',

@@ -28,9 +28,9 @@ export async function sendPushNotification(userId: string, item: NotificationIte
 			await webpush.sendNotification(
 				pushSub,
 				JSON.stringify({
-					title: item.seriesTitle,
+					title: item.seriesTitle ?? 'GL-Orbit',
 					body: item.message,
-					data: { url: `/series/${item.seriesId}` }
+					data: { url: item.seriesId ? `/series/${item.seriesId}` : '/notifications' }
 				})
 			);
 		} catch (err: any) {

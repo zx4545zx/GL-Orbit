@@ -1,9 +1,10 @@
-export type ImageType = 'posters' | 'profiles';
+export type ImageType = 'posters' | 'profiles' | 'moments';
 export type ImageExt = 'avif' | 'webp' | 'jpg';
 
 export const IMAGE_VARIANTS = {
 	posters: { widths: [480, 768, 1080], formats: ['avif', 'webp', 'jpg'] as const, fallback: 1080 },
-	profiles: { widths: [320, 640], formats: ['avif', 'webp', 'jpg'] as const, fallback: 640 }
+	profiles: { widths: [320, 640], formats: ['avif', 'webp', 'jpg'] as const, fallback: 640 },
+	moments: { widths: [480, 1080], formats: ['avif', 'webp', 'jpg'] as const, fallback: 1080 }
 } as const satisfies Record<ImageType, { widths: number[]; formats: readonly ImageExt[]; fallback: number }>;
 
 export type SrcEntry = { url: string; width: number };
@@ -11,12 +12,12 @@ export type VariantSet = { avif: SrcEntry[]; webp: SrcEntry[]; jpg: SrcEntry[] }
 
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 // New convention: .../images/{type}/{uuid}/{w}.{ext}
-const CANONICAL_RE = new RegExp(`^(.*\\/images)\\/(posters|profiles)\\/(${UUID})\\/\\d+\\.(jpg|png|webp)$`);
+const CANONICAL_RE = new RegExp(`^(.*\\/images)\\/(posters|profiles|moments)\\/(${UUID})\\/\\d+\\.(jpg|png|webp)$`);
 // Legacy:        .../images/{type}/{uuid}.{ext}
-const LEGACY_RE = new RegExp(`^(.*\\/images)\\/(posters|profiles)\\/(${UUID})\\.(jpg|png|webp)$`);
+const LEGACY_RE = new RegExp(`^(.*\\/images)\\/(posters|profiles|moments)\\/(${UUID})\\.(jpg|png|webp)$`);
 
 export function isManagedImageUrl(url: string): boolean {
-	return /\/images\/(posters|profiles)\//.test(url);
+	return /\/images\/(posters|profiles|moments)\//.test(url);
 }
 
 export function isLegacyImageUrl(url: string): boolean {

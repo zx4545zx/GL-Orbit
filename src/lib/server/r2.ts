@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { AwsClient } from 'aws4fetch';
-import { generateVariants } from './images/sharp.js';
+import { generateVariants, type Variant } from './images/sharp.js';
 import {
 	IMAGE_VARIANTS,
 	buildVariantKey,
@@ -97,6 +97,45 @@ export async function putObject(key: string, body: Buffer, contentType: string):
 	}
 }
 
+async function deleteObject(key: string): Promise<void> {
+	if (!endpoint || !bucketName) return;
+	const signed = await aws.sign(`${objectBaseEndpoint()}/${key}`, { method: 'DELETE' });
+	const response = await fetch(signed);
+	if (!response.ok && response.status !== 404) throw new Error(`Delete failed: ${response.status}`);
+}
+
+/** Best-effort cleanup for an image whose database persistence failed after R2 upload. */
+export async function deleteImageVariants(canonicalKey: string, remove: (key: string) => Promise<void> = deleteObject): Promise<void> {
+	const match = /^images\/(posters|profiles|moments)\/([0-9a-f-]{36})\/\d+\.jpg$/.exec(canonicalKey);
+	if (!match) return;
+	const [, rawType, id] = match;
+	const type = rawType as ImageType;
+	const keys = IMAGE_VARIANTS[type].widths.flatMap((width) =>
+		IMAGE_VARIANTS[type].formats.map((ext) => buildVariantKey(type, id, width, ext))
+	);
+	await Promise.allSettled(keys.map((key) => remove(key)));
+}
+
+export async function putVariantsWithCleanup(
+	variants: Variant[],
+	type: ImageType,
+	id: string,
+	put: (key: string, body: Buffer, contentType: string) => Promise<void> = putObject,
+	remove: (key: string) => Promise<void> = deleteObject
+): Promise<void> {
+	const entries = variants.map((variant) => ({
+		key: buildVariantKey(type, id, variant.width, variant.ext),
+		body: variant.buffer,
+		contentType: mimeForExt(variant.ext)
+	}));
+	const results = await Promise.allSettled(entries.map((entry) => put(entry.key, entry.body, entry.contentType)));
+	const failed = results.find((result): result is PromiseRejectedResult => result.status === 'rejected');
+	if (!failed) return;
+	// A rejected PUT may still have reached R2, so remove every generated key.
+	await Promise.allSettled(entries.map((entry) => remove(entry.key)));
+	throw failed.reason;
+}
+
 /** HEAD an object to check existence (used by backfill for idempotency). */
 export async function objectExists(key: string): Promise<boolean> {
 	if (!endpoint || !bucketName) return false;
@@ -128,10 +167,8 @@ export async function uploadImage(
 	const variants = await generateVariants(input, type);
 	const id = crypto.randomUUID();
 
-	// PUT all variants in parallel (variant keys are content-addressed by uuid → immutable)
-	await Promise.all(
-		variants.map((v) => putObject(buildVariantKey(type, id, v.width, v.ext), v.buffer, mimeForExt(v.ext)))
-	);
+	// PUT all variants in parallel; remove successful objects if any sibling PUT fails.
+	await putVariantsWithCleanup(variants, type, id);
 
 	const fallback = IMAGE_VARIANTS[type].fallback;
 	const canonicalKey = buildVariantKey(type, id, fallback, 'jpg');

@@ -120,6 +120,34 @@
       "when": 1783530016098,
       "tag": "0016_great_husk",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1783840346563,
+      "tag": "0017_ancient_khan",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1783857101358,
+      "tag": "0018_jazzy_red_hulk",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1783857401868,
+      "tag": "0019_free_captain_america",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1783858222932,
+      "tag": "0020_foamy_nitro",
+      "breakpoints": true
     }
   ]
 }

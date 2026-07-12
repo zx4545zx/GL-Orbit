@@ -1,0 +1,2 @@
+import { json } from '@sveltejs/kit'; import { setMomentBookmark } from '$lib/server/moments/mutations.js'; import type { RequestHandler } from './$types.js';
+const set = (bookmarked: boolean): RequestHandler => async ({ locals, params }) => { if (!locals.user) return json({ error: 'UNAUTHORIZED' }, { status: 401 }); await setMomentBookmark(params.id, locals.user.id, bookmarked); return json({ bookmarked }); }; export const PUT = set(true); export const DELETE = set(false);

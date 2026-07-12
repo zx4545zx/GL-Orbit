@@ -65,3 +65,4 @@ config/
 .mcp.json
 .neon
 .mcp
+.slim/deepwork/

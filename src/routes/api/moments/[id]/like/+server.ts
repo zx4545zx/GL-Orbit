@@ -1,0 +1,2 @@
+import { json } from '@sveltejs/kit'; import { setMomentLike } from '$lib/server/moments/mutations.js'; import type { RequestHandler } from './$types.js';
+const set = (liked: boolean): RequestHandler => async ({ locals, params }) => { if (!locals.user) return json({ error: 'UNAUTHORIZED' }, { status: 401 }); await setMomentLike(params.id, locals.user.id, liked); return json({ liked }); }; export const PUT = set(true); export const DELETE = set(false);

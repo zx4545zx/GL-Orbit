@@ -5,7 +5,7 @@ import { broadcastNotification, broadcastUnreadCount } from './notifications-sse
 import { sendPushNotification } from './push-notifications.js';
 import type { NotificationItem, NotificationsListResponse } from '$lib/types.js';
 
-export type NotificationType = 'new_episode' | 'status_change' | 'announcement';
+export type NotificationType = 'new_episode' | 'status_change' | 'announcement' | 'moment_like' | 'moment_comment';
 
 export interface NotificationRecord {
 	id: string;
@@ -15,6 +15,10 @@ export interface NotificationRecord {
 	message: string;
 	isRead: boolean;
 	createdAt: Date;
+	momentId?: string | null;
+	commentId?: string | null;
+	actorUserId?: string | null;
+	metadata?: Record<string, unknown> | null;
 }
 
 export function parseNotificationPagination(searchParams: URLSearchParams): { limit: number; offset: number } {
@@ -36,6 +40,10 @@ export async function getUserNotifications(
 		.select({
 			id: notifications.id,
 			seriesId: notifications.seriesId,
+			momentId: notifications.momentId,
+			commentId: notifications.commentId,
+			actorUserId: notifications.actorUserId,
+			metadata: notifications.metadata,
 			type: notifications.type,
 			message: notifications.message,
 			isRead: notifications.isRead,
@@ -43,7 +51,7 @@ export async function getUserNotifications(
 			seriesTitle: series.titleEn
 		})
 		.from(notifications)
-		.innerJoin(series, eq(notifications.seriesId, series.id))
+		.leftJoin(series, eq(notifications.seriesId, series.id))
 		.where(eq(notifications.userId, userId))
 		.orderBy(desc(notifications.createdAt))
 		.limit(limit)
@@ -68,7 +76,8 @@ export async function getUserNotifications(
 	const notificationItems: NotificationItem[] = rawRows.map((row) => ({
 		...row,
 		type: row.type as NotificationType,
-		createdAt: row.createdAt.toISOString()
+		createdAt: row.createdAt.toISOString(),
+		targetUrl: typeof row.metadata?.targetUrl === 'string' ? row.metadata.targetUrl : row.momentId ? `/halo/moments/${row.momentId}` : null
 	}));
 
 	return {
@@ -83,10 +92,9 @@ export async function getUserNotifications(
 
 async function enrichNotification(row: typeof notifications.$inferSelect): Promise<NotificationItem> {
 	const db = await getDb();
-	const [seriesRow] = await db
-		.select({ titleEn: series.titleEn })
-		.from(series)
-		.where(eq(series.id, row.seriesId));
+	const seriesRow = row.seriesId
+		? (await db.select({ titleEn: series.titleEn }).from(series).where(eq(series.id, row.seriesId)))[0]
+		: undefined;
 
 	return {
 		id: row.id,
@@ -95,8 +103,23 @@ async function enrichNotification(row: typeof notifications.$inferSelect): Promi
 		message: row.message,
 		isRead: row.isRead,
 		createdAt: row.createdAt.toISOString(),
-		seriesTitle: seriesRow?.titleEn ?? ''
+		seriesTitle: seriesRow?.titleEn ?? null,
+		momentId: row.momentId,
+		commentId: row.commentId,
+		actorUserId: row.actorUserId,
+		metadata: row.metadata,
+		targetUrl: typeof row.metadata?.targetUrl === 'string' ? row.metadata.targetUrl : row.momentId ? `/halo/moments/${row.momentId}` : null
 	};
+}
+
+export async function createMomentNotification(input: { userId: string; actorUserId: string; momentId: string; commentId?: string; type: 'moment_like' | 'moment_comment'; targetUrl: string }): Promise<NotificationItem | null> {
+	if (input.userId === input.actorUserId) return null;
+	const db = await getDb();
+	const [row] = await db.insert(notifications).values({ userId: input.userId, actorUserId: input.actorUserId, momentId: input.momentId, commentId: input.commentId ?? null, type: input.type, message: input.type === 'moment_like' ? 'New reaction to your Moment' : 'New comment on your Moment', metadata: { targetUrl: input.targetUrl } }).returning();
+	const item = await enrichNotification(row);
+	broadcastNotification(input.userId, item);
+	void sendPushNotification(input.userId, item);
+	return item;
 }
 
 export async function createAndBroadcastNotification(

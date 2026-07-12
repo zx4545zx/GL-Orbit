@@ -1,6 +1,7 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
 import Picture from '$lib/components/Picture.svelte';
+import LatestMomentsLink from '$lib/components/LatestMomentsLink.svelte';
 
 	import { page } from '$app/state';	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
 	import WatchedButton from '$lib/components/WatchedButton.svelte';
@@ -549,6 +550,7 @@ import Picture from '$lib/components/Picture.svelte';
 				</div>
 			</section>
 		{/if}
+		<LatestMomentsLink lang={page.data.lang} entity="series" entityId={series.id} />
 		</div>
 	</div>
 {/if}
