@@ -1,0 +1,2 @@
+<script lang="ts">import { m } from '$lib/i18n/paraglide.js';</script>
+<h1 class="font-display text-3xl font-extrabold">{m.halo_alerts_title()}</h1><section class="mt-5 rounded-[1.75rem] border border-white bg-white/75 p-5 shadow-[0_12px_34px_rgba(88,66,130,.08)]"><div class="flex gap-3"><span class="grid h-10 w-10 place-items-center rounded-2xl bg-coral/15 text-coral-dark">♥</span><p class="text-sm leading-6 text-plum"><strong>Mali S.</strong> liked your Moment.<br /><span class="text-xs text-plum-light">A little while ago</span></p></div></section>

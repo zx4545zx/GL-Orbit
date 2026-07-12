@@ -25,6 +25,11 @@ import Picture from './Picture.svelte';
 			label: m.nav_explore(),
 			icon: '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm.93-13.43 1.5 5.26c.12.4.44.72.84.84l5.26 1.5a.75.75 0 0 0 .92-.92l-1.5-5.26a1.27 1.27 0 0 0-.84-.84l-5.26-1.5a.75.75 0 0 0-.92.92Zm.3 4.2-2.5 2.5" /></svg>'
 		},
+		{
+			href: `/${page.data.lang}/halo`,
+			label: m.nav_halo(),
+			icon: '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75 14.37 8.55l5.3.77-3.84 3.74.9 5.28L12 15.85l-4.74 2.49.9-5.28-3.84-3.74 5.3-.77L12 3.75Z" /></svg>'
+		},
 	]);
 
 	function isActive(href: string) {

@@ -1,0 +1,2 @@
+<script lang="ts">import { m } from '$lib/i18n/paraglide.js'; import MomentFeed from '$lib/components/moments/MomentFeed.svelte'; import { sampleMoments } from '$lib/components/moments/types.js';</script>
+<h1 class="font-display text-3xl font-extrabold">{m.halo_saved_title()}</h1><p class="mt-2 mb-5 text-sm text-plum-light">Private to you. Come back whenever the feeling calls.</p><MomentFeed moments={[{ ...sampleMoments[1], saved: true }]} />
