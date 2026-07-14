@@ -16,7 +16,7 @@ describe('navigation performance indexes', () => {
 		const migration = files.find((file) => /^0021_.*\.sql$/.test(file));
 		expect(migration).toBeDefined();
 		const sql = await readFile(join(drizzleDirectory, migration!), 'utf8');
-		expect(sql.match(/CREATE INDEX IF NOT EXISTS/g)).toHaveLength(3);
+		expect(sql.match(/CREATE INDEX CONCURRENTLY IF NOT EXISTS/g)).toHaveLength(3);
 		expect(sql).toContain('"episodes_series_idx"');
 		expect(sql).toContain('"episode_schedules_episode_idx"');
 		expect(sql).toContain('"episode_schedules_air_date_idx"');
