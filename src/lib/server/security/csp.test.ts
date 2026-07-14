@@ -1,20 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import { contentSecurityPolicy } from './csp.js';
+import { readFileSync } from 'node:fs';
 
-describe('contentSecurityPolicy', () => {
-	it('allows only the external origins required by Moment embeds and images', () => {
-		const policy = contentSecurityPolicy(false);
+const config = readFileSync('svelte.config.js', 'utf8');
+const hooks = readFileSync('src/hooks.server.ts', 'utf8');
 
-		expect(policy).toContain("default-src 'self'");
-		expect(policy).toContain('frame-src https://www.youtube-nocookie.com');
-		expect(policy).toContain('img-src \'self\' https: data:');
-		expect(policy).not.toContain('https://*.youtube.com');
-		expect(policy).not.toContain('frame-src *');
+describe('SvelteKit content security policy', () => {
+	it('lets SvelteKit authorize hydration and service-worker bootstrap scripts', () => {
+		expect(config).toContain("mode: 'auto'");
+		expect(config).toContain("'script-src': ['self', 'https://platform.x.com', 'https://platform.twitter.com']");
+		expect(config).not.toMatch(/'script-src':[^\n]*unsafe-inline/);
+		expect(config).toContain("serviceWorker: { register: true }");
 	});
 
-	it('permits Vite development client injection only in development', () => {
-		expect(contentSecurityPolicy(true)).toContain("script-src 'self' 'unsafe-inline'");
-		expect(contentSecurityPolicy(true)).toContain("style-src 'self' 'unsafe-inline'");
-		expect(contentSecurityPolicy(false)).not.toContain("'unsafe-inline'");
+	it('keeps the embed allowlist narrow and permits only inline style attributes', () => {
+		expect(config).toContain("'style-src': ['self']");
+		expect(config).toContain("'style-src-attr': ['unsafe-inline']");
+		expect(config).toContain("'frame-src': [");
+		expect(config).toContain("'https://www.youtube-nocookie.com'");
+		expect(config).not.toContain('https://*.youtube.com');
+		expect(config).not.toContain("'frame-src': ['*']");
+	});
+
+	it('does not override SvelteKit nonces with a second response policy', () => {
+		expect(hooks).not.toContain('contentSecurityPolicy');
+		expect(hooks).not.toContain("headers.set('content-security-policy'");
 	});
 });
