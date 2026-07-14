@@ -182,7 +182,9 @@ export const episodes = pgTable('episodes', {
 	coverUrl: text('cover_url'),
 	trailerUrl: text('trailer_url'),
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
-});
+}, (table) => ({
+	seriesIndex: index('episodes_series_idx').on(table.seriesId)
+}));
 
 export const episodeSchedules = pgTable('episode_schedules', {
 	id: uuid('id').defaultRandom().primaryKey(),
@@ -192,7 +194,12 @@ export const episodeSchedules = pgTable('episode_schedules', {
 	streamLink: text('stream_link'),
 	isUncut: boolean('is_uncut').notNull().default(false),
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
-});
+}, (table) => ({
+	episodeIndex: index('episode_schedules_episode_idx').on(table.episodeId),
+	airDateIndex: index('episode_schedules_air_date_idx')
+		.on(table.airDate)
+		.where(sql`${table.deletedAt} IS NULL`)
+}));
 
 export const moments = pgTable('moments', {
 	id: uuid('id').defaultRandom().primaryKey(),

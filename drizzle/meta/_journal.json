@@ -148,6 +148,13 @@
       "when": 1783858222932,
       "tag": "0020_foamy_nitro",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1784044662650,
+      "tag": "0021_navigation_performance_indexes",
+      "breakpoints": true
     }
   ]
 }

@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
 	if (!cached) setCached(cacheKey, series, CACHE_TTL);
 
 	setHeaders({
-		'cache-control': 'public, max-age=0, s-maxage=30, stale-while-revalidate=60'
+		'cache-control': 'private, no-store'
 	});
 
 	return { series, filters };

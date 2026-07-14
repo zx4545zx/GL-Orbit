@@ -126,13 +126,13 @@ export async function getSeriesList(filters: SeriesFilters, page: number = 1): P
 	const offset = (page - 1) * SERIES_PAGE_LIMIT;
 	const where = buildSeriesConditions(filters);
 
-	const [countResult] = await db
+	const countQuery = db
 		.select({ count: sql<number>`count(*)::int` })
 		.from(series)
 		.leftJoin(studios, and(eq(series.studioId, studios.id), isNull(studios.deletedAt)))
 		.where(where);
 
-	const rows = await db
+	const rowsQuery = db
 		.select({
 			id: series.id,
 			titleEn: series.titleEn,
@@ -160,6 +160,8 @@ export async function getSeriesList(filters: SeriesFilters, page: number = 1): P
 		)
 		.limit(SERIES_PAGE_LIMIT)
 		.offset(offset);
+
+	const [[countResult], rows] = await Promise.all([countQuery, rowsQuery]);
 
 	// Fetch genres for all returned series IDs
 	const seriesIds = rows.map((r) => r.id);

@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	}
 
 	setHeaders({
-		'cache-control': 'public, max-age=0, s-maxage=30, stale-while-revalidate=60'
+		'cache-control': 'private, no-store'
 	});
 
 	return { artist };

@@ -2,9 +2,6 @@ import { redirect, type Handle } from '@sveltejs/kit';
 import { validateSession } from '$lib/server/auth/session.js';
 import { detectLocale } from '$lib/i18n/detect.js';
 import { availableLanguageTags, type AvailableLanguageTag } from '$lib/i18n/paraglide.js';
-import { getDb } from '$lib/server/db/index.js';
-import { users } from '$lib/server/db/schema.js';
-import { eq } from 'drizzle-orm';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionCookie = event.cookies.get('session');
@@ -24,15 +21,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const pathLang = event.url.pathname.split('/')[1] ?? '';
 	const cookieLocale = event.cookies.get('locale');
 
-	let userLocale: string | undefined;
-	if (event.locals.user) {
-		const db = await getDb();
-		const [user] = await db
-			.select({ preferredLanguage: users.preferredLanguage })
-			.from(users)
-			.where(eq(users.id, event.locals.user.id));
-		userLocale = user?.preferredLanguage ?? undefined;
-	}
+	const userLocale = event.locals.user?.preferredLanguage ?? undefined;
 
 	const locale = detectLocale({
 		urlLocale: pathLang,

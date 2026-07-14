@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { getDb } from '../db/index.js';
 import { artists, momentArtists, momentBookmarks, momentLikes, momentMedia, momentSeries, momentShips, moments, series, ships, users } from '../db/schema.js';
+import { getCached, setCached } from '../cache.js';
 import { encodeCursor } from './cursor.js';
 import { serializeMomentAuthor } from './serializers.js';
 
@@ -92,6 +93,10 @@ export type HaloDiscoveryItem = {
 export async function getHaloDiscovery(limit = 4): Promise<HaloDiscoveryItem[]> {
 	const db = await getDb();
 	const safeLimit = Math.min(10, Math.max(1, limit));
+	const cacheKey = `halo-discovery:${safeLimit}`;
+	const cached = getCached<HaloDiscoveryItem[]>(cacheKey);
+	if (cached) return cached;
+
 	const [seriesRows, artistRows, shipRows] = await Promise.all([
 		db.select({ id: series.id, label: series.titleEn, momentCount: sql<number>`count(distinct ${moments.id})::int` })
 			.from(momentSeries)
@@ -119,9 +124,12 @@ export async function getHaloDiscovery(limit = 4): Promise<HaloDiscoveryItem[]> 
 			.limit(safeLimit)
 	]);
 
-	return [
+	const result = [
 		...seriesRows.map((item) => ({ ...item, kind: 'series' as const })),
 		...artistRows.map((item) => ({ ...item, kind: 'artist' as const })),
 		...shipRows.map((item) => ({ ...item, kind: 'ship' as const }))
 	].sort((a, b) => b.momentCount - a.momentCount).slice(0, safeLimit);
+
+	setCached(cacheKey, result, 30_000);
+	return result;
 }
