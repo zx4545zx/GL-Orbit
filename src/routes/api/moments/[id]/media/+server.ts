@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { deleteImageVariants, ImageUploadValidationError, uploadImage } from '$lib/server/r2.js';
 import { appendMomentMedia, getMomentMediaUploadAccess } from '$lib/server/moments/mutations.js';
+import { signStagedMomentMedia } from '$lib/server/moments/media-token.js';
 import type { RequestHandler } from './$types.js';
 
 const MAX_REQUEST_BYTES = 4 * 1024 * 1024;
@@ -13,7 +14,8 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 
 	const access = await getMomentMediaUploadAccess(params.id, locals.user.id);
 	if (access === 'FORBIDDEN') return json({ error: 'ไม่มีสิทธิ์อัปโหลดรูปภาพสำหรับ Moment นี้' }, { status: 403 });
-	if (access !== 'OK') return json({ error: 'ไม่สามารถอัปโหลดรูปภาพเพิ่มได้' }, { status: 400 });
+	const staged = request.headers.get('x-moment-media-stage') === 'edit';
+	if (access !== 'OK' && !(staged && access === 'FULL')) return json({ error: 'ไม่สามารถอัปโหลดรูปภาพเพิ่มได้' }, { status: 400 });
 
 	let uploaded: { url: string; key: string } | null = null;
 	try {
@@ -22,6 +24,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		if (!IMAGE_TYPES.has(file.type)) return json({ error: 'ไฟล์ต้องเป็นรูปภาพ (JPEG, PNG, WebP)' }, { status: 400 });
 		if (file.size > MAX_REQUEST_BYTES) return json({ error: 'ไฟล์ต้องมีขนาดไม่เกิน 4 MB' }, { status: 413 });
 		uploaded = await uploadImage(file, 'moments');
+		if (staged) return json({ ...uploaded, token: signStagedMomentMedia(params.id, locals.user.id, uploaded.key, uploaded.url) }, { status: 201 });
 		if (!await appendMomentMedia({ momentId: params.id, authorId: locals.user.id, key: uploaded.key, url: uploaded.url })) {
 			await deleteImageVariants(uploaded.key);
 			return json({ error: 'ไม่สามารถอัปโหลดรูปภาพเพิ่มได้' }, { status: 400 });

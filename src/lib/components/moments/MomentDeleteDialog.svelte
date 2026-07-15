@@ -1,0 +1,11 @@
+<script lang="ts">
+	import { page } from '$app/state';
+	let { momentId, open = $bindable(false), onSuccess }: { momentId: string; open?: boolean; onSuccess?: () => void | Promise<void> } = $props();
+	let pending = $state(false); let error = $state('');
+	const thai = $derived(page.data.lang === 'th');
+	const copy = $derived(thai ? { title: 'ลบ Moment นี้?', detail: 'การลบไม่สามารถย้อนกลับจากหน้านี้ได้', cancel: 'ยกเลิก', remove: 'ลบโพสต์', removing: 'กำลังลบ…', failed: 'ลบโพสต์ไม่สำเร็จ โปรดลองอีกครั้ง' } : { title: 'Delete this Moment?', detail: 'This cannot be undone from this screen.', cancel: 'Cancel', remove: 'Delete post', removing: 'Deleting…', failed: 'Unable to delete this post. Try again.' });
+	async function remove() { if (pending) return; pending = true; error = ''; try { const response = await fetch(`/api/moments/${encodeURIComponent(momentId)}`, { method: 'DELETE' }); if (!response.ok) throw new Error(); open = false; await onSuccess?.(); } catch { error = copy.failed; } finally { pending = false; } }
+	function close() { if (!pending) { open = false; error = ''; } }
+</script>
+<svelte:window onkeydown={(event) => { if (event.key === 'Escape') close(); }} />
+{#if open}<div class="fixed inset-0 z-50 grid place-items-center bg-plum/35 p-4" role="presentation" onclick={(event) => { if (event.currentTarget === event.target) close(); }}><div role="dialog" aria-modal="true" aria-labelledby={`delete-moment-${momentId}`} class="w-full max-w-md rounded-3xl bg-white p-5 shadow-2xl"><h2 id={`delete-moment-${momentId}`} class="font-display text-lg font-extrabold text-plum">{copy.title}</h2><p class="mt-2 text-sm text-plum-light">{copy.detail}</p>{#if error}<p role="alert" class="mt-3 text-xs text-coral-dark">{error}</p>{/if}<div class="mt-5 flex justify-end gap-2"><button type="button" onclick={close} disabled={pending} class="halo-focus-ring rounded-full px-4 py-2 text-sm font-bold text-plum hover:bg-plum/[.05]">{copy.cancel}</button><button type="button" onclick={remove} disabled={pending} class="halo-focus-ring rounded-full bg-coral px-4 py-2 text-sm font-bold text-white hover:bg-coral-dark disabled:opacity-60">{pending ? copy.removing : copy.remove}</button></div></div></div>{/if}

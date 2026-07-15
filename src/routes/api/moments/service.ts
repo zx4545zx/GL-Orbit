@@ -16,8 +16,10 @@ export async function parseMomentRequest(request: Request) {
 			: null;
 	};
 	const seriesIds = ids('seriesIds', 3); const artistIds = ids('artistIds', 6); const shipIds = ids('shipIds', 3);
-	if (!seriesIds || !artistIds || !shipIds) return null;
-	return { ...parsed.value, sourceCanonicalUrl: embed.canonicalUrl, provider: embed.provider, externalId: embed.externalId, embedStatus: embed.status, embedMetadata: embed.metadata, seriesIds, artistIds, shipIds };
+	const mediaIds = ids('mediaIds', 4);
+	const stagedMedia = Array.isArray(body.stagedMedia) && body.stagedMedia.length <= 4 ? body.stagedMedia : null;
+	if (!seriesIds || !artistIds || !shipIds || !mediaIds || !stagedMedia || new Set(mediaIds).size !== mediaIds.length || mediaIds.length + stagedMedia.length > 4) return null;
+	return { ...parsed.value, sourceCanonicalUrl: embed.canonicalUrl, provider: embed.provider, externalId: embed.externalId, embedStatus: embed.status, embedMetadata: embed.metadata, seriesIds, artistIds, shipIds, mediaIds, stagedMedia };
 }
 
 export function requireUser(user: App.Locals['user']) { return user ?? null; }
