@@ -13,6 +13,7 @@ export type MomentApiItem = {
 	sourceUrl: string | null;
 	sourceCanonicalUrl?: string | null;
 	sourceProvider: 'YOUTUBE' | 'TIKTOK' | 'X' | 'OTHER' | null;
+	embedMetadata?: { thumbnailUrl?: string; thumbnailExpiresAt?: string; title?: string; authorName?: string; providerName?: string } | null;
 	likeCount: number;
 	commentCount: number;
 	createdAt: string | Date;
@@ -42,6 +43,9 @@ export type ProfileMoment = {
 	body: string;
 	source: string | null;
 	provider: 'YouTube' | 'TikTok' | 'X' | 'Link';
+	previewThumbnailUrl: string | null;
+	previewTitle: string | null;
+	previewAuthor: string | null;
 	tags: MomentTag[];
 	likes: number;
 	commentCount: number;
@@ -66,6 +70,11 @@ function formatMomentTime(value: string | Date, lang: string): string {
 export function toProfileMoment(moment: MomentApiItem, lang = 'th'): ProfileMoment {
 	const author = moment.author.displayName?.trim() || moment.author.username || 'ผู้ใช้ Halo';
 	const provider = ({ YOUTUBE: 'YouTube', TIKTOK: 'TikTok', X: 'X', OTHER: 'Link' } as const)[moment.sourceProvider ?? 'OTHER'];
+	const thumbnailUrl = moment.embedMetadata?.thumbnailUrl;
+	const expiresAt = moment.embedMetadata?.thumbnailExpiresAt;
+	const previewThumbnailUrl = typeof thumbnailUrl === 'string' && thumbnailUrl.startsWith('https://') && (!expiresAt || new Date(expiresAt).getTime() > Date.now()) ? thumbnailUrl : null;
+	const previewTitle = moment.embedMetadata?.title?.trim() || null;
+	const previewAuthor = moment.embedMetadata?.authorName?.trim() || null;
 	return {
 		id: moment.id,
 		author,
@@ -76,6 +85,9 @@ export function toProfileMoment(moment: MomentApiItem, lang = 'th'): ProfileMome
 		body: moment.body ?? '',
 		source: moment.sourceCanonicalUrl ?? moment.sourceUrl ?? null,
 		provider,
+		previewThumbnailUrl,
+		previewTitle,
+		previewAuthor,
 		tags: moment.entityTags ?? [
 			...moment.seriesIds.map((id) => ({ kind: 'series' as const, id, label: id })),
 			...moment.artistIds.map((id) => ({ kind: 'artist' as const, id, label: id })),

@@ -5,5 +5,5 @@ export type ResolvedEmbed = {
 	canonicalUrl: string;
 	externalId?: string;
 	status: 'READY' | 'FALLBACK' | 'FAILED';
-	metadata: { title?: string; authorName?: string; thumbnailUrl?: string; providerName?: string };
+	metadata: { title?: string; authorName?: string; thumbnailUrl?: string; thumbnailExpiresAt?: string; providerName?: string };
 };

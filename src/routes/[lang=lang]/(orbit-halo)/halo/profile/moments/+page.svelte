@@ -73,6 +73,10 @@
 		<div class="-mt-10 flex items-end">{#if data.profile.avatarUrl}<img src={data.profile.avatarUrl} alt="" class="relative z-10 h-20 w-20 rounded-full border-4 border-white object-cover" />{:else}<div class="relative z-10 grid h-20 w-20 place-items-center rounded-full border-4 border-white bg-coral/20 text-xl font-bold text-coral-dark">{initial}</div>{/if}</div>
 		<h1 class="mt-3 font-display text-xl font-extrabold">{displayName}</h1><p class="text-sm text-plum-light">@{data.profile.username}</p>
 	</div>
-	<div class="relative py-3 text-center text-sm font-bold">Moments<span class="absolute bottom-0 left-1/2 h-1 w-14 -translate-x-1/2 rounded-full bg-coral"></span></div>
+	<div class="grid grid-cols-3 border-t border-[#eee9ef] text-center text-sm font-bold">
+		<div class="relative py-3">Moments<span class="absolute bottom-0 left-1/2 h-1 w-14 -translate-x-1/2 rounded-full bg-coral"></span></div>
+		<div class="py-3 text-plum-light">Media</div>
+		<div class="py-3 text-plum-light">Links</div>
+	</div>
 </header>
 <MomentFeed moments={profileMoments} initialCursor={data.nextCursor} authorId={data.profile.id} />
