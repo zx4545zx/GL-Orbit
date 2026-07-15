@@ -1,12 +1,20 @@
 import { normalizeUrl } from './normalize-url.js';
+import { resolveShortLink } from './short-link-resolver.js';
 import type { ResolvedEmbed } from './types.js';
 import { parseSafeExternalUrl } from './url-security.js';
 
 const youtubeIdPattern = /^[A-Za-z0-9_-]{6,}$/;
 
 export async function resolveEmbed(rawUrl: string): Promise<ResolvedEmbed> {
-	parseSafeExternalUrl(rawUrl);
-	const canonicalUrl = normalizeUrl(rawUrl);
+	const submittedUrl = parseSafeExternalUrl(rawUrl);
+	let resolvedUrl = submittedUrl;
+	try {
+		resolvedUrl = await resolveShortLink(submittedUrl);
+	} catch {
+		// Preserve the submitted safe URL and existing fallback behavior.
+	}
+
+	const canonicalUrl = normalizeUrl(resolvedUrl.toString());
 	const url = new URL(canonicalUrl);
 	const host = url.hostname;
 

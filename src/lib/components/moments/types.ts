@@ -74,7 +74,7 @@ export function toProfileMoment(moment: MomentApiItem, lang = 'th'): ProfileMome
 		avatarUrl: moment.author.avatarUrl,
 		time: formatMomentTime(moment.createdAt, lang),
 		body: moment.body ?? '',
-		source: moment.sourceUrl ?? moment.sourceCanonicalUrl ?? null,
+		source: moment.sourceCanonicalUrl ?? moment.sourceUrl ?? null,
 		provider,
 		tags: moment.entityTags ?? [
 			...moment.seriesIds.map((id) => ({ kind: 'series' as const, id, label: id })),
