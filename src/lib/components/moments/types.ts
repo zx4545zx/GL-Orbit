@@ -20,7 +20,7 @@ export type MomentApiItem = {
 	liked: boolean;
 	bookmarked: boolean;
 	author: { id: string; username: string; displayName: string | null; avatarUrl: string | null };
-	media: Array<{ id: string; momentId: string; externalUrl: string | null; altText: string | null; sortOrder: number }>;
+	media: Array<{ id: string; momentId: string; externalUrl: string | null; storageKey: string | null; sourceType: 'EXTERNAL' | 'UPLOAD'; altText: string | null; sortOrder: number }>;
 	seriesIds: string[];
 	artistIds: string[];
 	shipIds: string[];
@@ -35,6 +35,7 @@ export type MomentTag = {
 
 export type ProfileMoment = {
 	id: string;
+	authorId: string;
 	author: string;
 	handle: string;
 	initial: string;
@@ -77,6 +78,7 @@ export function toProfileMoment(moment: MomentApiItem, lang = 'th'): ProfileMome
 	const previewAuthor = moment.embedMetadata?.authorName?.trim() || null;
 	return {
 		id: moment.id,
+		authorId: moment.authorId,
 		author,
 		handle: moment.author.username,
 		initial: author.trim().charAt(0).toUpperCase() || '✦',

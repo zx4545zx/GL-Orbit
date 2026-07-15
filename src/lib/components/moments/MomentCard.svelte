@@ -6,9 +6,10 @@
 	import HaloIcon from './HaloIcon.svelte';
 	import MomentComments from './MomentComments.svelte';
 	import MomentReportDialog from './MomentReportDialog.svelte';
+	import MomentDeleteDialog from './MomentDeleteDialog.svelte';
 	import type { ProfileMoment } from './types.js';
 
-	let { moment, expanded = false }: { moment: ProfileMoment; expanded?: boolean } = $props();
+	let { moment, expanded = false, onDeleted }: { moment: ProfileMoment; expanded?: boolean; onDeleted?: () => void | Promise<void> } = $props();
 	let liked = $state(false);
 	let bookmarked = $state(false);
 	let likes = $state(0);
@@ -19,7 +20,9 @@
 	let commentsOpen = $state(false);
 	let reportOpen = $state(false);
 	let reportSent = $state(false);
+	let actionsOpen = $state(false); let deleteOpen = $state(false);
 	const isThai = $derived(page.data.lang === 'th');
+	const isOwner = $derived(page.data.user?.id === moment.authorId);
 
 	$effect(() => {
 		liked = moment.liked;
@@ -66,7 +69,7 @@
 	<div class="flex gap-3">
 		<a href={`/${page.data.lang}/halo/u/${encodeURIComponent(moment.handle)}`} class="halo-focus-ring grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-lavender/25 text-sm font-bold text-plum">{#if moment.avatarUrl}<img src={moment.avatarUrl} alt="" class="h-full w-full object-cover" />{:else}{moment.initial}{/if}</a>
 		<div class="min-w-0 flex-1">
-			<header class="flex items-start gap-2"><div class="min-w-0 flex-1 truncate text-sm"><a href={`/${page.data.lang}/halo/u/${encodeURIComponent(moment.handle)}`} class="font-bold text-plum hover:underline">{moment.author}</a><span class="ml-1 text-plum-light">@{moment.handle} · {moment.time}</span></div></header>
+			<header class="flex items-start gap-2"><div class="min-w-0 flex-1 truncate text-sm"><a href={`/${page.data.lang}/halo/u/${encodeURIComponent(moment.handle)}`} class="font-bold text-plum hover:underline">{moment.author}</a><span class="ml-1 text-plum-light">@{moment.handle} · {moment.time}</span></div>{#if isOwner}<div class="relative"><button type="button" onclick={() => actionsOpen = !actionsOpen} aria-expanded={actionsOpen} aria-label={isThai ? 'จัดการโพสต์' : 'Manage post'} class="halo-focus-ring grid h-8 w-8 place-items-center rounded-full hover:bg-plum/[.05]">•••</button>{#if actionsOpen}<div role="menu" class="absolute right-0 z-20 mt-1 w-36 rounded-xl border border-[#eee9ef] bg-white p-1 shadow-lg"><a role="menuitem" href={`/${page.data.lang}/halo/moments/${encodeURIComponent(moment.id)}/edit`} class="block rounded-lg px-3 py-2 text-sm hover:bg-plum/[.05]">{isThai ? 'แก้ไขโพสต์' : 'Edit post'}</a><button role="menuitem" type="button" onclick={() => { actionsOpen = false; deleteOpen = true; }} class="w-full rounded-lg px-3 py-2 text-left text-sm text-coral-dark hover:bg-coral/10">{isThai ? 'ลบโพสต์' : 'Delete post'}</button></div>{/if}</div>{/if}</header>
 			{#if moment.body}<p class="mt-1 whitespace-pre-line text-[.94rem] leading-6 text-plum">{moment.body}</p>{/if}
 			{#if moment.tags.length}<div class="mt-2 flex flex-wrap gap-1.5">{#each moment.tags as tag}<a href={`/${page.data.lang}/halo?${tag.kind}Id=${encodeURIComponent(tag.id)}`} class="text-xs font-medium text-coral-dark hover:underline">#{tag.label}</a>{/each}</div>{/if}
 			{#if moment.media.length}{#each moment.media as media (media.id)}{#if media.externalUrl}<img src={media.externalUrl} alt={media.altText ?? ''} loading="lazy" decoding="async" referrerpolicy="no-referrer" class="mt-3 max-h-[560px] w-full rounded-2xl object-cover" />{/if}{/each}{/if}
@@ -84,3 +87,4 @@
 	</div>
 </article>
 <MomentReportDialog momentId={moment.id} bind:open={reportOpen} onSuccess={() => reportSent = true} />
+<MomentDeleteDialog momentId={moment.id} bind:open={deleteOpen} onSuccess={async () => { if (onDeleted) await onDeleted(); else await invalidateAll(); }} />

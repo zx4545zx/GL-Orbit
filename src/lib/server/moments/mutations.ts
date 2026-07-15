@@ -91,21 +91,23 @@ export async function appendMomentMedia(input: { momentId: string; authorId: str
 	return resultRows<{ moment_id: string }>(result[1]).length > 0;
 }
 
-export async function updateMoment(id: string, authorId: string, input: Pick<CreateMomentInput, 'body' | 'sourceUrl' | 'sourceCanonicalUrl' | 'provider' | 'externalId' | 'embedStatus' | 'embedMetadata' | 'imageUrls' | 'seriesIds' | 'artistIds' | 'shipIds'>): Promise<boolean> {
+export async function updateMoment(id: string, authorId: string, input: Pick<CreateMomentInput, 'body' | 'sourceUrl' | 'sourceCanonicalUrl' | 'provider' | 'externalId' | 'embedStatus' | 'embedMetadata' | 'seriesIds' | 'artistIds' | 'shipIds'> & { mediaIds: string[]; stagedMedia: Array<{ key: string; url: string; token: string }> }): Promise<boolean> {
 	const db = await getDb(); const sql = db.$client;
 	await verifyMomentSeriesIds(db, input.seriesIds);
+	if (input.mediaIds.length + input.stagedMedia.length > 4 || new Set(input.mediaIds).size !== input.mediaIds.length) return false;
 	const owned = sql`EXISTS (SELECT 1 FROM moments WHERE id = ${id} AND author_id = ${authorId} AND status = 'PUBLISHED')`;
-	const statements = [sql`UPDATE moments SET body = ${input.body ?? null}, source_url = ${input.sourceUrl}, source_canonical_url = ${input.sourceCanonicalUrl}, source_provider = ${input.provider}, source_external_id = ${input.externalId ?? null}, embed_status = ${input.embedStatus ?? 'FALLBACK'}, embed_metadata = ${JSON.stringify(input.embedMetadata ?? {})}::jsonb, updated_at = now() WHERE id = ${id} AND author_id = ${authorId} AND status = 'PUBLISHED'`, sql`DELETE FROM moment_media WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_series WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_artists WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_ships WHERE moment_id = ${id} AND ${owned}`];
-	for (const [sortOrder, url] of input.imageUrls.entries()) statements.push(sql`INSERT INTO moment_media (id, moment_id, external_url, sort_order) SELECT ${randomUUID()}, ${id}, ${url}, ${sortOrder} WHERE ${owned}`);
+	const statements = [sql`UPDATE moments SET body = ${input.body ?? null}, source_url = ${input.sourceUrl}, source_canonical_url = ${input.sourceCanonicalUrl}, source_provider = ${input.provider}, source_external_id = ${input.externalId ?? null}, embed_status = ${input.embedStatus ?? 'FALLBACK'}, embed_metadata = ${JSON.stringify(input.embedMetadata ?? {})}::jsonb, updated_at = now() WHERE id = ${id} AND author_id = ${authorId} AND status = 'PUBLISHED' RETURNING id`, sql`DELETE FROM moment_media WHERE moment_id = ${id} AND ${owned} AND id <> ALL(${input.mediaIds})`, sql`UPDATE moment_media SET sort_order = sort_order + 100 WHERE moment_id = ${id} AND ${owned} AND id = ANY(${input.mediaIds})`, sql`UPDATE moment_media SET sort_order = ordered.sort_order FROM unnest(${input.mediaIds}::uuid[]) WITH ORDINALITY AS ordered(id, sort_order) WHERE moment_media.moment_id = ${id} AND moment_media.id = ordered.id AND ${owned}`, sql`DELETE FROM moment_series WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_artists WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_ships WHERE moment_id = ${id} AND ${owned}`];
+	for (const [index, media] of input.stagedMedia.entries()) statements.push(sql`INSERT INTO moment_media (id, moment_id, source_type, storage_key, external_url, sort_order) SELECT ${randomUUID()}, ${id}, 'UPLOAD', ${media.key}, ${media.url}, ${input.mediaIds.length + index} WHERE ${owned}`);
 	for (const seriesId of input.seriesIds ?? []) statements.push(sql`INSERT INTO moment_series (moment_id, series_id) SELECT ${id}, ${seriesId} WHERE ${owned}`);
 	for (const artistId of input.artistIds ?? []) statements.push(sql`INSERT INTO moment_artists (moment_id, artist_id) SELECT ${id}, ${artistId} WHERE ${owned}`);
 	for (const shipId of input.shipIds ?? []) statements.push(sql`INSERT INTO moment_ships (moment_id, ship_id) SELECT ${id}, ${shipId} WHERE ${owned}`);
-	await sql.transaction(statements); return true;
+	const result = await sql.transaction(statements); return resultRows<{ id: string }>(result[0]).length > 0;
 }
 
-export async function deleteMoment(id: string, actorId: string, isAdmin = false): Promise<void> {
+export async function deleteMoment(id: string, actorId: string): Promise<boolean> {
 	const db = await getDb(); const sql = db.$client;
-	await sql.transaction([sql`UPDATE moments SET status = 'DELETED', deleted_at = now(), updated_at = now() WHERE id = ${id} AND (${isAdmin} OR author_id = ${actorId}) AND status <> 'DELETED'`]);
+	const result = await sql.transaction([sql`UPDATE moments SET status = 'DELETED', deleted_at = now(), updated_at = now() WHERE id = ${id} AND author_id = ${actorId} AND status = 'PUBLISHED' RETURNING id`]);
+	return resultRows<{ id: string }>(result[0]).length > 0;
 }
 
 export async function setMomentLike(momentId: string, userId: string, liked: boolean): Promise<void> {
