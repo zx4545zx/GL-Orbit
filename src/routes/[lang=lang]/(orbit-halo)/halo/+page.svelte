@@ -26,5 +26,5 @@
 		<div class="px-2 py-3.5 text-plum-light">{followingLabel}</div>
 	</div>
 </div>
-<div id="compose" class="scroll-mt-20 border-b border-[#eee9ef]"><MomentComposer /></div>
+<div id="compose" class="scroll-mt-20 border-b border-[#eee9ef]"><MomentComposer seriesOptions={data.seriesOptions} /></div>
 <MomentFeed moments={feed} initialCursor={data.nextCursor} {paginationQuery} />

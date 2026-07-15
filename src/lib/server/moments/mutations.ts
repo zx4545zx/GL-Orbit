@@ -1,5 +1,15 @@
 import { randomUUID } from 'node:crypto';
+import { and, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index.js';
+import { series } from '../db/schema.js';
+
+export class InvalidMomentSeriesError extends Error {}
+
+async function verifyMomentSeriesIds(db: Awaited<ReturnType<typeof getDb>>, seriesIds: string[] = []) {
+	if (!seriesIds.length) return;
+	const rows = await db.select({ id: series.id }).from(series).where(and(inArray(series.id, seriesIds), isNull(series.deletedAt)));
+	if (rows.length !== seriesIds.length) throw new InvalidMomentSeriesError();
+}
 
 type CreateMomentInput = {
 	authorId: string;
@@ -19,6 +29,7 @@ type CreateMomentInput = {
 
 export async function createMoment(input: CreateMomentInput): Promise<{ id: string }> {
 	const db = await getDb();
+	await verifyMomentSeriesIds(db, input.seriesIds);
 	const sql = db.$client;
 	const id = randomUUID();
 	const status = input.pendingMediaCount > 0 ? 'UPLOADING' : 'PUBLISHED';
@@ -82,6 +93,7 @@ export async function appendMomentMedia(input: { momentId: string; authorId: str
 
 export async function updateMoment(id: string, authorId: string, input: Pick<CreateMomentInput, 'body' | 'sourceUrl' | 'sourceCanonicalUrl' | 'provider' | 'externalId' | 'embedStatus' | 'embedMetadata' | 'imageUrls' | 'seriesIds' | 'artistIds' | 'shipIds'>): Promise<boolean> {
 	const db = await getDb(); const sql = db.$client;
+	await verifyMomentSeriesIds(db, input.seriesIds);
 	const owned = sql`EXISTS (SELECT 1 FROM moments WHERE id = ${id} AND author_id = ${authorId} AND status = 'PUBLISHED')`;
 	const statements = [sql`UPDATE moments SET body = ${input.body ?? null}, source_url = ${input.sourceUrl}, source_canonical_url = ${input.sourceCanonicalUrl}, source_provider = ${input.provider}, source_external_id = ${input.externalId ?? null}, embed_status = ${input.embedStatus ?? 'FALLBACK'}, embed_metadata = ${JSON.stringify(input.embedMetadata ?? {})}::jsonb, updated_at = now() WHERE id = ${id} AND author_id = ${authorId} AND status = 'PUBLISHED'`, sql`DELETE FROM moment_media WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_series WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_artists WHERE moment_id = ${id} AND ${owned}`, sql`DELETE FROM moment_ships WHERE moment_id = ${id} AND ${owned}`];
 	for (const [sortOrder, url] of input.imageUrls.entries()) statements.push(sql`INSERT INTO moment_media (id, moment_id, external_url, sort_order) SELECT ${randomUUID()}, ${id}, ${url}, ${sortOrder} WHERE ${owned}`);

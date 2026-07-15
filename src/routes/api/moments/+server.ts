@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { createMoment } from '$lib/server/moments/mutations.js';
+import { createMoment, InvalidMomentSeriesError } from '$lib/server/moments/mutations.js';
 import { decodeCursor } from '$lib/server/moments/cursor.js';
 import { getMoments } from '$lib/server/moments/queries.js';
 import { parseMomentRequest } from './service.js';
@@ -16,5 +16,6 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 export const POST: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) return json({ error: 'UNAUTHORIZED' }, { status: 401 });
 	const input = await parseMomentRequest(request); if (!input) return json({ error: 'INVALID_MOMENT' }, { status: 400 });
-	try { return json(await createMoment({ authorId: locals.user.id, ...input }), { status: 201 }); } catch { return json({ error: 'DUPLICATE_SOURCE' }, { status: 409 }); }
+	try { return json(await createMoment({ authorId: locals.user.id, ...input }), { status: 201 }); }
+	catch (error) { return json({ error: error instanceof InvalidMomentSeriesError ? 'INVALID_MOMENT' : 'DUPLICATE_SOURCE' }, { status: error instanceof InvalidMomentSeriesError ? 400 : 409 }); }
 };

@@ -14,6 +14,7 @@
 		| 'external'
 		| 'send'
 		| 'link'
+		| 'tag'
 		| 'lock'
 		| 'image'
 		| 'smile'
@@ -61,6 +62,8 @@
 		<path d="m21 3-8.2 18-2.3-7.5L3 11.2zM10.5 13.5 21 3" />
 	{:else if name === 'link'}
 		<path d="m10 13.5 4-4" /><path d="M7.3 16.2 5.8 17.7a3.5 3.5 0 0 1-5-5l3-3a3.5 3.5 0 0 1 5 0" transform="translate(2)" /><path d="m14.7 7.8 1.5-1.5a3.5 3.5 0 0 1 5 5l-3 3a3.5 3.5 0 0 1-5 0" transform="translate(-2)" />
+	{:else if name === 'tag'}
+		<path d="M20.5 13.2 13.2 20.5a2 2 0 0 1-2.8 0l-6.9-6.9a2 2 0 0 1-.6-1.4V5a1 1 0 0 1 1-1h7.2a2 2 0 0 1 1.4.6l7 7a2 2 0 0 1 0 2.8Z" /><circle cx="8.2" cy="8.2" r="1.1" />
 	{:else if name === 'lock'}
 		<rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" />
 	{:else if name === 'image'}

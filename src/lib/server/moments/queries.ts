@@ -7,6 +7,20 @@ import { serializeMomentAuthor } from './serializers.js';
 
 export type MomentFilter = { id?: string; limit?: number; cursor?: { createdAt: string; id: string } | null; seriesId?: string | null; artistId?: string | null; shipId?: string | null; authorId?: string | null; bookmarked?: boolean; viewerId?: string };
 
+export type MomentSeriesOption = { id: string; label: string };
+
+export async function getMomentSeriesOptions(lang: string): Promise<MomentSeriesOption[]> {
+	const db = await getDb();
+	const rows = await db
+		.select({ id: series.id, titleTh: series.titleTh, titleEn: series.titleEn })
+		.from(series)
+		.where(isNull(series.deletedAt));
+	return rows
+		.map((row) => ({ id: row.id, label: (lang === 'th' ? row.titleTh || row.titleEn : row.titleEn || row.titleTh || '').trim() }))
+		.filter((row) => row.label.length > 0)
+		.sort((a, b) => a.label.localeCompare(b.label, lang === 'th' ? 'th' : 'en'));
+}
+
 export async function getMoments(filter: MomentFilter = {}) {
 	const db = await getDb(); const limit = Math.min(50, Math.max(1, filter.limit ?? 20));
 	if (filter.bookmarked && !filter.viewerId) return { moments: [], nextCursor: null };

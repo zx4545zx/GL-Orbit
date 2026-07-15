@@ -5,10 +5,15 @@
 	import HaloIcon from './HaloIcon.svelte';
 	import XEmbedPlayer from './XEmbedPlayer.svelte';
 
+	type SeriesOption = { id: string; label: string };
+	let { seriesOptions }: { seriesOptions: SeriesOption[] } = $props();
 	let url = $state('');
 	let body = $state('');
 	let showUrlInput = $state(false);
 	let showEmojiPicker = $state(false);
+	let showSeriesPicker = $state(false);
+	let seriesSearch = $state('');
+	let selectedSeriesIds = $state<string[]>([]);
 	let composerState = $state<'idle' | 'resolving' | 'ready' | 'error' | 'publishing'>('idle');
 	let feedback = $state('');
 	let linkPreview = $state<{ provider: string; canonicalUrl?: string; metadata: { title?: string; authorName?: string; thumbnailUrl?: string; providerName?: string } } | null>(null);
@@ -24,6 +29,10 @@
 	const emojiOptions = ['✨', '💖', '💕', '🫶', '🥹', '😭', '😍', '🤍', '🌸', '🦋', '🎬', '🎀', '🔥', '💫', '🌈', '🙈'];
 	const signedIn = $derived(Boolean(page.data.user));
 	const isThai = $derived(page.data.lang === 'th');
+	const selectedSeries = $derived(seriesOptions.filter((option) => selectedSeriesIds.includes(option.id)));
+	const filteredSeriesOptions = $derived(seriesOptions.filter((option) =>
+		!selectedSeriesIds.includes(option.id) && option.label.toLocaleLowerCase().includes(seriesSearch.trim().toLocaleLowerCase())
+	));
 	const hasContent = $derived(Boolean(body.trim() || url.trim() || selectedMedia.length));
 	const sourceReady = $derived(!url.trim() || composerState === 'ready');
 	const canPublish = $derived(signedIn && hasContent && sourceReady && composerState !== 'publishing');
@@ -48,7 +57,7 @@
 					sourceNote: 'รูปจะอัปโหลดเมื่อกดแชร์เท่านั้น',
 					publish: 'แชร์เลย',
 					signIn: 'เข้าสู่ระบบก่อน',
-					image: 'เลือกรูปภาพ', emoji: 'เพิ่มอีโมจิ', remove: 'ลบรูปภาพ', linkError: 'ลิงก์นี้ยังดูตัวอย่างไม่ได้',
+					image: 'เลือกรูปภาพ', emoji: 'เพิ่มอีโมจิ', remove: 'ลบรูปภาพ', linkError: 'ลิงก์นี้ยังดูตัวอย่างไม่ได้', series: 'แท็กซีรี่ย์', seriesSearch: 'ค้นหาซีรี่ย์เพื่อแท็ก…', clearSeries: 'ล้างทั้งหมด', selectedSeries: 'เลือกซีรี่ย์แล้ว', seriesLimit: 'เลือกได้สูงสุด 3 เรื่อง',
 					imageError: 'เลือก JPEG, PNG หรือ WebP ขนาดไม่เกิน 4 MB ได้สูงสุด 4 รูป', failed: 'ยังแชร์ไม่สำเร็จ ลองอีกครั้งได้เลย',
 					shared: 'แชร์ Moment แล้ว'
 				}
@@ -62,7 +71,7 @@
 					sourceNote: 'Images upload only when you share',
 					publish: 'Share it',
 					signIn: 'Sign in first',
-					image: 'Choose images', emoji: 'Add emoji', remove: 'Remove image', linkError: 'This link could not be previewed',
+					image: 'Choose images', emoji: 'Add emoji', remove: 'Remove image', linkError: 'This link could not be previewed', series: 'Tag series', seriesSearch: 'Search series to tag…', clearSeries: 'Clear all', selectedSeries: 'Selected series', seriesLimit: 'Choose up to 3 series',
 					imageError: 'Choose up to 4 JPEG, PNG, or WebP images under 4 MB', failed: 'Could not share yet. Try again.',
 					shared: 'Moment shared'
 				}
@@ -118,6 +127,14 @@
 		bodyInput?.focus();
 	}
 
+	function selectSeries(id: string) {
+		if (selectedSeriesIds.length < 3 && !selectedSeriesIds.includes(id)) selectedSeriesIds = [...selectedSeriesIds, id];
+	}
+
+	function removeSeries(id: string) {
+		selectedSeriesIds = selectedSeriesIds.filter((selectedId) => selectedId !== id);
+	}
+
 	function showToast(message: string) {
 		clearTimeout(toastTimer);
 		toast = message;
@@ -135,7 +152,7 @@
 		feedback = '';
 		try {
 			if (!publishedMomentId) {
-				const response = await fetch('/api/moments', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ body: body.trim() || undefined, sourceUrl: url.trim() || undefined, pendingMediaCount: selectedMedia.length }) });
+				const response = await fetch('/api/moments', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ body: body.trim() || undefined, sourceUrl: url.trim() || undefined, pendingMediaCount: selectedMedia.length, seriesIds: selectedSeriesIds }) });
 				if (!response.ok) throw new Error();
 				publishedMomentId = (await response.json() as { id: string }).id;
 			}
@@ -150,6 +167,9 @@
 			url = '';
 			body = '';
 			showUrlInput = false;
+			showSeriesPicker = false;
+			seriesSearch = '';
+			selectedSeriesIds = [];
 			selectedMedia = [];
 			uploadedMedia = new Set();
 			publishedMomentId = null;
@@ -177,6 +197,35 @@
 			<label class="sr-only" for="moment-body">{copy.body}</label>
 			<textarea id="moment-body" bind:this={bodyInput} bind:value={body} maxlength="2000" placeholder={copy.body} rows="2" class="mt-1 w-full resize-none border-0 bg-transparent px-0 py-1 text-[15px] leading-6 outline-none placeholder:text-plum-light/55"></textarea>
 
+			{#if showSeriesPicker || selectedSeries.length}
+				<div class="mt-3 rounded-2xl border border-lavender/35 bg-[#faf8ff] p-3">
+					<div class="flex items-center justify-between gap-3">
+						<p class="text-xs font-bold text-plum">{copy.selectedSeries}</p>
+						{#if selectedSeries.length}
+							<button type="button" onclick={() => selectedSeriesIds = []} class="halo-focus-ring rounded-full px-2 py-1 text-xs font-semibold text-coral-dark" disabled={composerState === 'publishing'}>{copy.clearSeries}</button>
+						{/if}
+					</div>
+					{#if selectedSeries.length}
+						<div class="mt-2 flex flex-wrap gap-2">
+							{#each selectedSeries as option}
+								<button type="button" onclick={() => removeSeries(option.id)} class="halo-focus-ring inline-flex items-center gap-1 rounded-full bg-lavender/20 px-3 py-1.5 text-xs font-semibold text-lavender-dark" disabled={composerState === 'publishing'}>{option.label} <span aria-hidden="true">×</span></button>
+							{/each}
+						</div>
+					{/if}
+					{#if selectedSeriesIds.length < 3}
+						<label class="sr-only" for="moment-series-search">{copy.seriesSearch}</label>
+						<input id="moment-series-search" bind:value={seriesSearch} class="mt-3 w-full rounded-xl border border-plum/10 bg-white px-3 py-2 text-sm outline-none placeholder:text-plum-light/55" placeholder={copy.seriesSearch} disabled={composerState === 'publishing'} />
+						<div class="mt-2 max-h-48 overflow-y-auto rounded-xl border border-plum/10 bg-white">
+							{#each filteredSeriesOptions.slice(0, 8) as option}
+								<button type="button" onclick={() => selectSeries(option.id)} class="halo-focus-ring block w-full px-3 py-2.5 text-left text-sm text-plum transition hover:bg-lavender/10" disabled={composerState === 'publishing'}>{option.label}</button>
+							{/each}
+						</div>
+					{:else}
+						<p class="mt-3 text-xs text-plum-light">{copy.seriesLimit}</p>
+					{/if}
+				</div>
+			{/if}
+
 			{#if selectedMedia.length}
 				<div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
 					{#each selectedMedia as media, index}
@@ -194,7 +243,7 @@
 			{/if}
 
 			<div class="mt-3 flex items-center justify-between gap-3">
-				<div class="flex items-center gap-1">
+				<div class="flex flex-wrap items-center gap-1">
 					<input bind:this={imageInput} onchange={selectMedia} class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" multiple />
 					<button type="button" onclick={() => imageInput?.click()} disabled={selectedMedia.length >= 4 || composerState === 'publishing'} class="halo-focus-ring grid h-11 w-11 place-items-center rounded-full text-plum-light transition hover:bg-mint/20 hover:text-mint-dark disabled:opacity-35" aria-label={copy.image}><HaloIcon name="image" size={20} /></button>
 					<div class="relative">
@@ -208,6 +257,7 @@
 						{/if}
 					</div>
 					<button type="button" onclick={() => showUrlInput = !showUrlInput} disabled={composerState === 'publishing'} class={`halo-focus-ring grid h-11 w-11 place-items-center rounded-full transition hover:bg-coral/10 hover:text-coral-dark disabled:opacity-35 ${showUrlInput ? 'bg-coral/15 text-coral-dark' : 'text-plum-light'}`} aria-label={copy.linkLabel}><HaloIcon name="link" size={20} /></button>
+					<button type="button" onclick={() => showSeriesPicker = !showSeriesPicker} disabled={composerState === 'publishing'} class={`halo-focus-ring grid h-11 w-11 place-items-center rounded-full transition hover:bg-lavender/20 disabled:opacity-35 ${showSeriesPicker ? 'bg-lavender/20 text-lavender-dark' : 'text-plum-light'}`} aria-label={copy.series} aria-expanded={showSeriesPicker}><HaloIcon name="tag" size={20} /></button>
 				</div>
 				<button type="button" onclick={publish} class="halo-focus-ring shrink-0 rounded-full bg-coral px-4 py-2.5 text-xs font-bold text-white transition hover:bg-coral-dark disabled:cursor-not-allowed disabled:opacity-45" disabled={signedIn && !canPublish}>
 					{signedIn ? copy.publish : copy.signIn}
