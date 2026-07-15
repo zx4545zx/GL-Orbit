@@ -40,6 +40,7 @@
 	let searching = $state<EntityKind | ''>('');
 	let saving = $state(false);
 	let error = $state('');
+	let imageInput = $state<HTMLInputElement>();
 
 	const thai = $derived(page.data.lang === 'th');
 	const mediaCount = $derived(mediaItems.length);
@@ -199,8 +200,13 @@
 				</div>
 			{/each}
 		</div>
-		<input class="mt-4 block text-sm" type="file" accept="image/jpeg,image/png,image/webp" onchange={selectMedia} disabled={mediaCount >= 4} />
-		<p class="mt-1 text-xs text-plum-light">{mediaCount}/4</p>
+		<input bind:this={imageInput} class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" onchange={selectMedia} />
+		<div class="mt-3 flex items-center justify-between gap-3">
+			<button type="button" onclick={() => imageInput?.click()} disabled={mediaCount >= 4} class="halo-focus-ring inline-flex h-11 items-center gap-2 rounded-full border border-mint/35 bg-mint/10 px-4 text-sm font-bold text-mint-dark transition hover:bg-mint/20 disabled:cursor-not-allowed disabled:opacity-45">
+				<span aria-hidden="true">▧</span>{thai ? 'เพิ่มรูปภาพ' : 'Add images'}
+			</button>
+			<p class="text-xs text-plum-light">{mediaCount}/4</p>
+		</div>
 	</section>
 
 	<section class="mt-5 space-y-4">
