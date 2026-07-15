@@ -9,6 +9,16 @@
 	"orientation": "portrait",
 	"background_color": "#FFF5F7",
 	"theme_color": "#FF6B9D",
+	"share_target": {
+		"action": "/halo/compose",
+		"method": "GET",
+		"enctype": "application/x-www-form-urlencoded",
+		"params": {
+			"title": "title",
+			"text": "text",
+			"url": "url"
+		}
+	},
 	"icons": [
 		{
 			"src": "/icons/pwa-192x192.png",

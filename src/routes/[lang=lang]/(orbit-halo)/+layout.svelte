@@ -64,7 +64,7 @@
 							</a>
 						{/each}
 					</div>
-					<a href={`${base}#compose`} class="halo-focus-ring mt-4 flex w-full max-w-[190px] items-center justify-center rounded-full bg-coral px-5 py-3 text-sm font-bold text-white transition hover:bg-coral-dark">{m.halo_create()}</a>
+					<a href={`${base}/compose`} class="halo-focus-ring mt-4 flex w-full max-w-[190px] items-center justify-center rounded-full bg-coral px-5 py-3 text-sm font-bold text-white transition hover:bg-coral-dark">{m.halo_create()}</a>
 				</nav>
 				<div class="relative mt-auto" bind:this={settingsRoot}>
 					<button bind:this={settingsButton} type="button" onclick={toggleSettings} class="halo-focus-ring flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium text-plum-light transition hover:bg-plum/[.05] hover:text-plum" aria-expanded={settingsOpen} aria-haspopup="menu" aria-controls="halo-settings-menu">
@@ -104,7 +104,7 @@
 		<div class="mx-auto grid max-w-[620px] grid-cols-5">
 			<a href={mobileItems[0].href} aria-current={isActive(mobileItems[0].href) ? 'page' : undefined} class="halo-focus-ring flex min-h-14 items-center justify-center rounded-full {isActive(mobileItems[0].href) ? 'text-coral-dark' : 'text-plum'}" aria-label={mobileItems[0].label}><HaloIcon name={mobileItems[0].icon} size={21} /></a>
 			<a href={mobileItems[1].href} aria-current={isActive(mobileItems[1].href) ? 'page' : undefined} class="halo-focus-ring flex min-h-14 items-center justify-center rounded-full {isActive(mobileItems[1].href) ? 'text-coral-dark' : 'text-plum'}" aria-label={mobileItems[1].label}><HaloIcon name={mobileItems[1].icon} size={21} /></a>
-			<a href={`${base}#compose`} class="halo-focus-ring flex min-h-14 items-center justify-center" aria-label={m.halo_create()}><span class="grid h-10 w-10 place-items-center rounded-full bg-coral text-white"><HaloIcon name="plus" size={20} /></span></a>
+			<a href={`${base}/compose`} class="halo-focus-ring flex min-h-14 items-center justify-center" aria-label={m.halo_create()}><span class="grid h-10 w-10 place-items-center rounded-full bg-coral text-white"><HaloIcon name="plus" size={20} /></span></a>
 			<a href={mobileItems[2].href} aria-current={isActive(mobileItems[2].href) ? 'page' : undefined} class="halo-focus-ring flex min-h-14 items-center justify-center rounded-full {isActive(mobileItems[2].href) ? 'text-coral-dark' : 'text-plum'}" aria-label={mobileItems[2].label}><HaloIcon name={mobileItems[2].icon} size={21} /></a>
 			<a href={mobileItems[3].href} aria-current={isActive(mobileItems[3].href) ? 'page' : undefined} class="halo-focus-ring flex min-h-14 items-center justify-center rounded-full {isActive(mobileItems[3].href) ? 'text-coral-dark' : 'text-plum'}" aria-label={mobileItems[3].label}><HaloIcon name={mobileItems[3].icon} size={21} /></a>
 		</div>

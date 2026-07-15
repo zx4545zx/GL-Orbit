@@ -1,14 +1,29 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import HaloIcon from './HaloIcon.svelte';
 	import XEmbedPlayer from './XEmbedPlayer.svelte';
 
 	type SeriesOption = { id: string; label: string };
-	let { seriesOptions }: { seriesOptions: SeriesOption[] } = $props();
-	let url = $state('');
-	let body = $state('');
+	let {
+		seriesOptions,
+		initialBody = '',
+		initialUrl = '',
+		successHref
+	}: {
+		seriesOptions: SeriesOption[];
+		initialBody?: string;
+		initialUrl?: string;
+		successHref?: string;
+	} = $props();
+	function initialComposerValues() {
+		return { body: initialBody, url: initialUrl };
+	}
+	const initialValues = initialComposerValues();
+	let url = $state(initialValues.url);
+	let body = $state(initialValues.body);
 	let showUrlInput = $state(false);
 	let showEmojiPicker = $state(false);
 	let showSeriesPicker = $state(false);
@@ -84,6 +99,11 @@
 		if (!isValidSourceUrl(url.trim())) { composerState = 'error'; linkPreview = null; return; }
 		previewTimer = setTimeout(preview, 550);
 	}
+
+
+	onMount(() => {
+		if (initialUrl) queuePreview();
+	});
 
 	function isValidSourceUrl(value: string) {
 		try { return new URL(value).protocol === 'https:'; }
@@ -174,6 +194,10 @@
 			uploadedMedia = new Set();
 			publishedMomentId = null;
 			composerState = 'idle';
+			if (successHref) {
+				await goto(successHref, { invalidateAll: true });
+				return;
+			}
 			showToast(copy.shared);
 			await invalidateAll();
 		} catch {

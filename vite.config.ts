@@ -22,6 +22,16 @@ export default defineConfig({
 				background_color: '#FFF5F7',
 				display: 'standalone',
 				lang: 'th',
+				share_target: {
+					action: '/halo/compose',
+					method: 'GET',
+					enctype: 'application/x-www-form-urlencoded',
+					params: {
+						title: 'title',
+						text: 'text',
+						url: 'url'
+					}
+				},
 				icons: [
 					{
 						src: '/icons/pwa-192x192.png',
