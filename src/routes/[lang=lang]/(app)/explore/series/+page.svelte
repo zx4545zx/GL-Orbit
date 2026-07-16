@@ -38,8 +38,10 @@
 	let searchQuery = $state('');
 	let filterStatus = $state<SeriesStatusFilter>('ALL');
 	let loading = $state(false);
+	let loadingToast = $state(false);
 	let loadMoreLoading = $state(false);
 	let loadMoreError = $state('');
+	let navigationRevision = 0;
 	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
 	const canonicalPath = '/explore/series';
 	const SEO_TITLE = m.explore_series_seo_title();
@@ -58,6 +60,7 @@
 	const total = $derived(data.series.total);
 	const currentPage = $derived(data.series.page + Math.floor(extraSeries.length / data.series.limit));
 	const hasMore = $derived(allSeries.length < total);
+	const LOADING_TOAST_MIN_DURATION = 500;
 
 	// Reset incremental state whenever the SSR data changes (new search/filter/page from URL).
 	$effect(() => {
@@ -81,18 +84,38 @@
 		const target = buildUrl(search, status);
 		const current = page.url.pathname + page.url.search;
 		if (target === current) return;
+		const revision = ++navigationRevision;
+		const startedAt = Date.now();
+		clearTimeout(loadingToastTimer);
 		loading = true;
-		await goto(target, { replaceState: true, noScroll: true, keepFocus: true });
+		loadingToast = true;
+		try {
+			await goto(target, { replaceState: true, noScroll: true, keepFocus: true });
+		} finally {
+			if (revision !== navigationRevision) return;
+			// Keep the existing results visible if navigation fails or is cancelled.
+			loading = false;
+			const remaining = LOADING_TOAST_MIN_DURATION - (Date.now() - startedAt);
+			if (remaining > 0) {
+				loadingToastTimer = setTimeout(() => loadingToast = false, remaining);
+			} else {
+				loadingToast = false;
+			}
+		}
 	}
 
 	let searchTimer: ReturnType<typeof setTimeout> | undefined;
+	let loadingToastTimer: ReturnType<typeof setTimeout> | undefined;
 	function clearSearchTimer() {
 		clearTimeout(searchTimer);
 		searchTimer = undefined;
 	}
 
 	$effect(() => {
-		return () => clearSearchTimer();
+		return () => {
+			clearSearchTimer();
+			clearTimeout(loadingToastTimer);
+		};
 	});
 
 	function scheduleSearchUpdate() {
@@ -180,18 +203,17 @@
 
 <!-- Grid -->
 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6" aria-busy={loading}>
-	{#if loading}
-		{#each Array(8) as _, i (i)}
-			<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
-				<div class="relative aspect-[3/4] overflow-hidden bg-lavender/10 animate-pulse"></div>
-			</div>
-		{/each}
-	{:else}
-		{#each allSeries as s (s.id)}
-			<SeriesPosterCard item={s} />
-		{/each}
-	{/if}
+	{#each allSeries as s (s.id)}
+		<SeriesPosterCard item={s} />
+	{/each}
 </div>
+
+{#if loadingToast}
+	<div role="status" aria-live="polite" class="fixed inset-x-4 bottom-20 z-[60] mx-auto flex w-fit items-center gap-2 rounded-full bg-plum px-4 py-3 text-sm font-medium text-white shadow-lg shadow-plum/25 md:bottom-6">
+		<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+		{m.common_loading()}
+	</div>
+{/if}
 
 <!-- Load More -->
 {#if !loading && hasMore}
