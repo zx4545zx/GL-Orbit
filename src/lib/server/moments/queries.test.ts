@@ -20,4 +20,10 @@ describe('Moment hydration query compatibility', () => {
 		expect(source).toContain('setCached(cacheKey, result, 30_000)');
 		expect(feedSource).not.toContain('getCached');
 	});
+
+	it('filters the following feed by the viewer’s favorite series', () => {
+		const source = readFileSync(new URL('./queries.ts', import.meta.url), 'utf8');
+		expect(source).toContain('favorites f on f.series_id = ms.series_id');
+		expect(source).toContain('f.user_id = ${filter.viewerId}');
+	});
 });

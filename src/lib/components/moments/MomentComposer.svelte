@@ -6,7 +6,7 @@
 	import HaloIcon from './HaloIcon.svelte';
 	import XEmbedPlayer from './XEmbedPlayer.svelte';
 
-	type SeriesOption = { id: string; label: string };
+	type SeriesOption = { id: string; label: string; searchText: string };
 	let {
 		seriesOptions,
 		initialBody = '',
@@ -46,7 +46,7 @@
 	const isThai = $derived(page.data.lang === 'th');
 	const selectedSeries = $derived(seriesOptions.filter((option) => selectedSeriesIds.includes(option.id)));
 	const filteredSeriesOptions = $derived(seriesOptions.filter((option) =>
-		!selectedSeriesIds.includes(option.id) && option.label.toLocaleLowerCase().includes(seriesSearch.trim().toLocaleLowerCase())
+		!selectedSeriesIds.includes(option.id) && option.searchText.toLocaleLowerCase().includes(seriesSearch.trim().toLocaleLowerCase())
 	));
 	const hasContent = $derived(Boolean(body.trim() || url.trim() || selectedMedia.length));
 	const sourceReady = $derived(!url.trim() || composerState === 'ready');
@@ -266,12 +266,12 @@
 				</div>
 			{/if}
 
-			<div class="mt-3 flex items-center justify-between gap-3">
-				<div class="flex flex-wrap items-center gap-1">
+			<div class="mt-3 flex items-center justify-between gap-1 sm:gap-3">
+				<div class="flex shrink-0 items-center gap-0.5 sm:gap-1">
 					<input bind:this={imageInput} onchange={selectMedia} class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" multiple />
-					<button type="button" onclick={() => imageInput?.click()} disabled={selectedMedia.length >= 4 || composerState === 'publishing'} class="halo-focus-ring grid h-11 w-11 place-items-center rounded-full text-plum-light transition hover:bg-mint/20 hover:text-mint-dark disabled:opacity-35" aria-label={copy.image}><HaloIcon name="image" size={20} /></button>
+					<button type="button" onclick={() => imageInput?.click()} disabled={selectedMedia.length >= 4 || composerState === 'publishing'} class="halo-focus-ring grid h-10 w-10 place-items-center rounded-full text-plum-light transition hover:bg-mint/20 hover:text-mint-dark disabled:opacity-35 sm:h-11 sm:w-11" aria-label={copy.image}><HaloIcon name="image" size={20} /></button>
 					<div class="relative">
-						<button type="button" onclick={() => showEmojiPicker = !showEmojiPicker} disabled={composerState === 'publishing'} class={`halo-focus-ring grid h-11 w-11 place-items-center rounded-full transition hover:bg-lavender/20 hover:text-lavender-dark disabled:opacity-35 ${showEmojiPicker ? 'bg-lavender/20 text-lavender-dark' : 'text-plum-light'}`} aria-label={copy.emoji} aria-expanded={showEmojiPicker} aria-controls="moment-emoji-picker"><HaloIcon name="smile" size={20} /></button>
+						<button type="button" onclick={() => showEmojiPicker = !showEmojiPicker} disabled={composerState === 'publishing'} class={`halo-focus-ring grid h-10 w-10 place-items-center rounded-full transition hover:bg-lavender/20 hover:text-lavender-dark disabled:opacity-35 sm:h-11 sm:w-11 ${showEmojiPicker ? 'bg-lavender/20 text-lavender-dark' : 'text-plum-light'}`} aria-label={copy.emoji} aria-expanded={showEmojiPicker} aria-controls="moment-emoji-picker"><HaloIcon name="smile" size={20} /></button>
 						{#if showEmojiPicker}
 							<div id="moment-emoji-picker" role="group" aria-label={copy.emoji} class="absolute top-13 left-0 z-10 grid w-52 grid-cols-4 gap-1 rounded-2xl border border-white/80 bg-white/95 p-2 shadow-lg shadow-plum/15 backdrop-blur">
 								{#each emojiOptions as emoji}
@@ -280,10 +280,10 @@
 							</div>
 						{/if}
 					</div>
-					<button type="button" onclick={() => showUrlInput = !showUrlInput} disabled={composerState === 'publishing'} class={`halo-focus-ring grid h-11 w-11 place-items-center rounded-full transition hover:bg-coral/10 hover:text-coral-dark disabled:opacity-35 ${showUrlInput ? 'bg-coral/15 text-coral-dark' : 'text-plum-light'}`} aria-label={copy.linkLabel}><HaloIcon name="link" size={20} /></button>
-					<button type="button" onclick={() => showSeriesPicker = !showSeriesPicker} disabled={composerState === 'publishing'} class={`halo-focus-ring grid h-11 w-11 place-items-center rounded-full transition hover:bg-lavender/20 disabled:opacity-35 ${showSeriesPicker ? 'bg-lavender/20 text-lavender-dark' : 'text-plum-light'}`} aria-label={copy.series} aria-expanded={showSeriesPicker}><HaloIcon name="tag" size={20} /></button>
+					<button type="button" onclick={() => showUrlInput = !showUrlInput} disabled={composerState === 'publishing'} class={`halo-focus-ring grid h-10 w-10 place-items-center rounded-full transition hover:bg-coral/10 hover:text-coral-dark disabled:opacity-35 sm:h-11 sm:w-11 ${showUrlInput ? 'bg-coral/15 text-coral-dark' : 'text-plum-light'}`} aria-label={copy.linkLabel}><HaloIcon name="link" size={20} /></button>
+					<button type="button" onclick={() => showSeriesPicker = !showSeriesPicker} disabled={composerState === 'publishing'} class={`halo-focus-ring grid h-10 w-10 place-items-center rounded-full transition hover:bg-lavender/20 disabled:opacity-35 sm:h-11 sm:w-11 ${showSeriesPicker ? 'bg-lavender/20 text-lavender-dark' : 'text-plum-light'}`} aria-label={copy.series} aria-expanded={showSeriesPicker}><HaloIcon name="tag" size={20} /></button>
 				</div>
-				<button type="button" onclick={publish} class="halo-focus-ring shrink-0 rounded-full bg-coral px-4 py-2.5 text-xs font-bold text-white transition hover:bg-coral-dark disabled:cursor-not-allowed disabled:opacity-45" disabled={signedIn && !canPublish}>
+				<button type="button" onclick={publish} class="halo-focus-ring shrink-0 rounded-full bg-coral px-3 py-2.5 text-xs font-bold text-white transition hover:bg-coral-dark disabled:cursor-not-allowed disabled:opacity-45 sm:px-4" disabled={signedIn && !canPublish}>
 					{signedIn ? copy.publish : copy.signIn}
 				</button>
 			</div>

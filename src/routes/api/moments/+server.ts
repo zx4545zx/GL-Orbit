@@ -7,11 +7,13 @@ import type { RequestHandler } from './$types.js';
 
 export const GET: RequestHandler = async ({ locals, url }) => {
 	const bookmarked = url.searchParams.get('bookmarked') === 'true';
+	const following = url.searchParams.get('following') === 'true';
 	if (bookmarked && !locals.user) return json({ error: 'UNAUTHORIZED' }, { status: 401 });
+	if (following && !locals.user) return json({ error: 'UNAUTHORIZED' }, { status: 401 });
 	const rawLimit = Number.parseInt(url.searchParams.get('limit') ?? '20', 10);
 	const cursorValue = url.searchParams.get('cursor'); const cursor = cursorValue ? decodeCursor(cursorValue) : null;
 	if (cursorValue && !cursor) return json({ error: 'INVALID_CURSOR' }, { status: 400 });
-	return json(await getMoments({ limit: Number.isFinite(rawLimit) ? rawLimit : 20, cursor, seriesId: url.searchParams.get('seriesId'), artistId: url.searchParams.get('artistId'), shipId: url.searchParams.get('shipId'), authorId: url.searchParams.get('authorId'), bookmarked, viewerId: locals.user?.id }));
+	return json(await getMoments({ limit: Number.isFinite(rawLimit) ? rawLimit : 20, cursor, seriesId: url.searchParams.get('seriesId'), artistId: url.searchParams.get('artistId'), shipId: url.searchParams.get('shipId'), authorId: url.searchParams.get('authorId'), bookmarked, following, viewerId: locals.user?.id }));
 };
 export const POST: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) return json({ error: 'UNAUTHORIZED' }, { status: 401 });

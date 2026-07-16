@@ -20,6 +20,13 @@ describe('GET /api/moments', () => {
 		expect(mocks.getMoments).not.toHaveBeenCalled();
 	});
 
+	it('keeps the following feed private', async () => {
+		const { GET } = await import('./+server.js');
+		const response = await GET({ locals: { user: null }, url: new URL('http://localhost/api/moments?following=true') } as never) as Response;
+		expect(response.status).toBe(401);
+		expect(mocks.getMoments).not.toHaveBeenCalled();
+	});
+
 	it('allows guests to read the public feed', async () => {
 		const { GET } = await import('./+server.js');
 		const response = await GET({ locals: { user: null }, url: new URL('http://localhost/api/moments?limit=10') } as never) as Response;

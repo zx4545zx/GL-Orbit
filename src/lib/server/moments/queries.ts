@@ -1,13 +1,13 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { getDb } from '../db/index.js';
-import { artists, momentArtists, momentBookmarks, momentLikes, momentMedia, momentSeries, momentShips, moments, series, ships, users } from '../db/schema.js';
+import { artists, favorites, momentArtists, momentBookmarks, momentLikes, momentMedia, momentSeries, momentShips, moments, series, ships, users } from '../db/schema.js';
 import { getCached, setCached } from '../cache.js';
 import { encodeCursor } from './cursor.js';
 import { serializeMomentAuthor } from './serializers.js';
 
-export type MomentFilter = { id?: string; limit?: number; cursor?: { createdAt: string; id: string } | null; seriesId?: string | null; artistId?: string | null; shipId?: string | null; authorId?: string | null; bookmarked?: boolean; viewerId?: string };
+export type MomentFilter = { id?: string; limit?: number; cursor?: { createdAt: string; id: string } | null; seriesId?: string | null; artistId?: string | null; shipId?: string | null; authorId?: string | null; bookmarked?: boolean; following?: boolean; viewerId?: string };
 
-export type MomentSeriesOption = { id: string; label: string };
+export type MomentSeriesOption = { id: string; label: string; searchText: string };
 
 export async function getMomentSeriesOptions(lang: string): Promise<MomentSeriesOption[]> {
 	const db = await getDb();
@@ -16,14 +16,18 @@ export async function getMomentSeriesOptions(lang: string): Promise<MomentSeries
 		.from(series)
 		.where(isNull(series.deletedAt));
 	return rows
-		.map((row) => ({ id: row.id, label: (lang === 'th' ? row.titleTh || row.titleEn : row.titleEn || row.titleTh || '').trim() }))
+		.map((row) => ({
+			id: row.id,
+			label: (lang === 'th' ? row.titleTh || row.titleEn : row.titleEn || row.titleTh || '').trim(),
+			searchText: [row.titleTh, row.titleEn].filter((title): title is string => Boolean(title)).join(' ')
+		}))
 		.filter((row) => row.label.length > 0)
 		.sort((a, b) => a.label.localeCompare(b.label, lang === 'th' ? 'th' : 'en'));
 }
 
 export async function getMoments(filter: MomentFilter = {}) {
 	const db = await getDb(); const limit = Math.min(50, Math.max(1, filter.limit ?? 20));
-	if (filter.bookmarked && !filter.viewerId) return { moments: [], nextCursor: null };
+	if ((filter.bookmarked || filter.following) && !filter.viewerId) return { moments: [], nextCursor: null };
 	const clauses = [eq(moments.status, 'PUBLISHED')];
 	if (filter.id) clauses.push(eq(moments.id, filter.id));
 	if (filter.authorId) clauses.push(eq(moments.authorId, filter.authorId));
@@ -32,6 +36,7 @@ export async function getMoments(filter: MomentFilter = {}) {
 	if (filter.artistId) clauses.push(sql`exists (select 1 from moment_artists ma where ma.moment_id = ${moments.id} and ma.artist_id = ${filter.artistId})`);
 	if (filter.shipId) clauses.push(sql`exists (select 1 from moment_ships mh where mh.moment_id = ${moments.id} and mh.ship_id = ${filter.shipId})`);
 	if (filter.bookmarked && filter.viewerId) clauses.push(sql`exists (select 1 from moment_bookmarks mb where mb.moment_id = ${moments.id} and mb.user_id = ${filter.viewerId})`);
+	if (filter.following && filter.viewerId) clauses.push(sql`exists (select 1 from moment_series ms join favorites f on f.series_id = ms.series_id where ms.moment_id = ${moments.id} and f.user_id = ${filter.viewerId})`);
 	const rows = await db.select({ id: moments.id, authorId: moments.authorId, body: moments.body, sourceUrl: moments.sourceUrl, sourceCanonicalUrl: moments.sourceCanonicalUrl, sourceProvider: moments.sourceProvider, sourceExternalId: moments.sourceExternalId, embedStatus: moments.embedStatus, embedMetadata: moments.embedMetadata, likeCount: moments.likeCount, commentCount: moments.commentCount, createdAt: moments.createdAt, username: users.username, displayName: users.displayName, avatarUrl: users.avatarUrl }).from(moments).innerJoin(users, eq(moments.authorId, users.id)).where(and(...clauses)).orderBy(desc(moments.createdAt), desc(moments.id)).limit(limit + 1);
 	const page = rows.slice(0, limit); const ids = page.map((row) => row.id);
 	const [media, seriesTags, artistTags, shipTags, likedRows, bookmarkedRows] = ids.length ? await Promise.all([
