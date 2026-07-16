@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Picture from '$lib/components/Picture.svelte';
+	import { COVER_IMAGE_REQUIREMENTS, getCoverDimensionError } from '$lib/images/config.js';
 	import { getMediaDisplay, type MediaPurpose } from '$lib/images/display.js';
 
 	let {
@@ -7,12 +8,12 @@
 		label = 'รูปภาพ',
 		type = 'posters',
 		purpose = 'poster',
-		maxWidth = 1200,
-		quality = 0.85
+		maxWidth = undefined,
+		quality = undefined
 	}: {
 		url?: string;
 		label?: string;
-		type?: 'posters' | 'profiles';
+		type?: 'posters' | 'covers' | 'profiles';
 		purpose?: MediaPurpose;
 		maxWidth?: number;
 		quality?: number;
@@ -28,6 +29,8 @@
 	const ACCEPT_ATTRIBUTE = 'image/jpeg,image/png,image/webp';
 	const MAX_FILE_SIZE = 5 * 1024 * 1024;
 	const MAX_UPLOAD_SIZE = 4 * 1024 * 1024;
+	const effectiveMaxWidth = $derived(maxWidth ?? (purpose === 'cover' ? COVER_IMAGE_REQUIREMENTS.minWidth : 1200));
+	const effectiveQuality = $derived(quality ?? (purpose === 'cover' ? 0.9 : 0.85));
 
 	function clearError() {
 		error = '';
@@ -45,6 +48,16 @@
 
 			img.onload = () => {
 				URL.revokeObjectURL(objectUrl);
+				const sourceWidth = img.naturalWidth || img.width;
+				const sourceHeight = img.naturalHeight || img.height;
+				if (purpose === 'cover') {
+					const dimensionError = getCoverDimensionError(sourceWidth, sourceHeight);
+					if (dimensionError) {
+						reject(new Error(dimensionError));
+						return;
+					}
+				}
+
 				const canvas = document.createElement('canvas');
 				const ctx = canvas.getContext('2d');
 				if (!ctx) {
@@ -54,8 +67,8 @@
 
 				let { width, height } = img;
 				const longestSide = Math.max(width, height);
-				if (longestSide > maxWidth) {
-					const scale = maxWidth / longestSide;
+				if (longestSide > effectiveMaxWidth) {
+					const scale = effectiveMaxWidth / longestSide;
 					width = Math.round(width * scale);
 					height = Math.round(height * scale);
 				}
@@ -75,7 +88,7 @@
 						resolve(blob);
 					},
 					'image/jpeg',
-					quality
+					effectiveQuality
 				);
 			};
 			img.onerror = () => {
@@ -118,6 +131,7 @@
 			const formData = new FormData();
 			formData.append('file', uploadFile);
 			formData.append('type', type);
+			formData.append('purpose', purpose);
 
 			const res = await fetch('/api/admin/upload/image', {
 				method: 'POST',
@@ -172,7 +186,7 @@
 				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={placeholderIcon} />
 				</svg>
-				<span class="text-[10px] text-center">{isProfile ? 'ไม่มีรูปโปรไฟล์' : 'ไม่มีโปสเตอร์'}</span>
+				<span class="text-[10px] text-center">{isProfile ? 'ไม่มีรูปโปรไฟล์' : purpose === 'cover' ? 'ไม่มีภาพปก' : 'ไม่มีโปสเตอร์'}</span>
 			</div>
 		{/if}
 		{#if loading}
@@ -222,5 +236,9 @@
 		<p class="text-xs text-mint-dark">{uploadMessage}</p>
 	{/if}
 
-	<p class="text-[10px] text-plum-light">รองรับ JPEG, PNG, WebP · ไฟล์ต้นฉบับสูงสุด 5 MB · บีบอัดอัตโนมัติ</p>
+	{#if purpose === 'cover'}
+		<p class="text-[10px] leading-relaxed text-plum-light">ภาพแนวนอน 16:9–21:9 · กว้างอย่างน้อย {COVER_IMAGE_REQUIREMENTS.minWidth} px · JPEG, PNG, WebP สูงสุด 5 MB</p>
+	{:else}
+		<p class="text-[10px] text-plum-light">รองรับ JPEG, PNG, WebP · ไฟล์ต้นฉบับสูงสุด 5 MB · บีบอัดอัตโนมัติ</p>
+	{/if}
 </div>

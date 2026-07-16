@@ -1,8 +1,15 @@
-export type ImageType = 'posters' | 'profiles' | 'moments';
+export type ImageType = 'posters' | 'covers' | 'profiles' | 'moments';
 export type ImageExt = 'avif' | 'webp' | 'jpg';
+
+export const COVER_IMAGE_REQUIREMENTS = {
+	minWidth: 1800,
+	minAspectRatio: 16 / 9,
+	maxAspectRatio: 2.4
+} as const;
 
 export const IMAGE_VARIANTS = {
 	posters: { widths: [480, 768, 1080], formats: ['avif', 'webp', 'jpg'] as const, fallback: 1080 },
+	covers: { widths: [960, 1440, 1800], formats: ['avif', 'webp', 'jpg'] as const, fallback: 1800 },
 	profiles: { widths: [320, 640], formats: ['avif', 'webp', 'jpg'] as const, fallback: 640 },
 	moments: { widths: [480, 1080], formats: ['avif', 'webp', 'jpg'] as const, fallback: 1080 }
 } as const satisfies Record<ImageType, { widths: number[]; formats: readonly ImageExt[]; fallback: number }>;
@@ -12,12 +19,29 @@ export type VariantSet = { avif: SrcEntry[]; webp: SrcEntry[]; jpg: SrcEntry[] }
 
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 // New convention: .../images/{type}/{uuid}/{w}.{ext}
-const CANONICAL_RE = new RegExp(`^(.*\\/images)\\/(posters|profiles|moments)\\/(${UUID})\\/\\d+\\.(jpg|png|webp)$`);
+const CANONICAL_RE = new RegExp(`^(.*\\/images)\\/(posters|covers|profiles|moments)\\/(${UUID})\\/\\d+\\.(jpg|png|webp)$`);
 // Legacy:        .../images/{type}/{uuid}.{ext}
-const LEGACY_RE = new RegExp(`^(.*\\/images)\\/(posters|profiles|moments)\\/(${UUID})\\.(jpg|png|webp)$`);
+const LEGACY_RE = new RegExp(`^(.*\\/images)\\/(posters|covers|profiles|moments)\\/(${UUID})\\.(jpg|png|webp)$`);
 
 export function isManagedImageUrl(url: string): boolean {
-	return /\/images\/(posters|profiles|moments)\//.test(url);
+	return /\/images\/(posters|covers|profiles|moments)\//.test(url);
+}
+
+export function getCoverDimensionError(width: number, height: number): string | null {
+	if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+		return 'ไม่สามารถอ่านขนาดภาพปกได้';
+	}
+
+	const ratio = width / height;
+	if (ratio < COVER_IMAGE_REQUIREMENTS.minAspectRatio || ratio > COVER_IMAGE_REQUIREMENTS.maxAspectRatio) {
+		return 'ภาพปกต้องเป็นแนวนอน อัตราส่วนประมาณ 16:9 ถึง 21:9';
+	}
+
+	if (width < COVER_IMAGE_REQUIREMENTS.minWidth) {
+		return `ภาพปกต้องกว้างอย่างน้อย ${COVER_IMAGE_REQUIREMENTS.minWidth} px (ไฟล์นี้กว้าง ${Math.round(width)} px)`;
+	}
+
+	return null;
 }
 
 export function isLegacyImageUrl(url: string): boolean {

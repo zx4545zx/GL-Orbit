@@ -3,7 +3,15 @@
 	import { onMount } from 'svelte';
 
 	import { page } from '$app/state';
-	let { seriesId, className = '' }: { seriesId: string; className?: string } = $props();
+	let {
+		seriesId,
+		className = '',
+		variant = 'command'
+	}: {
+		seriesId: string;
+		className?: string;
+		variant?: 'command' | 'compact' | 'orbit';
+	} = $props();
 
 	let favorited = $state(false);
 	let loading = $state(false);
@@ -11,6 +19,21 @@
 	let mounted = $state(false);
 
 	const isLoading = $derived(checking || loading);
+	const buttonClass = $derived(
+		variant === 'orbit'
+			? `group relative flex min-h-[5.75rem] w-full flex-col justify-between overflow-hidden rounded-[1.35rem] border p-3 text-left transition duration-200 touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:pointer-events-none ${
+					isLoading
+						? 'cursor-wait border-coral/10 bg-coral/8 text-plum-light/55'
+						: favorited
+							? '-translate-y-0.5 border-coral bg-coral text-white shadow-[0_18px_30px_-22px_rgba(255,107,157,0.95)]'
+							: 'border-coral/20 bg-coral/10 text-plum hover:-translate-y-0.5 hover:border-coral/45 hover:bg-coral/16'
+			  } ${className}`
+			: `${
+					variant === 'compact'
+						? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-2 py-2 text-xs font-bold touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:pointer-events-none'
+						: 'inline-flex min-h-[3.35rem] items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:pointer-events-none'
+			  } ${isLoading ? 'cursor-wait text-plum-light/60' : favorited ? 'bg-coral/14 text-coral-dark hover:bg-coral/20' : 'text-plum-light hover:bg-coral/8 hover:text-coral-dark'} ${className}`
+	);
 
 	onMount(() => {
 		mounted = true;
@@ -87,9 +110,13 @@
 	disabled={isLoading}
 	aria-label={isLoading ? m.favorite_loading_aria() : favorited ? m.favorite_unmark_aria() : m.favorite_mark_aria()}
 	aria-pressed={isLoading ? undefined : favorited}
-	class="inline-flex min-h-[3.35rem] items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:pointer-events-none {isLoading ? 'border border-plum/10 bg-white/80 text-plum-light/60 cursor-wait' : favorited ? 'border border-coral/55 bg-coral/16 text-coral-dark hover:bg-coral/22' : 'border border-coral/35 bg-white/95 text-plum hover:border-coral/55 hover:bg-coral/8'} {className}"
+	class={buttonClass}
 >
-	<span class="grid h-9 w-9 shrink-0 place-items-center rounded-2xl {favorited ? 'bg-coral text-white' : 'bg-coral/12 text-coral-dark ring-1 ring-coral/25'}">
+	{#if variant === 'orbit'}
+		<span aria-hidden="true" class="absolute right-3 top-3 font-[family-name:var(--font-display)] text-[9px] font-black tracking-[0.2em] opacity-45">01</span>
+	{/if}
+
+	<span class="grid shrink-0 place-items-center {variant === 'compact' ? 'h-5 w-5' : variant === 'orbit' ? `h-9 w-9 rounded-full ${favorited ? 'bg-white/22 text-white' : 'bg-white text-coral-dark shadow-sm'}` : `h-9 w-9 rounded-2xl ${favorited ? 'bg-coral text-white' : 'bg-coral/12 text-coral-dark ring-1 ring-coral/25'}`} ">
 		{#if isLoading}
 			<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -102,8 +129,16 @@
 		{/if}
 	</span>
 
-	<span class="min-w-0 leading-none">
-		<span class="block text-[10px] font-bold uppercase tracking-[0.22em] opacity-70">FAV</span>
-		<span class="mt-1 block truncate text-xs font-bold sm:text-sm">{isLoading ? m.favorite_loading_label() : favorited ? m.favorite_favorited_label() : m.favorite_unfavorited_label()}</span>
-	</span>
+	{#if variant === 'orbit'}
+		<span class="mt-2 block break-words text-xs font-black leading-[1.25]">
+			{isLoading ? m.favorite_loading_label() : favorited ? m.favorite_favorited_label() : m.favorite_unfavorited_label()}
+		</span>
+	{:else if variant === 'compact'}
+		<span class="truncate">{isLoading ? m.favorite_loading_label() : favorited ? m.favorite_favorited_label() : m.favorite_unfavorited_label()}</span>
+	{:else}
+		<span class="min-w-0 leading-none">
+			<span class="block text-[10px] font-bold uppercase tracking-[0.22em] opacity-70">FAV</span>
+			<span class="mt-1 block truncate text-xs font-bold sm:text-sm">{isLoading ? m.favorite_loading_label() : favorited ? m.favorite_favorited_label() : m.favorite_unfavorited_label()}</span>
+		</span>
+	{/if}
 </button>

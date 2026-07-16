@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import sharp from 'sharp';
-import { generateVariants } from './sharp.js';
+import { generateVariants, getOrientedImageDimensions } from './sharp.js';
 
 // synthetic 2000x2000 jpeg — no fixture file needed
 async function synthInput(): Promise<Buffer> {
@@ -38,5 +38,12 @@ describe('generateVariants', () => {
 			const meta = await sharp(v.buffer).metadata();
 			expect(meta.format).toBe(expectedFormat(v.ext));
 		}
+	});
+
+	it('reads source dimensions for cover validation', async () => {
+		const landscape = await sharp({ create: { width: 2560, height: 1440, channels: 3, background: '#c4b5fd' } })
+			.jpeg()
+			.toBuffer();
+		expect(await getOrientedImageDimensions(landscape)).toEqual({ width: 2560, height: 1440 });
 	});
 });

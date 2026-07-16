@@ -10,8 +10,9 @@ export async function generateVariants(input: Buffer, type: ImageType): Promise<
 	for (const width of widths) {
 		for (const ext of formats) {
 			const buffer = await encode(
-				sharp(input).rotate().resize({ width }),
-				ext
+				sharp(input).rotate().resize({ width, withoutEnlargement: type === 'covers' }),
+				ext,
+				type
 			);
 			variants.push({ width, ext, buffer });
 		}
@@ -19,8 +20,19 @@ export async function generateVariants(input: Buffer, type: ImageType): Promise<
 	return variants;
 }
 
-async function encode(img: ReturnType<typeof sharp>, ext: ImageExt): Promise<Buffer> {
-	if (ext === 'avif') return img.avif({ quality: 50, effort: 4 }).toBuffer();
-	if (ext === 'webp') return img.webp({ quality: 72 }).toBuffer();
-	return img.jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+export async function getOrientedImageDimensions(input: Buffer): Promise<{ width: number; height: number }> {
+	const metadata = await sharp(input).metadata();
+	if (!metadata.width || !metadata.height) return { width: 0, height: 0 };
+
+	const swapsAxes = metadata.orientation !== undefined && metadata.orientation >= 5 && metadata.orientation <= 8;
+	return swapsAxes
+		? { width: metadata.height, height: metadata.width }
+		: { width: metadata.width, height: metadata.height };
+}
+
+async function encode(img: ReturnType<typeof sharp>, ext: ImageExt, type: ImageType): Promise<Buffer> {
+	const cover = type === 'covers';
+	if (ext === 'avif') return img.avif({ quality: cover ? 62 : 50, effort: 4 }).toBuffer();
+	if (ext === 'webp') return img.webp({ quality: cover ? 82 : 72 }).toBuffer();
+	return img.jpeg({ quality: cover ? 86 : 80, mozjpeg: true }).toBuffer();
 }

@@ -18,13 +18,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const formData = await request.formData();
 		const file = formData.get('file');
 		const type = formData.get('type');
+		const purpose = formData.get('purpose');
 
 		if (!file || !(file instanceof File)) {
 			return json({ success: false, error: 'กรุณาเลือกไฟล์รูปภาพ' }, { status: 400 });
 		}
 
-		if (type !== 'posters' && type !== 'profiles') {
+		if (type !== 'posters' && type !== 'covers' && type !== 'profiles') {
 			return json({ success: false, error: 'ประเภทรูปภาพไม่ถูกต้อง' }, { status: 400 });
+		}
+		if ((type === 'covers') !== (purpose === 'cover')) {
+			return json({ success: false, error: 'ประเภทภาพปกไม่ตรงกับการใช้งาน' }, { status: 400 });
 		}
 
 		const result = await uploadImage(file, type);

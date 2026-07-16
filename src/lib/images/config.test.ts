@@ -4,6 +4,7 @@ import {
 	isLegacyImageUrl,
 	isManagedImageUrl,
 	deriveVariantUrls,
+	getCoverDimensionError,
 	parseLegacyUrl
 } from './config.js';
 
@@ -26,6 +27,7 @@ describe('isManagedImageUrl', () => {
 	it('true for any supported managed image path', () => {
 		expect(isManagedImageUrl(`${BASE}/profiles/${UUID}/640.jpg`)).toBe(true);
 		expect(isManagedImageUrl(`${BASE}/posters/${UUID}.jpg`)).toBe(true);
+		expect(isManagedImageUrl(`${BASE}/covers/${UUID}/1800.jpg`)).toBe(true);
 		expect(isManagedImageUrl(`${BASE}/moments/${UUID}/1080.jpg`)).toBe(true);
 	});
 	it('false for external', () => {
@@ -64,6 +66,29 @@ describe('deriveVariantUrls', () => {
 		expect(v!.webp.map((e) => e.url)).toEqual([`${BASE}/moments/${UUID}/480.webp`, `${BASE}/moments/${UUID}/1080.webp`]);
 		expect(v!.jpg.map((e) => e.url)).toEqual([`${BASE}/moments/${UUID}/480.jpg`, `${BASE}/moments/${UUID}/1080.jpg`]);
 	});
+
+	it('handles covers type', () => {
+		const v = deriveVariantUrls(`${BASE}/covers/${UUID}/1800.jpg`, 'covers');
+		expect(v!.avif.map((e) => e.width)).toEqual([960, 1440, 1800]);
+		expect(v!.jpg.at(-1)?.url).toBe(`${BASE}/covers/${UUID}/1800.jpg`);
+	});
+
+	it('does not derive cover variants from an old poster-path cover', () => {
+		expect(deriveVariantUrls(`${BASE}/posters/${UUID}/1080.jpg`, 'covers')).toBeNull();
+	});
+});
+
+describe('getCoverDimensionError', () => {
+	it('accepts high-resolution landscape cover ratios', () => {
+		expect(getCoverDimensionError(1915, 1077)).toBeNull();
+		expect(getCoverDimensionError(2880, 1200)).toBeNull();
+	});
+
+	it('rejects undersized and incorrectly shaped covers', () => {
+		expect(getCoverDimensionError(1799, 1011)).toContain('1800 px');
+		expect(getCoverDimensionError(1800, 2200)).toContain('16:9');
+		expect(getCoverDimensionError(1800, 600)).toContain('16:9');
+	});
 });
 
 describe('parseLegacyUrl', () => {
@@ -83,6 +108,8 @@ describe('IMAGE_VARIANTS', () => {
 	it('has expected widths and fallback', () => {
 		expect(IMAGE_VARIANTS.posters.widths).toEqual([480, 768, 1080]);
 		expect(IMAGE_VARIANTS.posters.fallback).toBe(1080);
+		expect(IMAGE_VARIANTS.covers.widths).toEqual([960, 1440, 1800]);
+		expect(IMAGE_VARIANTS.covers.fallback).toBe(1800);
 		expect(IMAGE_VARIANTS.profiles.widths).toEqual([320, 640]);
 		expect(IMAGE_VARIANTS.profiles.fallback).toBe(640);
 		expect(IMAGE_VARIANTS.moments.widths).toEqual([480, 1080]);

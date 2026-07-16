@@ -1,182 +1,152 @@
 <script lang="ts">
-import { m } from '$lib/i18n/paraglide.js';
-import Picture from '$lib/components/Picture.svelte';
-import LatestMomentsLink from '$lib/components/LatestMomentsLink.svelte';
-
-	import { page } from '$app/state';	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
-	import WatchedButton from '$lib/components/WatchedButton.svelte';
+	import { page } from '$app/state';
+	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
+	import Picture from '$lib/components/Picture.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
-	import { buildBreadcrumbJsonLd, buildCanonicalUrl, jsonLdScript, localizedPath, safeJsonLd, truncateSeo } from '$lib/seo.js';
-	import type { PageData } from './$types.js';
+	import WatchedButton from '$lib/components/WatchedButton.svelte';
+	import { m } from '$lib/i18n/paraglide.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
+	import { latestMomentsHref } from '$lib/moments/latest-moments.js';
+	import {
+		buildBreadcrumbJsonLd,
+		buildCanonicalUrl,
+		jsonLdScript,
+		localizedPath,
+		safeJsonLd,
+		truncateSeo
+	} from '$lib/seo.js';
+	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
 
 	const series = $derived(data.series);
 	const title = $derived(data.title);
 	const description = $derived(data.description);
-	const loading = false;
+	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
 
-	const statusConfig: Record<string, { text: string; class: string; bg: string }> = {
-		ONGOING: { text: m.status_ongoing(), class: 'text-mint-dark', bg: 'bg-mint/20' },
-		UPCOMING: { text: m.status_upcoming(), class: 'text-lavender-dark', bg: 'bg-lavender/20' },
-		ENDED: { text: m.status_ended(), class: 'text-coral-dark', bg: 'bg-coral/10' }
+	const statusConfig: Record<string, { text: string; dot: string; chip: string }> = {
+		ONGOING: { text: m.status_ongoing(), dot: 'bg-mint', chip: 'text-mint-dark border-mint/40' },
+		UPCOMING: { text: m.status_upcoming(), dot: 'bg-lavender', chip: 'text-lavender-dark border-lavender/50' },
+		ENDED: { text: m.status_ended(), dot: 'bg-coral', chip: 'text-coral-dark border-coral/40' }
 	};
 
-	const s = $derived(series ? statusConfig[series.status] : null);
+	const s = $derived(statusConfig[series.status] ?? null);
 	const titleEnSuffix = $derived(
 		series.titleTh && series.titleEn && title !== series.titleEn ? ` (${series.titleEn})` : ''
 	);
 	const seoTitle = $derived(m.series_detail_seo_title({ title, titleEnSuffix }));
-	const seoDescription = $derived(truncateSeo(
-		description || m.series_detail_seo_fallback({ title })
-	));
-	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
+	const seoDescription = $derived(
+		truncateSeo(description || m.series_detail_seo_fallback({ title }))
+	);
 	const canonicalPath = $derived(`/series/${series.id}`);
 	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
-	const seriesJsonLd = $derived(safeJsonLd([
-		{
-			'@context': 'https://schema.org',
-			'@type': 'TVSeries',
-			name: series.titleEn,
-			alternateName: series.titleTh || undefined,
-			image: series.poster,
-			description: seoDescription,
-			url: canonicalUrl,
-			productionCompany: { '@type': 'Organization', name: series.studio },
-			numberOfEpisodes: series.episodes,
-			datePublished: series.year ? String(series.year) : undefined,
-			actor: series.artists.map((artist) => ({ '@type': 'Person', name: artist.name }))
-		},
-		buildBreadcrumbJsonLd(page.url.origin, [
-			{ name: m.nav_home(), path: localizedPath(currentLang, '') },
-			{ name: m.series_breadcrumb_all(), path: localizedPath(currentLang, '/series') },
-			{ name: series.titleEn, path: localizedPath(currentLang, canonicalPath) }
+	const seriesJsonLd = $derived(
+		safeJsonLd([
+			{
+				'@context': 'https://schema.org',
+				'@type': 'TVSeries',
+				name: series.titleEn,
+				alternateName: series.titleTh || undefined,
+				image: series.poster,
+				description: seoDescription,
+				url: canonicalUrl,
+				productionCompany: { '@type': 'Organization', name: series.studio },
+				numberOfEpisodes: series.episodes,
+				datePublished: series.year ? String(series.year) : undefined,
+				actor: series.artists.map((artist) => ({ '@type': 'Person', name: artist.name }))
+			},
+			buildBreadcrumbJsonLd(page.url.origin, [
+				{ name: m.nav_home(), path: localizedPath(currentLang, '') },
+				{ name: m.series_breadcrumb_all(), path: localizedPath(currentLang, '/series') },
+				{ name: series.titleEn, path: localizedPath(currentLang, canonicalPath) }
+			])
 		])
-	]));
-
+	);
 
 	const officialGalleryCandidates = $derived(
-		series
-			? series.gallery.map((image, index) => ({
-					src: image.imageUrl,
-					alt: image.caption ?? `${series.titleEn} gallery ${index + 1}`,
-					label: 'Gallery',
-					title: image.caption ?? ''
-				}))
-			: []
+		series.gallery.map((image, index) => ({
+			src: image.imageUrl,
+			alt: image.caption ?? `${series.titleEn} gallery ${index + 1}`,
+			label: m.series_detail_gallery(),
+			title: image.caption ?? ''
+		}))
 	);
 	const episodeCoverCandidates = $derived(
-		series
-			? series.schedule
-					.filter((item) => Boolean(item.coverUrl))
-					.map((item) => ({
-						src: item.coverUrl as string,
-						alt: m.series_episode_cover_alt({ episode: item.episode }),
-						label: `EP ${item.episode}`,
-						title: item.title
-					}))
-			: []
+		series.schedule
+			.filter((item) => Boolean(item.coverUrl))
+			.map((item) => ({
+				src: item.coverUrl as string,
+				alt: m.series_episode_cover_alt({ episode: item.episode }),
+				label: `EP ${item.episode}`,
+				title: item.title
+			}))
 	);
-	const galleryCandidates = $derived((officialGalleryCandidates.length > 0 ? officialGalleryCandidates : episodeCoverCandidates).slice(0, 7));
-	const primaryMeta = $derived([
-		{ label: m.common_episodes(), value: series?.episodes ?? null },
-		{ label: m.common_year(), value: series?.year ?? null },
-		{ label: m.common_cast(), value: series?.artists.length ?? null }
-	].filter((item) => item.value !== null));
+	const galleryCandidates = $derived(
+		(officialGalleryCandidates.length > 0 ? officialGalleryCandidates : episodeCoverCandidates).slice(0, 7)
+	);
+	const primaryMeta = $derived(
+		[
+			{ label: m.common_episodes(), value: series.episodes },
+			{ label: m.common_year(), value: series.year ?? null },
+			{ label: m.common_cast(), value: series.artists.length }
+		].filter((item) => item.value !== null)
+	);
+	const momentsHref = $derived(latestMomentsHref(page.data.lang, 'series', series.id));
 
-	// --- Collapsible schedule state ---
 	let expandedEpisodes = $state(new Set<number>());
 	let activatedTrailers = $state(new Set<number>());
 	let initializedSeriesId = $state<string | null>(null);
+	let descriptionExpanded = $state(false);
 
 	const episodeHasContent = $derived(
-		series
-			? new Set(
-					series.schedule
-						.filter((item) => {
-							const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA');
-							return hasSchedules || Boolean(item.trailerUrl);
-						})
-						.map((item) => item.episode)
-				)
-			: new Set<number>()
+		new Set(
+			series.schedule
+				.filter((item) => {
+					const hasSchedules =
+						item.schedules.length > 0 &&
+						item.schedules.some((schedule: { platform: string }) => schedule.platform !== 'TBA');
+					return hasSchedules || Boolean(item.trailerUrl);
+				})
+				.map((item) => item.episode)
+		)
 	);
-
 	const allExpanded = $derived(
 		episodeHasContent.size > 0 && episodeHasContent.size === expandedEpisodes.size
 	);
-
-	function toggleAll() {
-		if (allExpanded) {
-			expandedEpisodes = new Set<number>();
-		} else {
-			expandedEpisodes = new Set<number>(Array.from(episodeHasContent) as number[]);
-		}
-	}
-
-	function toggleEpisode(ep: number) {
-		if (expandedEpisodes.has(ep)) {
-			expandedEpisodes.delete(ep);
-		} else {
-			expandedEpisodes.add(ep);
-		}
-		// Trigger reactivity by reassigning
-		expandedEpisodes = new Set(expandedEpisodes);
-	}
-
-	function activateTrailer(ep: number, event: MouseEvent) {
-		event.stopPropagation();
-		activatedTrailers.add(ep);
-		activatedTrailers = new Set(activatedTrailers);
-	}
+	const hasLongDescription = $derived((description?.length ?? 0) > 420);
 
 	$effect(() => {
-		if (series && initializedSeriesId !== series.id) {
+		if (initializedSeriesId !== series.id) {
 			expandedEpisodes = new Set<number>();
 			activatedTrailers = new Set<number>();
+			descriptionExpanded = false;
 			initializedSeriesId = series.id;
 		}
 	});
 
-	// --- Description scroll fade ---
-	let descriptionHasOverflow = $state(false);
-	let descriptionScrolledToBottom = $state(false);
-	let descriptionEl: HTMLParagraphElement | undefined = $state();
-	function measureDescriptionOverflow() {
-		if (!descriptionEl) {
-			descriptionHasOverflow = false;
-			descriptionScrolledToBottom = false;
-			return;
+	function toggleAll() {
+		expandedEpisodes = allExpanded
+			? new Set<number>()
+			: new Set<number>(Array.from(episodeHasContent));
+	}
+
+	function toggleEpisode(episode: number) {
+		if (expandedEpisodes.has(episode)) {
+			expandedEpisodes.delete(episode);
+		} else {
+			expandedEpisodes.add(episode);
 		}
-		descriptionHasOverflow = descriptionEl.scrollHeight > descriptionEl.clientHeight;
-		descriptionScrolledToBottom =
-			descriptionEl.scrollTop + descriptionEl.clientHeight >= descriptionEl.scrollHeight - 1;
+		expandedEpisodes = new Set(expandedEpisodes);
 	}
 
-	function handleDescriptionScroll() {
-		if (!descriptionEl) return;
-		descriptionScrolledToBottom =
-			descriptionEl.scrollTop + descriptionEl.clientHeight >= descriptionEl.scrollHeight - 1;
+	function activateTrailer(episode: number, event: MouseEvent) {
+		event.stopPropagation();
+		activatedTrailers.add(episode);
+		activatedTrailers = new Set(activatedTrailers);
 	}
-
-	$effect(() => {
-		if (!descriptionEl) return;
-
-		measureDescriptionOverflow();
-
-		const observer = new ResizeObserver(() => {
-			measureDescriptionOverflow();
-		});
-		observer.observe(descriptionEl);
-
-		return () => {
-			observer.disconnect();
-		};
-	});
 
 	function scheduleSummary(item: { schedules: { platform: string; airDate: string }[] }): string {
-		const valid = item.schedules.filter((s) => s.platform !== 'TBA');
+		const valid = item.schedules.filter((schedule) => schedule.platform !== 'TBA');
 		if (valid.length === 0) return 'TBA';
 		if (valid.length === 1) return valid[0].platform;
 		return m.series_platform_count({ count: String(valid.length) });
@@ -184,27 +154,23 @@ import LatestMomentsLink from '$lib/components/LatestMomentsLink.svelte';
 
 	function isToday(schedules: { airDate: string }[]): boolean {
 		const today = new Date().toISOString().split('T')[0];
-		return schedules.some((s) => s.airDate === today);
+		return schedules.some((schedule) => schedule.airDate === today);
 	}
 
 	function hasUncut(schedules: { isUncut: boolean }[]): boolean {
-		return schedules.some((s) => s.isUncut);
+		return schedules.some((schedule) => schedule.isUncut);
 	}
 
-	function firstAirDate(item: { schedules: { airDate: string; platform: string }[] }): string {
-		if (item.schedules.length === 0) return 'TBA';
-		const first = item.schedules[0];
-		return first.airDate;
+	function firstAirDate(item: { schedules: { airDate: string }[] }): string {
+		return item.schedules[0]?.airDate ?? 'TBA';
 	}
 
 	function youtubeEmbedUrl(rawUrl: string | null): string | null {
 		if (!rawUrl) return null;
-
 		try {
 			const parsed = new URL(rawUrl);
 			const host = parsed.hostname.replace(/^www\.|^m\./, '');
 			let videoId: string | null = null;
-
 			if (host === 'youtu.be') {
 				videoId = parsed.pathname.split('/').filter(Boolean)[0] ?? null;
 			} else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
@@ -212,18 +178,19 @@ import LatestMomentsLink from '$lib/components/LatestMomentsLink.svelte';
 					videoId = parsed.searchParams.get('v');
 				} else {
 					const parts = parsed.pathname.split('/').filter(Boolean);
-					if (['embed', 'shorts', 'live'].includes(parts[0])) {
-						videoId = parts[1] ?? null;
-					}
+					if (['embed', 'shorts', 'live'].includes(parts[0])) videoId = parts[1] ?? null;
 				}
 			}
-
 			if (!videoId || !/^[\w-]{6,}$/.test(videoId)) return null;
 			return `https://www.youtube-nocookie.com/embed/${videoId}`;
 		} catch {
 			return null;
 		}
 	}
+
+	const artistPath = (id: string) => localizedPath(currentLang, `/artists/${id}`);
+	const shipPath = (slug: string) => localizedPath(currentLang, `/ships/${slug}`);
+	const backHref = $derived(localizedPath(currentLang, '/series'));
 </script>
 
 <svelte:head>
@@ -245,150 +212,171 @@ import LatestMomentsLink from '$lib/components/LatestMomentsLink.svelte';
 	{@html jsonLdScript(seriesJsonLd)}
 </svelte:head>
 
-{#if loading || !series}
-	<div class="py-6 sm:py-8 max-w-6xl mx-auto">
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12">
-			<div class="md:col-span-1">
-				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden max-w-xs sm:max-w-none mx-auto aspect-[2/3] bg-lavender/10 animate-pulse"></div>
+<div class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-cream pb-[calc(3rem+var(--bottom-nav-reserved-space))] md:-mt-24 md:mb-0 md:pb-20 md:pt-24">
+	<div aria-hidden="true" class="pointer-events-none absolute left-[-12rem] top-[36rem] h-[34rem] w-[34rem] rounded-full bg-lavender/20 blur-3xl"></div>
+	<div aria-hidden="true" class="pointer-events-none absolute right-[-14rem] top-[78rem] h-[38rem] w-[38rem] rounded-full bg-coral/15 blur-3xl"></div>
+
+	<div class="relative mx-auto max-w-[90rem] px-4 pt-4 sm:px-6 sm:pt-6 md:px-8">
+		<!-- Cover, poster, and title each get their own visual plane. -->
+		<section class="relative isolate overflow-hidden rounded-[1.75rem] bg-white shadow-[0_36px_90px_-44px_rgba(45,27,46,0.35)] sm:rounded-[2.5rem]">
+			{#if series.coverUrl}
+				<div class="relative aspect-[16/9] overflow-hidden bg-lavender-light lg:aspect-[21/9]">
+					<Picture
+						src={series.coverUrl}
+						type="covers"
+						sizes="100vw"
+						alt={series.titleEn}
+						width={1440}
+						height={810}
+						loading="eager"
+						fetchpriority="high"
+						class="absolute inset-0 h-full w-full object-cover"
+					/>
+				</div>
+			{/if}
+
+			<div class="z-20 flex items-center justify-between gap-3 p-4 sm:p-7 {series.coverUrl ? 'absolute inset-x-0 top-0' : 'relative border-b border-plum/5 bg-cream/60'}">
+				<a
+					href={backHref}
+					class="inline-flex items-center gap-2 rounded-full bg-white/92 px-4 py-2 text-sm font-bold text-plum shadow-lg backdrop-blur-md transition hover:bg-coral hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target"
+				>
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+					<span>{m.common_back()}</span>
+				</a>
+				{#if s}
+					<span class="inline-flex items-center gap-2 rounded-full border bg-white/92 px-3.5 py-2 text-xs font-black shadow-lg backdrop-blur-md sm:text-sm {s.chip}">
+						<span class="h-2 w-2 rounded-full {s.dot}"></span>
+						<span>{s.text}</span>
+					</span>
+				{/if}
 			</div>
-			<div class="md:col-span-2 space-y-4 sm:space-y-6">
-				<div class="space-y-3">
-					<div class="h-6 w-24 bg-lavender/10 rounded animate-pulse"></div>
-					<div class="h-10 w-3/4 bg-lavender/10 rounded animate-pulse"></div>
-					<div class="h-6 w-1/2 bg-lavender/10 rounded animate-pulse"></div>
+
+			<div class="relative px-5 pb-8 pt-6 sm:px-10 sm:pb-10 sm:pt-8 lg:min-h-[25rem] lg:py-12 lg:pl-[22rem] lg:pr-14">
+				<div class="relative z-10 mx-auto w-[10.5rem] rotate-[1.5deg] sm:w-[12rem] lg:absolute lg:bottom-6 lg:left-14 lg:w-[15rem] lg:rotate-[2.5deg]">
+					<div class="overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-[0_28px_65px_-24px_rgba(45,27,46,0.45)] ring-1 ring-plum/8">
+						<Picture src={series.poster} type="posters" sizes="(max-width: 639px) 168px, (max-width: 1023px) 192px, 240px" alt={series.titleEn} width={480} height={720} loading="eager" class="aspect-[2/3] w-full rounded-[1.3rem] object-cover" />
+					</div>
+					<div class="absolute -bottom-3 -left-3 grid h-14 w-14 -rotate-[8deg] place-items-center rounded-full bg-coral text-center text-white shadow-xl sm:h-16 sm:w-16 lg:-bottom-4 lg:-left-5 lg:h-20 lg:w-20">
+						<span class="font-[family-name:var(--font-display)] text-lg font-black leading-none sm:text-xl lg:text-2xl">{series.episodes}<small class="mt-1 block text-[7px] font-bold uppercase tracking-[0.2em] lg:text-[8px]">EP</small></span>
+					</div>
 				</div>
-				<div class="grid grid-cols-3 gap-2 sm:gap-4">
-					{#each Array(3) as _}
-						<div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 h-20 bg-lavender/10 animate-pulse"></div>
+
+				<div class="mt-8 min-w-0 text-center lg:mt-0 lg:text-left">
+					<p class="mb-4 text-[10px] font-black uppercase tracking-[0.42em] text-coral-dark sm:text-xs">GL-ORBIT / SERIES FILE</p>
+					<h1 class="break-words font-[family-name:var(--font-display)] text-[clamp(2.15rem,12vw,3rem)] font-black leading-[0.86] tracking-[-0.07em] text-plum [overflow-wrap:anywhere] sm:text-6xl lg:text-7xl xl:text-8xl">
+						{series.titleEn}
+					</h1>
+					{#if series.titleTh}
+						<p class="mt-5 font-[family-name:var(--font-thai)] text-xl font-semibold leading-snug text-plum-light/80 sm:text-2xl lg:text-3xl">
+							{series.titleTh}
+						</p>
+					{/if}
+					<p class="mt-5 text-sm font-semibold text-plum-light/55 sm:text-base">{series.studio}</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Command deck: actions and facts share one horizontal surface. -->
+		<div class="relative z-30 mx-3 mt-5 overflow-visible rounded-[1.75rem] bg-white p-3 shadow-[0_28px_70px_-38px_rgba(45,27,46,0.65)] sm:mx-8 sm:p-5 lg:mx-14 lg:grid lg:grid-cols-[minmax(22rem,0.9fr)_minmax(0,1.6fr)] lg:items-center lg:gap-8">
+			<div class="grid grid-cols-2 gap-2 min-[360px]:grid-cols-3 sm:gap-3">
+				<FavoriteButton seriesId={series.id} variant="orbit" />
+				<WatchedButton seriesId={series.id} variant="orbit" />
+				<ShareButton title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`} text={m.series_share_text({ title })} url={canonicalUrl} ariaLabel={m.series_share_aria_label()} variant="orbit" />
+			</div>
+
+			<div class="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-cream p-3 lg:mt-0 lg:grid-cols-[repeat(3,minmax(4.5rem,auto))_1fr] lg:items-center lg:gap-5">
+				{#each primaryMeta as item}
+					<div class="min-w-0 text-center lg:text-left">
+						<div class="font-[family-name:var(--font-display)] text-xl font-black leading-none text-plum sm:text-2xl">{item.value}</div>
+						<div class="mt-1 truncate text-[9px] font-black uppercase tracking-[0.16em] text-plum-light/55 sm:text-[10px]">{item.label}</div>
+					</div>
+				{/each}
+				<div class="col-span-3 mt-1 flex flex-wrap justify-center gap-1.5 lg:col-span-1 lg:mt-0 lg:justify-end">
+					{#each series.genres as genre}
+						<span class="rounded-full bg-coral/12 px-2.5 py-1 text-[10px] font-bold text-coral-dark sm:text-xs">{genre}</span>
 					{/each}
-				</div>
-				<div class="space-y-2">
-					<div class="h-4 w-full bg-lavender/10 rounded animate-pulse"></div>
-					<div class="h-4 w-5/6 bg-lavender/10 rounded animate-pulse"></div>
-					<div class="h-4 w-4/6 bg-lavender/10 rounded animate-pulse"></div>
+					{#each series.platforms as platform}
+						<span class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-plum-light shadow-sm sm:text-xs">
+							{#if platform.logo}<img src={platform.logo} alt="" width={16} height={16} loading="lazy" decoding="async" class="h-4 w-4 rounded-full object-cover" />{/if}
+							<span class="truncate">{platform.name}</span>
+						</span>
+					{/each}
 				</div>
 			</div>
 		</div>
-	</div>
-{:else}
-	<div class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden pb-[calc(2rem+var(--bottom-nav-reserved-space))] text-plum md:mb-0 md:-mt-24 md:pb-12 md:pt-24">
-		<div class="relative mx-auto max-w-7xl px-4 pt-5 sm:pt-8 md:px-6">
-			<button onclick={() => history.back()} class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/75 px-3.5 py-2 text-sm font-semibold text-plum-light hover:border-coral/40 hover:bg-white/90 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
-				<svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-				<span>{m.common_back()}</span>
-			</button>
 
-			<section class="relative z-10 grid gap-6 pb-10 md:grid-cols-[minmax(18rem,0.84fr)_minmax(0,1.35fr)] md:items-stretch md:gap-10 lg:gap-14">
-				<div class="relative mx-auto w-full max-w-[21rem] md:max-w-none">
-					<div class="relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/72 md:rounded-[2.25rem] perf-card">
-						<Picture src={series.poster} type="posters" sizes="(max-width: 768px) 84vw, 430px" alt={series.titleEn} width={480} height={720} loading="eager" fetchpriority="high" class="aspect-[2/3] w-full object-cover" />
+		<!-- Chapter 01: synopsis becomes the visual lead, not a text block beside a poster. -->
+		{#if description}
+			<section class="mt-20 grid gap-6 sm:mt-28 lg:grid-cols-12 lg:gap-8" aria-labelledby="synopsis-heading">
+				<header class="lg:col-span-4 lg:pt-8">
+					<p class="font-[family-name:var(--font-display)] text-7xl font-black leading-none tracking-[-0.08em] text-coral/25 sm:text-9xl">01</p>
+					<p class="mt-3 text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">Story file</p>
+					<h2 id="synopsis-heading" class="mt-2 max-w-xs text-4xl font-black text-plum sm:text-6xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-[0.95] tracking-[-0.055em]'}">{m.series_detail_synopsis()}</h2>
+				</header>
 
-					</div>
+				<div class="relative overflow-hidden rounded-[2.25rem] bg-coral-light/35 p-6 sm:rounded-[3rem] sm:p-10 lg:col-span-8 lg:p-14">
+					<div aria-hidden="true" class="absolute -right-10 -top-16 font-[family-name:var(--font-display)] text-[18rem] font-black leading-none text-white/45">“</div>
+					<p class:line-clamp-6={!descriptionExpanded && hasLongDescription} class="relative whitespace-pre-line font-[family-name:var(--font-thai)] text-lg font-medium leading-[2.05] text-plum sm:text-xl sm:leading-[2.1]">
+						{description}
+					</p>
+					{#if hasLongDescription}
+						<button type="button" onclick={() => (descriptionExpanded = !descriptionExpanded)} aria-expanded={descriptionExpanded} class="relative mt-6 inline-flex items-center gap-2 rounded-full bg-plum px-5 py-2.5 text-sm font-bold text-white transition hover:bg-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-plum touch-target">
+							<span>{descriptionExpanded ? (currentLang === 'th' ? 'ย่อเนื้อหา' : 'Show less') : (currentLang === 'th' ? 'อ่านเรื่องย่อเต็ม' : 'Read full synopsis')}</span>
+							<svg class:rotate-180={descriptionExpanded} class="h-4 w-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" /></svg>
+						</button>
+					{/if}
 
-					<div class="mt-4 rounded-[1.5rem] border border-white/80 bg-white/86 p-2 md:mt-5 md:rounded-[1.75rem] md:p-2.5">
-						<div class="grid grid-cols-2 gap-2">
-							<FavoriteButton seriesId={series.id} className="w-full justify-start" />
-							<WatchedButton seriesId={series.id} className="w-full justify-start" />
-							<div class="col-span-2">
-								<ShareButton
-									title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`}
-									text={m.series_share_text({ title })}
-									url={canonicalUrl}
-									ariaLabel={m.series_share_aria_label()}
-									variant="command"
-									className="w-full justify-start"
-								/>
-							</div>
+					<div class="relative mt-10 grid min-w-0 gap-3 sm:grid-cols-2">
+						<div class="min-w-0 rounded-[1.75rem] bg-white/70 p-5 backdrop-blur-sm">
+							<p class="text-[10px] font-black uppercase tracking-[0.28em] text-coral-dark">Studio</p>
+							<p class="mt-2 break-words font-[family-name:var(--font-display)] text-base font-black leading-tight text-plum [overflow-wrap:anywhere] min-[360px]:text-xl">{series.studio}</p>
 						</div>
-					</div>
-				</div>
-
-				<div class="relative min-w-0 pb-1 md:overflow-hidden">
-					<div class="md:absolute md:inset-0 md:flex md:flex-col md:overflow-hidden">
-						<div class="flex-shrink-0">
-							<div class="mb-4 flex flex-wrap items-center gap-2">
-								{#if s}
-									<span class="rounded-full border border-mint/25 bg-mint/18 px-3 py-1.5 text-xs font-bold text-mint-dark sm:text-sm">{s.text}</span>
+						{#if series.studioOfficialSite || series.studioSocials.length > 0}
+							<div class="flex min-w-0 flex-wrap content-center gap-2 rounded-[1.75rem] bg-plum p-4">
+								{#if series.studioOfficialSite}
+									<a href={series.studioOfficialSite} target="_blank" rel="noopener noreferrer" class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-bold text-plum transition hover:bg-coral hover:text-white touch-target">
+										<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" /></svg>
+										<span class="min-w-0 break-words [overflow-wrap:anywhere]">{m.series_detail_official_site()}</span>
+									</a>
 								{/if}
-								<span class="rounded-full border border-white/70 bg-white/75 px-3 py-1.5 text-xs font-semibold text-plum-light sm:text-sm">{series.studio}{#if series.year} • {series.year}{/if}</span>
-							</div>
-
-							<h1 class="max-w-full break-words font-[family-name:var(--font-display)] text-[clamp(1.9rem,3.6vw,3.65rem)] font-extrabold leading-[1.16] tracking-[-0.025em] text-plum [overflow-wrap:anywhere]">
-								{series.titleEn}
-							</h1>
-							{#if series.titleTh}
-								<p class="mt-3 max-w-3xl font-[family-name:var(--font-thai)] text-lg font-semibold text-plum-light sm:text-xl md:text-2xl">{series.titleTh}</p>
-							{/if}
-						</div>
-
-						{#if description}
-							<div class="mt-6 max-w-4xl rounded-[1.5rem] border border-white/80 bg-white/82 p-4 sm:p-5 md:rounded-[1.7rem] md:flex-1 md:min-h-0 md:flex md:flex-col md:overflow-hidden">
-								<div class="relative md:flex-1 md:min-h-0 md:overflow-hidden">
-									<p
-										bind:this={descriptionEl}
-										onscroll={handleDescriptionScroll}
-										class="font-[family-name:var(--font-thai)] text-sm leading-8 text-plum-light sm:text-base sm:leading-9 md:h-full md:overflow-y-auto"
-									>
-										{description}
-									</p>
-									{#if descriptionHasOverflow && !descriptionScrolledToBottom}
-										<div class="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/90 to-transparent" aria-hidden="true"></div>
-									{/if}
-								</div>
-							</div>
-						{/if}
-
-						<div class="mt-6 grid grid-cols-3 gap-2 sm:max-w-2xl sm:gap-3 md:flex-shrink-0">
-							{#each primaryMeta as item}
-								<div class="rounded-2xl border border-white/80 bg-white/78 p-3 text-center perf-card">
-									<div class="text-2xl font-black text-coral-dark sm:text-3xl">{item.value}</div>
-									<div class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-plum-light/65 sm:text-xs">{item.label}</div>
-								</div>
-							{/each}
-						</div>
-
-						{#if series.genres.length > 0 || series.platforms.length > 0}
-							<div class="mt-5 flex flex-wrap gap-2 md:flex-shrink-0">
-								{#each series.genres as genre}
-									<span class="rounded-full border border-coral/25 bg-coral/10 px-3 py-1.5 text-xs font-bold text-coral-dark sm:text-sm">{genre}</span>
-								{/each}
-								{#each series.platforms as platform}
-									<span class="inline-flex max-w-full items-center gap-2 rounded-full border border-lavender/25 bg-white/75 px-3 py-1.5 text-xs font-semibold text-plum-light sm:text-sm">
-										{#if platform.logo}
-											<img src={platform.logo} alt={platform.name} width={20} height={20} loading="lazy" decoding="async" class="h-5 w-5 shrink-0 rounded-full border border-white/20 object-cover" />
-										{/if}
-										<span class="truncate">{platform.name}</span>
-									</span>
+								{#each series.studioSocials as social}
+									<a href={social.url} target="_blank" rel="noopener noreferrer" aria-label={social.platform} class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white/12 px-3 py-2 text-xs font-bold text-white transition hover:bg-white hover:text-plum touch-target">
+										{#if social.iconUrl}<img src={social.iconUrl} alt="" width={16} height={16} loading="lazy" decoding="async" class="h-4 w-4 rounded-sm" />{/if}
+										<span class="min-w-0 break-words [overflow-wrap:anywhere]">{social.platform}</span>
+									</a>
 								{/each}
 							</div>
 						{/if}
 					</div>
 				</div>
 			</section>
+		{/if}
 
-		<!-- Artists -->
+		<!-- Chapter 02: a portrait wall replaces the horizontal card reel. -->
 		{#if series.artists.length > 0}
-			<section class="relative z-10 mb-10 sm:mb-12 perf-section">
-				<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
+			<section class="mt-24 sm:mt-32 perf-section" aria-labelledby="cast-heading">
+				<header class="mb-10 flex flex-wrap items-end justify-between gap-5 sm:mb-14">
 					<div>
-						<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-coral-light/70">Cast constellation</p>
-						<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-plum sm:text-4xl">{m.common_cast()}</h2>
+						<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">02 / Ensemble</p>
+						<h2 id="cast-heading" class="mt-2 text-5xl font-black text-plum sm:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.common_cast()}</h2>
 					</div>
-					<span class="rounded-full border border-white/50 bg-white/50 px-3 py-1 text-xs font-semibold text-plum-light">{series.artists.length} {m.common_people()}</span>
-				</div>
+					<div class="grid h-20 w-20 place-items-center rounded-full bg-mint text-center font-[family-name:var(--font-display)] text-3xl font-black text-plum sm:h-24 sm:w-24 sm:text-4xl">
+						<span>{series.artists.length}<small class="block text-[8px] font-black uppercase tracking-[0.2em]">{m.common_people()}</small></span>
+					</div>
+				</header>
 
-				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-					{#each series.artists as artist}
-						<a
-							href={`/artists/${artist.id}`}
-							class="relative overflow-hidden rounded-[1.35rem] border border-white/80 bg-white/78 p-3 hover:border-coral/30 hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-coral sm:p-4 perf-card"
-						>
-							<div class="relative flex items-center gap-3 sm:gap-4">
-								<Picture src={artist.image} type="profiles" sizes="96px" alt={artist.name} width={64} height={64} loading="lazy" class="h-14 w-14 flex-shrink-0 rounded-2xl border border-white/70 object-cover sm:h-16 sm:w-16" />
-								<div class="min-w-0">
-									<div class="truncate text-sm font-extrabold text-plum sm:text-base">{artist.name}</div>
-									<div class="mt-1 text-xs font-medium text-plum-light sm:text-sm">{artist.role}</div>
+				<div class="grid grid-cols-2 gap-x-3 gap-y-10 sm:grid-cols-3 sm:gap-x-5 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-16">
+					{#each series.artists as artist, index (artist.id)}
+						<a href={artistPath(artist.id)} class="group block min-w-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral {index % 2 === 1 ? 'sm:mt-8' : ''}">
+							<div class="relative">
+								<span aria-hidden="true" class="absolute -left-1 -top-5 z-10 font-[family-name:var(--font-display)] text-4xl font-black tracking-[-0.08em] text-coral sm:text-5xl">{String(index + 1).padStart(2, '0')}</span>
+								<div class="overflow-hidden rounded-t-[999px] rounded-b-[1.5rem] bg-lavender/25 shadow-[0_24px_50px_-34px_rgba(45,27,46,0.65)]">
+									<Picture src={artist.image} type="profiles" sizes="(max-width: 640px) 46vw, (max-width: 1024px) 24vw, 220px" alt={artist.name} width={320} height={400} loading="lazy" class="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-[1.04]" />
 								</div>
+							</div>
+							<div class="px-1 pt-4">
+								<h3 class="break-words text-sm font-black leading-[1.45] text-plum transition group-hover:text-coral-dark sm:text-base">{artist.name}</h3>
+								<p class="mt-1 truncate font-[family-name:var(--font-thai)] text-xs font-medium text-plum-light/65 sm:text-sm">{artist.role}</p>
 							</div>
 						</a>
 					{/each}
@@ -396,22 +384,48 @@ import LatestMomentsLink from '$lib/components/LatestMomentsLink.svelte';
 			</section>
 		{/if}
 
-		<!-- Scene gallery: uses official series gallery first, then falls back to episode covers. -->
-		{#if galleryCandidates.length >= 3}
-			<section class="relative z-10 mb-10 sm:mb-12 perf-section">
-				<div class="mb-4 text-center sm:mb-6">
-					<p class="text-[10px] font-bold uppercase tracking-[0.34em] text-mint-dark/70">Scene reel</p>
-					<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-plum sm:text-4xl">Gallery</h2>
+		<!-- Chapter 03: ships sit inside a soft editorial interlude. -->
+		{#if series.ships.length > 0}
+			<section class="mt-28 overflow-hidden rounded-[2.25rem] bg-lavender-light/70 p-6 text-plum sm:mt-36 sm:rounded-[3rem] sm:p-10 lg:p-14 perf-section" aria-labelledby="ships-heading">
+				<header class="mb-10 sm:mb-14">
+					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">03 / Chemistry</p>
+					<h2 id="ships-heading" class="mt-2 text-5xl font-black sm:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.series_detail_ships()}</h2>
+				</header>
+				<div class="grid gap-4 sm:grid-cols-2 {series.ships.length === 1 ? 'lg:grid-cols-1' : 'lg:grid-cols-3'}">
+					{#each series.ships as ship (ship.id)}
+						<a href={shipPath(ship.slug)} class="group relative min-h-[21rem] overflow-hidden rounded-[2rem] border border-white/80 bg-white/75 p-5 shadow-[0_24px_60px_rgba(45,27,46,0.09)] transition hover:-translate-y-1 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:min-h-[23rem] {series.ships.length === 1 ? 'sm:col-span-2 sm:grid sm:min-h-0 sm:grid-cols-[18rem_minmax(0,1fr)] sm:items-center sm:gap-10 sm:p-8 lg:col-span-1' : ''}">
+							<div aria-hidden="true" class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-coral/15 blur-2xl"></div>
+							<div class="relative mx-auto mt-2 flex max-w-[17rem] items-center justify-center {series.ships.length === 1 ? 'sm:mt-0' : ''}">
+								<div class="relative z-10 w-[62%] overflow-hidden rounded-full border-4 border-white bg-coral-light shadow-lg">
+									<Picture src={ship.artist1Image} type="profiles" sizes="190px" alt={ship.artist1Name} width={320} height={320} loading="lazy" class="aspect-square w-full object-cover transition duration-500 group-hover:-rotate-2 group-hover:scale-105" />
+								</div>
+								<div class="relative -ml-[24%] mt-24 w-[62%] overflow-hidden rounded-full border-4 border-white bg-lavender-light shadow-lg">
+									<Picture src={ship.artist2Image} type="profiles" sizes="190px" alt={ship.artist2Name} width={320} height={320} loading="lazy" class="aspect-square w-full object-cover transition duration-500 group-hover:rotate-2 group-hover:scale-105" />
+								</div>
+							</div>
+							<div class="relative mt-5 text-center {series.ships.length === 1 ? 'sm:mt-0 sm:text-left' : ''}">
+								<h3 class="break-words font-[family-name:var(--font-display)] text-xl font-black leading-tight tracking-[-0.04em] text-plum [overflow-wrap:anywhere] min-[360px]:text-2xl {series.ships.length === 1 ? 'sm:text-5xl' : ''}">{ship.name}</h3>
+								<p class="mt-1 break-words text-xs font-semibold leading-relaxed text-plum-light/65 [overflow-wrap:anywhere]">{ship.artist1Name} × {ship.artist2Name}</p>
+							</div>
+						</a>
+					{/each}
 				</div>
+			</section>
+		{/if}
 
-				<div class="grid grid-cols-2 gap-2 sm:grid-cols-6 sm:gap-3">
-					{#each galleryCandidates as image, index}
-						<figure class="relative overflow-hidden rounded-2xl border border-white/80 bg-white/70 perf-card {index === 0 ? 'col-span-2 sm:col-span-3 sm:row-span-2' : 'sm:col-span-3 lg:col-span-2'}">
-							<Picture src={image.src} type="posters" sizes={index === 0 ? '(max-width: 768px) 92vw, 640px' : '(max-width: 768px) 46vw, 360px'} alt={image.alt} width={index === 0 ? 640 : 360} height={index === 0 ? 360 : 203} loading="lazy" decoding="async" class="aspect-video h-full w-full object-cover" />
-							<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-75"></div>
-							<figcaption class="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78 sm:bottom-3 sm:left-3 sm:right-3">
-								<span>{image.label}</span>
-								<span class="truncate text-right normal-case tracking-normal">{image.title}</span>
+		{#if galleryCandidates.length >= 3}
+			<section class="mt-24 sm:mt-32 perf-section" aria-labelledby="gallery-heading">
+				<header class="mb-8 sm:mb-10">
+					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">04 / Stills</p>
+					<h2 id="gallery-heading" class="mt-2 text-5xl font-black text-plum sm:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.series_detail_gallery()}</h2>
+				</header>
+				<div class="grid auto-rows-[8rem] grid-cols-12 gap-2 sm:auto-rows-[11rem] sm:gap-3">
+					{#each galleryCandidates as image, index (image.src)}
+						<figure class="group relative overflow-hidden rounded-[1.5rem] bg-plum perf-card {index === 0 ? 'col-span-12 row-span-3 sm:col-span-7' : index === 1 || index === 2 ? 'col-span-6 row-span-2 sm:col-span-5' : 'col-span-6 row-span-2 sm:col-span-4'}">
+							<Picture src={image.src} type="posters" sizes={index === 0 ? '(max-width: 768px) 92vw, 760px' : '(max-width: 768px) 46vw, 440px'} alt={image.alt} width={index === 0 ? 760 : 440} height={index === 0 ? 570 : 330} loading="lazy" class="h-full w-full object-cover opacity-90 transition duration-500 group-hover:scale-[1.03] group-hover:opacity-100" />
+							<figcaption class="absolute inset-x-0 bottom-0 bg-[linear-gradient(0deg,rgba(45,27,46,0.9),transparent)] p-4 pt-12 text-white">
+								<span class="block text-[9px] font-black uppercase tracking-[0.24em] text-coral-light">{image.label}</span>
+								{#if image.title}<span class="mt-1 block truncate text-sm font-bold">{image.title}</span>{/if}
 							</figcaption>
 						</figure>
 					{/each}
@@ -419,138 +433,100 @@ import LatestMomentsLink from '$lib/components/LatestMomentsLink.svelte';
 			</section>
 		{/if}
 
-		<!-- Schedule with collapsible rows -->
+		<!-- Episode ledger replaces the former vertical timeline. -->
 		{#if series.schedule.length > 0}
-			<section class="relative z-10 perf-section">
-				<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
-					<div>
-						<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-lavender-dark/75">Episode orbit</p>
-						<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-plum sm:text-4xl">{m.common_schedule()}</h2>
-					</div>
-					<button onclick={toggleAll} class="inline-flex items-center gap-1 rounded-full border border-coral/30 bg-coral/10 py-1 pl-2 pr-3 text-xs font-bold text-coral-dark hover:border-coral/50 hover:bg-coral/25 touch-target whitespace-nowrap" aria-label={allExpanded ? m.common_collapse_all() : m.common_expand_all()}>
-						{#if allExpanded}
-							<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 15 12 7 20 15"/><line x1="4" y1="19" x2="20" y2="19"/></svg>
-							<span>{m.common_collapse_all()}</span>
-						{:else}
-							<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 9 12 17 20 9"/><line x1="4" y1="5" x2="20" y2="5"/></svg>
-							<span>{m.common_expand_all()}</span>
-						{/if}
+			<section class="mt-24 grid gap-8 sm:mt-32 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-12 perf-section" aria-labelledby="schedule-heading">
+				<header class="lg:sticky lg:top-28 lg:self-start">
+					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">05 / Episodes</p>
+					<h2 id="schedule-heading" class="mt-2 max-w-xs text-5xl font-black text-plum sm:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-[0.88] tracking-[-0.065em]'}">{m.common_schedule()}</h2>
+					<p class="mt-5 max-w-[14rem] text-sm font-medium leading-6 text-plum-light/60">{series.schedule.length} {m.common_episodes()}</p>
+					<button onclick={toggleAll} class="mt-5 inline-flex items-center gap-2 rounded-full bg-plum px-4 py-2.5 text-xs font-bold text-white transition hover:bg-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target" aria-label={allExpanded ? m.common_collapse_all() : m.common_expand_all()}>
+						<span>{allExpanded ? m.common_collapse_all() : m.common_expand_all()}</span>
+						<svg class="h-4 w-4 transition-transform {allExpanded ? 'rotate-180' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
 					</button>
-				</div>
-				<div class="overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/80 md:rounded-[2rem] perf-card">
-					<div class="divide-y divide-lavender/15">
-						{#each series.schedule as item}
-							{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((s: { platform: string }) => s.platform !== 'TBA')}
-							{@const hasEpisodeMedia = Boolean(item.trailerUrl)}
-							{@const hasEpisodeContent = hasSchedules || hasEpisodeMedia}
-							{@const trailerEmbedUrl = youtubeEmbedUrl(item.trailerUrl)}
-							<div class="{hasEpisodeContent ? 'hover:bg-white/75 cursor-pointer' : ''}"
-								role="button"
-								tabindex={hasEpisodeContent ? 0 : undefined}
-								onclick={hasEpisodeContent ? () => toggleEpisode(item.episode) : undefined}
-								onkeydown={hasEpisodeContent ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleEpisode(item.episode); } } : undefined}
-								aria-expanded={hasEpisodeContent ? expandedEpisodes.has(item.episode) : undefined}
-							>
-								<div class="flex items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
-									<div class="flex min-w-0 items-center gap-3 sm:gap-4">
-										{#if item.coverUrl}
-											<div class="relative h-14 w-24 flex-shrink-0 overflow-hidden rounded-2xl border border-white/70 bg-lavender/10 sm:h-16 sm:w-28">
-												<Picture src={item.coverUrl} type="posters" sizes="(max-width: 768px) 40vw, 220px" alt={m.series_episode_cover_alt({ episode: item.episode })} width={220} height={124} loading="lazy" class="h-full w-full object-cover" />
-												<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1">
-													<span class="text-[10px] font-black text-white">EP {item.episode}</span>
-												</div>
-											</div>
-										{:else}
-											<div class="grid h-12 w-12 flex-shrink-0 place-items-center rounded-2xl border border-white/70 bg-white/65 sm:h-14 sm:w-14">
-												<span class="text-sm font-black text-coral-dark">{item.episode}</span>
-											</div>
-										{/if}
-										<div class="min-w-0">
-											<div class="truncate text-sm font-extrabold text-plum sm:text-base">{item.title}</div>
-											<div class="mt-1 truncate text-xs font-medium text-plum-light/75 sm:text-sm">{scheduleSummary(item)}</div>
-										</div>
-									</div>
-									<div class="flex flex-shrink-0 items-center gap-2 sm:gap-3">
-										{#if isToday(item.schedules)}
-											<span class="rounded-full border border-coral/30 bg-coral/15 px-2 py-0.5 text-[10px] font-bold text-coral-dark whitespace-nowrap">{m.common_today()}</span>
-										{/if}
-										{#if hasUncut(item.schedules)}
-											<span class="hidden rounded-full border border-amber-200 bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 sm:inline-flex">{m.common_uncut()}</span>
-										{/if}
-										<span class="text-xs font-semibold text-coral-dark sm:text-sm whitespace-nowrap">{firstAirDate(item)}</span>
-										{#if hasEpisodeContent}
-											<svg class="h-4 w-4 text-plum-light/75 sm:h-5 sm:w-5 {expandedEpisodes.has(item.episode) ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-											</svg>
-										{/if}
-									</div>
-								</div>
+				</header>
 
-								{#if hasEpisodeContent && expandedEpisodes.has(item.episode)}
-									<div class="space-y-3 px-4 pb-4 sm:px-6 sm:pb-5">
+				<ol class="space-y-3">
+					{#each series.schedule as item (item.episode)}
+						{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((schedule: { platform: string }) => schedule.platform !== 'TBA')}
+						{@const hasEpisodeMedia = Boolean(item.trailerUrl)}
+						{@const hasEpisodeContent = hasSchedules || hasEpisodeMedia}
+						{@const trailerEmbedUrl = youtubeEmbedUrl(item.trailerUrl)}
+						{@const isOpen = hasEpisodeContent && expandedEpisodes.has(item.episode)}
+						<li>
+							<article class="overflow-hidden rounded-[1.5rem] bg-white shadow-[0_18px_46px_-38px_rgba(45,27,46,0.75)] transition hover:shadow-[0_22px_52px_-34px_rgba(45,27,46,0.55)] perf-card">
+								<button type="button" disabled={!hasEpisodeContent} onclick={() => toggleEpisode(item.episode)} aria-expanded={hasEpisodeContent ? isOpen : undefined} class="grid w-full grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-3 gap-y-3 p-3 text-left focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-coral disabled:cursor-default sm:grid-cols-[5.25rem_minmax(0,1fr)_auto] sm:gap-x-5 sm:p-5">
+									<div class="grid aspect-square place-items-center rounded-[1.2rem] {isOpen ? 'bg-coral text-white' : 'bg-cream text-plum'} transition-colors">
+										<span class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.06em] sm:text-4xl">{String(item.episode).padStart(2, '0')}</span>
+									</div>
+									<div class="min-w-0">
+										<p class="text-[9px] font-black uppercase tracking-[0.24em] text-coral-dark">Episode {item.episode}</p>
+										<h3 class="mt-1 truncate font-[family-name:var(--font-display)] text-lg font-black tracking-[-0.025em] text-plum sm:text-2xl">{item.title}</h3>
+										<p class="mt-1 truncate text-xs font-semibold text-plum-light/55 sm:text-sm">{scheduleSummary(item)}</p>
+									</div>
+									<div class="col-span-2 flex items-center justify-end gap-2 sm:col-span-1">
+										{#if isToday(item.schedules)}<span class="rounded-full bg-coral/12 px-2.5 py-1 text-[10px] font-bold text-coral-dark">{m.common_today()}</span>{/if}
+										{#if hasUncut(item.schedules)}<span class="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-700">{m.common_uncut()}</span>{/if}
+										<span class="whitespace-nowrap text-xs font-bold text-plum-light/65 sm:text-sm">{firstAirDate(item)}</span>
+										{#if hasEpisodeContent}
+											<span class="grid h-9 w-9 place-items-center rounded-full bg-cream text-plum"><svg class="h-4 w-4 transition-transform duration-300 {isOpen ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></span>
+										{/if}
+									</div>
+								</button>
+
+								{#if isOpen}
+									<div class="grid gap-3 bg-cream/70 p-3 sm:p-5 {item.trailerUrl && hasSchedules ? 'lg:grid-cols-2' : ''}">
 										{#if item.trailerUrl}
 											{#if trailerEmbedUrl}
 												{#if activatedTrailers.has(item.episode)}
-													<div class="overflow-hidden rounded-2xl border border-white/70 bg-plum/90">
-														<iframe src={trailerEmbedUrl} title={`Trailer ${item.title}`} class="aspect-video w-full" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-													</div>
+													<div class="overflow-hidden rounded-[1.25rem] bg-plum"><iframe src={trailerEmbedUrl} title={`Trailer ${item.title}`} class="aspect-video w-full" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 												{:else}
-													<button type="button" onclick={(event) => activateTrailer(item.episode, event)} class="flex w-full items-center justify-between gap-3 rounded-2xl border border-coral/15 bg-coral/8 px-4 py-3 text-left hover:bg-coral/12 touch-target">
-														<span>
-															<span class="block text-xs font-bold uppercase tracking-[0.18em] text-coral-dark">Trailer</span>
-															<span class="mt-1 block text-sm font-semibold text-plum">แตะเพื่อโหลดวิดีโอ</span>
-														</span>
-														<svg class="h-5 w-5 flex-shrink-0 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-5.197-3.03A1 1 0 008 9.002v5.996a1 1 0 001.555.832l5.197-2.966a1 1 0 000-1.696z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+													<button type="button" onclick={(event) => activateTrailer(item.episode, event)} class="group relative flex min-h-[12rem] w-full items-end overflow-hidden rounded-[1.25rem] bg-plum p-5 text-left text-white transition hover:bg-coral-dark touch-target">
+														<div aria-hidden="true" class="absolute right-5 top-5 grid h-14 w-14 place-items-center rounded-full bg-white text-plum transition group-hover:scale-110"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg></div>
+														<span class="relative"><span class="block text-[9px] font-black uppercase tracking-[0.25em] text-coral-light">Trailer</span><span class="mt-1 block text-base font-bold">{currentLang === 'th' ? 'แตะเพื่อโหลดวิดีโอ' : 'Tap to load video'}</span></span>
 													</button>
 												{/if}
 											{:else}
-												<div class="rounded-2xl border border-white/80 bg-white/72 p-4">
-													<p class="text-xs font-bold uppercase tracking-[0.22em] text-lavender-dark/75">Trailer</p>
-													<p class="mt-1 text-sm text-plum-light">{m.series_trailer_external_notice()}</p>
-													<a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 rounded-full bg-coral px-4 py-2 text-sm font-bold text-white hover:bg-coral-dark touch-target">
-														{m.series_trailer_open()}
-														<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-													</a>
-												</div>
+												<div class="rounded-[1.25rem] bg-white p-5"><p class="text-sm text-plum-light">{m.series_trailer_external_notice()}</p><a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center gap-2 rounded-full bg-coral px-4 py-2 text-sm font-bold text-white transition hover:bg-coral-dark touch-target">{m.series_trailer_open()}<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a></div>
 											{/if}
 										{/if}
 
-										{#each item.schedules as sch}
-											{@const hasStreamLink = sch.streamLink && sch.streamLink.length > 0}
-											<div class="flex items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/65 px-3 py-2 sm:px-4">
-												<div class="flex min-w-0 items-center gap-2 sm:gap-3">
-													{#if sch.platformLogo}
-														<img src={sch.platformLogo} alt={sch.platform} width={28} height={28} loading="lazy" decoding="async" class="h-6 w-6 flex-shrink-0 rounded-full border border-white/70 object-cover sm:h-7 sm:w-7" />
-													{:else}
-														<div class="grid h-6 w-6 flex-shrink-0 place-items-center rounded-full border border-lavender/25 bg-lavender/10 sm:h-7 sm:w-7"><span class="text-[10px] font-bold text-lavender-dark">{sch.platform.charAt(0)}</span></div>
-													{/if}
-													<div class="min-w-0">
-														<div class="flex items-center gap-1.5">
-															<span class="truncate text-sm font-semibold text-plum sm:text-base">{sch.platform}</span>
-															{#if sch.isUncut}
-																<span class="flex-shrink-0 rounded-md border border-amber-200 bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-700">{m.common_uncut()}</span>
-															{/if}
+										{#if hasSchedules}
+											<div class="space-y-2 rounded-[1.25rem] bg-white p-3 sm:p-4">
+												{#each item.schedules as schedule}
+													{@const hasStreamLink = schedule.streamLink && schedule.streamLink.length > 0}
+													<div class="flex items-center justify-between gap-3 rounded-xl bg-cream/70 px-3 py-2.5">
+														<div class="flex min-w-0 items-center gap-3">
+															{#if schedule.platformLogo}<img src={schedule.platformLogo} alt={schedule.platform} width={32} height={32} loading="lazy" decoding="async" class="h-8 w-8 shrink-0 rounded-full object-cover" />{:else}<span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-xs font-black text-plum">{schedule.platform.charAt(0)}</span>{/if}
+															<div class="min-w-0"><p class="truncate text-sm font-bold text-plum">{schedule.platform}</p><p class="mt-0.5 text-[10px] font-semibold text-plum-light/55">{schedule.airDate}{schedule.isUncut ? ` · ${m.common_uncut()}` : ''}</p></div>
 														</div>
-														<div class="text-xs text-plum-light/70">{sch.airDate}</div>
+														{#if hasStreamLink}<a href={schedule.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex shrink-0 items-center gap-1 rounded-full bg-coral px-3 py-2 text-xs font-bold text-white transition hover:bg-coral-dark touch-target">{m.series_detail_watch_now()}<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>{/if}
 													</div>
-												</div>
-												{#if hasStreamLink}
-													<a href={sch.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-coral px-4 py-1.5 text-xs font-bold text-white hover:bg-coral-dark touch-target sm:text-sm">
-														{m.series_watch_now()}
-														<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-													</a>
-												{/if}
+												{/each}
 											</div>
-										{/each}
+										{/if}
 									</div>
 								{/if}
-							</div>
-						{/each}
-					</div>
-				</div>
+							</article>
+						</li>
+					{/each}
+				</ol>
 			</section>
 		{/if}
-		<LatestMomentsLink lang={page.data.lang} entity="series" entityId={series.id} />
-		</div>
+
+		<section class="relative mt-24 overflow-hidden rounded-[2.25rem] bg-lavender/35 p-7 sm:mt-32 sm:rounded-[3rem] sm:p-12">
+			<div aria-hidden="true" class="absolute -right-10 -top-16 h-64 w-64 rounded-full border-[3.5rem] border-white/50"></div>
+			<div aria-hidden="true" class="absolute bottom-8 right-40 hidden h-5 w-5 rounded-full bg-coral sm:block"></div>
+			<div class="relative flex min-w-0 flex-wrap items-end justify-between gap-6">
+				<div class="min-w-0 max-w-full">
+					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">Orbit Halo</p>
+					<h2 class="mt-2 max-w-full break-words font-[family-name:var(--font-display)] text-[1.75rem] font-black leading-[0.95] tracking-[-0.055em] text-plum [overflow-wrap:anywhere] min-[360px]:text-4xl sm:text-6xl">Latest Moments</h2>
+				</div>
+				<a href={momentsHref} class="inline-flex max-w-full items-center gap-3 rounded-full bg-plum px-5 py-3 text-sm font-bold text-white transition hover:bg-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-plum touch-target">
+					<span class="min-w-0 break-words [overflow-wrap:anywhere]">{currentLang === 'th' ? 'ดู Moment ทั้งหมด' : 'View all moments'}</span>
+					<svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6" /></svg>
+				</a>
+			</div>
+		</section>
 	</div>
-{/if}
+</div>

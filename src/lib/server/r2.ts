@@ -1,10 +1,11 @@
 import 'dotenv/config';
 import { AwsClient } from 'aws4fetch';
-import { generateVariants, type Variant } from './images/sharp.js';
+import { generateVariants, getOrientedImageDimensions, type Variant } from './images/sharp.js';
 import {
 	IMAGE_VARIANTS,
 	buildVariantKey,
 	buildVariantUrl,
+	getCoverDimensionError,
 	mimeForExt,
 	type ImageExt,
 	type ImageType
@@ -106,7 +107,7 @@ async function deleteObject(key: string): Promise<void> {
 
 /** Best-effort cleanup for an image whose database persistence failed after R2 upload. */
 export async function deleteImageVariants(canonicalKey: string, remove: (key: string) => Promise<void> = deleteObject): Promise<void> {
-	const match = /^images\/(posters|profiles|moments)\/([0-9a-f-]{36})\/\d+\.jpg$/.exec(canonicalKey);
+	const match = /^images\/(posters|covers|profiles|moments)\/([0-9a-f-]{36})\/\d+\.jpg$/.exec(canonicalKey);
 	if (!match) return;
 	const [, rawType, id] = match;
 	const type = rawType as ImageType;
@@ -164,6 +165,11 @@ export async function uploadImage(
 	}
 
 	const input = Buffer.from(await file.arrayBuffer());
+	if (type === 'covers') {
+		const { width, height } = await getOrientedImageDimensions(input);
+		const dimensionError = getCoverDimensionError(width, height);
+		if (dimensionError) throw new ImageUploadValidationError(dimensionError);
+	}
 	const variants = await generateVariants(input, type);
 	const id = crypto.randomUUID();
 

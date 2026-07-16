@@ -13,7 +13,7 @@
 		url: string;
 		className?: string;
 		ariaLabel?: string;
-		variant?: 'compact' | 'command';
+		variant?: 'compact' | 'command' | 'orbit';
 	} = $props();
 
 	let menuOpen = $state(false);
@@ -31,7 +31,9 @@
 		`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`
 	);
 	const buttonClass = $derived(
-		variant === 'command'
+		variant === 'orbit'
+			? `group relative flex h-full min-h-[5.75rem] w-full flex-col justify-between overflow-hidden rounded-[1.35rem] border p-3 text-left text-plum transition duration-200 touch-target max-[359px]:min-h-14 max-[359px]:flex-row max-[359px]:items-center max-[359px]:justify-start max-[359px]:gap-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? '-translate-y-0.5 border-lavender bg-lavender shadow-[0_18px_30px_-22px_rgba(124,58,237,0.75)]' : 'border-lavender/25 bg-lavender/12 hover:-translate-y-0.5 hover:border-lavender/55 hover:bg-lavender/20'} ${className}`
+			: variant === 'command'
 			? `inline-flex min-h-[3.35rem] items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/60 bg-lavender/18 text-lavender-dark' : 'border border-lavender/40 bg-white/95 text-plum hover:border-lavender/60 hover:bg-lavender/8'} ${className}`
 			: `inline-flex items-center gap-2.5 rounded-full px-3.5 py-2 text-sm font-semibold touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/60 bg-lavender/18 text-lavender-dark' : 'border border-lavender/35 bg-white/95 text-plum hover:border-lavender/55 hover:bg-lavender/8 hover:text-lavender-dark'} ${className}`
 	);
@@ -98,7 +100,7 @@
 
 <svelte:window onclick={handleWindowClick} onkeydown={handleKeydown} />
 
-<div class="relative" bind:this={rootEl}>
+<div class="relative {variant === 'orbit' ? 'h-full max-[359px]:col-span-2' : ''}" bind:this={rootEl}>
 	<button
 		onclick={handleShare}
 		aria-label={ariaLabel}
@@ -106,7 +108,20 @@
 		aria-expanded={menuOpen}
 		class={buttonClass}
 	>
-		{#if variant === 'command'}
+		{#if variant === 'orbit'}
+			<span aria-hidden="true" class="absolute right-3 top-3 font-[family-name:var(--font-display)] text-[9px] font-black tracking-[0.2em] opacity-45">03</span>
+			<span class="grid h-9 w-9 shrink-0 place-items-center rounded-full {menuOpen ? 'bg-plum text-lavender' : 'bg-white text-lavender-dark shadow-sm'}">
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="1.9"
+						d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-2.684-4.684M5.342 8.684a3 3 0 104.026 4.026m-4.026-4.026L18.058 5.5M5.342 15.316L18.058 18.5"
+					/>
+				</svg>
+			</span>
+			<span class="mt-2 block break-words text-xs font-black leading-[1.25] max-[359px]:mt-0">{m.share_aria_label()}</span>
+		{:else if variant === 'command'}
 			<span class="grid h-9 w-9 shrink-0 place-items-center rounded-2xl {menuOpen ? 'bg-lavender text-white' : 'bg-lavender/16 text-lavender-dark ring-1 ring-lavender/30'}">
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -142,7 +157,7 @@
 		<div
 			role="menu"
 			aria-label={m.share_menu_label()}
-			class="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-3xl border border-white/70 bg-white/95 p-2"
+			class="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-3xl border border-white/70 bg-white/95 p-2 {variant === 'orbit' ? 'max-sm:fixed max-sm:inset-x-4 max-sm:bottom-24 max-sm:top-auto max-sm:mt-0 max-sm:w-auto' : ''}"
 		>
 			<p class="px-3 pb-2 pt-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-plum-light">{m.share_to()}</p>
 
