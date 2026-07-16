@@ -111,7 +111,7 @@
 </article>
 {#if fullImageOpen && images[mediaIndex]}
 	<div class="fixed inset-0 z-50 grid place-items-center bg-plum/90 p-4" role="dialog" aria-modal="true" aria-label={isThai ? 'ภาพขนาดเต็ม' : 'Full-size image'}>
-		<button type="button" onclick={() => fullImageOpen = false} class="halo-focus-ring absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white/15 text-2xl text-white transition hover:bg-white/25" aria-label={isThai ? 'ปิดภาพขนาดเต็ม' : 'Close full-size image'}>×</button>
+		<button type="button" onclick={() => fullImageOpen = false} class="halo-focus-ring absolute right-4 top-4 z-10 grid h-11 w-11 place-items-center rounded-full bg-white/15 text-2xl text-white transition hover:bg-white/25" aria-label={isThai ? 'ปิดภาพขนาดเต็ม' : 'Close full-size image'}>×</button>
 		<div class="relative h-full w-full" role="region" aria-roledescription="carousel" aria-label={isThai ? `รูปภาพโพสต์ ${images.length} รูป` : `${images.length} post images`}>
 			<img src={images[mediaIndex].externalUrl} alt={images[mediaIndex].altText ?? ''} decoding="async" referrerpolicy="no-referrer" class="h-full w-full object-contain" />
 			{#if images.length > 1}
