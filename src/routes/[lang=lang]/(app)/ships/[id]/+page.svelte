@@ -24,29 +24,29 @@
 	{@html jsonLdScript(data.seo.jsonLd)}
 </svelte:head>
 
-<article class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[radial-gradient(circle_at_12%_10%,rgba(255,107,157,0.18),transparent_28%),radial-gradient(circle_at_88%_8%,rgba(196,181,253,0.22),transparent_30%),radial-gradient(circle_at_50%_86%,rgba(110,231,183,0.12),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,245,247,0.92))] pb-[calc(2.5rem+var(--bottom-nav-reserved-space))] text-plum md:mb-0 md:-mt-24 md:pb-14 md:pt-24">
-	<div class="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(45,27,46,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(45,27,46,0.035)_1px,transparent_1px)] bg-[size:4.5rem_4.5rem] opacity-45"></div>
-	<div class="pointer-events-none absolute -right-24 top-20 h-72 w-72 rounded-full bg-lavender/18 blur-3xl"></div>
-	<div class="pointer-events-none absolute -left-20 bottom-16 h-64 w-64 rounded-full bg-coral/12 blur-3xl"></div>
+<article class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-cream pb-[calc(3rem+var(--bottom-nav-reserved-space))] text-plum md:mb-0 md:-mt-24 md:pb-20 md:pt-24">
+	<div aria-hidden="true" class="pointer-events-none absolute -left-48 top-[34rem] h-[34rem] w-[34rem] rounded-full bg-lavender/20 blur-3xl"></div>
+	<div aria-hidden="true" class="pointer-events-none absolute -right-48 top-[78rem] h-[38rem] w-[38rem] rounded-full bg-coral/15 blur-3xl"></div>
 
-	<div class="relative mx-auto max-w-7xl px-4 pt-5 sm:pt-8 md:px-6">
-		<button onclick={() => history.back()} class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/75 px-3.5 py-2 text-sm font-semibold text-plum-light shadow-sm shadow-lavender/10 backdrop-blur-xl transition-all duration-300 hover:-translate-x-0.5 hover:border-coral/40 hover:bg-white/90 hover:text-coral-dark sm:mb-8 sm:text-base touch-target">
+	<div class="relative mx-auto max-w-[90rem] px-4 pt-4 sm:px-6 sm:pt-6 md:px-8">
+		<button onclick={() => history.back()} class="mb-5 inline-flex items-center gap-2 rounded-full bg-white/92 px-4 py-2 text-sm font-bold text-plum shadow-lg backdrop-blur-md transition hover:bg-coral hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral sm:mb-6 touch-target">
 			<svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
 			<span>{m.common_back()}</span>
 		</button>
 
-		<section class="relative z-10 mb-10 grid gap-5 lg:grid-cols-[minmax(0,1.04fr)_minmax(19rem,0.96fr)] lg:items-stretch lg:gap-8">
-			<div class="glass-card-strong relative overflow-hidden rounded-[2rem] border border-white/80 p-5 shadow-2xl shadow-lavender/10 sm:p-7 lg:p-9">
-				<div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full border border-coral/20"></div>
-				<div class="pointer-events-none absolute bottom-8 right-12 h-24 w-24 rounded-full border border-mint/25"></div>
-				<div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-coral via-lavender to-mint"></div>
+		<section class="relative z-10 mb-16 overflow-hidden rounded-[1.75rem] bg-white shadow-[0_36px_90px_-44px_rgba(45,27,46,0.35)] sm:mb-24 sm:rounded-[2.5rem]">
+			<div class="grid gap-0 lg:grid-cols-[minmax(0,1.04fr)_minmax(19rem,0.96fr)] lg:items-stretch">
+			<div class="relative overflow-hidden p-5 sm:p-9 lg:p-12">
+				<div aria-hidden="true" class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full border-[2rem] border-coral/10"></div>
+				<div aria-hidden="true" class="pointer-events-none absolute bottom-8 right-12 h-24 w-24 rounded-full border border-lavender/30"></div>
 
 				<div class="relative flex min-h-full flex-col justify-between gap-8">
 					<div>
-						<p class="mb-3 font-[family-name:var(--font-thai)] text-base font-semibold text-coral-dark sm:text-lg">{data.ship.artist1.name} × {data.ship.artist2.name}</p>
+						<p class="mb-4 text-[10px] font-black uppercase tracking-[0.42em] text-coral-dark sm:text-xs">GL-ORBIT / SHIP FILE</p>
 						<h1 class="max-w-4xl break-words font-[family-name:var(--font-display)] text-[clamp(2.75rem,8vw,7rem)] font-black leading-[0.86] tracking-[-0.07em] text-plum [overflow-wrap:anywhere]">
 							{data.ship.name}
 						</h1>
+						<p class="mt-5 font-[family-name:var(--font-thai)] text-lg font-semibold text-plum-light/80 sm:text-2xl">{data.ship.artist1.name} × {data.ship.artist2.name}</p>
 					</div>
 
 					<div class="max-w-3xl rounded-[1.6rem] border border-white/80 bg-white/76 p-4 backdrop-blur-xl sm:p-5">
@@ -65,7 +65,7 @@
 				</div>
 			</div>
 
-			<div class="relative min-h-[31rem] overflow-hidden rounded-[2rem] border border-white/80 bg-coral/10 shadow-2xl shadow-coral/10 lg:min-h-[38rem]">
+			<div class="relative min-h-[31rem] overflow-hidden bg-coral/10 lg:min-h-[38rem]">
 				<Picture src={data.ship.imageUrl} type="posters" sizes="(max-width: 1024px) 92vw, 520px" alt={data.ship.name} width={640} height={880} loading="eager" fetchpriority="high" class="h-full w-full object-cover" />
 				<div class="absolute inset-0 bg-[radial-gradient(circle_at_28%_16%,rgba(255,255,255,0.24),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(255,107,157,0.20),transparent_34%),radial-gradient(circle_at_50%_78%,rgba(196,181,253,0.16),transparent_42%),linear-gradient(180deg,rgba(255,245,247,0.10),rgba(255,107,157,0.18)_58%,rgba(45,27,46,0.30))]"></div>
 				<div class="pointer-events-none absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/24"></div>
@@ -88,15 +88,21 @@
 					</span>
 				</a>
 
-				<div class="absolute bottom-5 left-5 rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-white backdrop-blur-md sm:bottom-7 sm:left-7">GL-Orbit ship</div>
+			</div>
 			</div>
 		</section>
 
-		<section class="relative z-10 mb-10 rounded-[2rem] border border-white/80 bg-white/62 p-4 shadow-xl shadow-lavender/10 backdrop-blur-xl sm:mb-12 sm:p-5 lg:p-6">
+		<section class="relative z-10 mb-16 grid gap-6 sm:mb-24 lg:grid-cols-12 lg:gap-8" aria-labelledby="artists-heading">
+			<header class="lg:col-span-4 lg:pt-8">
+				<p class="font-[family-name:var(--font-display)] text-7xl font-black leading-none tracking-[-0.08em] text-coral/25 sm:text-9xl">01</p>
+				<p class="mt-3 text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">Orbit pair</p>
+				<h2 id="artists-heading" class="mt-2 font-[family-name:var(--font-thai)] text-4xl font-black leading-[1.25] tracking-[-0.03em] text-plum sm:text-6xl">ศิลปินที่โคจรรอบกัน</h2>
+			</header>
+			<div class="relative rounded-[2.25rem] bg-lavender-light/70 p-4 sm:rounded-[3rem] sm:p-7 lg:col-span-8 lg:p-8">
 			<div class="mb-5 flex flex-wrap items-end justify-between gap-4">
 				<div>
-					<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-coral-light/70">Chemistry map</p>
-					<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-plum sm:text-4xl">ศิลปินที่โคจรรอบกัน</h2>
+					<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-coral-dark">Chemistry map</p>
+					<p class="font-[family-name:var(--font-thai)] text-base font-semibold text-plum-light sm:text-lg">สองแรงดึงดูด หนึ่งวงโคจร</p>
 				</div>
 				<span class="rounded-full border border-white/70 bg-white/72 px-3 py-1 text-xs font-semibold text-plum-light">2 artists</span>
 			</div>
@@ -135,19 +141,20 @@
 					</div>
 				</a>
 			</div>
+			</div>
 		</section>
 
 		<section class="relative z-10">
 			<div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
 				<div>
-					<p class="text-[10px] font-bold uppercase tracking-[0.28em] text-lavender-dark/75">Shared reel</p>
+					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">02 / Shared reel</p>
 					<h2 class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.04em] text-plum sm:text-4xl">ผลงานร่วมกัน</h2>
 				</div>
 				<span class="rounded-full border border-white/60 bg-white/62 px-3 py-1 text-xs font-semibold text-plum-light">{data.ship.series.length} เรื่อง</span>
 			</div>
 
 			{#if data.ship.series.length > 0}
-				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+				<div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
 					{#each data.ship.series as item}
 						{@const status = statusConfig[item.status]}
 						<a href="/{page.data.lang}/series/{item.id}" class="group block overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/72 shadow-lg shadow-lavender/10 transition-all duration-300 hover:-translate-y-1 hover:border-coral/30 hover:bg-white/92 hover:shadow-2xl hover:shadow-coral/10 focus-visible:outline-2 focus-visible:outline-coral">

@@ -10,6 +10,7 @@ export type ShipListItem = {
 	slug: string;
 	name: string;
 	imageUrl: string;
+	hasImage: boolean;
 	description: string;
 	hashtags: string[];
 	isFeatured: boolean;
@@ -143,6 +144,7 @@ export async function getShipList(filters: ShipFilters, page: number = 1): Promi
 			slug: row.slug,
 			name: row.name,
 			imageUrl: row.imageUrl ?? DEFAULT_SHIP_IMAGE,
+			hasImage: Boolean(row.imageUrl),
 			description: row.description ?? '',
 			hashtags: row.hashtags ?? [],
 			isFeatured: row.isFeatured,

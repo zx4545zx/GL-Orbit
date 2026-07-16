@@ -108,14 +108,17 @@
 			{#each allShips as ship (ship.id)}
 				<ImageListingCard
 					href={`/${page.data.lang}/ships/${ship.slug}`}
-					image={ship.imageUrl}
+					image={ship.hasImage ? ship.imageUrl : ship.artist1.imageUrl}
+					secondaryImage={ship.hasImage ? '' : ship.artist2.imageUrl}
+					imageType={ship.hasImage ? 'posters' : 'profiles'}
 					title={ship.name}
 					subtitle={`${ship.artist1.name} × ${ship.artist2.name}`}
 					eyebrow={`${ship.seriesCount} ผลงานร่วมกัน`}
 					badgeText={ship.isFeatured ? 'Featured' : ''}
 					badgeClass="bg-coral/10 text-coral-dark"
 					chips={ship.hashtags.slice(0, 2).map((tag) => `#${tag}`)}
-					alt={ship.name}
+					alt={ship.hasImage ? ship.name : ship.artist1.name}
+					secondaryAlt={ship.hasImage ? '' : ship.artist2.name}
 				/>
 			{/each}
 		{/if}
