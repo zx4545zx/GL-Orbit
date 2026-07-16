@@ -252,18 +252,18 @@
 			</div>
 
 			<div class="relative px-5 pb-8 pt-6 sm:px-10 sm:pb-10 sm:pt-8 lg:min-h-[25rem] lg:py-12 lg:pl-[22rem] lg:pr-14">
-				<div class="relative z-10 mx-auto w-[10.5rem] rotate-[1.5deg] sm:w-[12rem] lg:absolute lg:bottom-6 lg:left-14 lg:w-[15rem] lg:rotate-[2.5deg]">
+				<div class="relative z-10 mx-auto w-[72vw] max-w-[15rem] rotate-[1.5deg] sm:w-[15rem] lg:absolute lg:bottom-6 lg:left-14 lg:rotate-[2.5deg]">
 					<div class="overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-[0_28px_65px_-24px_rgba(45,27,46,0.45)] ring-1 ring-plum/8">
-						<Picture src={series.poster} type="posters" sizes="(max-width: 639px) 168px, (max-width: 1023px) 192px, 240px" alt={series.titleEn} width={480} height={720} loading="eager" class="aspect-[2/3] w-full rounded-[1.3rem] object-cover" />
+						<Picture src={series.poster} type="posters" sizes="(max-width: 333px) 72vw, 240px" alt={series.titleEn} width={480} height={720} loading="eager" class="aspect-[2/3] w-full rounded-[1.3rem] object-cover" />
 					</div>
 					<div class="absolute -bottom-3 -left-3 grid h-14 w-14 -rotate-[8deg] place-items-center rounded-full bg-coral text-center text-white shadow-xl sm:h-16 sm:w-16 lg:-bottom-4 lg:-left-5 lg:h-20 lg:w-20">
 						<span class="font-[family-name:var(--font-display)] text-lg font-black leading-none sm:text-xl lg:text-2xl">{series.episodes}<small class="mt-1 block text-[7px] font-bold uppercase tracking-[0.2em] lg:text-[8px]">EP</small></span>
 					</div>
 				</div>
 
-				<div class="mt-8 min-w-0 text-center lg:mt-0 lg:text-left">
+				<div class="mt-6 min-w-0 text-center lg:mt-0 lg:text-left">
 					<p class="mb-4 text-[10px] font-black uppercase tracking-[0.42em] text-coral-dark sm:text-xs">GL-ORBIT / SERIES FILE</p>
-					<h1 class="break-words font-[family-name:var(--font-display)] text-[clamp(2.15rem,12vw,3rem)] font-black leading-[0.86] tracking-[-0.07em] text-plum [overflow-wrap:anywhere] sm:text-6xl lg:text-7xl xl:text-8xl">
+					<h1 class="break-words font-[family-name:var(--font-display)] text-[clamp(2rem,10vw,2.5rem)] font-black leading-[0.86] tracking-[-0.07em] text-plum [overflow-wrap:anywhere] sm:text-6xl lg:text-7xl xl:text-8xl">
 						{series.titleEn}
 					</h1>
 					{#if series.titleTh}
@@ -316,7 +316,7 @@
 
 				<div class="relative overflow-hidden rounded-[2.25rem] bg-coral-light/35 p-6 sm:rounded-[3rem] sm:p-10 lg:col-span-8 lg:p-14">
 					<div aria-hidden="true" class="absolute -right-10 -top-16 font-[family-name:var(--font-display)] text-[18rem] font-black leading-none text-white/45">“</div>
-					<p class:line-clamp-6={!descriptionExpanded && hasLongDescription} class="relative whitespace-pre-line font-[family-name:var(--font-thai)] text-lg font-medium leading-[2.05] text-plum sm:text-xl sm:leading-[2.1]">
+					<p class:line-clamp-6={!descriptionExpanded && hasLongDescription} class="relative whitespace-pre-line font-[family-name:var(--font-thai)] text-base font-medium leading-[1.9] text-plum sm:text-lg sm:leading-[2] lg:text-xl lg:leading-[2.1]">
 						{description}
 					</p>
 					{#if hasLongDescription}
@@ -352,31 +352,31 @@
 			</section>
 		{/if}
 
-		<!-- Chapter 02: a portrait wall replaces the horizontal card reel. -->
+		<!-- Chapter 02: compact roster on mobile, portrait wall on larger screens. -->
 		{#if series.artists.length > 0}
 			<section class="mt-24 sm:mt-32 perf-section" aria-labelledby="cast-heading">
-				<header class="mb-10 flex flex-wrap items-end justify-between gap-5 sm:mb-14">
+				<header class="mb-6 flex flex-wrap items-end justify-between gap-5 sm:mb-14">
 					<div>
 						<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">02 / Ensemble</p>
 						<h2 id="cast-heading" class="mt-2 text-5xl font-black text-plum sm:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.common_cast()}</h2>
 					</div>
-					<div class="grid h-20 w-20 place-items-center rounded-full bg-mint text-center font-[family-name:var(--font-display)] text-3xl font-black text-plum sm:h-24 sm:w-24 sm:text-4xl">
-						<span>{series.artists.length}<small class="block text-[8px] font-black uppercase tracking-[0.2em]">{m.common_people()}</small></span>
+					<div class="flex min-h-11 items-center rounded-full bg-mint px-3 text-center font-[family-name:var(--font-display)] text-xl font-black text-plum sm:grid sm:h-24 sm:w-24 sm:place-items-center sm:px-0 sm:text-4xl">
+						<span>{series.artists.length}<small class="ml-1 text-[7px] font-black uppercase tracking-[0.2em] sm:ml-0 sm:block sm:text-[8px]">{m.common_people()}</small></span>
 					</div>
 				</header>
 
-				<div class="grid grid-cols-2 gap-x-3 gap-y-10 sm:grid-cols-3 sm:gap-x-5 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-16">
+				<div class="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-10 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-16">
 					{#each series.artists as artist, index (artist.id)}
-						<a href={artistPath(artist.id)} class="group block min-w-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral {index % 2 === 1 ? 'sm:mt-8' : ''}">
-							<div class="relative">
-								<span aria-hidden="true" class="absolute -left-1 -top-5 z-10 font-[family-name:var(--font-display)] text-4xl font-black tracking-[-0.08em] text-coral sm:text-5xl">{String(index + 1).padStart(2, '0')}</span>
-								<div class="overflow-hidden rounded-t-[999px] rounded-b-[1.5rem] bg-lavender/25 shadow-[0_24px_50px_-34px_rgba(45,27,46,0.65)]">
-									<Picture src={artist.image} type="profiles" sizes="(max-width: 640px) 46vw, (max-width: 1024px) 24vw, 220px" alt={artist.name} width={320} height={400} loading="lazy" class="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-[1.04]" />
+						<a href={artistPath(artist.id)} class="group flex min-w-0 items-center gap-2 rounded-[1.25rem] border border-white/80 bg-white/70 p-2 shadow-[0_14px_34px_-28px_rgba(45,27,46,0.7)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:block sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none {index % 2 === 1 ? 'sm:mt-8' : ''}">
+							<div class="relative shrink-0">
+								<span aria-hidden="true" class="absolute -left-1 -top-5 z-10 hidden font-[family-name:var(--font-display)] text-5xl font-black tracking-[-0.08em] text-coral sm:block">{String(index + 1).padStart(2, '0')}</span>
+								<div class="h-14 w-14 overflow-hidden rounded-[1.1rem] bg-lavender/25 shadow-sm sm:h-auto sm:w-auto sm:rounded-t-[999px] sm:rounded-b-[1.5rem] sm:shadow-[0_24px_50px_-34px_rgba(45,27,46,0.65)]">
+									<Picture src={artist.image} type="profiles" sizes="(max-width: 639px) 56px, (max-width: 1024px) 24vw, 220px" alt={artist.name} width={320} height={400} loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04] sm:aspect-[4/5] sm:h-auto" />
 								</div>
 							</div>
-							<div class="px-1 pt-4">
-								<h3 class="break-words text-sm font-black leading-[1.45] text-plum transition group-hover:text-coral-dark sm:text-base">{artist.name}</h3>
-								<p class="mt-1 truncate font-[family-name:var(--font-thai)] text-xs font-medium text-plum-light/65 sm:text-sm">{artist.role}</p>
+							<div class="min-w-0 flex-1 sm:px-1 sm:pt-4">
+								<h3 class="break-words text-[11px] font-black leading-[1.35] text-plum transition [overflow-wrap:anywhere] group-hover:text-coral-dark min-[360px]:text-xs sm:text-base sm:leading-[1.45]">{artist.name}</h3>
+								<p class="mt-1 truncate font-[family-name:var(--font-thai)] text-[10px] font-medium text-plum-light/65 sm:text-sm">{artist.role}</p>
 							</div>
 						</a>
 					{/each}
@@ -386,26 +386,26 @@
 
 		<!-- Chapter 03: ships sit inside a soft editorial interlude. -->
 		{#if series.ships.length > 0}
-			<section class="mt-28 overflow-hidden rounded-[2.25rem] bg-lavender-light/70 p-6 text-plum sm:mt-36 sm:rounded-[3rem] sm:p-10 lg:p-14 perf-section" aria-labelledby="ships-heading">
-				<header class="mb-10 sm:mb-14">
+			<section class="mt-20 overflow-hidden rounded-[2rem] bg-lavender-light/70 p-4 text-plum min-[360px]:p-5 sm:mt-36 sm:rounded-[3rem] sm:p-10 lg:p-14 perf-section" aria-labelledby="ships-heading">
+				<header class="mb-6 sm:mb-14">
 					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">03 / Chemistry</p>
-					<h2 id="ships-heading" class="mt-2 text-5xl font-black sm:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.series_detail_ships()}</h2>
+					<h2 id="ships-heading" class="mt-2 text-4xl font-black sm:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.series_detail_ships()}</h2>
 				</header>
-				<div class="grid gap-4 sm:grid-cols-2 {series.ships.length === 1 ? 'lg:grid-cols-1' : 'lg:grid-cols-3'}">
+				<div class="grid grid-cols-2 gap-2 sm:gap-4 {series.ships.length === 1 ? 'lg:grid-cols-1' : 'lg:grid-cols-3'}">
 					{#each series.ships as ship (ship.id)}
-						<a href={shipPath(ship.slug)} class="group relative min-h-[21rem] overflow-hidden rounded-[2rem] border border-white/80 bg-white/75 p-5 shadow-[0_24px_60px_rgba(45,27,46,0.09)] transition hover:-translate-y-1 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:min-h-[23rem] {series.ships.length === 1 ? 'sm:col-span-2 sm:grid sm:min-h-0 sm:grid-cols-[18rem_minmax(0,1fr)] sm:items-center sm:gap-10 sm:p-8 lg:col-span-1' : ''}">
-							<div aria-hidden="true" class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-coral/15 blur-2xl"></div>
-							<div class="relative mx-auto mt-2 flex max-w-[17rem] items-center justify-center {series.ships.length === 1 ? 'sm:mt-0' : ''}">
-								<div class="relative z-10 w-[62%] overflow-hidden rounded-full border-4 border-white bg-coral-light shadow-lg">
-									<Picture src={ship.artist1Image} type="profiles" sizes="190px" alt={ship.artist1Name} width={320} height={320} loading="lazy" class="aspect-square w-full object-cover transition duration-500 group-hover:-rotate-2 group-hover:scale-105" />
+						<a href={shipPath(ship.slug)} class="group relative min-h-0 overflow-hidden rounded-[1.5rem] border border-white/80 bg-white/75 p-3 shadow-[0_18px_45px_rgba(45,27,46,0.08)] transition hover:-translate-y-1 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:min-h-[23rem] sm:rounded-[2rem] sm:p-5 sm:shadow-[0_24px_60px_rgba(45,27,46,0.09)] {series.ships.length === 1 ? 'col-span-2 sm:grid sm:min-h-0 sm:grid-cols-[18rem_minmax(0,1fr)] sm:items-center sm:gap-10 sm:p-8 lg:col-span-1' : ''}">
+							<div aria-hidden="true" class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-coral/15 blur-2xl sm:-right-10 sm:-top-10 sm:h-40 sm:w-40"></div>
+							<div class="relative mx-auto flex max-w-[8.5rem] items-center justify-center sm:mt-2 sm:max-w-[17rem] {series.ships.length === 1 ? 'sm:mt-0' : ''}">
+								<div class="relative z-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-coral-light shadow-md sm:border-4 sm:shadow-lg">
+									<Picture src={ship.artist1Image} type="profiles" sizes="(max-width: 639px) 84px, 190px" alt={ship.artist1Name} width={320} height={320} loading="lazy" class="aspect-square w-full object-cover transition duration-500 group-hover:-rotate-2 group-hover:scale-105" />
 								</div>
-								<div class="relative -ml-[24%] mt-24 w-[62%] overflow-hidden rounded-full border-4 border-white bg-lavender-light shadow-lg">
-									<Picture src={ship.artist2Image} type="profiles" sizes="190px" alt={ship.artist2Name} width={320} height={320} loading="lazy" class="aspect-square w-full object-cover transition duration-500 group-hover:rotate-2 group-hover:scale-105" />
+								<div class="relative -ml-[24%] mt-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-lavender-light shadow-md sm:mt-24 sm:border-4 sm:shadow-lg">
+									<Picture src={ship.artist2Image} type="profiles" sizes="(max-width: 639px) 84px, 190px" alt={ship.artist2Name} width={320} height={320} loading="lazy" class="aspect-square w-full object-cover transition duration-500 group-hover:rotate-2 group-hover:scale-105" />
 								</div>
 							</div>
-							<div class="relative mt-5 text-center {series.ships.length === 1 ? 'sm:mt-0 sm:text-left' : ''}">
-								<h3 class="break-words font-[family-name:var(--font-display)] text-xl font-black leading-tight tracking-[-0.04em] text-plum [overflow-wrap:anywhere] min-[360px]:text-2xl {series.ships.length === 1 ? 'sm:text-5xl' : ''}">{ship.name}</h3>
-								<p class="mt-1 break-words text-xs font-semibold leading-relaxed text-plum-light/65 [overflow-wrap:anywhere]">{ship.artist1Name} × {ship.artist2Name}</p>
+							<div class="relative mt-3 text-center sm:mt-5 {series.ships.length === 1 ? 'sm:mt-0 sm:text-left' : ''}">
+								<h3 class="break-words font-[family-name:var(--font-display)] text-[10px] font-black leading-tight tracking-[-0.06em] text-plum [overflow-wrap:anywhere] min-[360px]:text-xs sm:text-2xl sm:tracking-[-0.04em] {series.ships.length === 1 ? 'sm:text-5xl' : ''}">{ship.name}</h3>
+								<p class="mt-1 break-words text-[9px] font-semibold leading-[1.45] text-plum-light/65 [overflow-wrap:anywhere] min-[360px]:text-[10px] sm:text-xs sm:leading-relaxed">{ship.artist1Name} × {ship.artist2Name}</p>
 							</div>
 						</a>
 					{/each}
@@ -446,15 +446,15 @@
 					</button>
 				</header>
 
-				<ol class="space-y-3">
+				<ol class="min-w-0 space-y-3">
 					{#each series.schedule as item (item.episode)}
 						{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((schedule: { platform: string }) => schedule.platform !== 'TBA')}
 						{@const hasEpisodeMedia = Boolean(item.trailerUrl)}
 						{@const hasEpisodeContent = hasSchedules || hasEpisodeMedia}
 						{@const trailerEmbedUrl = youtubeEmbedUrl(item.trailerUrl)}
 						{@const isOpen = hasEpisodeContent && expandedEpisodes.has(item.episode)}
-						<li>
-							<article class="overflow-hidden rounded-[1.5rem] bg-white shadow-[0_18px_46px_-38px_rgba(45,27,46,0.75)] transition hover:shadow-[0_22px_52px_-34px_rgba(45,27,46,0.55)] perf-card">
+						<li class="min-w-0">
+							<article class="min-w-0 max-w-full overflow-hidden rounded-[1.5rem] bg-white shadow-[0_18px_46px_-38px_rgba(45,27,46,0.75)] transition hover:shadow-[0_22px_52px_-34px_rgba(45,27,46,0.55)] perf-card">
 								<button type="button" disabled={!hasEpisodeContent} onclick={() => toggleEpisode(item.episode)} aria-expanded={hasEpisodeContent ? isOpen : undefined} class="grid w-full grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-3 gap-y-3 p-3 text-left focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-coral disabled:cursor-default sm:grid-cols-[5.25rem_minmax(0,1fr)_auto] sm:gap-x-5 sm:p-5">
 									<div class="grid aspect-square place-items-center rounded-[1.2rem] {isOpen ? 'bg-coral text-white' : 'bg-cream text-plum'} transition-colors">
 										<span class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.06em] sm:text-4xl">{String(item.episode).padStart(2, '0')}</span>
@@ -475,7 +475,7 @@
 								</button>
 
 								{#if isOpen}
-									<div class="grid gap-3 bg-cream/70 p-3 sm:p-5 {item.trailerUrl && hasSchedules ? 'lg:grid-cols-2' : ''}">
+									<div class="grid min-w-0 gap-3 bg-coral-light/40 p-3 sm:p-5 {item.trailerUrl && hasSchedules ? 'lg:grid-cols-2' : ''}">
 										{#if item.trailerUrl}
 											{#if trailerEmbedUrl}
 												{#if activatedTrailers.has(item.episode)}
@@ -492,15 +492,15 @@
 										{/if}
 
 										{#if hasSchedules}
-											<div class="space-y-2 rounded-[1.25rem] bg-white p-3 sm:p-4">
+											<div class="min-w-0 max-w-full space-y-2 rounded-[1.25rem] bg-white p-3 sm:p-4">
 												{#each item.schedules as schedule}
 													{@const hasStreamLink = schedule.streamLink && schedule.streamLink.length > 0}
-													<div class="flex items-center justify-between gap-3 rounded-xl bg-cream/70 px-3 py-2.5">
-														<div class="flex min-w-0 items-center gap-3">
+													<div class="flex min-w-0 max-w-full items-center justify-between gap-2 rounded-xl bg-cream/70 px-3 py-2.5 min-[360px]:gap-3">
+														<div class="flex min-w-0 flex-1 items-center gap-2 min-[360px]:gap-3">
 															{#if schedule.platformLogo}<img src={schedule.platformLogo} alt={schedule.platform} width={32} height={32} loading="lazy" decoding="async" class="h-8 w-8 shrink-0 rounded-full object-cover" />{:else}<span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-xs font-black text-plum">{schedule.platform.charAt(0)}</span>{/if}
-															<div class="min-w-0"><p class="truncate text-sm font-bold text-plum">{schedule.platform}</p><p class="mt-0.5 text-[10px] font-semibold text-plum-light/55">{schedule.airDate}{schedule.isUncut ? ` · ${m.common_uncut()}` : ''}</p></div>
+															<div class="min-w-0 flex-1"><p class="truncate text-sm font-bold text-plum">{schedule.platform}</p><p class="truncate mt-0.5 text-[10px] font-semibold text-plum-light/55">{schedule.airDate}{schedule.isUncut ? ` · ${m.common_uncut()}` : ''}</p></div>
 														</div>
-														{#if hasStreamLink}<a href={schedule.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex shrink-0 items-center gap-1 rounded-full bg-coral px-3 py-2 text-xs font-bold text-white transition hover:bg-coral-dark touch-target">{m.series_detail_watch_now()}<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>{/if}
+														{#if hasStreamLink}<a href={schedule.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex shrink-0 items-center gap-1 rounded-full bg-coral px-3 py-2 text-xs font-bold text-white transition hover:bg-coral-dark max-[359px]:h-11 max-[359px]:w-11 max-[359px]:justify-center max-[359px]:px-0 touch-target"><span class="max-[359px]:sr-only">{m.series_detail_watch_now()}</span><svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>{/if}
 													</div>
 												{/each}
 											</div>
