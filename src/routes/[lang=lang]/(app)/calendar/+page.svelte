@@ -23,10 +23,11 @@
 	const params_m = $derived(data.params.month);
 	const params_sd = $derived<string | null>(data.params.startDate);
 	const params_ed = $derived<string | null>(data.params.endDate);
+	const params_view = $derived(data.params.view);
 	const contentLoading = $derived(Boolean(navigating.to && navigating.to.url.pathname === page.url.pathname));
 
 	$effect(() => {
-		viewMode = data.params.startDate ? 'card' : 'calendar';
+		viewMode = params_view ?? (data.params.startDate ? 'card' : 'calendar');
 	});
 
 	// Current month derived from load params
@@ -133,14 +134,14 @@
 		const newDate = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate() - 7);
 		const start = getStartOfWeek(newDate);
 		const end = getEndOfWeek(newDate);
-		navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
+		navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}&view=${viewMode}`);
 	}
 
 	function nextWeek() {
 		const newDate = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate() + 7);
 		const start = getStartOfWeek(newDate);
 		const end = getEndOfWeek(newDate);
-		navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
+		navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}&view=${viewMode}`);
 	}
 
 	async function goToThisWeek() {
@@ -148,7 +149,7 @@
 		const today = new Date();
 		const start = getStartOfWeek(today);
 		const end = getEndOfWeek(today);
-		await navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`);
+		await navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}&view=card`);
 		await scrollToSchedule();
 	}
 

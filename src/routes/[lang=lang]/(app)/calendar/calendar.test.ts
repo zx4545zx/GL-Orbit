@@ -29,6 +29,14 @@ describe('parseCalendarParams', () => {
 		expect(result.endDate).toBe('2024-06-07');
 	});
 
+	it('accepts all supported view modes', () => {
+		expect(parseCalendarParams(new URLSearchParams('view=grid')).view).toBe('grid');
+		expect(parseCalendarParams(new URLSearchParams('view=calendar')).view).toBe('calendar');
+		expect(parseCalendarParams(new URLSearchParams('view=list')).view).toBe('list');
+		expect(parseCalendarParams(new URLSearchParams('view=card')).view).toBe('card');
+		expect(parseCalendarParams(new URLSearchParams('view=unknown')).view).toBeNull();
+	});
+
 	it('returns empty params when no query string', () => {
 		const params = new URLSearchParams('');
 		const result = parseCalendarParams(params);
@@ -63,42 +71,42 @@ describe('parseCalendarParams', () => {
 describe('getViewUrl', () => {
 	it('returns week URL (startDate/endDate) for list view', () => {
 		const url = getViewUrl('list', 'th', 2026, 6, null, null);
-		expect(url).toMatch(/^\/th\/calendar\?startDate=\d{4}-\d{2}-\d{2}&endDate=\d{4}-\d{2}-\d{2}$/);
+		expect(url).toMatch(/^\/th\/calendar\?startDate=\d{4}-\d{2}-\d{2}&endDate=\d{4}-\d{2}-\d{2}&view=list$/);
 	});
 
 	it('returns month URL (year/month) for grid view', () => {
 		const url = getViewUrl('grid', 'th', 2026, 6, null, null);
-		expect(url).toBe('/th/calendar?year=2026&month=6');
+		expect(url).toBe('/th/calendar?year=2026&month=6&view=grid');
 	});
 
 	it('returns month URL (year/month) for calendar view', () => {
 		const url = getViewUrl('calendar', 'th', 2026, 6, null, null);
-		expect(url).toBe('/th/calendar?year=2026&month=6');
+		expect(url).toBe('/th/calendar?year=2026&month=6&view=calendar');
 	});
 
 	it('preserves existing week params when switching to list view', () => {
 		const url = getViewUrl('list', 'th', undefined, undefined, '2026-06-01', '2026-06-07');
-		expect(url).toBe('/th/calendar?startDate=2026-06-01&endDate=2026-06-07');
+		expect(url).toBe('/th/calendar?startDate=2026-06-01&endDate=2026-06-07&view=list');
 	});
 
 	it('returns month URL for grid view even when week params exist (switching FROM list)', () => {
 		const url = getViewUrl('grid', 'th', 2026, 6, '2026-06-01', '2026-06-07');
-		expect(url).toBe('/th/calendar?year=2026&month=6');
+		expect(url).toBe('/th/calendar?year=2026&month=6&view=grid');
 	});
 
 	it('returns month URL for calendar view even when week params exist (switching FROM list)', () => {
 		const url = getViewUrl('calendar', 'th', 2026, 6, '2026-06-01', '2026-06-07');
-		expect(url).toBe('/th/calendar?year=2026&month=6');
+		expect(url).toBe('/th/calendar?year=2026&month=6&view=calendar');
 	});
 
 	it('returns week URL for card view', () => {
 		const url = getViewUrl('card', 'th', 2026, 6, '2026-06-01', '2026-06-07');
-		expect(url).toBe('/th/calendar?startDate=2026-06-01&endDate=2026-06-07');
+		expect(url).toBe('/th/calendar?startDate=2026-06-01&endDate=2026-06-07&view=card');
 	});
 
 	it('generates week URL for card view when no week params exist', () => {
 		const url = getViewUrl('card', 'th', 2026, 6, null, null);
-		expect(url).toMatch(/^\/th\/calendar\?startDate=\d{4}-\d{2}-\d{2}&endDate=\d{4}-\d{2}-\d{2}$/);
+		expect(url).toMatch(/^\/th\/calendar\?startDate=\d{4}-\d{2}-\d{2}&endDate=\d{4}-\d{2}-\d{2}&view=card$/);
 	});
 });
 

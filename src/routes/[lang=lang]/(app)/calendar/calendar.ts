@@ -9,6 +9,7 @@ export interface CalendarParams {
 	month?: number;
 	startDate: string | null;
 	endDate: string | null;
+	view: 'grid' | 'calendar' | 'list' | 'card' | null;
 	/** Stable string derived from the search params, suitable as a reactive dependency key. */
 	key: string;
 }
@@ -22,15 +23,19 @@ export function parseCalendarParams(searchParams: URLSearchParams): CalendarPara
 	const monthParam = searchParams.get('month');
 	const startDateParam = searchParams.get('startDate');
 	const endDateParam = searchParams.get('endDate');
+	const viewParam = searchParams.get('view');
 
 	const year = yearParam ? parseInt(yearParam, 10) : undefined;
 	const month = monthParam ? parseInt(monthParam, 10) : undefined;
 	const startDate = startDateParam ?? null;
 	const endDate = endDateParam ?? null;
+	const view = viewParam === 'grid' || viewParam === 'calendar' || viewParam === 'list' || viewParam === 'card'
+		? viewParam
+		: null;
 
 	const key = searchParams.toString();
 
-	return { year, month, startDate, endDate, key };
+	return { year, month, startDate, endDate, view, key };
 }
 
 /**
@@ -83,17 +88,16 @@ export function getViewUrl(
 	if (view === 'grid' || view === 'calendar') {
 		const y = currentYear ?? new Date().getFullYear();
 		const m = currentMonth ?? new Date().getMonth() + 1;
-		return `${base}?year=${y}&month=${m}`;
+		return `${base}?year=${y}&month=${m}&view=${view}`;
 	}
 
 	if (view === 'list' || view === 'card') {
 		if (currentStartDate && currentEndDate) {
-			return `${base}?startDate=${currentStartDate}&endDate=${currentEndDate}`;
+			return `${base}?startDate=${currentStartDate}&endDate=${currentEndDate}&view=${view}`;
 		}
 	}
 	const today = new Date();
 	const start = getStartOfWeek(today);
 	const end = getEndOfWeek(today);
-	return `${base}?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}`;
+	return `${base}?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}&view=${view}`;
 }
-

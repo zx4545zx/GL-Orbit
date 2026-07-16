@@ -37,7 +37,8 @@ export const load: PageServerLoad = async ({ url }) => {
 			year: displayYear,
 			month: displayMonth,
 			startDate: params.startDate ?? null,
-			endDate: params.endDate ?? null
+			endDate: params.endDate ?? null,
+			view: params.view
 		}
 	};
 };
