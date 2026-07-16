@@ -15,6 +15,7 @@ describe('SvelteKit content security policy', () => {
 	it('keeps the embed allowlist narrow and permits only inline style attributes', () => {
 		expect(config).toContain("'style-src': ['self']");
 		expect(config).toContain("'style-src-attr': ['unsafe-inline']");
+		expect(config).toContain("'img-src': ['self', 'https:', 'data:', 'blob:']");
 		expect(config).toContain("'frame-src': [");
 		expect(config).toContain("'https://www.youtube-nocookie.com'");
 		expect(config).not.toContain('https://*.youtube.com');

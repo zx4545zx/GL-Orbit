@@ -21,7 +21,8 @@ const config = {
 				'script-src': ['self', 'https://platform.x.com', 'https://platform.twitter.com'],
 				'style-src': ['self'],
 				'style-src-attr': ['unsafe-inline'],
-				'img-src': ['self', 'https:', 'data:'],
+				// Local upload previews and client-side image compression use blob URLs.
+				'img-src': ['self', 'https:', 'data:', 'blob:'],
 				'font-src': ['self'],
 				'connect-src': ['self'],
 				'frame-src': [
