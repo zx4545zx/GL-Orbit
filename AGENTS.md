@@ -297,3 +297,4 @@ src/
 - **สร้าง Admin คนแรก:** ต้อง insert ผ่าน database โดยตรง (ยังไม่มีหน้าสร้าง admin) หรือเปลี่ยน role ใน DB
 - **ถ้าแก้ไข schema อย่าลืม:** `npm run db:generate` แล้ว `npm run db:push`
 - **Drizzle Studio:** ใช้ `npm run db:studio` สำหรับดู/แก้ไขข้อมูลในฐานข้อมูลได้สะดวก
+- **Design preference:** ห้ามใช้แถบหรือเส้นไล่สีรุ้งใน UI เว้นแต่ผู้ใช้ขอโดยตรง และห้ามใช้เส้นคั่นบาง/HR เป็นองค์ประกอบตกแต่ง UI
