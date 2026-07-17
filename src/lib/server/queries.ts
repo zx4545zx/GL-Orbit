@@ -76,6 +76,7 @@ export async function getSeriesFull(db: Db, id: string) {
 		episodeId: string;
 		platformId: string;
 		platformName: string;
+		title: string | null;
 		airDate: Date;
 		streamLink: string | null;
 		isUncut: boolean;
@@ -87,6 +88,7 @@ export async function getSeriesFull(db: Db, id: string) {
 				episodeId: episodeSchedules.episodeId,
 				platformId: episodeSchedules.platformId,
 				platformName: platforms.name,
+				title: episodeSchedules.title,
 				airDate: episodeSchedules.airDate,
 				streamLink: episodeSchedules.streamLink,
 				isUncut: episodeSchedules.isUncut
@@ -106,6 +108,7 @@ export async function getSeriesFull(db: Db, id: string) {
 				episodeId: es.episodeId,
 				platformId: es.platformId,
 				platformName: es.platformName,
+				title: es.title,
 				airDate: es.airDate ? formatThailandDateTime(es.airDate) : '',
 				streamLink: es.streamLink,
 				isUncut: es.isUncut

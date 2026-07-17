@@ -190,6 +190,7 @@ export const episodeSchedules = pgTable('episode_schedules', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	episodeId: uuid('episode_id').notNull().references(() => episodes.id, { onDelete: 'cascade' }),
 	platformId: uuid('platform_id').notNull().references(() => platforms.id),
+	title: varchar('title', { length: 255 }),
 	airDate: timestamp('air_date', { withTimezone: true }).notNull(),
 	streamLink: text('stream_link'),
 	isUncut: boolean('is_uncut').notNull().default(false),

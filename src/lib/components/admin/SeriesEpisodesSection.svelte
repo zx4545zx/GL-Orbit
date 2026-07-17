@@ -28,16 +28,18 @@
 
 	// single add-schedule form — เฉพาะตอนที่ขยายอยู่
 	let schedPlatformId = $state('');
+	let schedTitle = $state('');
 	let schedAirDate = $state('');
 	let schedStreamLink = $state('');
 	let schedIsUncut = $state(false);
 
-// schedule editing state
-let scheduleEditId = $state<string | null>(null);
-let schedEditPlatformId = $state('');
-let schedEditAirDate = $state('');
-let schedEditStreamLink = $state('');
-let schedEditIsUncut = $state(false);
+	// schedule editing state
+	let scheduleEditId = $state<string | null>(null);
+	let schedEditPlatformId = $state('');
+	let schedEditTitle = $state('');
+	let schedEditAirDate = $state('');
+	let schedEditStreamLink = $state('');
+	let schedEditIsUncut = $state(false);
 
 	function toggle(id: string) {
 		if (expandedId === id) {
@@ -52,6 +54,7 @@ let schedEditIsUncut = $state(false);
 		editing = false;
 		scheduleEditId = null;
 		schedPlatformId = '';
+		schedTitle = '';
 		schedAirDate = '';
 		schedStreamLink = '';
 		schedIsUncut = false;
@@ -132,6 +135,7 @@ let schedEditIsUncut = $state(false);
 		const res = await editorApi.addEpisodeSchedule({
 			episodeId: ep.id,
 			platformId: schedPlatformId,
+			title: schedTitle.trim() || null,
 			airDate: schedAirDate,
 			streamLink: schedStreamLink.trim() || null,
 			isUncut: schedIsUncut
@@ -143,6 +147,7 @@ let schedEditIsUncut = $state(false);
 			return;
 		}
 		schedPlatformId = '';
+		schedTitle = '';
 		schedAirDate = '';
 		schedStreamLink = '';
 		schedIsUncut = false;
@@ -167,6 +172,7 @@ let schedEditIsUncut = $state(false);
 	function startEditSchedule(sched: EpisodeSchedule) {
 		scheduleEditId = sched.id;
 		schedEditPlatformId = sched.platformId;
+		schedEditTitle = sched.title ?? '';
 		schedEditAirDate = formatDateForEdit(sched.airDate);
 		schedEditStreamLink = sched.streamLink ?? '';
 		schedEditIsUncut = sched.isUncut;
@@ -187,6 +193,7 @@ let schedEditIsUncut = $state(false);
 		const res = await editorApi.updateEpisodeSchedule(sched.id, {
 			episodeId: sched.episodeId,
 			platformId: schedEditPlatformId,
+			title: schedEditTitle.trim() || null,
 			airDate: schedEditAirDate,
 			streamLink: schedEditStreamLink.trim() || null,
 			isUncut: schedEditIsUncut
@@ -318,6 +325,7 @@ let schedEditIsUncut = $state(false);
 														<SearchableSelect bind:value={schedEditPlatformId} options={reference.platforms.map((p) => ({ id: p.id, label: p.name }))} placeholder="ค้นหาช่องทาง..." emptyText="ไม่พบช่องทาง" />
 														<input type="datetime-local" bind:value={schedEditAirDate} class="w-full px-3 py-2 rounded-lg border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
 													</div>
+													<input type="text" bind:value={schedEditTitle} placeholder="ชื่อตอนย่อย เช่น EP.1 [1/4]" class="w-full px-3 py-2 rounded-lg border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
 													<input type="url" bind:value={schedEditStreamLink} placeholder="ลิงก์สตรีม (ถ้ามี)" class="w-full px-3 py-2 rounded-lg border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
 													<div class="flex items-center justify-between gap-2">
 														<label class="flex items-center gap-2 text-sm text-plum cursor-pointer select-none">
@@ -335,6 +343,7 @@ let schedEditIsUncut = $state(false);
 													<div class="flex-1 min-w-0">
 														<div class="flex items-center gap-1.5 flex-wrap">
 															<span class="text-sm font-medium text-plum">{sched.platformName}</span>
+															{#if sched.title}<span class="text-xs text-plum-light">{sched.title}</span>{/if}
 															{#if sched.isUncut}
 																<span class="px-1.5 py-0.5 rounded-md bg-coral/15 text-coral-dark text-[10px] font-semibold">Uncut</span>
 															{/if}
@@ -364,6 +373,7 @@ let schedEditIsUncut = $state(false);
 										<SearchableSelect bind:value={schedPlatformId} options={reference.platforms.map((p) => ({ id: p.id, label: p.name }))} placeholder="ค้นหาช่องทาง..." emptyText="ไม่พบช่องทาง" />
 										<input type="datetime-local" bind:value={schedAirDate} class="w-full px-3 py-2 rounded-lg border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
 									</div>
+									<input type="text" bind:value={schedTitle} placeholder="ชื่อตอนย่อย เช่น EP.1 [1/4]" class="w-full px-3 py-2 rounded-lg border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
 									<input type="url" bind:value={schedStreamLink} placeholder="ลิงก์สตรีม (ถ้ามี)" class="w-full px-3 py-2 rounded-lg border border-lavender/30 bg-white/60 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
 									<div class="flex items-center justify-between gap-2">
 										<label class="flex items-center gap-2 text-sm text-plum cursor-pointer select-none">

@@ -269,11 +269,12 @@
 													{/if}
 													<div class="min-w-0">
 														<div class="flex items-center gap-1">
-															<span class="text-sm font-medium text-plum truncate">{sch.platform}</span>
+															<span class="text-sm font-medium text-plum truncate">{sch.title || sch.platform}</span>
 															{#if sch.isUncut}
 																<span class="shrink-0 px-1 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[8px] font-bold">Uncut</span>
 															{/if}
 														</div>
+														{#if sch.title}<div class="text-xs text-plum-light">{sch.platform}</div>{/if}
 														<div class="text-xs text-plum-light">{sch.airDate}</div>
 													</div>
 												</div>

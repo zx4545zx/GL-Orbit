@@ -21,6 +21,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			id: episodeSchedules.id,
 			episodeId: episodeSchedules.episodeId,
 			platformId: episodeSchedules.platformId,
+			title: episodeSchedules.title,
 			airDate: episodeSchedules.airDate,
 			streamLink: episodeSchedules.streamLink,
 			isUncut: episodeSchedules.isUncut,
@@ -58,7 +59,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	const db = await getDb();
 	const body = await request.json();
 
-	const { episodeId, platformId, airDate, streamLink, isUncut } = body;
+	const { episodeId, platformId, title, airDate, streamLink, isUncut } = body;
 
 	if (!episodeId || !platformId || !airDate) {
 		error(400, 'กรุณากรอกข้อมูลให้ครบถ้วน (episodeId, platformId, airDate)');
@@ -69,6 +70,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		.values({
 			episodeId,
 			platformId,
+			title: typeof title === 'string' ? title.trim() || null : null,
 			airDate: new Date(airDate + '+07:00'),
 			streamLink: streamLink ?? null,
 			isUncut: isUncut ?? false

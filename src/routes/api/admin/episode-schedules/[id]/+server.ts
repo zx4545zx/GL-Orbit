@@ -17,7 +17,7 @@ export const PUT: RequestHandler = async ({ locals, params, request }) => {
 	const db = await getDb();
 	const body = await request.json();
 
-	const { episodeId, platformId, airDate, streamLink, isUncut } = body;
+	const { episodeId, platformId, title, airDate, streamLink, isUncut } = body;
 
 	if (!episodeId || !platformId || !airDate) {
 		error(400, 'กรุณากรอกข้อมูลให้ครบถ้วน (episodeId, platformId, airDate)');
@@ -28,6 +28,7 @@ export const PUT: RequestHandler = async ({ locals, params, request }) => {
 		.set({
 			episodeId,
 			platformId,
+			title: typeof title === 'string' ? title.trim() || null : null,
 			airDate: new Date(airDate + '+07:00'),
 			streamLink: streamLink ?? null,
 			isUncut: isUncut ?? false

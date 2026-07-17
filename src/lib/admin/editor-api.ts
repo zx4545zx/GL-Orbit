@@ -58,6 +58,7 @@ export const editorApi = {
 	addEpisodeSchedule: (body: {
 		episodeId: string;
 		platformId: string;
+		title: string | null;
 		airDate: string;
 		streamLink: string | null;
 		isUncut: boolean;
@@ -65,6 +66,7 @@ export const editorApi = {
 	updateEpisodeSchedule: (id: string, body: {
 		episodeId: string;
 		platformId: string;
+		title: string | null;
 		airDate: string;
 		streamLink: string | null;
 		isUncut: boolean;

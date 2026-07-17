@@ -32,7 +32,7 @@ export type SeriesDetail = {
 		title: string;
 		coverUrl: string | null;
 		trailerUrl: string | null;
-		schedules: { airDate: string; platform: string; platformLogo: string | null; streamLink: string | null; isUncut: boolean }[];
+		schedules: { title: string | null; airDate: string; platform: string; platformLogo: string | null; streamLink: string | null; isUncut: boolean }[];
 	}[];
 };
 
@@ -42,6 +42,7 @@ type ScheduleRow = {
 	platformId: string | null;
 	platformName: string | null;
 	platformLogo: string | null;
+	title: string | null;
 	streamLink: string | null;
 	isUncut: boolean;
 };
@@ -133,6 +134,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 					platformId: platforms.id,
 					platformName: platforms.name,
 					platformLogo: platforms.logoUrl,
+					title: episodeSchedules.title,
 					streamLink: episodeSchedules.streamLink,
 					isUncut: episodeSchedules.isUncut
 				})
@@ -222,6 +224,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 			coverUrl: ep.coverUrl ?? null,
 			trailerUrl: ep.trailerUrl ?? null,
 			schedules: rows.map((sch) => ({
+				title: sch.title,
 				airDate: sch.airDate ? formatThailandDate(sch.airDate) : 'TBA',
 				platform: sch.platformName ?? 'TBA',
 				platformLogo: sch.platformLogo ?? null,

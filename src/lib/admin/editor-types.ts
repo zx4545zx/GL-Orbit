@@ -50,6 +50,7 @@ export interface EpisodeSchedule {
 	episodeId: string;
 	platformId: string;
 	platformName: string;
+	title: string | null;
 	airDate: string; // ISO format (yyyy-mm-ddThh:mm:ss.sssZ)
 	streamLink: string | null;
 	isUncut: boolean;

@@ -1,0 +1,1 @@
+ALTER TABLE "episode_schedules" ADD COLUMN "title" varchar(255);
