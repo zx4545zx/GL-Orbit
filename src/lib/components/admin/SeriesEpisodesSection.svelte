@@ -169,6 +169,27 @@
 		await onrefresh();
 	}
 
+	async function duplicateSchedule(sched: EpisodeSchedule) {
+		busy = true;
+		busyText = 'กำลังทำซ้ำช่องทาง...';
+		error = '';
+		const res = await editorApi.addEpisodeSchedule({
+			episodeId: sched.episodeId,
+			platformId: sched.platformId,
+			title: sched.title,
+			airDate: formatDateForEdit(sched.airDate),
+			streamLink: sched.streamLink,
+			isUncut: sched.isUncut
+		});
+		busy = false;
+		busyText = '';
+		if (!res.ok) {
+			error = res.error ?? 'ทำซ้ำไม่สำเร็จ';
+			return;
+		}
+		await onrefresh();
+	}
+
 	function startEditSchedule(sched: EpisodeSchedule) {
 		scheduleEditId = sched.id;
 		schedEditPlatformId = sched.platformId;
@@ -353,8 +374,11 @@
 															<a href={sched.streamLink} target="_blank" rel="noopener" class="text-xs text-lavender-dark hover:underline truncate block mt-0.5">🔗 {sched.streamLink}</a>
 														{/if}
 													</div>
-													<div class="flex gap-1 flex-shrink-0">
-														<button type="button" onclick={() => startEditSchedule(sched)} aria-label="แก้ไขช่องทาง" class="p-1.5 rounded-lg hover:bg-lavender/10 text-plum-light hover:text-lavender-dark transition-colors touch-target">
+														<div class="flex gap-1 flex-shrink-0">
+															<button type="button" onclick={() => duplicateSchedule(sched)} disabled={busy} aria-label="ทำซ้ำช่องทาง" class="p-1.5 rounded-lg hover:bg-lavender/10 text-plum-light hover:text-lavender-dark transition-colors touch-target disabled:opacity-50">
+																<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h9a3 3 0 013 3v9m-4 2H7a3 3 0 01-3-3V7a3 3 0 013-3h9a3 3 0 013 3v9" /></svg>
+															</button>
+															<button type="button" onclick={() => startEditSchedule(sched)} aria-label="แก้ไขช่องทาง" class="p-1.5 rounded-lg hover:bg-lavender/10 text-plum-light hover:text-lavender-dark transition-colors touch-target">
 															<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
 														</button>
 														<button type="button" onclick={() => removeSchedule(sched.id)} disabled={busy} aria-label="ลบช่องทาง" class="p-1.5 rounded-lg hover:bg-coral/10 text-plum-light hover:text-coral-dark transition-colors touch-target disabled:opacity-50">

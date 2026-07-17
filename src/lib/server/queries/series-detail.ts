@@ -144,6 +144,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 					inArray(episodeSchedules.episodeId, episodeIds),
 					isNull(episodeSchedules.deletedAt)
 				))
+				.orderBy(asc(episodeSchedules.airDate), asc(episodeSchedules.title))
 			: [];
 
 		return { episodes: episodesResult, schedule: scheduleResult };

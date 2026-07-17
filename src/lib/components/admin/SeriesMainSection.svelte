@@ -34,6 +34,7 @@
 	let saving = $state(false);
 	let saved = $state(false);
 	let error = $state('');
+	let activeSection = $state<'details' | 'gallery'>('details');
 
 	let galleryImageUrl = $state('');
 	let galleryCaption = $state('');
@@ -182,7 +183,13 @@
 </script>
 
 <div class="space-y-6">
-	<section class="overflow-hidden rounded-3xl border border-lavender/20 bg-white/55 shadow-lg shadow-lavender/5">
+	<div role="tablist" aria-label="จัดการข้อมูลซีรีส์" class="flex w-fit rounded-2xl border border-lavender/20 bg-white/70 p-1 shadow-sm shadow-lavender/10">
+		<button type="button" role="tab" aria-selected={activeSection === 'details'} aria-controls="series-details" onclick={() => (activeSection = 'details')} class="min-h-10 rounded-xl px-4 text-sm font-bold transition {activeSection === 'details' ? 'bg-coral text-white shadow-md shadow-coral/20' : 'text-plum-light hover:text-plum'}">ข้อมูลหลัก</button>
+		<button type="button" role="tab" aria-selected={activeSection === 'gallery'} aria-controls="series-gallery" onclick={() => (activeSection = 'gallery')} class="min-h-10 rounded-xl px-4 text-sm font-bold transition {activeSection === 'gallery' ? 'bg-lavender-dark text-white shadow-md shadow-lavender/20' : 'text-plum-light hover:text-plum'}">Gallery</button>
+	</div>
+
+	{#if activeSection === 'details'}
+	<section id="series-details" role="tabpanel" class="overflow-hidden rounded-3xl border border-lavender/20 bg-white/55 shadow-lg shadow-lavender/5">
 		<div class="border-b border-lavender/15 bg-gradient-to-r from-coral/10 via-white/30 to-lavender/10 px-4 py-4 sm:px-6">
 			<p class="text-xs font-bold uppercase tracking-[0.2em] text-coral-dark">Metadata</p>
 			<h2 class="mt-1 text-lg font-bold text-plum">ข้อมูลหลักของซีรีส์</h2>
@@ -200,16 +207,17 @@
 				<div><div class="mb-1.5 flex items-center justify-between"><span class="text-sm font-semibold text-plum">สตูดิโอ</span><button type="button" onclick={() => openCreate('studio')} class="text-xs font-bold text-coral-dark hover:text-coral">+ สร้างใหม่</button></div><SearchableSelect bind:value={studioId} options={reference.studios.map((studio) => ({ id: studio.id, label: studio.name }))} placeholder="ค้นหาสตูดิโอ..." emptyText="ไม่พบสตูดิโอ" /></div>
 			</div>
 			<div class="rounded-2xl border border-lavender/20 bg-lavender/5 p-4"><div class="mb-3 flex items-start justify-between gap-3"><div><h3 class="text-sm font-semibold text-plum">ประเภทซีรีส์</h3><p class="text-xs text-plum-light">เลือกได้หลายประเภท</p></div><button type="button" onclick={() => openCreate('genre')} class="text-xs font-bold text-coral-dark hover:text-coral">+ สร้างใหม่</button></div><div class="flex flex-wrap gap-2">{#each reference.genres as genre (genre.id)}{@const active = selectedGenreIds.includes(genre.id)}<button type="button" onclick={() => toggleGenre(genre.id)} class="min-h-10 rounded-full px-3 text-sm font-medium transition {active ? 'bg-coral text-white shadow-md shadow-coral/20' : 'border border-lavender/30 bg-white/75 text-plum-light hover:border-coral/40'}">{genre.name}</button>{/each}</div></div>
+			<div class="border-t border-lavender/15 pt-6"><div class="mb-4"><h3 class="text-base font-bold text-plum">ภาพปกซีรีส์</h3><p class="text-sm text-plum-light">โปสเตอร์และภาพปกจะบันทึกพร้อมข้อมูลหลัก</p></div><div class="grid gap-4 sm:grid-cols-2"><div class="rounded-2xl border border-lavender/15 bg-white/60 p-3"><ImageUpload bind:url={posterUrl} type="posters" purpose="poster" label="โปสเตอร์" /></div><div class="rounded-2xl border border-lavender/15 bg-white/60 p-3"><ImageUpload bind:url={coverUrl} type="covers" purpose="cover" label="ภาพปกแนวนอน" /></div></div></div>
 			{#if error}<p class="rounded-xl bg-coral/10 px-3 py-2 text-sm text-coral-dark">{error}</p>{/if}
-			<div class="flex flex-wrap items-center gap-3 border-t border-lavender/15 pt-5"><button type="button" onclick={save} disabled={saving || !metadataDirty} class="min-h-11 rounded-xl bg-gradient-to-r from-coral to-coral-dark px-5 text-sm font-bold text-white shadow-lg shadow-coral/20 transition hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50">{saving ? 'กำลังบันทึก...' : 'บันทึกข้อมูลหลัก'}</button>{#if metadataDirty}<span class="text-sm text-plum-light">มีการแก้ไขที่ยังไม่บันทึก</span>{/if}{#if saved}<span class="text-sm font-medium text-mint-dark">บันทึกแล้ว</span>{/if}</div>
+			<div class="flex flex-wrap items-center justify-end gap-3 border-t border-lavender/15 pt-5">{#if metadataDirty}<span class="text-sm text-plum-light">มีการแก้ไขที่ยังไม่บันทึก</span>{/if}{#if saved}<span class="text-sm font-medium text-mint-dark">บันทึกแล้ว</span>{/if}<button type="button" onclick={save} disabled={saving || !metadataDirty} class="min-h-11 rounded-xl bg-gradient-to-r from-coral to-coral-dark px-5 text-sm font-bold text-white shadow-lg shadow-coral/20 transition hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50">{saving ? 'กำลังบันทึก...' : 'บันทึกข้อมูลหลัก'}</button></div>
 		</div>
 	</section>
 
-	<section class="overflow-hidden rounded-3xl border border-lavender/20 bg-white/55 shadow-lg shadow-lavender/5">
-		<div class="border-b border-lavender/15 bg-gradient-to-r from-lavender/10 via-white/30 to-mint/10 px-4 py-4 sm:px-6"><p class="text-xs font-bold uppercase tracking-[0.2em] text-lavender-dark">Media</p><h2 class="mt-1 text-lg font-bold text-plum">ภาพและ Gallery</h2><p class="mt-1 text-sm text-plum-light">โปสเตอร์และภาพปกบันทึกพร้อมข้อมูลหลัก · Gallery บันทึกทันที</p></div>
+	{:else}
+	<section id="series-gallery" role="tabpanel" class="overflow-hidden rounded-3xl border border-lavender/20 bg-white/55 shadow-lg shadow-lavender/5">
+		<div class="border-b border-lavender/15 bg-gradient-to-r from-lavender/10 via-white/30 to-mint/10 px-4 py-4 sm:px-6"><p class="text-xs font-bold uppercase tracking-[0.2em] text-lavender-dark">Gallery</p><h2 class="mt-1 text-lg font-bold text-plum">Gallery รูปซีรีส์</h2><p class="mt-1 text-sm text-plum-light">เพิ่ม ลบ และจัดลำดับรูปจะบันทึกทันที</p></div>
 		<div class="space-y-6 p-4 sm:p-6">
-			<div class="grid gap-4 sm:grid-cols-2"><div class="rounded-2xl border border-lavender/15 bg-white/60 p-3"><ImageUpload bind:url={posterUrl} type="posters" purpose="poster" label="โปสเตอร์" /></div><div class="rounded-2xl border border-lavender/15 bg-white/60 p-3"><ImageUpload bind:url={coverUrl} type="covers" purpose="cover" label="ภาพปกแนวนอน" /></div></div>
-			<div class="border-t border-lavender/15 pt-6"><div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><h3 class="text-base font-bold text-plum">Gallery รูปซีรีส์</h3><p class="text-sm text-plum-light">เพิ่ม ลบ และจัดลำดับรูปจะบันทึกทันที</p></div><span class="text-xs font-semibold text-lavender-dark">{gallery.length} รูป</span></div>
+			<div><div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><span class="text-xs font-semibold text-lavender-dark">{gallery.length} รูป</span></div>
 				<div class="grid gap-5 lg:grid-cols-[minmax(14rem,18rem)_1fr]"><div class="rounded-2xl border border-dashed border-lavender/35 bg-lavender/5 p-4"><div class="space-y-3"><ImageUpload bind:url={galleryImageUrl} type="posters" purpose="gallery" label="เพิ่มรูป Gallery" /><div><label for="gallery-caption" class="mb-1.5 block text-sm font-semibold text-plum">Caption <span class="font-normal text-plum-light">(ไม่บังคับ)</span></label><input id="gallery-caption" type="text" bind:value={galleryCaption} placeholder="เช่น ฉากริมทะเล" class="w-full rounded-xl border border-lavender/30 bg-white/75 px-3 py-2.5 text-sm text-plum focus:outline-none focus:ring-2 focus:ring-coral/30" /></div><button type="button" onclick={addGalleryImage} disabled={galleryBusy || !galleryImageUrl.trim()} class="min-h-11 w-full rounded-xl bg-gradient-to-r from-lavender-dark to-coral px-4 text-sm font-bold text-white shadow-lg shadow-lavender/20 disabled:opacity-50">{galleryBusy ? 'กำลังบันทึก...' : 'เพิ่มรูป Gallery'}</button></div></div>
 					<div class="min-w-0">{#if gallery.length === 0}<div class="flex min-h-52 items-center justify-center rounded-2xl border border-dashed border-lavender/30 bg-white/40 p-6 text-center text-sm text-plum-light">ยังไม่มีรูป Gallery<br />เพิ่มรูปแรกจากด้านซ้ายได้เลย</div>{:else}<div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{#each gallery as image, index (image.id)}<article class="overflow-hidden rounded-2xl border border-white/80 bg-white/80 shadow-md shadow-lavender/10"><div class="aspect-video overflow-hidden bg-lavender/10"><Picture src={image.imageUrl} type="posters" sizes="(max-width: 640px) 100vw, 320px" alt={image.caption ?? `Gallery ${index + 1}`} width={320} height={180} loading="lazy" class="h-full w-full object-cover" /></div><div class="space-y-3 p-3"><p class="line-clamp-2 min-h-9 text-xs text-plum-light">{image.caption || 'ไม่มี caption'}</p><div class="flex items-center justify-between gap-2"><div class="flex gap-1"><button type="button" onclick={() => moveGalleryImage(index, -1)} disabled={galleryBusy || index === 0} class="min-h-9 rounded-lg border border-lavender/25 px-2 text-xs font-semibold text-plum-light disabled:opacity-35">ขึ้น</button><button type="button" onclick={() => moveGalleryImage(index, 1)} disabled={galleryBusy || index === gallery.length - 1} class="min-h-9 rounded-lg border border-lavender/25 px-2 text-xs font-semibold text-plum-light disabled:opacity-35">ลง</button></div><button type="button" onclick={() => removeGalleryImage(image.id)} disabled={galleryBusy} class="min-h-9 rounded-lg bg-coral/10 px-2 text-xs font-bold text-coral-dark disabled:opacity-35">ลบ</button></div></div></article>{/each}</div>{/if}</div></div>
 				{#if galleryMessage}<p aria-live="polite" class="mt-4 rounded-xl bg-mint/15 px-3 py-2 text-sm font-medium text-mint-dark">{galleryMessage}</p>{/if}
@@ -217,6 +225,7 @@
 			</div>
 		</div>
 	</section>
+	{/if}
 </div>
 
 <EntityCreateModal bind:open={createOpen} bind:loading={createLoading} bind:error={createError} title={createType === 'studio' ? 'สร้างสตูดิโอใหม่' : 'สร้างประเภทใหม่'} fields={[{ key: 'name', label: createType === 'studio' ? 'ชื่อสตูดิโอ' : 'ชื่อประเภท', placeholder: 'เช่น GMMTV / Romance', required: true }]} onsubmit={handleCreate} />

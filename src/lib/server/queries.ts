@@ -96,7 +96,7 @@ export async function getSeriesFull(db: Db, id: string) {
 			.from(episodeSchedules)
 			.innerJoin(platforms, eq(episodeSchedules.platformId, platforms.id))
 			.where(and(inArray(episodeSchedules.episodeId, epIds), isNull(episodeSchedules.deletedAt)))
-			.orderBy(asc(episodeSchedules.airDate));
+			.orderBy(asc(episodeSchedules.airDate), asc(episodeSchedules.title));
 	}
 
 	const episodesOut = epRows.map((e) => ({
