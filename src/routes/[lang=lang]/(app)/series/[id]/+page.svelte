@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
 	import Picture from '$lib/components/Picture.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
@@ -191,6 +192,10 @@
 	const artistPath = (id: string) => localizedPath(currentLang, `/artists/${id}`);
 	const shipPath = (slug: string) => localizedPath(currentLang, `/ships/${slug}`);
 	const backHref = $derived(localizedPath(currentLang, '/series'));
+	const goBack = () => {
+		if (typeof history !== 'undefined' && history.length > 1) history.back();
+		else goto(localizedPath(currentLang, '/series'));
+	};
 </script>
 
 <svelte:head>
@@ -220,7 +225,7 @@
 		<!-- Cover, poster, and title each get their own visual plane. -->
 		<section class="relative isolate overflow-hidden rounded-[1.75rem] bg-white shadow-[0_36px_90px_-44px_rgba(45,27,46,0.35)] sm:rounded-[2.5rem]">
 			{#if series.coverUrl}
-				<div class="relative aspect-[16/9] overflow-hidden bg-lavender-light lg:aspect-[21/9]">
+				<div class="relative aspect-[21/9] overflow-hidden bg-lavender-light">
 					<Picture
 						src={series.coverUrl}
 						type="covers"
@@ -236,13 +241,14 @@
 			{/if}
 
 			<div class="z-0 flex items-center justify-between gap-3 p-4 sm:p-7 {series.coverUrl ? 'absolute inset-x-0 top-0' : 'relative border-b border-plum/5 bg-cream/60'}">
-				<a
-					href={backHref}
+				<button
+					type="button"
+					onclick={goBack}
 					class="inline-flex items-center gap-2 rounded-full bg-white/92 px-4 py-2 text-sm font-bold text-plum shadow-lg backdrop-blur-md transition hover:bg-coral hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
 					<span>{m.common_back()}</span>
-				</a>
+				</button>
 				{#if s}
 					<span class="inline-flex items-center gap-2 rounded-full border bg-white/92 px-3.5 py-2 text-xs font-black shadow-lg backdrop-blur-md sm:text-sm {s.chip}">
 						<span class="h-2 w-2 rounded-full {s.dot}"></span>
@@ -281,7 +287,9 @@
 			<div class="grid grid-cols-2 gap-2 min-[360px]:grid-cols-3 sm:gap-3">
 				<FavoriteButton seriesId={series.id} variant="orbit" />
 				<WatchedButton seriesId={series.id} variant="orbit" />
-				<ShareButton title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`} text={m.series_share_text({ title })} url={canonicalUrl} ariaLabel={m.series_share_aria_label()} variant="orbit" />
+				<div class="col-span-2 h-full w-[calc(50%-0.25rem)] justify-self-center min-[360px]:col-span-1 min-[360px]:w-full">
+					<ShareButton title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`} text={m.series_share_text({ title })} url={canonicalUrl} ariaLabel={m.series_share_aria_label()} variant="orbit" />
+				</div>
 			</div>
 
 			<div class="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-cream p-3 lg:mt-0 lg:grid-cols-[repeat(3,minmax(4.5rem,auto))_1fr] lg:items-center lg:gap-5">

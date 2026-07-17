@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import Picture from '$lib/components/Picture.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
@@ -66,6 +67,10 @@
 	const shipPath = (slug: string) => localizedPath(currentLang, `/ships/${slug}`);
 	const seriesPath = (id: string) => localizedPath(currentLang, `/series/${id}`);
 	const backHref = $derived(localizedPath(currentLang, '/artists'));
+	const goBack = () => {
+		if (typeof history !== 'undefined' && history.length > 1) history.back();
+		else goto(localizedPath(currentLang, '/artists'));
+	};
 
 	type SocialMeta = {
 		label: string;
@@ -123,13 +128,14 @@
 		<!-- Hero card: poster frame + title block. -->
 		<section class="relative isolate overflow-hidden rounded-[1.75rem] bg-white shadow-[0_36px_90px_-44px_rgba(45,27,46,0.35)] sm:rounded-[2.5rem]">
 			<div class="relative flex items-center justify-between gap-3 p-4 border-b border-plum/5 bg-cream/60 sm:p-7">
-				<a
-					href={backHref}
+				<button
+					type="button"
+					onclick={goBack}
 					class="inline-flex items-center gap-2 rounded-full bg-white/92 px-4 py-2 text-sm font-bold text-plum shadow-lg backdrop-blur-md transition hover:bg-coral hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
 					<span>{m.common_back()}</span>
-				</a>
+				</button>
 				<span class="inline-flex items-center gap-2 rounded-full border border-coral/30 bg-white/92 px-3.5 py-2 text-xs font-black text-coral-dark shadow-lg backdrop-blur-md sm:text-sm">
 					<span class="h-2 w-2 rounded-full bg-coral"></span>
 					<span>{m.common_cast()}</span>
@@ -160,34 +166,43 @@
 			</div>
 		</section>
 
-		<!-- Command deck: share button and fact tiles share one horizontal surface. -->
-		<div class="relative z-30 mx-3 mt-5 flex flex-col gap-3 overflow-visible rounded-[1.75rem] bg-white p-3 shadow-[0_28px_70px_-38px_rgba(45,27,46,0.65)] sm:mx-8 sm:p-5 lg:mx-14 lg:flex-row lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(14rem,auto)] lg:items-stretch lg:gap-3">
-			<div class="grid grid-cols-3 gap-2 rounded-2xl bg-cream p-3 lg:grid-cols-[repeat(3,minmax(4.5rem,auto))_1fr] lg:items-center lg:gap-5">
-				{#each primaryMeta as item}
-					<div class="min-w-0 text-center lg:text-left">
-						<div class="font-[family-name:var(--font-display)] text-xl font-black leading-none text-plum sm:text-2xl">{item.value}</div>
-						<div class="mt-1 truncate text-[9px] font-black uppercase tracking-[0.16em] text-plum-light/55 sm:text-[10px]">{item.label}</div>
-					</div>
-				{/each}
-				{#if artist.socials.length > 0}
-					<div class="col-span-3 mt-1 flex flex-wrap justify-center gap-1.5 lg:col-span-1 lg:mt-0 lg:justify-start">
-						{#each artist.socials as social (social.id)}
-							{@const meta = socialMeta(social.platform)}
-							<span class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-plum-light shadow-sm sm:text-xs">
-								<span aria-hidden="true" class="grid h-4 w-4 place-items-center rounded-full {meta.brandBadge} text-white">
-									<svg class="h-2.5 w-2.5" fill={meta.stroke ? 'none' : 'currentColor'} stroke={meta.stroke ? 'currentColor' : 'none'} viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={meta.icon} /></svg>
-								</span>
-								<span class="truncate">{meta.label}</span>
-							</span>
-						{/each}
-					</div>
-				{/if}
+		<!-- Artist telemetry: facts and sharing behave as one compact control board. -->
+		<section class="relative z-30 mx-3 mt-5 overflow-visible rounded-[2rem] bg-plum p-3 text-white shadow-[0_30px_70px_-36px_rgba(45,27,46,0.9)] sm:mx-8 sm:p-5 lg:mx-14" aria-label="Artist signals">
+			<div class="pointer-events-none absolute -right-10 -top-14 h-40 w-40 rounded-full border-[22px] border-white/5" aria-hidden="true"></div>
+			<div class="relative mb-3 flex items-end justify-between gap-4 px-2 pt-2 sm:mb-4">
+				<div class="min-w-0">
+					<p class="text-[9px] font-black uppercase tracking-[0.38em] text-coral-light sm:text-[10px]">Artist signals</p>
+					<p class="mt-1 truncate text-xs font-semibold text-white/55 sm:text-sm">{artist.nickname} / orbit data</p>
+				</div>
+				<span class="shrink-0 rounded-full bg-white/10 px-3 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-white/70 sm:text-[9px]">Live profile</span>
 			</div>
 
-			<div class="col-span-1 flex items-stretch justify-center min-[360px]:justify-end">
-				<ShareButton title={m.artist_share_title({ name: artist.nickname })} text={m.artist_share_text({ name: artist.nickname })} url={canonicalUrl} ariaLabel={m.artist_share_aria_label()} variant="orbit" ordinal={null} orientation="row" className="w-full h-full" />
+			<div class="relative grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+				{#each primaryMeta as item, index}
+					<div class="group relative flex min-h-[6.75rem] min-w-0 flex-col justify-between overflow-hidden rounded-[1.5rem] bg-white/10 p-4 transition duration-200 hover:-translate-y-0.5 hover:bg-white/15">
+						<span class="absolute right-4 top-3 font-[family-name:var(--font-display)] text-[9px] font-black tracking-[0.18em] text-white/25">0{index + 1}</span>
+						<div class="font-[family-name:var(--font-display)] text-3xl font-black leading-none text-white sm:text-4xl">{item.value}</div>
+						<div class="truncate text-[9px] font-black uppercase tracking-[0.18em] text-white/55 sm:text-[10px]">{item.label}</div>
+					</div>
+				{/each}
+				<ShareButton title={m.artist_share_title({ name: artist.nickname })} text={m.artist_share_text({ name: artist.nickname })} url={canonicalUrl} ariaLabel={m.artist_share_aria_label()} variant="orbit" ordinal={null} className="h-full w-full min-h-[6.75rem] !rounded-[1.5rem] sm:min-h-0" />
 			</div>
-		</div>
+
+			{#if artist.socials.length > 0}
+				<div class="relative mt-2 flex flex-wrap items-center gap-2 rounded-[1.35rem] bg-white/5 p-3 sm:mt-3 sm:px-4">
+					<span class="mr-1 text-[8px] font-black uppercase tracking-[0.24em] text-white/40 sm:text-[9px]">Signals</span>
+					{#each artist.socials as social (social.id)}
+						{@const meta = socialMeta(social.platform)}
+						<span class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1.5 text-[10px] font-bold text-white/80 sm:text-xs">
+							<span aria-hidden="true" class="grid h-4 w-4 place-items-center rounded-full {meta.brandBadge} text-white">
+								<svg class="h-2.5 w-2.5" fill={meta.stroke ? 'none' : 'currentColor'} stroke={meta.stroke ? 'currentColor' : 'none'} viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={meta.icon} /></svg>
+							</span>
+							<span class="truncate">{meta.label}</span>
+						</span>
+					{/each}
+				</div>
+			{/if}
+		</section>
 
 		<!-- Chapter 01: orbiting pairs sit inside a soft editorial interlude. -->
 		{#if artist.ships.length > 0}

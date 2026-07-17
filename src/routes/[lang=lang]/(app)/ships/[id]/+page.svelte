@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { m } from '$lib/i18n/paraglide.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import Picture from '$lib/components/Picture.svelte';
@@ -44,6 +45,10 @@
 	const artistPath = (id: string) => localizedPath(currentLang, `/artists/${id}`);
 	const seriesPath = (id: string) => localizedPath(currentLang, `/series/${id}`);
 	const backHref = $derived(localizedPath(currentLang, '/ships'));
+	const goBack = () => {
+		if (typeof history !== 'undefined' && history.length > 1) history.back();
+		else goto(localizedPath(currentLang, '/ships'));
+	};
 
 	const jsonLd = $derived(
 		safeJsonLd([
@@ -96,10 +101,10 @@
 		<!-- Hero card: poster frame + title block. -->
 		<section class="relative isolate overflow-hidden rounded-[1.75rem] bg-white shadow-[0_36px_90px_-44px_rgba(45,27,46,0.35)] sm:rounded-[2.5rem]">
 			<div class="relative flex items-center justify-between gap-3 p-4 border-b border-plum/5 bg-cream/60 sm:p-7">
-				<a href={backHref} class="inline-flex items-center gap-2 rounded-full bg-white/92 px-4 py-2 text-sm font-bold text-plum shadow-lg backdrop-blur-md transition hover:bg-coral hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target">
+				<button type="button" onclick={goBack} class="inline-flex items-center gap-2 rounded-full bg-white/92 px-4 py-2 text-sm font-bold text-plum shadow-lg backdrop-blur-md transition hover:bg-coral hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target">
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
 					<span>{m.common_back()}</span>
-				</a>
+				</button>
 				<span class="inline-flex items-center gap-2 rounded-full border border-coral/30 bg-white/92 px-3.5 py-2 text-xs font-black text-coral-dark shadow-lg backdrop-blur-md sm:text-sm">
 					<span class="h-2 w-2 rounded-full bg-coral"></span>
 					<span>{m.nav_ships()}</span>
@@ -148,7 +153,7 @@
 			</div>
 
 			<div class="col-span-1 flex items-stretch justify-center min-[360px]:justify-end">
-				<ShareButton title={shareTitle} text={shareText} url={canonicalUrl} ariaLabel={shareAriaLabel} variant="orbit" ordinal={null} orientation="row" className="w-full h-full" />
+				<ShareButton title={shareTitle} text={shareText} url={canonicalUrl} ariaLabel={shareAriaLabel} variant="orbit" ordinal={null} className="w-full h-full" />
 			</div>
 		</div>
 
