@@ -114,7 +114,31 @@
 			<div class="relative px-5 pb-8 pt-6 sm:px-10 sm:pb-10 sm:pt-8 lg:min-h-[25rem] lg:py-12 lg:pl-[22rem] lg:pr-14">
 				<div class="relative z-10 mx-auto w-[72vw] max-w-[15rem] rotate-[1.5deg] sm:w-[15rem] lg:absolute lg:bottom-6 lg:left-14 lg:rotate-[2.5deg]">
 					<div class="overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-[0_28px_65px_-24px_rgba(45,27,46,0.45)] ring-1 ring-plum/8">
-						<Picture src={ship.imageUrl} type="posters" sizes="(max-width: 333px) 72vw, 240px" alt={ship.name} width={480} height={720} loading="eager" class="aspect-[2/3] w-full rounded-[1.3rem] object-cover" />
+						{#if ship.hasImage}
+							<Picture src={ship.imageUrl} type="posters" sizes="(max-width: 333px) 72vw, 240px" alt={ship.name} width={480} height={720} loading="eager" class="aspect-[2/3] w-full rounded-[1.3rem] object-cover" />
+						{:else}
+							<div class="group relative aspect-[2/3] w-full overflow-hidden rounded-[1.3rem] bg-plum" role="img" aria-label={`${ship.name}: ${ship.artist1.name} and ${ship.artist2.name}`}>
+								<div class="absolute -left-12 -top-10 h-40 w-40 rounded-full bg-coral/45 blur-3xl transition duration-700 group-hover:scale-125" aria-hidden="true"></div>
+								<div class="absolute -bottom-12 -right-10 h-44 w-44 rounded-full bg-lavender/50 blur-3xl transition duration-700 group-hover:scale-125" aria-hidden="true"></div>
+								<div class="absolute left-1/2 top-[42%] h-36 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15" aria-hidden="true"></div>
+								<div class="absolute left-1/2 top-[42%] h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-white/25 motion-safe:animate-[spin_18s_linear_infinite]" aria-hidden="true"></div>
+
+								<div class="absolute left-[7%] top-[9%] w-[57%] -rotate-[7deg] overflow-hidden rounded-t-[999px] rounded-b-[1.15rem] border-[3px] border-white bg-coral-light shadow-2xl transition duration-500 group-hover:-rotate-[10deg] group-hover:scale-[1.03]">
+									<Picture src={ship.artist1.imageUrl} type="profiles" sizes="140px" alt={ship.artist1.name} width={320} height={400} loading="eager" class="aspect-[4/5] w-full object-cover object-top" />
+								</div>
+								<div class="absolute right-[6%] top-[27%] w-[57%] rotate-[7deg] overflow-hidden rounded-t-[999px] rounded-b-[1.15rem] border-[3px] border-white bg-lavender-light shadow-2xl transition duration-500 group-hover:rotate-[10deg] group-hover:scale-[1.03]">
+									<Picture src={ship.artist2.imageUrl} type="profiles" sizes="140px" alt={ship.artist2.name} width={320} height={400} loading="eager" class="aspect-[4/5] w-full object-cover object-top" />
+								</div>
+
+								<div class="absolute bottom-3 left-3 right-3 rounded-[1rem] bg-plum/80 px-3 py-2.5 text-white shadow-lg backdrop-blur-md">
+									<div class="flex items-center justify-between gap-2">
+										<span class="text-[7px] font-black uppercase tracking-[0.24em] text-coral-light">Duo portrait</span>
+										<span class="h-1.5 w-1.5 rounded-full bg-mint shadow-[0_0_12px_rgba(110,231,183,0.9)]" aria-hidden="true"></span>
+									</div>
+									<p class="mt-1 truncate font-[family-name:var(--font-display)] text-sm font-black tracking-[-0.03em]">{ship.name}</p>
+								</div>
+							</div>
+						{/if}
 					</div>
 					<div class="absolute -bottom-3 -left-3 grid h-14 w-14 -rotate-[8deg] place-items-center rounded-full bg-coral text-center text-white shadow-xl sm:h-16 sm:w-16 lg:-bottom-4 lg:-left-5 lg:h-20 lg:w-20">
 						<span class="font-[family-name:var(--font-display)] text-lg font-black leading-none sm:text-xl lg:text-2xl">{ship.series.length}<small class="mt-1 block text-[7px] font-bold uppercase tracking-[0.2em] lg:text-[8px]">{m.artist_works_count_label()}</small></span>
@@ -134,28 +158,37 @@
 			</div>
 		</section>
 
-		<!-- Command deck: share button and fact tiles share one horizontal surface. -->
-		<div class="relative z-30 mx-3 mt-5 flex flex-col gap-3 overflow-visible rounded-[1.75rem] bg-white p-3 shadow-[0_28px_70px_-38px_rgba(45,27,46,0.65)] sm:mx-8 sm:p-5 lg:mx-14 lg:flex-row lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(14rem,auto)] lg:items-stretch lg:gap-3">
-			<div class="grid grid-cols-3 gap-2 rounded-2xl bg-cream p-3 lg:grid-cols-[repeat(3,minmax(4.5rem,auto))_1fr] lg:items-center lg:gap-5">
-				{#each primaryMeta as item}
-					<div class="min-w-0 text-center lg:text-left">
-						<div class="font-[family-name:var(--font-display)] text-xl font-black leading-none text-plum sm:text-2xl">{item.value}</div>
-						<div class="mt-1 truncate text-[9px] font-black uppercase tracking-[0.16em] text-plum-light/55 sm:text-[10px]">{item.label}</div>
-					</div>
-				{/each}
-				{#if ship.hashtags.length > 0}
-					<div class="col-span-3 mt-1 flex flex-wrap justify-center gap-1.5 lg:col-span-1 lg:mt-0 lg:justify-start">
-						{#each ship.hashtags as tag}
-							<span class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-plum-light shadow-sm sm:text-xs">#{tag}</span>
-						{/each}
-					</div>
-				{/if}
+		<!-- Ship telemetry: pair facts and sharing live on one balanced control board. -->
+		<section class="relative z-30 mx-3 mt-5 overflow-visible rounded-[2rem] bg-plum p-3 text-white shadow-[0_30px_70px_-36px_rgba(45,27,46,0.9)] sm:mx-8 sm:p-5 lg:mx-14" aria-label="Ship signals">
+			<div class="pointer-events-none absolute -right-10 -top-14 h-40 w-40 rounded-full border-[22px] border-white/5" aria-hidden="true"></div>
+			<div class="relative mb-3 flex items-end justify-between gap-4 px-2 pt-2 sm:mb-4">
+				<div class="min-w-0">
+					<p class="text-[9px] font-black uppercase tracking-[0.38em] text-coral-light sm:text-[10px]">Ship signals</p>
+					<p class="mt-1 truncate text-xs font-semibold text-white/55 sm:text-sm">{ship.name} / pair telemetry</p>
+				</div>
+				<span class="shrink-0 rounded-full bg-white/10 px-3 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-white/70 sm:text-[9px]">Live orbit</span>
 			</div>
 
-			<div class="col-span-1 flex items-stretch justify-center min-[360px]:justify-end">
-				<ShareButton title={shareTitle} text={shareText} url={canonicalUrl} ariaLabel={shareAriaLabel} variant="orbit" ordinal={null} className="w-full h-full" />
+			<div class="relative grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+				{#each primaryMeta as item, index}
+					<div class="group relative flex min-h-[6.75rem] min-w-0 flex-col justify-between overflow-hidden rounded-[1.5rem] bg-white/10 p-4 transition duration-200 hover:-translate-y-0.5 hover:bg-white/15">
+						<span class="absolute right-4 top-3 font-[family-name:var(--font-display)] text-[9px] font-black tracking-[0.18em] text-white/25">0{index + 1}</span>
+						<div class="font-[family-name:var(--font-display)] text-3xl font-black leading-none text-white sm:text-4xl">{item.value}</div>
+						<div class="truncate text-[9px] font-black uppercase tracking-[0.18em] text-white/55 sm:text-[10px]">{item.label}</div>
+					</div>
+				{/each}
+				<ShareButton title={shareTitle} text={shareText} url={canonicalUrl} ariaLabel={shareAriaLabel} variant="orbit" ordinal={null} className="h-full w-full min-h-[6.75rem] !rounded-[1.5rem] sm:min-h-0" />
 			</div>
-		</div>
+
+			{#if ship.hashtags.length > 0}
+				<div class="relative mt-2 flex flex-wrap items-center gap-2 rounded-[1.35rem] bg-white/5 p-3 sm:mt-3 sm:px-4">
+					<span class="mr-1 text-[8px] font-black uppercase tracking-[0.24em] text-white/40 sm:text-[9px]">Hashtags</span>
+					{#each ship.hashtags as tag}
+						<span class="inline-flex max-w-full items-center rounded-full bg-white/10 px-2.5 py-1.5 text-[10px] font-bold text-white/80 sm:text-xs">#{tag}</span>
+					{/each}
+				</div>
+			{/if}
+		</section>
 
 		{#if ship.description}
 			<section class="mt-16 sm:mt-24 perf-section">

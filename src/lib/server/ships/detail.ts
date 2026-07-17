@@ -9,6 +9,7 @@ export type ShipDetail = {
 	slug: string;
 	name: string;
 	imageUrl: string;
+	hasImage: boolean;
 	description: string;
 	startedAt: Date | null;
 	hashtags: string[];
@@ -85,6 +86,7 @@ export async function getShipDetail(identifier: string): Promise<ShipDetail | nu
 		slug: row.slug,
 		name: row.name,
 		imageUrl: row.imageUrl ?? DEFAULT_SHIP_IMAGE,
+		hasImage: Boolean(row.imageUrl),
 		description: row.description ?? '',
 		startedAt: row.startedAt,
 		hashtags: row.hashtags ?? [],
