@@ -235,7 +235,7 @@
 				</div>
 			{/if}
 
-			<div class="z-20 flex items-center justify-between gap-3 p-4 sm:p-7 {series.coverUrl ? 'absolute inset-x-0 top-0' : 'relative border-b border-plum/5 bg-cream/60'}">
+			<div class="z-0 flex items-center justify-between gap-3 p-4 sm:p-7 {series.coverUrl ? 'absolute inset-x-0 top-0' : 'relative border-b border-plum/5 bg-cream/60'}">
 				<a
 					href={backHref}
 					class="inline-flex items-center gap-2 rounded-full bg-white/92 px-4 py-2 text-sm font-bold text-plum shadow-lg backdrop-blur-md transition hover:bg-coral hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target"
@@ -251,8 +251,8 @@
 				{/if}
 			</div>
 
-			<div class="relative px-5 pb-8 pt-6 sm:px-10 sm:pb-10 sm:pt-8 lg:min-h-[25rem] lg:py-12 lg:pl-[22rem] lg:pr-14">
-				<div class="relative z-10 mx-auto w-[72vw] max-w-[15rem] rotate-[1.5deg] sm:w-[15rem] lg:absolute lg:bottom-6 lg:left-14 lg:rotate-[2.5deg]">
+			<div class="relative px-5 pb-8 pt-6 sm:px-10 sm:pb-10 sm:pt-8 lg:min-h-[28rem] lg:py-12 lg:pl-[26rem] lg:pr-14">
+				<div class="relative z-10 mx-auto w-[78vw] max-w-[18rem] rotate-[1.5deg] sm:w-[18rem] lg:absolute lg:bottom-6 lg:left-14 lg:rotate-[2.5deg]">
 					<div class="overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-[0_28px_65px_-24px_rgba(45,27,46,0.45)] ring-1 ring-plum/8">
 						<Picture src={series.poster} type="posters" sizes="(max-width: 333px) 72vw, 240px" alt={series.titleEn} width={480} height={720} loading="eager" class="aspect-[2/3] w-full rounded-[1.3rem] object-cover" />
 					</div>
@@ -263,7 +263,7 @@
 
 				<div class="mt-6 min-w-0 text-center lg:mt-0 lg:text-left">
 					<p class="mb-4 text-[10px] font-black uppercase tracking-[0.42em] text-coral-dark sm:text-xs">GL-ORBIT / SERIES FILE</p>
-					<h1 class="break-words font-[family-name:var(--font-display)] text-[clamp(2rem,10vw,2.5rem)] font-black leading-[0.86] tracking-[-0.07em] text-plum [overflow-wrap:anywhere] sm:text-6xl lg:text-7xl xl:text-8xl">
+					<h1 class="break-words font-[family-name:var(--font-display)] text-[clamp(1.75rem,7.5vw,2.25rem)] font-black leading-[0.92] tracking-[-0.04em] text-plum [overflow-wrap:anywhere] sm:text-4xl lg:text-5xl xl:text-6xl">
 						{series.titleEn}
 					</h1>
 					{#if series.titleTh}
