@@ -117,17 +117,17 @@
 
 	function prevMonth() {
 		const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
-		navigateCalendar(`/${lang}/calendar?year=${newDate.getFullYear()}&month=${newDate.getMonth() + 1}`);
+		navigateCalendar(getViewUrl(viewMode === 'grid' ? 'grid' : 'calendar', lang, newDate.getFullYear(), newDate.getMonth() + 1, null, null));
 	}
 
 	function nextMonth() {
 		const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
-		navigateCalendar(`/${lang}/calendar?year=${newDate.getFullYear()}&month=${newDate.getMonth() + 1}`);
+		navigateCalendar(getViewUrl(viewMode === 'grid' ? 'grid' : 'calendar', lang, newDate.getFullYear(), newDate.getMonth() + 1, null, null));
 	}
 
 	function goToToday() {
 		const today = new Date();
-		navigateCalendar(`/${lang}/calendar?year=${today.getFullYear()}&month=${today.getMonth() + 1}`);
+		navigateCalendar(getViewUrl(viewMode === 'grid' ? 'grid' : 'calendar', lang, today.getFullYear(), today.getMonth() + 1, null, null));
 	}
 
 	function prevWeek() {
@@ -144,12 +144,12 @@
 		navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}&view=${viewMode}`);
 	}
 
-	async function goToThisWeek() {
-		viewMode = 'card';
+	async function goToThisWeek(view: 'card' | 'list') {
+		viewMode = view;
 		const today = new Date();
 		const start = getStartOfWeek(today);
 		const end = getEndOfWeek(today);
-		await navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}&view=card`);
+		await navigateCalendar(`/${lang}/calendar?startDate=${formatDateLocal(start)}&endDate=${formatDateLocal(end)}&view=${view}`);
 		await scrollToSchedule();
 	}
 
@@ -404,7 +404,7 @@
 
 		<div class="relative mt-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 			<button
-				onclick={goToThisWeek}
+				onclick={() => goToThisWeek('card')}
 				class="inline-flex w-full lg:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-coral to-coral-dark px-5 py-3 text-sm font-bold text-white shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
 			>
 				{m.calendar_this_week_cta()}
@@ -681,7 +681,7 @@
 			currentWeek={currentWeek}
 			onPrevWeek={prevWeek}
 			onNextWeek={nextWeek}
-			onThisWeek={goToThisWeek}
+			onThisWeek={() => goToThisWeek('list')}
 		/>
 
 		{#if contentLoading}
@@ -769,7 +769,7 @@
 			currentWeek={currentWeek}
 			onPrevWeek={prevWeek}
 			onNextWeek={nextWeek}
-			onThisWeek={goToThisWeek}
+			onThisWeek={() => goToThisWeek('card')}
 		/>
 
 		{#if contentLoading}

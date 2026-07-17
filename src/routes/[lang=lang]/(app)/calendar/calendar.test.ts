@@ -159,10 +159,11 @@ describe('calendar page loading structure — source-level regression', () => {
 		expect(todayPos).toBeLessThan(todayLoadingPos);
 	});
 
-	it('goToThisWeek is delegated to shared CalendarWeekHeader component', () => {
+	it('This Week controls preserve the selected week-view mode', () => {
 		const source = readFileSync(pagePath, 'utf-8');
-		const thisWeekPropPos = source.indexOf('onThisWeek={goToThisWeek}');
-		expect(thisWeekPropPos).toBeGreaterThan(0);
+		expect(source).toContain("onclick={() => goToThisWeek('card')}");
+		expect(source).toContain("onThisWeek={() => goToThisWeek('list')}");
+		expect(source).toContain("onThisWeek={() => goToThisWeek('card')}");
 	});
 
 	it('uses skeleton instead of text-based loading indicator', () => {
@@ -221,5 +222,12 @@ describe('calendar page loading structure — source-level regression', () => {
 		const hasBtnKeyPattern = source.includes(`getViewUrl(btn.key`);
 		expect(hasPerModeGuard).toBe(false);
 		expect(hasBtnKeyPattern).toBe(true);
+	});
+
+	it('month navigation preserves the active monthly view in the URL', () => {
+		const source = readFileSync(pagePath, 'utf-8');
+		const monthlyViewUrl = "getViewUrl(viewMode === 'grid' ? 'grid' : 'calendar'";
+
+		expect(source.split(monthlyViewUrl)).toHaveLength(4);
 	});
 });
