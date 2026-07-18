@@ -243,7 +243,7 @@
 						style="animation-delay: {idx * 60}ms"
 					>
 						<a href="/{page.data.lang}/series/{event.seriesId}" class="flex gap-3">
-							<div class="relative flex-shrink-0">
+							<div class="relative flex self-stretch flex-shrink-0 overflow-hidden">
 								<Picture
 									src={event.posterUrl}
 									type="posters"
@@ -251,7 +251,7 @@
 									alt={event.series}
 									width={64}
 									height={90}
-									class="w-20 h-28 sm:w-24 sm:h-32 rounded-lg object-cover shadow-sm bg-white/50"
+									class="block h-full w-20 sm:w-24 object-cover shadow-sm bg-white/50"
 									loading="lazy"
 								/>
 								{#if event.isUncut}

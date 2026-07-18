@@ -616,19 +616,21 @@
 
 						<div class="space-y-2 sm:space-y-3">
 							{#each selectedEvents as event}
-								<div class="glass-card-strong rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:shadow-lg transition-all">
-									<div class="flex gap-3 sm:gap-4">
-										<Picture
-											src={event.posterUrl}
-											type="posters"
-											sizes="4rem"
-											alt={event.series}
-											width={64}
-											height={90}
-											class="w-14 h-20 sm:w-20 sm:h-28 rounded-lg sm:rounded-xl object-cover shadow-sm flex-shrink-0 bg-white/50"
-											loading="lazy"
-										/>
-										<div class="flex-1 min-w-0">
+								<div class="glass-card-strong rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-lg transition-all">
+									<div class="flex min-h-[117px] sm:min-h-[144px] gap-3 sm:gap-4">
+										<div class="flex aspect-[9/16] self-stretch flex-shrink-0 overflow-hidden">
+											<Picture
+												src={event.posterUrl}
+												type="posters"
+												sizes="4rem"
+												alt={event.series}
+												width={64}
+												height={90}
+												class="block h-full w-full object-cover shadow-sm bg-white/50"
+												loading="lazy"
+											/>
+										</div>
+										<div class="flex-1 min-w-0 py-3 sm:py-4 pr-3 sm:pr-4">
 											<div class="flex items-center gap-2 mb-1.5 sm:mb-2">
 												<span class="px-2 py-0.5 rounded-lg bg-coral/10 text-coral-dark text-xs font-bold">{event.time}</span>
 												{#if event.isUncut}
@@ -715,21 +717,21 @@
 						</div>
 						<div class="divide-y divide-lavender/10">
 							{#each day.items as item}
-								<div class="px-4 sm:px-6 py-4 sm:py-5 flex items-center gap-3 sm:gap-5 hover:bg-white/40 transition-colors group">
-									<Picture
-										src={item.posterUrl}
-										type="posters"
-										sizes="4rem"
-										alt={item.series}
-										width={64}
-										height={90}
-										class="w-10 h-14 sm:w-12 sm:h-16 rounded-lg object-cover shadow-sm flex-shrink-0 bg-white/50"
-										loading="lazy"
-									/>
-									<div class="flex-shrink-0 w-12 sm:w-16 text-center">
-										<div class="text-base sm:text-lg font-bold text-coral-dark">{item.time}</div>
+								<div class="pr-4 sm:pr-6 min-h-[89px] sm:min-h-[104px] flex items-center gap-3 sm:gap-5 hover:bg-white/40 transition-colors group">
+									<div class="flex aspect-[9/16] self-stretch flex-shrink-0 overflow-hidden">
+										<Picture
+											src={item.posterUrl}
+											type="posters"
+											sizes="4rem"
+											alt={item.series}
+											width={64}
+											height={90}
+											class="block h-full w-full object-cover shadow-sm bg-white/50"
+											loading="lazy"
+										/>
 									</div>
 									<div class="flex-1 min-w-0">
+										<div class="mb-0.5 text-xs sm:text-sm font-bold text-coral-dark">{item.time}</div>
 										<div class="flex items-center gap-2 mb-1">
 											<h3 class="font-semibold text-plum text-sm sm:text-base">{item.series}</h3>
 											{#if item.isUncut}
