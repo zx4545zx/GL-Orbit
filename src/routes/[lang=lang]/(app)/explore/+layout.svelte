@@ -28,7 +28,7 @@
 
 		<!-- Static tab switcher (in-flow, not floating) -->
 		<nav>
-			<div class="inline-flex glass-card-strong rounded-2xl p-1.5 gap-1">
+			<div class="inline-flex glass-card-strong rounded-2xl p-0 gap-0">
 				{#each tabs as tab (tab.id)}
 					{@const active = isActive(tab.href)}
 					<a

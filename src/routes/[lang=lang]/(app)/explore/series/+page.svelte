@@ -187,7 +187,7 @@
 
 	<!-- Status Filter -->
 	<div class="flex justify-center">
-		<div class="orbit-surface rounded-xl p-1.5 flex gap-1 overflow-x-auto">
+		<div class="orbit-surface rounded-xl p-0 flex gap-0 overflow-x-auto">
 			{#each filterOptions as filter}
 				<button
 					onclick={() => updateStatus(filter.key)}
