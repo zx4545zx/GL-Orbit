@@ -10,7 +10,7 @@ export const COVER_IMAGE_REQUIREMENTS = {
 export const IMAGE_VARIANTS = {
 	posters: { widths: [480, 768, 1080], formats: ['avif', 'webp', 'jpg'] as const, fallback: 1080 },
 	covers: { widths: [960, 1440, 1800], formats: ['avif', 'webp', 'jpg'] as const, fallback: 1800 },
-	profiles: { widths: [320, 640], formats: ['avif', 'webp', 'jpg'] as const, fallback: 640 },
+	profiles: { widths: [320, 640, 1080], formats: ['avif', 'webp', 'jpg'] as const, fallback: 1080 },
 	moments: { widths: [480, 1080], formats: ['avif', 'webp', 'jpg'] as const, fallback: 1080 }
 } as const satisfies Record<ImageType, { widths: number[]; formats: readonly ImageExt[]; fallback: number }>;
 
@@ -19,7 +19,7 @@ export type VariantSet = { avif: SrcEntry[]; webp: SrcEntry[]; jpg: SrcEntry[] }
 
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 // New convention: .../images/{type}/{uuid}/{w}.{ext}
-const CANONICAL_RE = new RegExp(`^(.*\\/images)\\/(posters|covers|profiles|moments)\\/(${UUID})\\/\\d+\\.(jpg|png|webp)$`);
+const CANONICAL_RE = new RegExp(`^(.*\\/images)\\/(posters|covers|profiles|moments)\\/(${UUID})\\/(\\d+)\\.(jpg|png|webp)$`);
 // Legacy:        .../images/{type}/{uuid}.{ext}
 const LEGACY_RE = new RegExp(`^(.*\\/images)\\/(posters|covers|profiles|moments)\\/(${UUID})\\.(jpg|png|webp)$`);
 
@@ -60,9 +60,11 @@ export function parseLegacyUrl(
 export function deriveVariantUrls(canonicalUrl: string, type: ImageType): VariantSet | null {
 	const m = CANONICAL_RE.exec(canonicalUrl);
 	if (!m) return null;
-	const [, base, t, uuid] = m;
+	const [, base, t, uuid, sourceWidth] = m;
 	if (t !== type) return null;
-	const widths = IMAGE_VARIANTS[type].widths;
+	// Older uploads only have variants up to the width in their canonical URL.
+	// Do not advertise larger source candidates until the image is re-uploaded.
+	const widths = IMAGE_VARIANTS[type].widths.filter((width) => width <= Number(sourceWidth));
 	const make = (ext: ImageExt): SrcEntry[] =>
 		widths.map((w) => ({ url: `${base}/${type}/${uuid}/${w}.${ext}`, width: w }));
 	return { avif: make('avif'), webp: make('webp'), jpg: make('jpg') };

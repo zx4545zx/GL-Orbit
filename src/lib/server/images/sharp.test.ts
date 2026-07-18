@@ -26,7 +26,7 @@ describe('generateVariants', () => {
 			.jpeg().toBuffer();
 		const variants = await generateVariants(small, 'profiles');
 		// widths should be exactly the configured widths, not clamped to source
-		expect(variants.map((v) => v.width)).toEqual([320, 320, 320, 640, 640, 640]);
+		expect(variants.map((v) => v.width)).toEqual([320, 320, 320, 640, 640, 640, 1080, 1080, 1080]);
 	});
 
 	it('each variant buffer is a valid image of correct format', async () => {

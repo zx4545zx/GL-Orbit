@@ -60,6 +60,11 @@ describe('deriveVariantUrls', () => {
 		expect(v!.avif.map((e) => e.width)).toEqual([320, 640]);
 	});
 
+	it('uses the larger profile variant for new uploads', () => {
+		const v = deriveVariantUrls(`${BASE}/profiles/${UUID}/1080.jpg`, 'profiles');
+		expect(v!.avif.map((e) => e.width)).toEqual([320, 640, 1080]);
+	});
+
 	it('handles moments type', () => {
 		const v = deriveVariantUrls(`${BASE}/moments/${UUID}/1080.jpg`, 'moments');
 		expect(v!.avif.map((e) => e.width)).toEqual([480, 1080]);
@@ -110,8 +115,8 @@ describe('IMAGE_VARIANTS', () => {
 		expect(IMAGE_VARIANTS.posters.fallback).toBe(1080);
 		expect(IMAGE_VARIANTS.covers.widths).toEqual([960, 1440, 1800]);
 		expect(IMAGE_VARIANTS.covers.fallback).toBe(1800);
-		expect(IMAGE_VARIANTS.profiles.widths).toEqual([320, 640]);
-		expect(IMAGE_VARIANTS.profiles.fallback).toBe(640);
+		expect(IMAGE_VARIANTS.profiles.widths).toEqual([320, 640, 1080]);
+		expect(IMAGE_VARIANTS.profiles.fallback).toBe(1080);
 		expect(IMAGE_VARIANTS.moments.widths).toEqual([480, 1080]);
 		expect(IMAGE_VARIANTS.moments.fallback).toBe(1080);
 	});
