@@ -224,7 +224,7 @@
 				<header class="mb-8 flex flex-wrap items-end justify-between gap-5 sm:mb-12">
 					<div>
 						<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">02 / Filmography</p>
-						<h2 id="filmography-heading" class="mt-2 text-5xl font-black text-plum sm:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.artist_works_heading()}</h2>
+						<h2 id="filmography-heading" class="mt-2 text-[clamp(1.875rem,9vw,3rem)] font-black text-plum sm:text-6xl lg:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.artist_works_heading()}</h2>
 					</div>
 					<div class="flex min-h-11 items-center border border-plum bg-mint px-3 text-center font-[family-name:var(--font-display)] text-xl font-black text-plum sm:grid sm:h-24 sm:w-24 sm:place-items-center sm:px-0 sm:text-4xl">
 						<span>{artist.series.length}<small class="ml-1 text-[7px] font-black uppercase tracking-[0.2em] sm:ml-0 sm:block sm:text-[8px]">{m.artist_works_count_label()}</small></span>
@@ -260,7 +260,7 @@
 			<section class="mt-20 border-t-2 border-plum pt-6 sm:mt-28 sm:pt-9" aria-labelledby="filmography-heading">
 				<header class="mb-6 sm:mb-14">
 					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">02 / Filmography</p>
-					<h2 id="filmography-heading" class="mt-2 text-5xl font-black text-plum sm:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.artist_works_heading()}</h2>
+					<h2 id="filmography-heading" class="mt-2 text-[clamp(1.875rem,9vw,3rem)] font-black text-plum sm:text-6xl lg:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.artist_works_heading()}</h2>
 				</header>
 				<div class="border border-[var(--orbit-line-strong)] bg-white p-8 text-center sm:p-12">
 					<p class="font-[family-name:var(--font-display)] text-xl font-black text-plum sm:text-2xl">{m.artist_detail_empty_title()}</p>
