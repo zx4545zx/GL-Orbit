@@ -118,7 +118,7 @@
 
 <!-- Mobile Day Tabs -->
 <div class="md:hidden mb-4">
-	<div class="glass-card rounded-xl p-1.5 grid grid-cols-8 gap-1 min-[360px]:flex min-[360px]:justify-between" role="tablist" aria-label={m.calendar_card_select_day_aria()}>
+	<div class="glass-card rounded-xl grid grid-cols-8 gap-1 p-1.5 min-[360px]:grid-cols-7 min-[360px]:p-1" role="tablist" aria-label={m.calendar_card_select_day_aria()}>
 		{#each weekDayNames as day, i}
 			{@const date = getDayDate(i)}
 			{@const active = selectedMobileDay === i}
@@ -128,7 +128,7 @@
 				aria-selected={active}
 				aria-label="{day} {date.getDate()}"
 				onclick={() => selectMobileDay(i)}
-				class="col-span-2 flex-1 flex flex-col items-center justify-start py-2 rounded-lg text-xs font-medium transition-colors duration-200 touch-target min-w-0 {i === 4 ? 'col-start-2' : ''} {active ? 'bg-coral text-white' : 'text-plum-light hover:bg-coral-light hover:text-coral-dark'}"
+				class="col-span-2 min-[360px]:col-span-1 flex flex-col items-center justify-start py-2 rounded-lg text-xs font-medium transition-colors duration-200 touch-target min-w-0 {i === 4 ? 'col-start-2 min-[360px]:col-start-auto' : ''} {active ? 'bg-coral text-white' : 'text-plum-light hover:bg-coral-light hover:text-coral-dark'}"
 			>
 				<span class="font-bold">{weekDayNamesShort[i]}</span>
 				<span class="text-[10px] opacity-80 mt-0.5 truncate w-full px-1 text-center">{date.getDate()}</span>
