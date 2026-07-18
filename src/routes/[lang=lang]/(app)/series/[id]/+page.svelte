@@ -300,8 +300,7 @@
 		{#if description}
 			<section class="mt-20 grid border-t border-[var(--orbit-line-strong)] sm:mt-28 lg:grid-cols-12" aria-labelledby="synopsis-heading">
 				<header class="pt-6 lg:col-span-3 lg:pr-8 lg:pt-8">
-					<p class="font-[family-name:var(--font-display)] text-4xl font-black leading-none tracking-[-0.06em] text-coral/35 sm:text-6xl">01</p>
-					<p class="mt-3 text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">Story file</p>
+					<p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">Story file</p>
 					<h2 id="synopsis-heading" class="mt-2 max-w-xs text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-[0.95] tracking-[-0.05em]'}">{m.series_detail_synopsis()}</h2>
 				</header>
 
@@ -344,8 +343,7 @@
 			<section class="mt-24 border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8" aria-labelledby="cast-heading">
 				<header class="mb-8 flex flex-wrap items-end justify-between gap-5 sm:mb-12">
 					<div>
-						<p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">02 / Ensemble</p>
-						<h2 id="cast-heading" class="mt-2 text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.common_cast()}</h2>
+						<h2 id="cast-heading" class="text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.common_cast()}</h2>
 					</div>
 					<div class="flex min-h-11 items-center border border-[var(--orbit-line-strong)] bg-mint px-3 text-center font-[family-name:var(--font-display)] text-xl font-black text-plum sm:px-4 sm:text-2xl">
 						<span>{series.artists.length}<small class="ml-1 text-[8px] font-black uppercase tracking-[0.18em]">{m.common_people()}</small></span>
@@ -421,8 +419,7 @@
 		{#if series.schedule.length > 0}
 			<section class="mt-24 grid border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-12" aria-labelledby="schedule-heading">
 				<header class="pb-8 lg:sticky lg:top-28 lg:self-start lg:pb-0">
-					<p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">05 / Episodes</p>
-					<h2 id="schedule-heading" class="mt-2 max-w-xs text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-[0.95] tracking-[-0.05em]'}">{m.common_schedule()}</h2>
+					<h2 id="schedule-heading" class="max-w-xs text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-[0.95] tracking-[-0.05em]'}">{m.common_schedule()}</h2>
 					<p class="mt-4 max-w-[14rem] text-sm font-medium leading-6 text-plum-light/60">{series.schedule.length} {m.common_episodes()}</p>
 					<button onclick={toggleAll} class="mt-4 inline-flex items-center gap-2 rounded-md bg-plum px-4 py-2.5 text-xs font-bold text-white transition hover:bg-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target" aria-label={allExpanded ? m.common_collapse_all() : m.common_expand_all()}>
 						<span>{allExpanded ? m.common_collapse_all() : m.common_expand_all()}</span>
