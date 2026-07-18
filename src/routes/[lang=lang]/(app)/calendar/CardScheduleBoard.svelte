@@ -17,6 +17,9 @@
 		return new Intl.DateTimeFormat(l, { weekday: 'long' }).format(date);
 	}
 	function getWeekDayShort(date: Date, l: string) {
+		if (l.startsWith('th')) {
+			return ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'][date.getDay()];
+		}
 		return new Intl.DateTimeFormat(l, { weekday: 'short' }).format(date);
 	}
 	function getMonthShort(date: Date, l: string) {
@@ -30,13 +33,13 @@
 	const weekDayNamesShort = $derived(Array.from({ length: 7 }, (_, i) => getWeekDayShort(new Date(2024, 0, 1 + i), lang)));
 
 	const dayColorClasses = [
-		'from-coral/15 to-coral/5',
-		'from-orange-300/15 to-orange-300/5',
-		'from-lavender/15 to-lavender/5',
-		'from-emerald-300/15 to-emerald-300/5',
-		'from-teal-300/15 to-teal-300/5',
-		'from-blue-300/15 to-blue-300/5',
-		'from-rose-300/15 to-rose-300/5'
+		'bg-coral/10',
+		'bg-orange-300/10',
+		'bg-lavender/15',
+		'bg-emerald-300/10',
+		'bg-teal-300/10',
+		'bg-blue-300/10',
+		'bg-rose-300/10'
 	];
 
 	function getDayDate(index: number): Date {
@@ -115,7 +118,7 @@
 
 <!-- Mobile Day Tabs -->
 <div class="md:hidden mb-4">
-	<div class="glass-card rounded-2xl p-1.5 flex justify-between" role="tablist" aria-label={m.calendar_card_select_day_aria()}>
+	<div class="glass-card rounded-xl p-1.5 grid grid-cols-8 gap-1 min-[360px]:flex min-[360px]:justify-between" role="tablist" aria-label={m.calendar_card_select_day_aria()}>
 		{#each weekDayNames as day, i}
 			{@const date = getDayDate(i)}
 			{@const active = selectedMobileDay === i}
@@ -125,14 +128,14 @@
 				aria-selected={active}
 				aria-label="{day} {date.getDate()}"
 				onclick={() => selectMobileDay(i)}
-				class="flex-1 flex flex-col items-center justify-start py-2 rounded-xl text-xs font-medium transition-all duration-200 touch-target min-w-0 {active ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/50'}"
+				class="col-span-2 flex-1 flex flex-col items-center justify-start py-2 rounded-lg text-xs font-medium transition-colors duration-200 touch-target min-w-0 {i === 4 ? 'col-start-2' : ''} {active ? 'bg-coral text-white' : 'text-plum-light hover:bg-coral-light hover:text-coral-dark'}"
 			>
 				<span class="font-bold">{weekDayNamesShort[i]}</span>
 				<span class="text-[10px] opacity-80 mt-0.5 truncate w-full px-1 text-center">{date.getDate()}</span>
 				{#if hasEvents}
-					<span class="mt-1 min-w-4 h-4 px-1 rounded-full text-[9px] leading-4 {active ? 'bg-white/20 text-white' : 'bg-coral/10 text-coral-dark'}">{scheduleMap[i]?.items.length}</span>
+					<span class="mt-1 min-w-4 h-4 px-1 rounded-full text-[9px] leading-4 {active ? 'bg-white text-coral-dark' : 'bg-coral-light text-coral-dark'}">{scheduleMap[i]?.items.length}</span>
 				{:else}
-					<span class="mt-1 w-1 h-1 rounded-full {active ? 'bg-white/40' : 'bg-plum-light/20'}"></span>
+					<span class="mt-1 w-1 h-1 rounded-full {active ? 'bg-coral' : 'bg-plum-light/20'}"></span>
 				{/if}
 			</button>
 		{/each}
@@ -146,8 +149,8 @@
 		{@const schedule = scheduleMap[i]}
 		{@const events = schedule?.items.slice().sort(sortByTime) ?? []}
 		{@const today = isToday(date)}
-		<div class="flex flex-col min-h-[320px] rounded-2xl overflow-hidden glass-card">
-			<div class="px-3 py-3 text-center bg-gradient-to-b {dayColorClasses[i]} border-b border-white/50">
+		<div class="flex flex-col min-h-[320px] rounded-xl overflow-hidden glass-card">
+			<div class="px-3 py-3 text-center {dayColorClasses[i]} border-b border-[var(--orbit-line)]">
 				<div class="text-xs font-medium opacity-80 mb-0.5 {today ? 'text-coral-dark' : 'text-plum-light'}">{day}</div>
 				<div class="font-[family-name:var(--font-display)] text-lg font-bold text-plum flex items-center justify-center gap-1.5">
 					{#if today}
@@ -162,7 +165,7 @@
 					{#each events as event, idx (event.series + event.time + event.episode)}
 						<article
 							aria-label={m.calendar_event_aria({ series: event.series, episode: event.episode, time: event.time })}
-							class="group glass-card-strong rounded-xl p-2.5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer animate-fade-in"
+							class="group overflow-hidden glass-card-strong rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer animate-fade-in"
 							style="animation-delay: {idx * 60}ms"
 						>
 							<a href="/{page.data.lang}/series/{event.seriesId}" class="block">
@@ -181,7 +184,7 @@
 										<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-coral text-white text-[9px] font-bold shadow-sm">Uncut</span>
 									{/if}
 								</div>
-								<div class="space-y-1">
+								<div class="space-y-1 px-2.5 pb-2.5">
 									<div class="flex flex-col gap-1">
 										<span class="text-sm font-bold text-coral-dark">{event.time}</span>
 										<span class="text-[10px] px-1.5 py-0.5 rounded-md border w-fit {platformClass(event.platforms[0])}">{event.platforms[0]}</span>
@@ -209,10 +212,10 @@
 
 <!-- Mobile Selected Day Cards -->
 <div class="md:hidden space-y-3" role="tabpanel" aria-label={m.calendar_card_day_items_aria({ day: mobileDay })}>
-	<div class="glass-card rounded-2xl p-4">
+	<div class="glass-card rounded-xl p-4">
 		<div class="flex items-center justify-between gap-3 mb-4">
 			<div class="flex items-center gap-3 min-w-0">
-				<div class="w-11 h-11 rounded-xl bg-gradient-to-br {dayColorClasses[selectedMobileDay]} flex items-center justify-center flex-shrink-0">
+				<div class="w-11 h-11 rounded-xl {dayColorClasses[selectedMobileDay]} flex items-center justify-center flex-shrink-0">
 					<span class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{weekDayNamesShort[selectedMobileDay]}</span>
 				</div>
 				<div class="min-w-0">
@@ -236,7 +239,7 @@
 				{#each mobileEvents as event, idx (event.series + event.time + event.episode)}
 					<article
 						aria-label={m.calendar_event_aria({ series: event.series, episode: event.episode, time: event.time })}
-						class="group glass-card-strong rounded-xl p-3 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 animate-fade-in"
+						class="group overflow-hidden glass-card-strong rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 animate-fade-in"
 						style="animation-delay: {idx * 60}ms"
 					>
 						<a href="/{page.data.lang}/series/{event.seriesId}" class="flex gap-3">
@@ -255,7 +258,7 @@
 									<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-coral text-white text-[9px] font-bold shadow-sm">Uncut</span>
 								{/if}
 							</div>
-							<div class="flex-1 min-w-0 flex flex-col justify-center">
+							<div class="flex-1 min-w-0 flex flex-col justify-center py-3 pr-3">
 								<div class="flex items-center gap-2 mb-1.5">
 									<span class="text-base font-bold text-coral-dark">{event.time}</span>
 									<span class="text-[10px] px-2 py-0.5 rounded-md border {platformClass(event.platforms[0])}">{event.platforms[0]}</span>

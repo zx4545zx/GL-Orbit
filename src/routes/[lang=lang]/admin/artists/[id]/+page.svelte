@@ -184,7 +184,7 @@
 			<div class="grid grid-cols-2 lg:flex lg:flex-col gap-1.5 lg:sticky lg:top-6">
 				{#each tabs as tab (tab.id)}
 					{@const active = activeTab === tab.id}
-					<button type="button" onclick={() => (activeTab = tab.id)} class="flex items-center justify-center lg:justify-start gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap {active ? 'bg-gradient-to-r from-coral/10 to-lavender/10 text-coral-dark shadow-sm' : 'text-plum-light hover:bg-white/60 hover:text-plum bg-white/40 lg:bg-transparent'}">
+					<button type="button" onclick={() => (activeTab = tab.id)} class="flex items-center justify-center lg:justify-start gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap {active ? 'bg-coral/10 text-coral-dark shadow-sm' : 'text-plum-light hover:bg-white/60 hover:text-plum bg-white/40 lg:bg-transparent'}">
 						<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={tab.icon} /></svg>
 						<span>{tab.label}</span>
 						{#if tab.id === 'socials'}<span class="ml-auto px-1.5 py-0.5 rounded-md text-[10px] font-semibold {active ? 'bg-coral/15 text-coral-dark' : 'bg-lavender/15 text-plum-light'}">{data.socials.length}</span>{/if}
@@ -222,7 +222,7 @@
 							</div>
 						</div>
 						{#if artistError}<p class="text-sm text-coral-dark bg-coral/5 px-3 py-2 rounded-lg">{artistError}</p>{/if}
-						<div class="flex items-center gap-3 pt-2"><button onclick={saveArtist} disabled={savingArtist} class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 text-sm sm:text-base touch-target disabled:opacity-60">{savingArtist ? 'กำลังบันทึก...' : 'บันทึกข้อมูลนักแสดง'}</button>{#if artistSaved}<span class="text-sm text-mint-dark">บันทึกแล้ว</span>{/if}</div>
+						<div class="flex items-center gap-3 pt-2"><button onclick={saveArtist} disabled={savingArtist} class="orbit-action rounded-xl px-6 py-2.5 font-semibold text-sm sm:text-base touch-target disabled:opacity-60">{savingArtist ? 'กำลังบันทึก...' : 'บันทึกข้อมูลนักแสดง'}</button>{#if artistSaved}<span class="text-sm text-mint-dark">บันทึกแล้ว</span>{/if}</div>
 					</div>
 				{:else}
 					<div class="space-y-5">

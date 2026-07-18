@@ -119,22 +119,9 @@ import Picture from '$lib/components/Picture.svelte';
 </svelte:head>
 
 <!-- Hero -->
-<section class="relative overflow-hidden -mx-4 px-4 pt-4 sm:pt-8 pb-10 sm:pb-14">
-	<!-- background atmosphere (same as home hero: mesh + floating blobs + orbit) -->
-	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
-	<div class="absolute top-4 left-2 sm:left-10 w-44 h-44 sm:w-72 sm:h-72 bg-coral/20 rounded-full blur-3xl animate-float pointer-events-none"></div>
-	<div class="absolute top-24 right-2 sm:right-12 w-52 h-52 sm:w-80 sm:h-80 bg-lavender/20 rounded-full blur-3xl animate-float-delayed pointer-events-none"></div>
-	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[460px] sm:h-[460px] bg-mint/10 rounded-full blur-3xl pointer-events-none"></div>
-
-	<!-- orbiting particles — signature of GL-Orbit -->
-	<div class="absolute top-20 right-6 sm:top-24 sm:right-24 w-[170px] h-[170px] sm:w-[230px] sm:h-[230px] pointer-events-none">
-		<div class="absolute w-2.5 h-2.5 bg-coral rounded-full animate-orbit opacity-70"></div>
-		<div class="absolute w-2 h-2 bg-lavender rounded-full animate-orbit opacity-50 orbit-delay-lavender"></div>
-		<div class="absolute w-1.5 h-1.5 bg-mint rounded-full animate-orbit opacity-60 orbit-delay-mint"></div>
-	</div>
-
-	<div class="relative z-10 max-w-3xl mx-auto">
-		<button onclick={() => history.back()} class="flex w-fit items-center gap-1.5 text-sm font-medium text-plum-light hover:text-coral-dark transition-colors mb-6 sm:mb-8 glass-card rounded-full pl-3 pr-4 py-2 touch-target">
+<section class="-mx-4 px-4 pt-4 sm:pt-8 pb-10 sm:pb-14">
+	<div class="max-w-3xl mx-auto">
+		<button onclick={() => history.back()} class="orbit-control flex w-fit items-center gap-1.5 text-sm font-medium text-plum-light hover:text-coral-dark transition-colors mb-6 sm:mb-8 rounded-lg pl-3 pr-4 py-2 touch-target">
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
 			{m.common_back()}
 		</button>
@@ -155,7 +142,7 @@ import Picture from '$lib/components/Picture.svelte';
 		</p>
 
 		<div class="mt-5 animate-slide-up stagger-3">
-			<span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-card text-plum-light text-xs sm:text-sm">
+			<span class="orbit-surface inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-plum-light text-xs sm:text-sm">
 				<svg class="w-4 h-4 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
 				{m.countdown_tracking_label()}
 				<span class="font-bold text-plum tabular-nums">{activeCountdowns.length}</span>
@@ -177,17 +164,12 @@ import Picture from '$lib/components/Picture.svelte';
 						href="/{page.data.lang}/series/{c.seriesId}"
 						class="group block animate-slide-up fill-mode-both {stagger60Class(i)}"
 					>
-						<article class="glass-card-strong rounded-[1.75rem] p-5 sm:p-6 relative overflow-hidden hover:-translate-y-1.5 transition-all duration-500 hover:shadow-2xl hover:shadow-coral/20 h-full flex flex-col">
-							<!-- playful sparkle badge: magic countdown -->
-							<div class="absolute top-3.5 right-3.5 z-10 animate-float float-delay-countdown-badge">
-								<div class="w-10 h-10 rounded-full bg-gradient-to-br from-coral to-lavender shadow-lg shadow-lavender/50 flex items-center justify-center">
+						<article class="orbit-surface rounded-2xl p-5 sm:p-6 relative overflow-hidden hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
+							<div class="absolute top-3.5 right-3.5 z-10">
+								<div class="w-10 h-10 rounded-lg bg-coral flex items-center justify-center">
 									<svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l1.4 6.6L20 10l-6.6 1.4L12 18l-1.4-6.6L4 10l6.6-1.4z"/></svg>
 								</div>
-								<span class="absolute -bottom-1 -left-2 w-2 h-2 rounded-full bg-mint shadow-[0_0_5px_rgba(110,231,183,0.95)]"></span>
 							</div>
-							<!-- decorative blobs -->
-							<div class="absolute -top-10 -right-10 w-32 h-32 bg-coral/15 rounded-full blur-2xl pointer-events-none"></div>
-							<div class="absolute -bottom-10 -left-10 w-32 h-32 bg-lavender/15 rounded-full blur-2xl pointer-events-none"></div>
 
 							<!-- header: poster + meta -->
 							<div class="relative flex items-center gap-3 mb-3 pr-12">
@@ -230,7 +212,7 @@ import Picture from '$lib/components/Picture.svelte';
 							</div>
 
 							<!-- air date -->
-							<div class="relative mt-5 pt-4 border-t border-lavender/20 text-center">
+							<div class="relative mt-5 pt-4 text-center">
 								<p class="text-xs text-plum-light">{c.airLabel}</p>
 							</div>
 						</article>
@@ -245,8 +227,7 @@ import Picture from '$lib/components/Picture.svelte';
 	<div class="relative w-32 h-32 sm:w-36 sm:h-36">
 		<!-- dashed orbital ring -->
 		<div class="absolute inset-0 rounded-full border-2 border-dashed border-lavender/35"></div>
-		<!-- soft gradient halo inside -->
-		<div class="absolute inset-3 rounded-full bg-gradient-to-br from-coral/8 to-lavender/8"></div>
+		<div class="absolute inset-3 rounded-full bg-coral/8"></div>
 		<!-- orbiting satellite dot (traces the ring) -->
 		<div class="absolute inset-0 animate-[spin_9s_linear_infinite]">
 			<span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-coral shadow-[0_0_12px_rgba(255,107,157,0.85)]"></span>
@@ -261,7 +242,7 @@ import Picture from '$lib/components/Picture.svelte';
 
 {#snippet timeUnit(value: string, label: string)}
 	<div class="flex flex-col items-center gap-1">
-		<span class="min-w-[2.75rem] sm:min-w-[3.25rem] text-center rounded-xl bg-gradient-to-br from-plum to-plum-light text-cream px-2 py-1.5 text-2xl sm:text-3xl font-bold tabular-nums shadow-lg shadow-plum/20 ring-1 ring-white/10">
+			<span class="min-w-[2.75rem] sm:min-w-[3.25rem] text-center rounded-lg bg-plum text-cream px-2 py-1.5 text-2xl sm:text-3xl font-bold tabular-nums">
 			{value}
 		</span>
 		<span class="text-[10px] font-semibold text-plum-light/80">{label}</span>

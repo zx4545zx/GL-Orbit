@@ -116,7 +116,7 @@
 			<h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum mb-1">จัดการนักแสดง</h1>
 			<p class="text-sm sm:text-base text-plum-light">คลิกนักแสดงเพื่อจัดการข้อมูลและโซเชียลมีเดียในหน้าเดียว</p>
 		</div>
-		<button onclick={openCreate} class="px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm sm:text-base touch-target">
+		<button onclick={openCreate} class="orbit-action px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base touch-target">
 			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
 			เพิ่มนักแสดง
 		</button>
@@ -125,7 +125,7 @@
 	<form class="mb-4 sm:mb-6" onsubmit={(e) => e.preventDefault()}>
 		<div class="relative">
 			<svg class="w-5 h-5 text-plum-light/60 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-			<input type="text" bind:value={search} placeholder="ค้นหาชื่อเล่น / ชื่อ EN / ชื่อ TH..." class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-lavender/30 bg-white/70 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
+			<input type="text" bind:value={search} placeholder="ค้นหาชื่อเล่น / ชื่อ EN / ชื่อ TH..." class="orbit-control w-full pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
 		</div>
 	</form>
 
@@ -155,8 +155,8 @@
 				</div>
 				{#if createError}<p class="text-sm text-coral-dark">{createError}</p>{/if}
 				<div class="flex gap-2 pt-2">
-					<button type="submit" disabled={createLoading} class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 text-sm sm:text-base touch-target disabled:opacity-50">{createLoading ? 'กำลังสร้าง...' : 'สร้าง & จัดการ'}</button>
-					<button type="button" onclick={cancelCreate} class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-medium text-sm sm:text-base touch-target">ยกเลิก</button>
+					<button type="submit" disabled={createLoading} class="orbit-action px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base touch-target disabled:opacity-50">{createLoading ? 'กำลังสร้าง...' : 'สร้าง & จัดการ'}</button>
+					<button type="button" onclick={cancelCreate} class="orbit-control px-5 py-2.5 rounded-xl font-medium text-sm sm:text-base touch-target">ยกเลิก</button>
 				</div>
 			</form>
 		</div>

@@ -294,7 +294,7 @@
 				{#if currentUser.avatarUrl}
 					<Picture src={currentUser.avatarUrl} type="profiles" sizes="64px" alt="" width={32} height={32} loading="lazy" class="h-8 w-8 rounded-full object-cover" />
 				{:else}
-					<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-coral/20 to-lavender/25 text-xs font-black text-coral-dark">
+					<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-coral/10 text-xs font-black text-coral-dark">
 						{(currentUser.displayName || currentUser.username || 'U').charAt(0).toUpperCase()}
 					</div>
 				{/if}
@@ -467,9 +467,9 @@
 						{/if}
 					</div>
 				{/if}
-				<div class="relative overflow-hidden rounded-[1.65rem] border border-lavender/25 bg-white/95 p-2.5 shadow-2xl shadow-lavender/25 ring-1 ring-white/80 before:pointer-events-none before:absolute before:inset-0 before:rounded-[1.65rem] before:bg-gradient-to-r before:from-coral/5 before:via-lavender/5 before:to-mint/5">
+				<div class="relative overflow-hidden rounded-[1.65rem] border border-lavender/25 bg-white p-2.5 shadow-2xl shadow-lavender/25 ring-1 ring-white/80">
 					<div class="relative flex items-end gap-2">
-						<div class="hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-coral/20 to-lavender/25 text-xs font-black text-coral-dark shadow-inner shadow-white/40 sm:flex">
+						<div class="hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-coral/10 text-xs font-black text-coral-dark shadow-inner shadow-white/40 sm:flex">
 							AI
 						</div>
 						<textarea
@@ -481,7 +481,7 @@
 							class="max-h-36 min-h-11 flex-1 resize-none bg-transparent px-2 py-2.5 text-base leading-6 text-plum placeholder:text-plum-light/70 outline-none sm:px-3"
 							disabled={loading}
 						></textarea>
-						<button type="button" onclick={sendMessage} disabled={loading || !input.trim()} class="group flex h-11 shrink-0 items-center gap-2 rounded-2xl bg-gradient-to-br from-plum to-coral px-4 text-sm font-black text-white shadow-lg shadow-coral/20 transition hover:-translate-y-0.5 hover:shadow-coral/35 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-45 sm:px-5">
+						<button type="button" onclick={sendMessage} disabled={loading || !input.trim()} class="group flex h-11 shrink-0 items-center gap-2 rounded-2xl bg-plum px-4 text-sm font-black text-white shadow-lg shadow-coral/20 transition hover:-translate-y-0.5 hover:shadow-coral/35 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-45 sm:px-5">
 							<span class="hidden sm:inline">{m.chat_send()}</span>
 							<svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.4">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m0 0-5-5m5 5-5 5" />

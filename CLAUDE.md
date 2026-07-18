@@ -44,6 +44,14 @@ npx tsx scripts/seed-data.ts    # Wipes and re-seeds mock data (preserves ADMIN 
 - **Auth**: Custom JWT (`jose` + `bcryptjs`), not OAuth or an auth library
 - **Build**: Vite 6
 
+## Design System — Orbit Editorial Grid
+
+- Use grid as quiet structure: rectangular surfaces, thin semantic borders, measured spacing, and the existing coral/lavender/mint/plum palette.
+- Do not introduce rounded corners for containers, cards, inputs, buttons, menus, modals, or image frames. Prefer no `rounded-*` utility or `rounded-none`.
+- Circles are reserved for inherently circular data such as status dots or avatars, never decorative container framing; opt in explicitly with `.orbit-round-data` because the global migration guard removes legacy radii.
+- Avoid pill-heavy UI, repeated soft cards, gradient blobs, and heavy shadows. Use `--orbit-line` and `--orbit-line-strong` for grouping and hierarchy.
+- Keep keyboard focus visibility, 44×44px minimum touch targets, responsive reflow, and all loading/disabled/error states intact.
+
 ## Auth System
 
 - **Session**: JWT signed with HS256, 30-day expiry, stored in `httpOnly` cookie named `session`

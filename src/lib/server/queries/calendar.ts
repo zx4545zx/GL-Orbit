@@ -7,6 +7,11 @@ import type { CalendarApiResponse } from '$lib/types/calendar.js';
 
 const DEFAULT_POSTER = '/placeholders/poster.svg';
 const CACHE_TTL = 30_000;
+const episodeLabelCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+
+function formatEpisodeLabels(labels: string[]): string {
+	return [...labels].sort((a, b) => episodeLabelCollator.compare(a, b)).join(', ');
+}
 
 export type CalendarQuery =
 	| { type: 'month'; year: number; month: number }
@@ -216,9 +221,7 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 			eventsByDate[dateStr] = [];
 		}
 
-		const episodeText = event.episodes.length > 1
-			? event.episodes.join(', ')
-			: event.episodes[0];
+		const episodeText = formatEpisodeLabels(event.episodes);
 
 		eventsByDate[dateStr].push({
 			time: event.time,
@@ -287,7 +290,7 @@ export async function getCalendarData(query: CalendarQuery): Promise<CalendarApi
 			series: item.series,
 			seriesId: item.seriesId,
 			posterUrl: item.posterUrl,
-			episode: item.episodes.length > 1 ? item.episodes.join(', ') : item.episodes[0],
+			episode: formatEpisodeLabels(item.episodes),
 			platforms: item.platforms,
 			isUncut: item.isUncut
 		}))

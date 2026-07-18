@@ -140,22 +140,17 @@ import NotificationBadge from './NotificationBadge.svelte';
 <nav
 	class="fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300 {bottomNavHidden ? 'translate-y-full' : 'translate-y-0'}"
 >
-	<div class="bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(196,181,253,0.3)] overflow-hidden border-t border-lavender/15 safe-area-bottom">
-		<div class="flex items-stretch px-1">
+	<div class="overflow-hidden border-t border-[var(--orbit-line-strong)] bg-white safe-area-bottom">
+		<div class="flex items-stretch px-0">
 			{#each navItems as item}
 				{@const active = isActive(item.href)}
 				<a
 					href={item.href}
 					data-sveltekit-preload-data="hover"
 					aria-current={active ? 'page' : undefined}
-					class="group flex min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 px-1 py-2 touch-target transition-all duration-300"
+					class="group flex min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 border-r border-[var(--orbit-line)] px-1 py-2 touch-target transition-colors last:border-r-0 {active ? 'bg-plum text-white' : 'text-plum-light hover:bg-cream hover:text-plum'}"
 				>
 					<div class="relative flex items-center justify-center">
-						{#if active}
-							<div
-								class="absolute inset-0 -m-1 bg-gradient-to-br from-coral/15 to-lavender/15 rounded-xl transition-all duration-300"
-							></div>
-						{/if}
 						<div class="relative">
 							{@html item.icon(active)}
 							{#if item.href === `/${page.data.lang}/notifications`}
@@ -164,15 +159,11 @@ import NotificationBadge from './NotificationBadge.svelte';
 						</div>
 					</div>
 					<span
-						class="block max-w-full truncate text-center text-[10px] font-medium leading-none transition-all duration-300 {active ? 'text-plum font-semibold' : 'text-plum-light'}"
+						class="block max-w-full truncate text-center text-[10px] font-medium leading-none transition-all duration-300 {active ? 'text-white font-semibold' : 'text-plum-light'}"
 					>
 						{item.label}
 					</span>
-					{#if active}
-						<div class="w-1 h-1 rounded-full bg-coral-dark mt-0.5"></div>
-					{:else}
-						<div class="w-1 h-1 rounded-full bg-transparent mt-0.5"></div>
-					{/if}
+					<div class="mt-0.5 h-px w-5 {active ? 'bg-mint' : 'bg-transparent'}"></div>
 				</a>
 			{/each}
 		</div>

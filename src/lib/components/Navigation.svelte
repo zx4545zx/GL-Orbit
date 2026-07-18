@@ -112,11 +112,11 @@ import Picture from './Picture.svelte';
 <svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
 
 <nav class="fixed top-[var(--pwa-safe-top)] left-0 right-0 z-50 hidden md:block transition-transform duration-300 ease-out {navHidden ? '-translate-y-full' : 'translate-y-0'}">
-	<div class="bg-white mx-2 sm:mx-4 mt-2 sm:mt-4 rounded-2xl shadow-lg shadow-lavender/25 border border-lavender/15">
-		<div class="grid grid-cols-[minmax(12rem,1fr)_auto_minmax(12rem,1fr)] items-center gap-3 px-4 sm:px-6 py-3 sm:py-4">
+	<div class="border-b border-[var(--orbit-line-strong)] bg-white">
+		<div class="mx-auto grid max-w-7xl grid-cols-[minmax(12rem,1fr)_auto_minmax(12rem,1fr)] items-center gap-3 px-6 py-2">
 			<!-- Logo -->
 			<a href="/{page.data.lang}/" class="justify-self-start flex items-center gap-2 group touch-target">
-				<div class="relative w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-md shadow-lavender/20 transition-transform duration-300 group-hover:scale-105">
+				<div class="relative h-8 w-8 rounded-md bg-white sm:h-9 sm:w-9">
 					<img
 						src="/icons/gl-orbit-logo.svg"
 						alt=""
@@ -139,7 +139,7 @@ import Picture from './Picture.svelte';
 						href={link.href}
 						aria-label={link.label}
 						title={link.label}
-						class="relative px-3 xl:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 touch-target flex items-center justify-center gap-2 whitespace-nowrap {isActive(link.href) ? 'bg-coral/15 text-coral-dark font-semibold' : 'text-plum-light hover:bg-lavender/20 hover:text-plum'}"
+						class="relative flex items-center justify-center gap-2 whitespace-nowrap border-x border-transparent px-3 py-2 text-sm font-medium transition-colors touch-target xl:px-4 {isActive(link.href) ? 'border-[var(--orbit-line-strong)] bg-plum text-white font-semibold' : 'text-plum-light hover:border-[var(--orbit-line)] hover:bg-cream hover:text-coral-dark'}"
 					>
 						<span class="flex-shrink-0" aria-hidden="true">{@html link.icon}</span>
 						<span class="hidden xl:inline">{link.label}</span>
@@ -162,12 +162,12 @@ import Picture from './Picture.svelte';
 							onclick={toggleProfileMenu}
 							aria-haspopup="menu"
 							aria-expanded={profileMenuOpen}
-							class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-lavender/20 transition-all touch-target"
+							class="flex items-center gap-2 rounded-md px-3 py-2 transition-colors hover:bg-plum/5 touch-target"
 						>
 							{#if currentUser.avatarUrl}
-								<Picture src={currentUser.avatarUrl} type="profiles" sizes="56px" alt="" width={28} height={28} loading="eager" class="w-7 h-7 rounded-full object-cover" />
+								<Picture src={currentUser.avatarUrl} type="profiles" sizes="56px" alt="" width={28} height={28} loading="eager" class="orbit-round-data w-7 h-7 object-cover" />
 							{:else}
-								<div class="w-7 h-7 rounded-full bg-gradient-to-br from-coral/20 to-lavender/20 flex items-center justify-center">
+								<div class="orbit-round-data flex h-7 w-7 items-center justify-center bg-coral/20">
 									<span class="text-xs font-bold text-coral-dark">{(currentUser.displayName || currentUser.username).charAt(0).toUpperCase()}</span>
 								</div>
 							{/if}
@@ -180,13 +180,13 @@ import Picture from './Picture.svelte';
 						{#if profileMenuOpen}
 							<div
 								role="menu"
-								class="absolute right-0 top-full z-[60] mt-2 w-56 overflow-hidden rounded-2xl border border-white/60 bg-white/90 p-2 shadow-2xl shadow-lavender/25 backdrop-blur-xl"
+							class="absolute right-0 top-full z-[60] mt-2 w-56 overflow-hidden border border-[var(--orbit-line-strong)] bg-white p-2 shadow-[var(--orbit-shadow-raised)]"
 							>
 								<a
 									href="/{page.data.lang}/profile"
 									role="menuitem"
 									onclick={closeProfileMenu}
-									class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-plum transition-all hover:bg-lavender/15 hover:text-coral-dark"
+									class="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold text-plum transition-colors hover:bg-plum/5 hover:text-coral-dark"
 								>
 									<svg class="h-5 w-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
@@ -198,7 +198,7 @@ import Picture from './Picture.svelte';
 										href="/{page.data.lang}/admin/series"
 										role="menuitem"
 										onclick={closeProfileMenu}
-										class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-plum transition-all hover:bg-lavender/15 hover:text-coral-dark"
+										class="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold text-plum transition-colors hover:bg-plum/5 hover:text-coral-dark"
 									>
 										<svg class="h-5 w-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 12h9.75M10.5 18h9.75M3.75 6h.008v.008H3.75V6Zm0 6h.008v.008H3.75V12Zm0 6h.008v.008H3.75V18Z" />
@@ -210,7 +210,7 @@ import Picture from './Picture.svelte';
 									<button
 										type="submit"
 										role="menuitem"
-										class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-coral-dark transition-all hover:bg-coral/10"
+										class="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-coral-dark transition-colors hover:bg-coral/10"
 									>
 										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
@@ -225,13 +225,13 @@ import Picture from './Picture.svelte';
 					<div class="flex items-center gap-2">
 						<a
 							href="/{page.data.lang}/login"
-							class="px-4 py-2 rounded-xl text-sm font-medium text-plum-light hover:bg-lavender/20 hover:text-plum transition-all touch-target flex items-center"
+							class="flex items-center rounded-md px-4 py-2 text-sm font-medium text-plum hover:bg-plum/5 hover:text-coral-dark transition-colors touch-target"
 						>
 							{m.nav_login()}
 						</a>
 						<a
 							href="/{page.data.lang}/register"
-							class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white text-sm font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:scale-105 transition-all duration-300 touch-target flex items-center"
+						class="flex items-center border border-coral bg-coral px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-coral-dark touch-target"
 						>
 							{m.nav_register()}
 						</a>

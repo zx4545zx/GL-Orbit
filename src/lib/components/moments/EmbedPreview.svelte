@@ -33,8 +33,8 @@ let thumbnailFailed = $state(false);
 {:else if embed && feedCard && embed.kind !== 'x'}
 	<a href={source} target="_blank" rel="noreferrer" class="halo-focus-ring group block overflow-hidden rounded-2xl border border-[#ded8df] bg-[#f6f3f6] transition hover:-translate-y-0.5 hover:shadow-md" aria-label={playLabel}>
 		<div class="relative overflow-hidden">
-			{#if previewImage}<img src={previewImage} alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror={() => thumbnailFailed = true} class="h-80 w-full bg-plum/5 object-contain sm:h-96" />{:else}<div class="h-80 bg-gradient-to-br from-plum via-coral-dark to-lavender-dark sm:h-96"></div>{/if}
-			<span class="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent"></span><span class="absolute bottom-3 left-4 text-sm font-bold text-white">{title || provider}{#if author}<span class="ml-1.5 text-white/75">· {author}</span>{/if}</span>
+			{#if previewImage}<img src={previewImage} alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror={() => thumbnailFailed = true} class="h-80 w-full bg-plum/5 object-contain sm:h-96" />{:else}<div class="h-80 bg-plum sm:h-96"></div>{/if}
+			<span class="absolute inset-x-0 bottom-0 h-1/3 bg-black/60"></span><span class="absolute bottom-3 left-4 text-sm font-bold text-white">{title || provider}{#if author}<span class="ml-1.5 text-white/75">· {author}</span>{/if}</span>
 		</div>
 		<div class="flex items-center justify-between bg-white px-4 py-3 text-xs"><span class="font-medium text-plum">{title || provider}</span><span class="font-medium text-coral-dark">{isThai ? 'เปิดดู ↗' : 'Open ↗'}</span></div>
 	</a>

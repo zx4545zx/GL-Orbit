@@ -37,12 +37,12 @@
 	})());
 </script>
 
-<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-5 mb-4 sm:mb-6">
+<div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-5 mb-4 sm:mb-6">
 	<div class="flex items-center gap-3">
 		<button
 			aria-label={m.calendar_week_header_prev_aria()}
 			onclick={onPrevWeek}
-			class="w-11 h-11 rounded-2xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:-translate-x-0.5 touch-target flex-shrink-0"
+			class="w-11 h-11 rounded-xl orbit-control flex items-center justify-center transition-all hover:-translate-x-0.5 touch-target flex-shrink-0"
 		>
 			<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -61,14 +61,14 @@
 			<button
 				onclick={onThisWeek}
 				aria-label={m.calendar_week_header_this_week_aria()}
-				class="hidden sm:inline-flex h-11 px-5 rounded-2xl items-center justify-center bg-gradient-to-r from-coral to-coral-dark text-white text-sm font-bold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
+				class="hidden sm:inline-flex h-11 px-5 rounded-xl items-center justify-center orbit-action text-sm font-bold hover:-translate-y-0.5 transition-all touch-target"
 			>
 				{m.calendar_week_header_this_week_text()}
 			</button>
 			<button
 				onclick={onThisWeek}
 				aria-label={m.calendar_week_header_this_week_aria()}
-				class="sm:hidden w-11 h-11 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white flex items-center justify-center shadow-lg shadow-coral/25 touch-target"
+				class="sm:hidden w-11 h-11 rounded-xl orbit-action flex items-center justify-center touch-target"
 			>
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -77,7 +77,7 @@
 			<button
 				aria-label={m.calendar_week_header_next_aria()}
 				onclick={onNextWeek}
-				class="w-11 h-11 rounded-2xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:translate-x-0.5 touch-target"
+			class="w-11 h-11 rounded-xl orbit-control flex items-center justify-center transition-all hover:translate-x-0.5 touch-target"
 			>
 				<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>

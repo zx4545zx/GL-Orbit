@@ -193,8 +193,15 @@ src/
 - **Fonts:** Syne (display), DM Sans (body), Mali (Thai)
 - **Fluid Type & Spacing:** ใช้ `clamp()` สำหรับ responsive โดยไม่ต้องพึ่ง breakpoint
 
+### Orbit Editorial Grid
+- **Direction:** ใช้ grid เป็นโครงสร้าง, พื้นผิวสี่เหลี่ยม, เส้นคั่นบาง และ spacing เพื่อสร้างลำดับข้อมูล
+- **Corners:** ห้ามใช้มุมโค้งกับ container, card, input, button, menu, modal, หรือ image frame ใหม่/ที่แก้ไข ให้ใช้ `rounded-none` หรือไม่ใส่ utility แทน
+- **Exceptions:** วงกลมใช้ได้เฉพาะข้อมูลที่เป็นวงกลมโดยธรรมชาติ เช่น status dot หรือ avatar; ห้ามใช้เป็นกรอบตกแต่ง และต้องใส่ `.orbit-round-data` โดยเจตนา
+- **Surfaces:** หลีกเลี่ยงเงาหนัก, gradient blob, pill และ card มุมมนซ้ำ ๆ; ใช้ `border` สีจาก `--orbit-line` / `--orbit-line-strong` เพื่อแบ่งกลุ่มข้อมูล
+- **Buttons:** ใช้ rectangular action surface, เส้นคั่นบาง และสี semantic ที่นิ่ง; รักษา focus ring, touch target อย่างน้อย 44×44px และ disabled/loading states
+
 ### Key CSS Utilities
-- `.glass-card` / `.glass-card-strong` — Glassmorphism cards
+- `.glass-card` / `.glass-card-strong` — Glassmorphism surface (ต้องทำเป็นเหลี่ยมเมื่อใช้/แก้ไข)
 - `.text-gradient` / `.text-gradient-coral` — Gradient text
 - `.touch-target` — Min 44×44px (accessibility)
 - `.animate-float`, `.animate-orbit`, `.animate-pulse-glow` — Motion effects

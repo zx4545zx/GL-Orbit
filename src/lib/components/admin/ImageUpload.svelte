@@ -177,6 +177,11 @@
 
 <div class="space-y-2">
 	<span class="block text-sm font-medium text-plum">{label}</span>
+	{#if isProfile}
+		<p class="max-w-sm text-xs leading-5 text-plum-light">
+			แนะนำรูปแนวตั้ง 1200 × 1600px หรือ 1200 × 1800px · ไฟล์ไม่เกิน 5MB
+		</p>
+	{/if}
 
 	<div class="relative w-full {purpose === 'cover' || purpose === 'gallery' ? 'max-w-sm' : 'max-w-[160px]'} {aspectClass} {roundedClass} overflow-hidden bg-lavender/10 border border-lavender/20">
 			{#if url}
@@ -190,7 +195,7 @@
 			</div>
 		{/if}
 		{#if loading}
-			<div class="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center">
+			<div class="absolute inset-0 bg-white/90 flex items-center justify-center">
 				<svg class="animate-spin h-6 w-6 text-coral" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
 					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
 					<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -208,7 +213,7 @@
 			เลือกรูป
 		</button>
 		{#if url}
-			<button type="button" onclick={clearImage} class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl glass-card text-plum text-xs font-semibold hover:bg-white/80 transition-colors touch-target">
+			<button type="button" onclick={clearImage} class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg orbit-control text-plum text-xs font-semibold transition-colors touch-target">
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 				</svg>

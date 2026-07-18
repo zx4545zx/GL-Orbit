@@ -177,7 +177,7 @@
 
 <!-- Search + Filter -->
 <div class="flex flex-col gap-3 max-w-xl mx-auto mb-6 sm:mb-8">
-	<div class="glass-card-strong rounded-2xl flex items-center px-4 py-3 gap-3 transition-all duration-300 focus-within:ring-2 focus-within:ring-coral/30 focus-within:border-coral/30">
+	<div class="orbit-surface rounded-xl flex items-center px-4 py-3 gap-3 transition-all duration-200 focus-within:ring-2 focus-within:ring-coral/30 focus-within:border-coral/30">
 		<svg class="w-5 h-5 text-plum-light flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
 		<input type="text" bind:value={searchQuery} oninput={scheduleSearchUpdate} placeholder={m.series_search_placeholder()} aria-label={m.series_search_label()} class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base" />
 		{#if searchQuery}
@@ -187,12 +187,12 @@
 
 	<!-- Status Filter -->
 	<div class="flex justify-center">
-		<div class="glass-card rounded-2xl p-1.5 flex gap-1 overflow-x-auto">
+		<div class="orbit-surface rounded-xl p-1.5 flex gap-1 overflow-x-auto">
 			{#each filterOptions as filter}
 				<button
 					onclick={() => updateStatus(filter.key)}
 					aria-pressed={filterStatus === filter.key}
-					class="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 touch-target whitespace-nowrap {filterStatus === filter.key ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/60'}"
+					class="px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 touch-target whitespace-nowrap {filterStatus === filter.key ? 'orbit-action' : 'text-plum-light hover:bg-lavender/20'}"
 				>
 					{filter.label}
 				</button>
@@ -202,7 +202,7 @@
 </div>
 
 <!-- Grid -->
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6" aria-busy={loading}>
+<div class="grid grid-cols-2 min-[440px]:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5" aria-busy={loading}>
 	{#each allSeries as s (s.id)}
 		<SeriesPosterCard item={s} />
 	{/each}
@@ -218,7 +218,7 @@
 <!-- Load More -->
 {#if !loading && hasMore}
 	<div class="text-center mt-8 sm:mt-10">
-		<button onclick={loadMore} disabled={loadMoreLoading} class="px-8 py-3 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-105 transition-all text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 mx-auto">
+		<button onclick={loadMore} disabled={loadMoreLoading} class="orbit-action px-8 py-3 rounded-xl font-semibold transition-colors text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 mx-auto">
 			{#if loadMoreLoading}
 				<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
 				{m.common_loading()}

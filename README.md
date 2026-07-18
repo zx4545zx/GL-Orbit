@@ -18,7 +18,7 @@
 - **ระบบสมาชิก** — โปรไฟล์ + Favorite/Watched + การแจ้งเตือน
 - **แผงผู้ดูแลระบบ** — CRUD ซีรีส์ ตอน ตารางฉาย นักแสดง สตูดิโอ แพลตฟอร์ม และข้อมูลอ้างอิงหลัก
 - **SEO & PWA** — robots/sitemap/llms.txt, Open Graph, JSON-LD, ติดตั้งเป็นแอปได้
-- **ดีไซน์โมเดิร์น** — Glassmorphism + สีพาสเทล + อนิเมชั่นลื่นไหล
+- **ดีไซน์ Orbit Editorial Grid** — โครงสร้างเหลี่ยม เส้นคั่นบาง สีพาสเทลที่ใช้อย่างมีบทบาท และ motion ที่จำเป็น
 - **Pending Shells** — Skeleton UI ระหว่างโหลดหน้า ลด perceived latency
 
 ---

@@ -236,13 +236,13 @@
 	})());
 
 	const dayColorClasses = [
-		'from-coral/20 to-coral/5',
-		'from-orange-300/20 to-orange-300/5',
-		'from-lavender/20 to-lavender/5',
-		'from-emerald-300/20 to-emerald-300/5',
-		'from-teal-300/20 to-teal-300/5',
-		'from-blue-300/20 to-blue-300/5',
-		'from-rose-300/20 to-rose-300/5'
+		'bg-coral/10',
+		'bg-orange-300/10',
+		'bg-lavender/15',
+		'bg-emerald-300/10',
+		'bg-teal-300/10',
+		'bg-blue-300/10',
+		'bg-rose-300/10'
 	];
 
 	const seoTitle = m.calendar_seo_title();
@@ -286,11 +286,8 @@
 
 {#snippet viewToggle()}
 	<div class="w-full lg:w-auto lg:flex lg:justify-center">
-		<div class="glass-card rounded-2xl p-1.5 grid grid-cols-4 gap-1 lg:flex lg:items-center lg:min-w-max">
+		<div class="glass-card grid grid-cols-4 gap-0 border border-[var(--orbit-line-strong)] lg:flex lg:items-center lg:min-w-max">
 			{#each viewButtons as btn, index}
-				{#if index === 2}
-					<div class="hidden lg:block mx-1 h-7 w-px bg-lavender/25" aria-hidden="true"></div>
-				{/if}
 				{@const active = viewMode === btn.key}
 				<button
 					aria-label={btn.label}
@@ -299,7 +296,7 @@
 						viewMode = btn.key;
 						navigateCalendar(getViewUrl(btn.key, lang, params_y, params_m, params_sd, params_ed));
 					}}
-					class="min-w-0 justify-center px-2 lg:px-4 py-2.5 lg:py-2 rounded-xl text-xs lg:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 lg:gap-2 touch-target {active ? 'bg-white text-coral-dark shadow-md shadow-lavender/20 ring-1 ring-coral/10' : btn.group === 'monthly' ? 'text-plum-light/80 hover:bg-lavender/10 hover:text-plum' : 'text-plum-light hover:bg-white/60'}"
+					class="min-w-0 justify-center border-r border-[var(--orbit-line)] px-2 lg:px-4 py-2.5 lg:py-2 text-xs lg:text-sm font-semibold transition-colors duration-200 last:border-r-0 flex items-center gap-1.5 lg:gap-2 touch-target {active ? 'bg-plum text-white' : btn.group === 'monthly' ? 'text-plum-light hover:bg-lavender-light hover:text-plum' : 'text-plum-light hover:bg-cream hover:text-coral-dark'}"
 				>
 					<svg class="w-5 h-5 lg:w-4 lg:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">{@html btn.icon}</svg>
 					<span class="hidden lg:inline">{btn.label}</span>
@@ -310,12 +307,12 @@
 {/snippet}
 
 {#snippet monthHeader()}
-	<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-5 mb-4 sm:mb-6">
+	<div class="glass-card border border-[var(--orbit-line-strong)] p-3 sm:p-5 mb-4 sm:mb-6">
 		<div class="flex items-center gap-3">
 			<button
 				aria-label={m.calendar_month_prev_aria()}
 				onclick={prevMonth}
-				class="w-11 h-11 rounded-2xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:-translate-x-0.5 touch-target flex-shrink-0"
+				class="w-11 h-11 orbit-control flex items-center justify-center transition-all hover:bg-coral-light touch-target flex-shrink-0"
 			>
 				<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
 			</button>
@@ -334,14 +331,14 @@
 				<button
 					onclick={goToToday}
 					aria-label={m.calendar_month_today_aria()}
-					class="hidden sm:inline-flex h-11 px-5 rounded-2xl items-center justify-center bg-gradient-to-r from-coral to-coral-dark text-white text-sm font-bold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
+					class="hidden sm:inline-flex h-11 border border-coral px-5 items-center justify-center orbit-action text-sm font-bold transition-all touch-target"
 				>
 					{m.calendar_month_today_text()}
 				</button>
 				<button
 					onclick={goToToday}
 					aria-label={m.calendar_month_today_aria()}
-					class="sm:hidden w-11 h-11 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white flex items-center justify-center shadow-lg shadow-coral/25 touch-target"
+					class="sm:hidden w-11 h-11 border border-coral orbit-action flex items-center justify-center touch-target"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -350,7 +347,7 @@
 				<button
 					aria-label={m.calendar_month_next_aria()}
 					onclick={nextMonth}
-					class="w-11 h-11 rounded-2xl glass-card-strong flex items-center justify-center hover:bg-white/90 transition-all hover:translate-x-0.5 touch-target"
+				class="w-11 h-11 orbit-control flex items-center justify-center transition-all hover:bg-coral-light touch-target"
 				>
 					<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
 				</button>
@@ -361,16 +358,14 @@
 
 <div class="py-6 sm:py-8 max-w-6xl mx-auto">
 	<!-- Today / This Week Hero -->
-	<section class="relative overflow-hidden glass-card rounded-3xl p-5 sm:p-8 mb-5 sm:mb-7">
-		<div class="absolute -top-16 -right-12 w-40 h-40 rounded-full bg-coral/10 blur-3xl"></div>
-		<div class="absolute -bottom-20 -left-16 w-52 h-52 rounded-full bg-lavender/20 blur-3xl"></div>
-		<div class="relative grid gap-5 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+	<section class="mb-8 py-3 sm:py-5">
+		<div class="grid gap-5 lg:grid-cols-[1.4fr_1fr] lg:items-end">
 			<div>
-				<div class="inline-flex items-center gap-2 rounded-full bg-coral/10 px-3 py-1 text-xs font-bold text-coral-dark mb-3">
-					<span class="w-1.5 h-1.5 rounded-full bg-coral animate-pulse"></span>
+				<div class="inline-flex items-center gap-2 border border-coral/30 bg-coral/10 px-3 py-1 text-xs font-bold text-coral-dark mb-3">
+					<span class="orbit-round-data w-1.5 h-1.5 bg-coral animate-pulse"></span>
 					Today / This Week
 				</div>
-				<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum leading-tight mb-2">
+				<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-bold text-plum leading-tight mb-2">
 					{m.calendar_title_plain()}<span class="text-coral"> GL</span>
 				</h1>
 				<p class="text-sm sm:text-base text-plum-light max-w-2xl leading-relaxed">
@@ -379,17 +374,17 @@
 			</div>
 
 			<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
-				<div class="rounded-2xl bg-white/70 p-4 shadow-sm shadow-lavender/10 border border-white/60">
+				<div class="border border-coral/25 bg-coral-light px-4 py-3">
 					<div class="text-xs font-medium text-plum-light mb-1">{m.calendar_today_label()}</div>
 					<div class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum">{weekSummary.todayCount}</div>
 					<div class="text-[11px] text-plum-light">{m.calendar_today_count_label()}</div>
 				</div>
-				<div class="rounded-2xl bg-white/70 p-4 shadow-sm shadow-lavender/10 border border-white/60">
+				<div class="border border-lavender/40 bg-lavender-light px-4 py-3">
 					<div class="text-xs font-medium text-plum-light mb-1">{m.calendar_week_label()}</div>
 					<div class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum">{weekSummary.weekCount}</div>
 					<div class="text-[11px] text-plum-light">{m.calendar_week_count_label()}</div>
 				</div>
-				<div class="col-span-2 sm:col-span-1 lg:col-span-2 xl:col-span-1 rounded-2xl bg-gradient-to-br from-coral/10 to-lavender/15 p-4 border border-coral/10">
+				<div class="col-span-2 border border-mint/40 bg-mint-light px-4 py-3 sm:col-span-1 lg:col-span-2 xl:col-span-1">
 					<div class="text-xs font-medium text-plum-light mb-1">{m.calendar_featured_label()}</div>
 					{#if weekSummary.featuredEvent}
 						<div class="text-sm font-bold text-plum truncate">{weekSummary.featuredEvent.series}</div>
@@ -402,10 +397,10 @@
 			</div>
 		</div>
 
-		<div class="relative mt-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+		<div class="mt-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 			<button
 				onclick={() => goToThisWeek('card')}
-				class="inline-flex w-full lg:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-coral to-coral-dark px-5 py-3 text-sm font-bold text-white shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:-translate-y-0.5 transition-all touch-target"
+				class="inline-flex w-full lg:w-auto items-center justify-center gap-2 border border-coral orbit-action px-5 py-3 text-sm font-bold transition-all touch-target"
 			>
 				{m.calendar_this_week_cta()}
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
@@ -468,7 +463,7 @@
 					<table class="w-full min-w-[640px]">
 						<thead>
 							<tr class="border-b border-lavender/10">
-								<th class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-semibold text-plum-light w-28 sm:w-32 md:w-44 lg:w-52 border-r border-lavender/10 align-top">
+								<th class="sticky left-0 z-10 bg-white px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-semibold text-plum-light w-28 sm:w-32 md:w-44 lg:w-52 border-r border-lavender/10 align-top">
 									{m.calendar_grid_series_header()}
 								</th>
 								{#each monthDays as day}
@@ -485,7 +480,7 @@
 						<tbody>
 							{#each monthAllSeries as seriesName, seriesIndex}
 								<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
-									<td class="sticky left-0 z-10 bg-white/80 backdrop-blur-sm px-2 sm:px-3 py-2 sm:py-3 border-r border-lavender/10 align-top w-28 sm:w-32 md:w-44 lg:w-52">
+									<td class="sticky left-0 z-10 bg-white px-2 sm:px-3 py-2 sm:py-3 border-r border-lavender/10 align-top w-28 sm:w-32 md:w-44 lg:w-52">
 										<div class="flex flex-col items-center gap-1.5 md:gap-2">
 											<Picture
 												src={monthSeriesPosters[seriesName] ?? '/placeholders/poster.svg'}
@@ -578,14 +573,14 @@
 									class="relative aspect-square rounded-lg sm:rounded-xl p-0.5 sm:p-1 transition-all duration-300 flex flex-col items-center justify-center gap-0.5 touch-target
 										{day.month !== 'current' ? 'text-plum-light/40' : 'text-plum'}
 										{isToday(day.fullDate) ? 'ring-1 sm:ring-2 ring-coral' : ''}
-										{isSelected ? 'bg-gradient-to-br from-coral/20 to-lavender/20' : 'hover:bg-white/40'}
+										{isSelected ? 'bg-coral text-white' : 'hover:bg-coral-light'}
 										{eventCount > 0 && !isSelected ? 'bg-white/30' : ''}"
 								>
 									<span class="text-xs sm:text-sm font-medium">{day.date}</span>
 									{#if eventCount > 0}
 										<div class="flex gap-0.5">
 											{#each Array(Math.min(eventCount, 3)) as _, i}
-												<div class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-coral"></div>
+											<div class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full {isSelected ? 'bg-white' : 'bg-coral'}"></div>
 											{/each}
 										</div>
 									{/if}
@@ -712,9 +707,9 @@
 			<div class="space-y-4 sm:space-y-6">
 				{#each weekScheduleByDay as day, i}
 					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
-						<div class="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r {dayColorClasses[i] || 'from-lavender/20 to-lavender/5'} border-b border-white/50">
+						<div class="px-4 sm:px-6 py-3 sm:py-4 {dayColorClasses[i] || 'bg-lavender/15'} border-b border-[var(--orbit-line)]">
 							<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum flex items-center gap-2 sm:gap-3">
-								<span class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/80 flex items-center justify-center text-base sm:text-lg">📅</span>
+							<span class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white flex items-center justify-center text-base sm:text-lg">📅</span>
 								{weekDayNames[day.dayIndex]}
 							</h2>
 						</div>
@@ -790,8 +785,8 @@
 	</div>
 
 	<!-- Countdown CTA -->
-	<a href="/{page.data.lang}/countdown" class="group flex items-center gap-4 sm:gap-5 mt-6 sm:mt-8 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:shadow-lavender/20 transition-all duration-300">
-		<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coral/90 to-lavender flex items-center justify-center flex-shrink-0 shadow-lg shadow-coral/20">
+	<a href="/{page.data.lang}/countdown" class="group flex items-center gap-4 sm:gap-5 mt-6 sm:mt-8 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 hover:shadow-lg transition-all duration-300">
+		<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-coral flex items-center justify-center flex-shrink-0 shadow-sm shadow-coral/20">
 			<svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-3 4-4 7-4 10v2l-1 2h10l-1-2v-2c0-3-1-6-4-10z"/><circle cx="12" cy="10" r="1.5" fill="white" opacity="0.6"/><path d="M10 17c0 1.5 2 2.5 2 2.5s2-1 2-2.5" fill="currentColor" opacity="0.4"/></svg>
 		</div>
 		<div class="flex-1 min-w-0">

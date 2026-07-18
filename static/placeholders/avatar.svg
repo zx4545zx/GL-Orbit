@@ -1,15 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="ไม่มีรูปโปรไฟล์">
-	<defs>
-		<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-			<stop offset="0%" stop-color="#FFB8D0"/>
-			<stop offset="55%" stop-color="#C4B5FD"/>
-			<stop offset="100%" stop-color="#A7F3D0"/>
-		</linearGradient>
-	</defs>
-	<rect width="200" height="200" fill="url(#bg)"/>
-	<!-- person bust silhouette -->
-	<g fill="#FFF5F7" opacity="0.92">
-		<circle cx="100" cy="82" r="36"/>
-		<path d="M40 178 C40 138 66 118 100 118 C134 118 160 138 160 178 Z"/>
-	</g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-label="ไม่มีรูปโปรไฟล์">
+	<rect width="320" height="320" fill="#FFF5F7"/>
+	<rect x="18" y="18" width="284" height="284" fill="none" stroke="#2D1B2E" stroke-width="2"/>
+	<path d="M42 66H278M42 254H278" stroke="#E7DCE2" stroke-width="2"/>
+	<rect x="42" y="88" width="8" height="144" fill="#FF6B9D"/>
+	<rect x="104" y="112" width="112" height="96" fill="none" stroke="#2D1B2E" stroke-width="5"/>
+	<circle cx="184" cy="140" r="9" fill="#FF6B9D"/>
+	<path d="M116 193L145 164L165 183L181 167L204 193" fill="none" stroke="#2D1B2E" stroke-linecap="square" stroke-linejoin="miter" stroke-width="5"/>
 </svg>

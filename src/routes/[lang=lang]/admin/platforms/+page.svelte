@@ -119,7 +119,7 @@
 			<h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum mb-1">จัดการแพลตฟอร์ม</h1>
 			<p class="text-sm sm:text-base text-plum-light">เพิ่ม แก้ไข และลบข้อมูลแพลตฟอร์มสตรีมมิ่ง</p>
 		</div>
-		<button onclick={openCreate} class="px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm sm:text-base touch-target">
+		<button onclick={openCreate} class="orbit-action px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base touch-target">
 			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
 			<span class="hidden sm:inline">เพิ่มแพลตฟอร์ม</span>
 			<span class="sm:hidden">เพิ่ม</span>
@@ -151,10 +151,10 @@
 					<p class="text-sm text-coral-dark">{formError}</p>
 				{/if}
 				<div class="flex gap-2 pt-2">
-					<button type="submit" disabled={formLoading} class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl transition-all text-sm sm:text-base touch-target disabled:opacity-50">
+					<button type="submit" disabled={formLoading} class="orbit-action px-5 py-2.5 rounded-xl font-semibold transition-colors text-sm sm:text-base touch-target disabled:opacity-50">
 						{formLoading ? 'กำลังบันทึก...' : 'บันทึก'}
 					</button>
-					<button type="button" onclick={closeForm} class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-all text-sm sm:text-base touch-target">ยกเลิก</button>
+					<button type="button" onclick={closeForm} class="orbit-control px-5 py-2.5 rounded-xl font-medium transition-colors text-sm sm:text-base touch-target">ยกเลิก</button>
 				</div>
 			</form>
 		</div>

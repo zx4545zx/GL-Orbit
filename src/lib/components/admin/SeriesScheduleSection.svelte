@@ -118,7 +118,7 @@
 				{@const open = expandedId === s.id}
 				<div class="bg-white/70 rounded-2xl border border-lavender/15 overflow-hidden">
 					<button type="button" onclick={() => (expandedId = open ? null : s.id)} class="w-full flex items-center gap-3 p-3 text-left">
-					<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-lavender/30 to-mint/20 flex flex-col items-center justify-center flex-shrink-0">
+					<div class="w-12 h-12 rounded-xl bg-lavender/20 flex flex-col items-center justify-center flex-shrink-0">
 						<span class="text-[10px] text-plum-light leading-none">วัน</span>
 						<span class="text-sm font-bold text-plum leading-none mt-0.5">{dayNames[s.dayOfWeek]}</span>
 					</div>

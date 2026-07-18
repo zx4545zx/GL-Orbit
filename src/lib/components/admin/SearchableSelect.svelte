@@ -141,7 +141,7 @@
 	{#if open && filtered.length > 0}
 		<div
 			bind:this={listEl}
-			class="absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-white/70 bg-white/90 p-1 shadow-2xl shadow-plum/15 backdrop-blur-xl"
+			class="absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-plum/10 bg-white p-1 shadow-2xl shadow-plum/15"
 			role="listbox"
 		>
 			{#each filtered as option, i}
@@ -160,7 +160,7 @@
 			{/each}
 		</div>
 	{:else if open && query.trim()}
-		<div class="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-white/70 bg-white/90 p-4 shadow-2xl shadow-plum/15 backdrop-blur-xl">
+		<div class="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-plum/10 bg-white p-4 shadow-2xl shadow-plum/15">
 			<p class="text-sm text-plum-light text-center">{emptyText}</p>
 		</div>
 	{/if}

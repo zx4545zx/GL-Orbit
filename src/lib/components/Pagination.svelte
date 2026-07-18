@@ -50,7 +50,7 @@
 			onclick={() => goTo(page - 1)}
 			disabled={page <= 1}
 			aria-label={m.pagination_prev_aria()}
-			class="px-3 py-2 rounded-lg text-sm font-medium transition-all touch-target disabled:opacity-40 disabled:cursor-not-allowed {page <= 1 ? 'text-plum-light/50' : 'text-plum hover:bg-lavender/20'}"
+			class="px-3 py-2 rounded-md text-sm font-medium transition-all touch-target disabled:opacity-40 disabled:cursor-not-allowed {page <= 1 ? 'text-plum-light/50' : 'text-plum hover:bg-lavender/30'}"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
 		</button>
@@ -61,7 +61,7 @@
 			{:else}
 				<button
 					onclick={() => goTo(p as number)}
-					class="min-w-[2.25rem] h-9 px-2.5 rounded-lg text-sm font-medium transition-all touch-target {page === p ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-md shadow-coral/25' : 'text-plum hover:bg-lavender/20'}"
+					class="min-w-[2.25rem] h-9 px-2.5 rounded-md text-sm font-medium transition-all touch-target {page === p ? 'bg-coral text-white shadow-sm shadow-coral/25' : 'text-plum hover:bg-lavender/30'}"
 				>
 					{p}
 				</button>
@@ -72,7 +72,7 @@
 			onclick={() => goTo(page + 1)}
 			disabled={page >= totalPages}
 			aria-label={m.pagination_next_aria()}
-			class="px-3 py-2 rounded-lg text-sm font-medium transition-all touch-target disabled:opacity-40 disabled:cursor-not-allowed {page >= totalPages ? 'text-plum-light/50' : 'text-plum hover:bg-lavender/20'}"
+			class="px-3 py-2 rounded-md text-sm font-medium transition-all touch-target disabled:opacity-40 disabled:cursor-not-allowed {page >= totalPages ? 'text-plum-light/50' : 'text-plum hover:bg-lavender/30'}"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
 		</button>

@@ -216,13 +216,9 @@
 </svelte:head>
 
 <!-- About page hero -->
-<section class="relative -mx-4 overflow-hidden px-4 py-16 sm:py-24">
-	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
-	<div class="absolute -top-16 right-[-6rem] h-72 w-72 rounded-full bg-coral/15 blur-[80px] pointer-events-none"></div>
-	<div class="absolute bottom-0 left-[-6rem] h-72 w-72 rounded-full bg-mint/15 blur-[80px] pointer-events-none"></div>
-
-	<div class="relative mx-auto max-w-4xl text-center">
-		<div class="inline-flex items-center gap-2 rounded-full border border-lavender/20 bg-white/65 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-coral-dark backdrop-blur-md">
+<section class="-mx-4 px-4 py-16 sm:py-24">
+	<div class="mx-auto max-w-4xl text-center">
+		<div class="orbit-surface inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-coral-dark">
 			<span class="h-2 w-2 rounded-full bg-coral"></span>
 			{m.about_hero_badge()}
 		</div>
@@ -236,10 +232,10 @@
 			{m.about_last_updated({ date: LAST_UPDATED_LABEL })}
 		</p>
 		<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-			<a href="/{page.data.lang}/calendar" class="touch-target inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-coral to-coral-dark px-6 py-3 font-semibold text-white shadow-xl shadow-coral/20 transition hover:scale-105">
+			<a href="/{page.data.lang}/calendar" class="orbit-action touch-target inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold transition-colors">
 				{m.about_cta_schedule()}
 			</a>
-			<a href="/{page.data.lang}/" class="touch-target inline-flex items-center justify-center rounded-2xl glass-card-strong px-6 py-3 font-semibold text-plum transition hover:scale-105">
+			<a href="/{page.data.lang}/" class="orbit-control touch-target inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold transition-colors">
 				{m.about_cta_home()}
 			</a>
 		</div>
@@ -263,7 +259,7 @@
 		</div>
 		<div class="grid gap-4 md:grid-cols-2">
 			{#each aiAnswerBlocks as block}
-				<article class="rounded-3xl border border-lavender/20 bg-white/70 p-5 shadow-sm shadow-lavender/10 backdrop-blur-sm">
+				<article class="orbit-surface rounded-xl p-5">
 					<h3 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{block.question}</h3>
 					<p class="mt-2 text-sm leading-7 text-plum-light">{block.answer}</p>
 				</article>
@@ -273,13 +269,8 @@
 </section>
 
 <!-- Editorial: The GL-Orbit Guide (unified magazine feature) -->
-<section class="relative -mx-4 px-4 py-16 sm:py-24 content-visibility-auto overflow-hidden">
-	<!-- single soft atmosphere (replaces 3 stacked gradients) -->
-	<div class="absolute inset-0 bg-gradient-to-b from-cream via-white to-lavender/5 pointer-events-none"></div>
-	<div class="absolute top-[12%] -right-24 w-72 h-72 sm:w-96 sm:h-96 bg-coral/8 rounded-full blur-[90px] animate-float pointer-events-none"></div>
-	<div class="absolute bottom-[18%] -left-24 w-72 h-72 sm:w-96 sm:h-96 bg-mint/8 rounded-full blur-[90px] animate-float-delayed pointer-events-none"></div>
-
-	<div class="relative mx-auto max-w-5xl">
+<section class="-mx-4 px-4 py-16 sm:py-24 content-visibility-auto">
+	<div class="mx-auto max-w-5xl">
 
 		<!-- §01 — Lede: what is GL-Orbit -->
 		<header class="edi-head">

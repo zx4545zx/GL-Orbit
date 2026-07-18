@@ -78,23 +78,23 @@
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<div class="min-h-dvh bg-gray-50 flex">
+<div class="admin-minimal min-h-dvh bg-[var(--orbit-paper-deep)] flex text-plum">
 	<!-- Desktop Sidebar -->
-	<aside class="hidden lg:flex flex-col bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-30 {sidebarExpanded ? 'w-64' : 'w-16'} transition-[width] duration-300 ease-in-out motion-reduce:transition-none {resolved ? '' : 'transition-none'}">
-		<div class="h-16 flex items-center border-b border-gray-100 {sidebarExpanded ? 'px-6 justify-between' : 'px-2 justify-center'}">
+	<aside class="hidden lg:flex flex-col border-r border-[var(--orbit-line)] bg-white text-plum fixed inset-y-0 left-0 z-30 {sidebarExpanded ? 'w-64' : 'w-16'} transition-[width] duration-300 ease-in-out motion-reduce:transition-none {resolved ? '' : 'transition-none'}">
+		<div class="h-16 flex items-center border-b border-[var(--orbit-line)] {sidebarExpanded ? 'px-6 justify-between' : 'px-2 justify-center'}">
 			{#if sidebarExpanded}
 				<div class="flex items-center">
 					<a href={adminHome} class="text-lg font-bold text-plum tracking-tight">GL-Orbit</a>
-					<span class="ml-2 px-2 py-0.5 rounded-md bg-coral/10 text-coral-dark text-xs font-semibold">Admin</span>
+					<span class="ml-2 text-[10px] font-bold uppercase tracking-wider text-coral-dark">Admin</span>
 				</div>
 			{/if}
 			<button
 				type="button"
 				onclick={() => sidebarExpanded = !sidebarExpanded}
-				class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors touch-target"
+				class="p-1.5 rounded-lg hover:bg-plum/5 transition-colors touch-target"
 				aria-label={sidebarExpanded ? 'ย่อ sidebar' : 'ขยาย sidebar'}
 			>
-				<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-5 h-5 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					{#if sidebarExpanded}
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
 					{:else}
@@ -107,21 +107,21 @@
 		<nav class="flex-1 overflow-y-auto {sidebarExpanded ? 'px-3' : 'px-2'} py-4 space-y-4">
 			{#each navSections as section}
 				<div>
-					<p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-plum-light/50 {sidebarExpanded ? '' : 'sr-only'}">{section.title}</p>
+					<p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-plum-light/70 {sidebarExpanded ? '' : 'sr-only'}">{section.title}</p>
 					<div class="space-y-1">
 						{#each section.items as item}
 							{@const active = isActive(item.href)}
 							<a
 								href={item.href}
 								title={sidebarExpanded ? undefined : item.label}
-								class="flex items-center rounded-xl text-sm font-medium transition-all duration-200 {sidebarExpanded ? 'gap-3 px-3 py-2.5' : 'justify-center px-2 py-2.5'} {active ? 'bg-gradient-to-r from-coral/10 to-lavender/10 text-coral-dark shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-plum'}"
+								class="flex items-center rounded-lg text-sm font-medium transition-colors duration-200 {sidebarExpanded ? 'gap-3 px-3 py-2.5' : 'justify-center px-2 py-2.5'} {active ? 'bg-plum text-white' : 'text-plum-light hover:bg-coral-light hover:text-coral-dark'}"
 							>
-								<svg class="w-5 h-5 flex-shrink-0 {active ? 'text-coral-dark' : 'text-gray-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<svg class="w-5 h-5 flex-shrink-0 {active ? 'text-coral-light' : 'text-plum-light'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={item.icon}/>
 								</svg>
 								<span class="{sidebarExpanded ? 'flex-1' : 'hidden'}">{item.label}</span>
 								{#if item.hint && sidebarExpanded}
-									<span class="text-[10px] text-plum-light/50 hidden xl:inline">{item.hint}</span>
+									<span class="text-[10px] text-plum-light/70 hidden xl:inline">{item.hint}</span>
 								{/if}
 							</a>
 						{/each}
@@ -130,8 +130,8 @@
 			{/each}
 		</nav>
 
-		<div class="p-3 border-t border-gray-100">
-			<a href="/{page.data.lang}/" title={sidebarExpanded ? undefined : 'กลับหน้าหลัก'} class="flex items-center rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-plum transition-all {sidebarExpanded ? 'gap-3 px-3 py-2.5' : 'justify-center px-2 py-2.5'}">
+		<div class="p-3 border-t border-[var(--orbit-line)]">
+			<a href="/{page.data.lang}/" title={sidebarExpanded ? undefined : 'กลับหน้าหลัก'} class="flex items-center rounded-lg text-sm font-medium text-plum-light hover:bg-plum/5 hover:text-plum transition-colors {sidebarExpanded ? 'gap-3 px-3 py-2.5' : 'justify-center px-2 py-2.5'}">
 				<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
 				<span class="{sidebarExpanded ? '' : 'hidden'}">กลับหน้าหลัก</span>
 			</a>
@@ -139,14 +139,14 @@
 	</aside>
 
 	<!-- Mobile Header -->
-	<header class="lg:hidden fixed top-[var(--pwa-safe-top)] left-0 right-0 z-40 bg-white border-b border-gray-200">
+	<header class="lg:hidden fixed top-[var(--pwa-safe-top)] left-0 right-0 z-40 border-b border-[var(--orbit-line)] bg-white text-plum">
 		<div class="flex items-center justify-between h-14 px-4">
-			<button onclick={() => mobileOpen = !mobileOpen} class="p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors touch-target" aria-label="เปิดเมนู">
+			<button onclick={() => mobileOpen = !mobileOpen} class="p-2 -ml-2 rounded-lg hover:bg-white/10 transition-colors touch-target" aria-label="เปิดเมนู">
 				<svg class="w-6 h-6 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
 			</button>
 			<div class="flex items-center gap-2">
 				<span class="text-base font-bold text-plum">GL-Orbit</span>
-				<span class="px-1.5 py-0.5 rounded-md bg-coral/10 text-coral-dark text-[10px] font-semibold">Admin</span>
+				<span class="text-[10px] font-bold uppercase tracking-wider text-coral-dark">Admin</span>
 			</div>
 			<div class="w-10"></div>
 		</div>
@@ -155,14 +155,14 @@
 	<!-- Mobile Sidebar Overlay -->
 	{#if mobileOpen}
 		<div class="lg:hidden fixed inset-0 z-50" role="dialog" aria-modal="true">
-			<button type="button" class="absolute inset-0 bg-plum/30 backdrop-blur-sm" onclick={closeMobile} aria-label="ปิดเมนู"></button>
-			<div transition:slide={{ axis: 'x', duration: 200 }} class="absolute left-0 top-0 bottom-0 w-72 bg-white shadow-2xl flex flex-col">
-				<div class="h-14 flex items-center justify-between px-4 border-b border-gray-100">
+			<button type="button" class="absolute inset-0 bg-plum/50" onclick={closeMobile} aria-label="ปิดเมนู"></button>
+			<div transition:slide={{ axis: 'x', duration: 200 }} class="absolute left-0 top-0 bottom-0 w-72 bg-white text-plum flex flex-col">
+				<div class="h-14 flex items-center justify-between px-4 border-b border-[var(--orbit-line)]">
 					<div class="flex items-center gap-2">
 						<span class="text-base font-bold text-plum">GL-Orbit</span>
-						<span class="px-1.5 py-0.5 rounded-md bg-coral/10 text-coral-dark text-[10px] font-semibold">Admin</span>
+						<span class="text-[10px] font-bold uppercase tracking-wider text-coral-dark">Admin</span>
 					</div>
-					<button onclick={closeMobile} class="p-2 rounded-lg hover:bg-gray-100 transition-colors touch-target" aria-label="ปิดเมนู">
+					<button onclick={closeMobile} class="p-2 rounded-lg hover:bg-white/10 transition-colors touch-target" aria-label="ปิดเมนู">
 						<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
 					</button>
 				</div>
@@ -170,16 +170,16 @@
 				<nav class="flex-1 overflow-y-auto px-3 py-4 space-y-4">
 					{#each navSections as section}
 						<div>
-							<p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-plum-light/50">{section.title}</p>
+							<p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-plum-light/70">{section.title}</p>
 							<div class="space-y-1">
 								{#each section.items as item}
 									{@const active = isActive(item.href)}
 									<a
 										href={item.href}
 										onclick={closeMobile}
-										class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all {active ? 'bg-gradient-to-r from-coral/10 to-lavender/10 text-coral-dark shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-plum'}"
+						class="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors {active ? 'bg-plum text-white' : 'text-plum-light hover:bg-coral-light hover:text-coral-dark'}"
 									>
-										<svg class="w-5 h-5 flex-shrink-0 {active ? 'text-coral-dark' : 'text-gray-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<svg class="w-5 h-5 flex-shrink-0 {active ? 'text-coral-light' : 'text-plum-light'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={item.icon}/>
 										</svg>
 										<span>{item.label}</span>
@@ -190,8 +190,8 @@
 					{/each}
 				</nav>
 
-				<div class="p-3 border-t border-gray-100">
-					<a href="/{page.data.lang}/" onclick={closeMobile} class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-plum transition-all">
+				<div class="p-3 border-t border-[var(--orbit-line)]">
+					<a href="/{page.data.lang}/" onclick={closeMobile} class="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-plum-light hover:bg-plum/5 hover:text-plum transition-colors">
 						<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
 						<span>กลับหน้าหลัก</span>
 					</a>

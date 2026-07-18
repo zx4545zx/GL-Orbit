@@ -49,18 +49,11 @@
 </svelte:head>
 
 <!-- Pocket Orbit Console — compact mobile command hub -->
-<div class="relative -mx-4 min-h-[calc(100dvh-var(--bottom-nav-reserved-space))] overflow-hidden px-4 pb-6 pt-4 sm:py-8 md:min-h-[calc(100dvh-6rem)]">
-	<div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-mesh"></div>
-	<div class="pointer-events-none absolute -right-24 top-3 -z-10 h-64 w-64 rounded-full bg-coral/18 blur-[5rem]"></div>
-	<div class="pointer-events-none absolute -left-28 top-64 -z-10 h-72 w-72 rounded-full bg-lavender/20 blur-[5rem]"></div>
-	<div class="pointer-events-none absolute bottom-10 right-8 -z-10 h-56 w-56 rounded-full bg-mint/14 blur-[5rem]"></div>
-
-	<div class="relative mx-auto flex max-w-2xl flex-col gap-3.5 sm:gap-5">
-		<header class="glass-card-strong relative overflow-hidden rounded-[1.8rem] p-4 shadow-xl shadow-lavender/20 sm:p-5">
-			<div class="pointer-events-none absolute -right-12 -top-14 h-32 w-32 rounded-full border border-coral/25"></div>
-			<div class="pointer-events-none absolute right-0 top-8 h-20 w-20 rounded-full border border-dashed border-lavender/40"></div>
-			<div class="relative flex items-center gap-3.5">
-				<div class="h-14 w-14 shrink-0 overflow-hidden rounded-[1.25rem] shadow-lg shadow-lavender/25">
+<div class="-mx-4 min-h-[calc(100dvh-var(--bottom-nav-reserved-space))] px-4 pb-6 pt-4 sm:py-8 md:min-h-[calc(100dvh-6rem)]">
+	<div class="mx-auto flex max-w-2xl flex-col gap-3.5 sm:gap-5">
+		<header class="orbit-surface rounded-2xl p-4 sm:p-5">
+			<div class="flex items-center gap-3.5">
+				<div class="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-lavender/30">
 					<img src="/icons/gl-orbit-logo.svg" alt="GL-Orbit" class="h-full w-full" />
 				</div>
 				<div class="min-w-0 flex-1">
@@ -79,10 +72,9 @@
 			{#if currentUser}
 				<a
 					href={localizedHref('/profile', page.data.lang)}
-					class="group relative flex items-center gap-4 overflow-hidden rounded-[1.75rem] border border-white/65 bg-white/76 p-4 shadow-lg shadow-lavender/16 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_48px_-20px_rgba(255,107,157,0.45)] touch-target sm:p-5"
+					class="group orbit-surface flex items-center gap-4 rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 touch-target sm:p-5"
 				>
-					<div class="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-coral/16 to-transparent"></div>
-					<div class="relative h-14 w-14 shrink-0 overflow-hidden rounded-[1.15rem] bg-gradient-to-br from-coral/20 to-lavender/25 ring-2 ring-white/80 sm:h-16 sm:w-16">
+					<div class="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-coral/10 sm:h-16 sm:w-16">
 						{#if currentUser.avatarUrl}
 							<Picture src={currentUser.avatarUrl} type="profiles" sizes="96px" alt="" loading="eager" class="h-full w-full object-cover" />
 						{:else}
@@ -101,7 +93,7 @@
 							{m.menus_profile_desc()}
 						</p>
 					</div>
-					<div class="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-coral-dark shadow-md shadow-lavender/15 transition-all duration-300 group-hover:translate-x-1 group-hover:bg-coral group-hover:text-white">
+					<div class="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white text-coral-dark transition-all duration-200 group-hover:translate-x-1 group-hover:bg-coral group-hover:text-white">
 						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
 						</svg>
@@ -111,7 +103,7 @@
 				<div class="grid grid-cols-2 gap-3">
 					<a
 						href={localizedHref('/login', page.data.lang)}
-						class="group relative overflow-hidden rounded-[1.6rem] border border-white/65 bg-white/76 p-4 text-left shadow-lg shadow-lavender/16 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_38px_-18px_rgba(255,107,157,0.35)] touch-target sm:p-5"
+						class="group orbit-surface rounded-2xl p-4 text-left transition-all duration-200 hover:-translate-y-0.5 touch-target sm:p-5"
 					>
 						<div class="mb-3 grid h-11 w-11 place-items-center rounded-2xl bg-coral/10 text-coral-dark transition-all duration-300 group-hover:bg-coral group-hover:text-white">
 							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
@@ -128,7 +120,7 @@
 
 					<a
 						href={localizedHref('/register', page.data.lang)}
-						class="group relative overflow-hidden rounded-[1.6rem] border border-white/65 bg-white/76 p-4 text-left shadow-lg shadow-lavender/16 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_38px_-18px_rgba(139,92,246,0.35)] touch-target sm:p-5"
+						class="group orbit-surface rounded-2xl p-4 text-left transition-all duration-200 hover:-translate-y-0.5 touch-target sm:p-5"
 					>
 						<div class="mb-3 grid h-11 w-11 place-items-center rounded-2xl bg-lavender/15 text-lavender-dark transition-all duration-300 group-hover:bg-lavender-dark group-hover:text-white">
 							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
@@ -148,10 +140,9 @@
 			{#if currentUser?.role === 'ADMIN'}
 			<a
 				href={localizedHref('/halo', page.data.lang)}
-				class="group relative flex items-center gap-4 overflow-hidden rounded-[1.75rem] border border-white/65 bg-white/76 p-4 shadow-lg shadow-lavender/16 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_48px_-20px_rgba(255,107,157,0.45)] touch-target sm:p-5"
+				class="group orbit-surface flex items-center gap-4 rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 touch-target sm:p-5"
 			>
-				<div class="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-lavender/16 to-transparent"></div>
-				<div class="relative grid h-14 w-14 shrink-0 place-items-center rounded-[1.15rem] bg-gradient-to-br from-yellow-400/25 to-orange-300/30 ring-2 ring-white/80 sm:h-16 sm:w-16">
+				<div class="relative grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-yellow-100 sm:h-16 sm:w-16">
 					<svg class="h-7 w-7 text-yellow-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.75 14.37 8.55l5.3.77-3.84 3.74.9 5.28L12 15.85l-4.74 2.49.9-5.28-3.84-3.74 5.3-.77L12 3.75Z" /></svg>
 				</div>
 				<div class="relative min-w-0 flex-1">
@@ -162,7 +153,7 @@
 						{m.halo_tagline()}
 					</p>
 				</div>
-				<div class="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-yellow-600 shadow-md shadow-lavender/15 transition-all duration-300 group-hover:translate-x-1 group-hover:bg-yellow-500 group-hover:text-white">
+				<div class="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white text-yellow-600 transition-all duration-200 group-hover:translate-x-1 group-hover:bg-yellow-500 group-hover:text-white">
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
 					</svg>
@@ -175,7 +166,7 @@
 					{#if currentUser.role === 'ADMIN'}
 						<a
 							href={localizedHref('/admin/series', page.data.lang)}
-							class="group flex items-center justify-center gap-2 rounded-[1.35rem] bg-gradient-to-r from-coral to-coral-dark px-4 py-3.5 text-sm font-black text-white shadow-lg shadow-coral/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-coral/35 touch-target"
+							class="orbit-action group flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-black transition-colors touch-target"
 						>
 							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 12h9.75M10.5 18h9.75M3.75 6h.008v.008H3.75V6Zm0 6h.008v.008H3.75V12Zm0 6h.008v.008H3.75V18Z" />
@@ -187,7 +178,7 @@
 						type="button"
 						onclick={handleLogout}
 						disabled={isLoggingOut}
-						class="group flex items-center justify-center gap-2 rounded-[1.35rem] border border-coral/35 bg-white/78 px-4 py-3.5 text-sm font-black text-coral-dark shadow-md shadow-lavender/12 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-coral/50 hover:bg-coral/10 disabled:opacity-60 touch-target {currentUser.role === 'ADMIN' ? '' : 'sm:col-span-2'}"
+					class="orbit-control group flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-black text-coral-dark transition-colors hover:bg-coral/10 disabled:opacity-60 touch-target {currentUser.role === 'ADMIN' ? '' : 'sm:col-span-2'}"
 					>
 						{#if isLoggingOut}
 							<svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
@@ -202,9 +193,8 @@
 				</div>
 			{/if}
 
-			<section class="relative overflow-hidden rounded-[1.75rem] border border-white/65 bg-white/72 p-4 shadow-lg shadow-lavender/16 backdrop-blur-2xl sm:p-5" aria-labelledby="menus-language-heading">
-				<div class="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-mint/16 blur-2xl"></div>
-				<div class="relative mb-3 flex items-center gap-3">
+			<section class="orbit-surface rounded-2xl p-4 sm:p-5" aria-labelledby="menus-language-heading">
+				<div class="mb-3 flex items-center gap-3">
 					<div class="grid h-11 w-11 shrink-0 place-items-center rounded-[1.05rem] bg-mint/15 text-mint-dark ring-1 ring-white/70" aria-hidden="true">
 						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
@@ -226,12 +216,8 @@
 							type="button"
 							onclick={() => switchLanguage(lang)}
 							aria-pressed={active}
-							class="relative overflow-hidden rounded-[1.2rem] border px-3 py-3 text-left transition-all duration-300 touch-target sm:px-4 {active ? 'border-coral/30 bg-gradient-to-br from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'border-white/70 bg-white/68 text-plum shadow-sm shadow-lavender/10 hover:bg-white/90 hover:shadow-md'}"
+							class="relative overflow-hidden rounded-xl border px-3 py-3 text-left transition-all duration-200 touch-target sm:px-4 {active ? 'border-coral bg-coral text-white' : 'border-lavender/30 bg-white text-plum hover:bg-lavender/10'}"
 						>
-							{#if active}
-								<span class="pointer-events-none absolute -right-5 -top-5 h-14 w-14 rounded-full border border-white/25"></span>
-								<span class="pointer-events-none absolute right-3 top-3 h-2 w-2 rounded-full bg-white/85"></span>
-							{/if}
 							<span class="block text-[10px] font-black tracking-[0.18em] opacity-70">{lang.toUpperCase()}</span>
 							<span class="mt-0.5 block font-[family-name:var(--font-display)] text-base font-black sm:text-lg">
 								{lang === 'th' ? m.language_th() : m.language_en()}

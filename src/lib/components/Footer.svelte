@@ -5,29 +5,24 @@
 	const currentUser = $derived(page.data.user);
 </script>
 
-<footer class="mt-12 sm:mt-20 relative overflow-hidden">
-	<div class="absolute inset-0 bg-gradient-to-t from-lavender/10 to-transparent pointer-events-none"></div>
-	
-	<div class="relative max-w-6xl mx-auto px-4 py-10 sm:py-16">
-		<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-12">
+<footer class="relative mt-12 bg-plum text-white sm:mt-20">
+	<div class="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+		<div class="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-12 md:grid-cols-3">
 			<!-- Brand -->
 			<div class="space-y-4">
 				<div class="flex items-center gap-2">
-					<div class="relative w-8 h-8">
-						<div class="absolute inset-0 bg-gradient-to-br from-coral to-lavender rounded-lg rotate-3"></div>
-						<div class="absolute inset-0 bg-white rounded-lg flex items-center justify-center">
-							<span class="text-sm font-bold text-gradient">G</span>
-						</div>
+					<div class="flex h-8 w-8 items-center justify-center rounded-md bg-coral">
+						<span class="text-sm font-bold text-white">G</span>
 					</div>
-					<span class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">GL-Orbit</span>
+					<span class="font-[family-name:var(--font-display)] text-lg font-bold text-white">GL-Orbit</span>
 				</div>
-				<p class="text-sm text-plum-light leading-relaxed max-w-xs">
+				<p class="max-w-xs text-sm leading-relaxed text-white/75">
 					{m.footer_tagline()}
 				</p>
 				<div class="flex gap-3">
 					{#each ['twitter', 'instagram', 'github'] as social}
-						<span class="w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-white/60 hover:bg-coral/20 flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer touch-target">
-							<svg class="w-5 h-5 sm:w-4 sm:h-4 text-plum-light" fill="currentColor" viewBox="0 0 24 24">
+						<span class="flex h-10 w-10 items-center justify-center rounded-md text-white/75 transition-colors hover:bg-white/10 hover:text-white touch-target sm:h-9 sm:w-9">
+							<svg class="h-5 w-5 sm:h-4 sm:w-4" fill="currentColor" viewBox="0 0 24 24">
 								{#if social === 'twitter'}
 									<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
 								{:else if social === 'instagram'}
@@ -43,33 +38,33 @@
 
 			<!-- Quick Links -->
 			<div>
-				<h3 class="font-[family-name:var(--font-display)] font-semibold text-plum mb-4">{m.footer_quick_links()}</h3>
+				<h3 class="mb-4 font-[family-name:var(--font-display)] font-semibold text-white">{m.footer_quick_links()}</h3>
 				<ul class="space-y-3">
-					<li><a href="/{page.data.lang}/" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.nav_home()}</a></li>
-					<li><a href="/{page.data.lang}/calendar" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.nav_calendar()}</a></li>
-					<li><a href="/{page.data.lang}/series" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.footer_all_series()}</a></li>
+					<li><a href="/{page.data.lang}/" class="text-sm text-white/75 hover:text-coral-light transition-colors touch-target inline-flex items-center">{m.nav_home()}</a></li>
+					<li><a href="/{page.data.lang}/calendar" class="text-sm text-white/75 hover:text-coral-light transition-colors touch-target inline-flex items-center">{m.nav_calendar()}</a></li>
+					<li><a href="/{page.data.lang}/series" class="text-sm text-white/75 hover:text-coral-light transition-colors touch-target inline-flex items-center">{m.footer_all_series()}</a></li>
 					{#if currentUser}
-						<li><a href="/{page.data.lang}/profile" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.nav_profile()}</a></li>
+						<li><a href="/{page.data.lang}/profile" class="text-sm text-white/75 hover:text-coral-light transition-colors touch-target inline-flex items-center">{m.nav_profile()}</a></li>
 					{:else}
-						<li><a href="/{page.data.lang}/login" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.nav_login()}</a></li>
-						<li><a href="/{page.data.lang}/register" class="text-sm text-plum-light hover:text-coral-dark transition-colors touch-target inline-flex items-center">{m.nav_register()}</a></li>
+						<li><a href="/{page.data.lang}/login" class="text-sm text-white/75 hover:text-coral-light transition-colors touch-target inline-flex items-center">{m.nav_login()}</a></li>
+						<li><a href="/{page.data.lang}/register" class="text-sm text-white/75 hover:text-coral-light transition-colors touch-target inline-flex items-center">{m.nav_register()}</a></li>
 					{/if}
 				</ul>
 			</div>
 
 			<!-- About -->
 			<div>
-				<h3 class="font-[family-name:var(--font-display)] font-semibold text-plum mb-4">{m.footer_about()}</h3>
+				<h3 class="mb-4 font-[family-name:var(--font-display)] font-semibold text-white">{m.footer_about()}</h3>
 				<ul class="space-y-3">
-					<li><span class="text-sm text-plum-light">{m.footer_about_1()}</span></li>
-					<li><span class="text-sm text-plum-light">{m.footer_about_2()}</span></li>
-					<li><span class="text-sm text-plum-light">{m.footer_about_3()}</span></li>
+					<li><span class="text-sm text-white/75">{m.footer_about_1()}</span></li>
+					<li><span class="text-sm text-white/75">{m.footer_about_2()}</span></li>
+					<li><span class="text-sm text-white/75">{m.footer_about_3()}</span></li>
 				</ul>
 			</div>
 		</div>
 
-		<div class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-lavender/20 text-center">
-			<p class="text-xs text-plum-light/60">
+		<div class="mt-8 px-4 py-3 text-center sm:mt-10">
+			<p class="text-xs text-white/60">
 				{m.footer_copyright({ year: new Date().getFullYear() })} {m.footer_made_with()}
 			</p>
 		</div>

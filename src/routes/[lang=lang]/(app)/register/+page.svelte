@@ -53,10 +53,6 @@
 </svelte:head>
 
 <div class="min-h-[calc(100dvh-6rem)] flex items-center justify-center px-4">
-	<div class="absolute inset-0 bg-gradient-mesh pointer-events-none"></div>
-	<div class="absolute top-10 sm:top-20 left-4 sm:left-10 w-48 h-48 sm:w-72 sm:h-72 bg-coral/15 rounded-full blur-3xl"></div>
-	<div class="absolute bottom-10 sm:bottom-20 right-4 sm:right-10 w-64 h-64 sm:w-96 sm:h-96 bg-lavender/15 rounded-full blur-3xl"></div>
-
 	<div class="relative w-full max-w-sm sm:max-w-md">
 		<div class="text-center mb-6 sm:mb-8">
 			<div class="w-14 h-14 sm:w-16 sm:h-16 mb-4 mx-auto">
@@ -66,7 +62,7 @@
 			<p class="text-sm sm:text-base text-plum-light">{m.register_subtitle()}</p>
 		</div>
 
-		<div class="glass-card-strong rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-lavender/10">
+		<div class="glass-card-strong rounded-xl sm:rounded-2xl p-6 sm:p-8">
 			{#if errorMessage}
 				<div class="mb-4 p-3 rounded-xl bg-coral/10 border border-coral/20 text-coral-dark text-sm text-center">
 					{errorMessage}
@@ -82,7 +78,7 @@
 						type="text"
 						bind:value={username}
 						placeholder="username"
-						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target {fieldErrors.username ? 'border-coral/50' : ''}"
+						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg orbit-control placeholder:text-plum-light/50 transition-all text-sm sm:text-base touch-target {fieldErrors.username ? 'border-coral/50' : ''}"
 						required
 					/>
 					{#if fieldErrors.username}
@@ -97,7 +93,7 @@
 						type="text"
 						bind:value={displayName}
 						placeholder={m.register_placeholder_display_name()}
-						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target"
+						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg orbit-control placeholder:text-plum-light/50 transition-all text-sm sm:text-base touch-target"
 					/>
 				</div>
 				<div>
@@ -108,7 +104,7 @@
 						type="email"
 						bind:value={email}
 						placeholder="your@email.com"
-						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target {fieldErrors.email ? 'border-coral/50' : ''}"
+						class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg orbit-control placeholder:text-plum-light/50 transition-all text-sm sm:text-base touch-target {fieldErrors.email ? 'border-coral/50' : ''}"
 						required
 					/>
 					{#if fieldErrors.email}
@@ -132,7 +128,7 @@
 				<button
 					type="submit"
 					disabled={isLoading}
-					class="w-full py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 hover:scale-[1.02] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 text-sm sm:text-base touch-target flex items-center justify-center"
+					class="w-full py-3 sm:py-3.5 rounded-lg orbit-action font-semibold transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed text-sm sm:text-base touch-target flex items-center justify-center"
 				>
 					{#if isLoading}
 						<div class="flex items-center justify-center gap-2">

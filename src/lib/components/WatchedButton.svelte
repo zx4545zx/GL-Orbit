@@ -21,12 +21,12 @@
 	const isLoading = $derived(checking || loading);
 	const buttonClass = $derived(
 		variant === 'orbit'
-			? `group relative flex min-h-[5.75rem] w-full flex-col justify-between overflow-hidden rounded-[1.35rem] border p-3 text-left transition duration-200 touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint disabled:pointer-events-none ${
+			? `group relative flex min-h-[5rem] w-full flex-col justify-between overflow-hidden rounded-md border p-3 text-left transition duration-200 touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint disabled:pointer-events-none ${
 					isLoading
-						? 'cursor-wait border-mint/10 bg-mint/8 text-plum-light/55'
+						? 'cursor-wait border-[#bfdce8] bg-[#e7f2f7] text-plum-light/55'
 						: watched
-							? '-translate-y-0.5 border-mint bg-mint text-plum shadow-[0_18px_30px_-22px_rgba(16,185,129,0.85)]'
-							: 'border-mint/25 bg-mint/12 text-plum hover:-translate-y-0.5 hover:border-mint/55 hover:bg-mint/20'
+							? 'border-[#bfdce8] bg-[#d9edf5] text-plum'
+							: 'border-[#bfdce8] bg-[#e7f2f7] text-plum hover:bg-[#d9edf5]'
 			  } ${className}`
 			: `${
 					variant === 'compact'
@@ -116,7 +116,7 @@
 		<span aria-hidden="true" class="absolute right-3 top-3 font-[family-name:var(--font-display)] text-[9px] font-black tracking-[0.2em] opacity-45">02</span>
 	{/if}
 
-	<span class="grid shrink-0 place-items-center {variant === 'compact' ? 'h-5 w-5' : variant === 'orbit' ? `h-9 w-9 rounded-full ${watched ? 'bg-plum text-mint' : 'bg-white text-mint-dark shadow-sm'}` : `h-9 w-9 rounded-2xl ${watched ? 'bg-mint text-white' : 'bg-mint/16 text-mint-dark ring-1 ring-mint/30'}`} ">
+	<span class="grid shrink-0 place-items-center {variant === 'compact' ? 'h-5 w-5' : variant === 'orbit' ? `h-9 w-9 rounded-md ${watched ? 'bg-[#78b2cc] text-white' : 'bg-white text-[#4d91b0]'}` : `h-9 w-9 rounded-2xl ${watched ? 'bg-mint text-white' : 'bg-mint/16 text-mint-dark ring-1 ring-mint/30'}`} ">
 		{#if isLoading}
 			<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

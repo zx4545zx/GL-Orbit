@@ -7,6 +7,9 @@
 	let { children } = $props();
 
 	const langPrefix = $derived(`/${page.data.lang}`);
+	const isHomePage = $derived(
+		page.url.pathname === langPrefix || page.url.pathname === `${langPrefix}/`
+	);
 
 	// Show the floating back-to-top button on long list pages, but NOT on detail pages.
 	const showBackToTop = $derived(
@@ -59,9 +62,9 @@
 	});
 </script>
 
-<div class="min-h-dvh flex flex-col">
+<div class="minimal-shell min-h-dvh flex flex-col">
 	<Navigation {navHidden} />
-	<div class="flex-1 pt-0 md:pt-24 mobile-bottom-safe-space px-4">
+	<div class="flex-1 mobile-bottom-safe-space px-4 {isHomePage ? '' : 'md:pt-24'}">
 		{@render children()}
 	</div>
 	<BottomNav {bottomNavHidden} />

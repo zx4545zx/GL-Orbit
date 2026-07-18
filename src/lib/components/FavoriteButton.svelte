@@ -21,12 +21,12 @@
 	const isLoading = $derived(checking || loading);
 	const buttonClass = $derived(
 		variant === 'orbit'
-			? `group relative flex min-h-[5.75rem] w-full flex-col justify-between overflow-hidden rounded-[1.35rem] border p-3 text-left transition duration-200 touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:pointer-events-none ${
+			? `group relative flex min-h-[5rem] w-full flex-col justify-between overflow-hidden rounded-md border p-3 text-left transition duration-200 touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint disabled:pointer-events-none ${
 					isLoading
-						? 'cursor-wait border-coral/10 bg-coral/8 text-plum-light/55'
+						? 'cursor-wait border-[#e8b8ca] bg-[#f8e8ef] text-plum-light/55'
 						: favorited
-							? '-translate-y-0.5 border-coral bg-coral text-white shadow-[0_18px_30px_-22px_rgba(255,107,157,0.95)]'
-							: 'border-coral/20 bg-coral/10 text-plum hover:-translate-y-0.5 hover:border-coral/45 hover:bg-coral/16'
+							? 'border-[#e8b8ca] bg-[#f3d5e1] text-plum'
+							: 'border-[#e8b8ca] bg-[#f8e8ef] text-plum hover:bg-[#f3d5e1]'
 			  } ${className}`
 			: `${
 					variant === 'compact'
@@ -116,7 +116,7 @@
 		<span aria-hidden="true" class="absolute right-3 top-3 font-[family-name:var(--font-display)] text-[9px] font-black tracking-[0.2em] opacity-45">01</span>
 	{/if}
 
-	<span class="grid shrink-0 place-items-center {variant === 'compact' ? 'h-5 w-5' : variant === 'orbit' ? `h-9 w-9 rounded-full ${favorited ? 'bg-white/22 text-white' : 'bg-white text-coral-dark shadow-sm'}` : `h-9 w-9 rounded-2xl ${favorited ? 'bg-coral text-white' : 'bg-coral/12 text-coral-dark ring-1 ring-coral/25'}`} ">
+	<span class="grid shrink-0 place-items-center {variant === 'compact' ? 'h-5 w-5' : variant === 'orbit' ? `h-9 w-9 rounded-md ${favorited ? 'bg-[#c75580] text-white' : 'bg-white text-[#b54972]'}` : `h-9 w-9 rounded-2xl ${favorited ? 'bg-coral text-white' : 'bg-coral/12 text-coral-dark ring-1 ring-coral/25'}`} ">
 		{#if isLoading}
 			<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

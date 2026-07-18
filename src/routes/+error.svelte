@@ -51,7 +51,7 @@
 		<div class="flex flex-col sm:flex-row items-center justify-center gap-3">
 			<a
 				href="/{page.data.lang}/"
-				class="px-6 py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-medium shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30 transition-all hover:-translate-y-0.5 touch-target"
+				class="orbit-action rounded-xl px-6 py-3 font-medium shadow-lg shadow-coral/25 transition-all hover:-translate-y-0.5 touch-target"
 			>
 				{m.error_back_home()}
 			</a>

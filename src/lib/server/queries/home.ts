@@ -83,7 +83,9 @@ export async function getHomeData(lang: 'th' | 'en' = 'th'): Promise<HomeApiResp
 				isNull(series.deletedAt)
 			))
 			.orderBy(asc(episodeSchedules.airDate))
-			.limit(20)
+			// Fetch enough raw schedule rows before collapsing platform/episode duplicates.
+			// A small limit can otherwise be consumed by one series and hide later releases.
+			.limit(100)
 	]);
 
 	const dayFormatter = new Intl.DateTimeFormat(lang === 'th' ? 'th-TH' : 'en-US', { weekday: 'short' });

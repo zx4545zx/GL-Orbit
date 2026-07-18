@@ -173,10 +173,10 @@ import Picture from '$lib/components/Picture.svelte';
 </svelte:head>
 
 {#snippet searchFilter()}
-	<div class="flex flex-col gap-3 max-w-xl mx-auto">
+	<div class="flex flex-col gap-3 max-w-2xl mx-auto">
 		<!-- Search Input -->
 		<div class="relative w-full">
-			<div class="glass-card-strong rounded-2xl flex items-center px-4 py-3 gap-3 transition-all duration-300 focus-within:ring-2 focus-within:ring-coral/30 focus-within:border-coral/30">
+			<div class="orbit-surface flex items-center border-x-4 border-x-plum px-4 py-3 gap-3 transition-all duration-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-coral">
 				<svg class="w-5 h-5 text-plum-light flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
 				</svg>
@@ -191,7 +191,7 @@ import Picture from '$lib/components/Picture.svelte';
 				{#if searchQuery}
 					<button
 						onclick={clearSearch}
-						class="p-1 rounded-lg hover:bg-lavender/20 transition-colors flex-shrink-0"
+					class="p-1 rounded-md hover:bg-lavender/30 transition-colors flex-shrink-0"
 						aria-label={m.common_search_clear()}
 					>
 						<svg class="w-4 h-4 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,12 +204,12 @@ import Picture from '$lib/components/Picture.svelte';
 
 		<!-- Status Filter -->
 		<div class="flex justify-center">
-			<div class="glass-card rounded-2xl p-1.5 flex gap-1 overflow-x-auto">
+			<div class="orbit-surface flex gap-0 overflow-x-auto">
 				{#each filterOptions as filter}
 					<button
 						onclick={() => updateStatus(filter.key)}
 						aria-pressed={filterStatus === filter.key}
-						class="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 flex items-center gap-1.5 touch-target whitespace-nowrap {filterStatus === filter.key ? 'bg-gradient-to-r from-coral to-coral-dark text-white shadow-lg shadow-coral/25' : 'text-plum-light hover:bg-white/60'}"
+						class="border-r border-[var(--orbit-line)] px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 touch-target whitespace-nowrap last:border-r-0 {filterStatus === filter.key ? 'bg-plum text-white' : 'text-plum-light hover:bg-cream'}"
 					>
 						{filter.label}
 					</button>
@@ -219,13 +219,16 @@ import Picture from '$lib/components/Picture.svelte';
 	</div>
 {/snippet}
 
-<div class="py-6 sm:py-8 max-w-6xl mx-auto" aria-busy={loading}>
+<div class="py-8 sm:py-12 max-w-6xl mx-auto" aria-busy={loading}>
 	<!-- Title -->
-	<div class="text-center mb-6 sm:mb-8">
-		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
+	<div class="mb-8 grid gap-5 border-b border-[var(--orbit-line-strong)] pb-7 sm:mb-10 sm:grid-cols-[1fr_auto] sm:items-end sm:pb-9">
+		<div>
+			<p class="orbit-index">{m.nav_explore()}</p>
+		<h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
 			<span>{m.series_heading_plain()}</span><span class="text-coral">{m.series_heading_accent()}</span>
 		</h1>
 		<p class="text-sm sm:text-base text-plum-light">{m.series_subtitle()}</p>
+		</div>
 	</div>
 
 	<!-- Normal Search & Filter -->
@@ -234,54 +237,49 @@ import Picture from '$lib/components/Picture.svelte';
 	</div>
 
 	<!-- Series Grid -->
-	<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+	<div class="grid grid-cols-2 min-[440px]:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
 		{#if loading}
 			{#each Array(8) as _, i}
-				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+				<div class="overflow-hidden border border-[var(--orbit-line)] bg-white">
 					<div class="relative aspect-[3/4] overflow-hidden">
 						<div class="absolute inset-0 bg-lavender/10 animate-pulse"></div>
-						<div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5 space-y-2">
-							<div class="h-3 w-1/2 bg-white/20 rounded animate-pulse"></div>
-							<div class="h-5 w-3/4 bg-white/30 rounded animate-pulse"></div>
-							<div class="h-3 w-2/3 bg-white/20 rounded animate-pulse"></div>
-						</div>
 					</div>
+					<div class="space-y-2 p-3"><div class="h-3 w-1/2 rounded bg-lavender/20 animate-pulse"></div><div class="h-4 w-3/4 rounded bg-lavender/30 animate-pulse"></div></div>
 				</div>
 			{/each}
 		{:else}
 			{#each allSeries as s (s.id)}
-				<a href="/{page.data.lang}/series/{s.id}" class="group">
-					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-lavender/20 transition-all duration-500 hover:-translate-y-2">
+				<a href="/{page.data.lang}/series/{s.id}" class="group block h-full focus-visible:outline-offset-4">
+					<div class="flex h-full flex-col overflow-hidden border border-[var(--orbit-line)] bg-white transition-[border-color,box-shadow] duration-200 group-hover:border-coral/60 group-hover:shadow-[var(--orbit-shadow)]">
 						<div class="relative aspect-[3/4] overflow-hidden">
 							<Picture
 								src={s.poster}
 								type="posters"
-								sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+								sizes="(max-width: 440px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
 								alt={s.title}
 								width={400}
 								height={533}
-								class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+								class="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-90"
 								loading="lazy"
 								decoding="async"
 							/>
-							<div class="absolute inset-0 bg-gradient-to-t from-plum/80 via-plum/20 to-transparent"></div>
 							<div class="absolute top-3 sm:top-4 left-3 sm:left-4">
-								<span class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-semibold backdrop-blur-md {statusConfig[s.status].class}">
+								<span class="rounded-md px-2 py-1 text-[0.65rem] font-semibold {statusConfig[s.status].class}">
 									{statusConfig[s.status].text}
 								</span>
 							</div>
-							<div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-								<p class="text-white/70 text-xs sm:text-sm mb-1">{s.studio}</p>
-								<h3 class="text-white font-bold text-lg sm:text-xl mb-1">{s.title}</h3>
-								<p class="text-white/80 text-xs sm:text-sm mb-2">{s.subtitle}</p>
-								{#if s.genres && s.genres.length > 0}
-									<div class="hidden flex-wrap gap-1 sm:flex">
-										{#each s.genres as genre}
-											<span class="px-1.5 py-0.5 rounded-full bg-white/20 text-white text-xs font-medium">{genre.name}</span>
-										{/each}
-									</div>
-								{/if}
-							</div>
+						</div>
+						<div class="min-w-0 flex-1 p-3 sm:p-4">
+							<p class="mb-1 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-coral line-clamp-1">{s.studio}</p>
+							<h3 class="min-h-[2.75rem] text-base font-bold leading-snug text-plum line-clamp-2 sm:min-h-[3rem] sm:text-lg">{s.title}</h3>
+							<p class="mt-1 text-xs text-plum-light line-clamp-1 sm:text-sm">{s.subtitle}</p>
+							{#if s.genres && s.genres.length > 0}
+								<div class="mt-2 hidden flex-wrap gap-1 sm:flex">
+									{#each s.genres as genre}
+										<span class="border border-lavender/50 bg-lavender/20 px-1.5 py-0.5 text-xs font-medium text-plum">{genre.name}</span>
+									{/each}
+								</div>
+							{/if}
 						</div>
 					</div>
 				</a>
@@ -295,7 +293,7 @@ import Picture from '$lib/components/Picture.svelte';
 			<button
 				onclick={loadMore}
 				disabled={loadMoreLoading}
-				class="px-8 py-3 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-105 transition-all text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 mx-auto"
+				class="border border-coral px-8 py-3 orbit-action font-semibold transition-all text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
 			>
 				{#if loadMoreLoading}
 					<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">

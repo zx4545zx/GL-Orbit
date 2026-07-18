@@ -70,22 +70,11 @@
 </svelte:head>
 
 <div class="relative py-4 sm:py-6">
-	<!-- ambient background -->
-	<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 overflow-hidden rounded-[2.5rem] opacity-80">
-		<div class="absolute -top-16 left-6 h-48 w-48 rounded-full bg-coral/18 blur-3xl"></div>
-		<div class="absolute top-12 right-10 h-56 w-56 rounded-full bg-lavender/20 blur-3xl"></div>
-		<div class="absolute bottom-0 left-1/2 h-36 w-72 -translate-x-1/2 rounded-full bg-mint/15 blur-3xl"></div>
-	</div>
-
 	<!-- Studio hero -->
-	<section class="relative mb-5 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/75 p-4 shadow-2xl shadow-lavender/10 backdrop-blur-xl sm:p-5 lg:p-6">
-		<div class="absolute inset-0 opacity-[0.55] [background:radial-gradient(circle_at_18%_12%,rgba(255,107,157,.22),transparent_28%),radial-gradient(circle_at_92%_20%,rgba(196,181,253,.28),transparent_30%),linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,245,247,.45))]"></div>
-		<div class="absolute -right-20 -top-28 h-56 w-56 rounded-full border border-coral/20"></div>
-		<div class="absolute -bottom-24 left-1/2 h-44 w-44 rounded-full border border-lavender/25"></div>
-
-		<div class="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+	<section class="orbit-surface relative mb-5 overflow-hidden rounded-2xl p-4 sm:p-5 lg:p-6">
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
 			<div class="flex gap-4">
-				<button onclick={leaveEditor} class="mt-1 hidden h-10 w-10 items-center justify-center rounded-2xl bg-white/70 text-plum shadow-sm ring-1 ring-lavender/20 transition hover:-translate-x-0.5 hover:bg-white sm:flex" aria-label="กลับ">
+				<button onclick={leaveEditor} class="orbit-control mt-1 hidden h-10 w-10 items-center justify-center rounded-xl shadow-sm transition hover:-translate-x-0.5 sm:flex" aria-label="กลับ">
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
 				</button>
 
@@ -97,7 +86,7 @@
 							<svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>
 						</div>
 					{/if}
-					<div class="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-plum/45 to-transparent"></div>
+					<div class="absolute inset-x-0 bottom-0 h-1/3 bg-plum/45"></div>
 				</div>
 
 				<div class="min-w-0 pt-1 sm:pt-2">
@@ -119,13 +108,13 @@
 				</div>
 			</div>
 
-			<div class="w-full rounded-2xl bg-white/65 p-3 ring-1 ring-white/70 lg:w-72">
+			<div class="w-full rounded-xl bg-plum/5 p-3 lg:w-72">
 				<div class="flex items-center justify-between text-xs font-semibold text-plum">
 					<span>Studio readiness</span>
 					<span>{readinessPercent}%</span>
 				</div>
 				<div class="mt-2 h-2 overflow-hidden rounded-full bg-lavender/15">
-					<div class="h-full rounded-full bg-gradient-to-r from-coral via-lavender to-mint transition-all duration-500" style={`width: ${readinessPercent}%`}></div>
+					<div class="h-full rounded-full bg-coral transition-all duration-500" style={`width: ${readinessPercent}%`}></div>
 				</div>
 				<p class="mt-2 text-[11px] text-plum-light">ครบ {readinessScore}/4 ส่วนหลัก: poster, cast, episodes, schedule</p>
 			</div>
@@ -135,7 +124,7 @@
 	<!-- Snapshot metrics -->
 	<div class="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
 		{#each statCards as stat}
-			<div class="rounded-2xl border border-white/70 bg-white/70 p-3 shadow-sm shadow-lavender/5 backdrop-blur-xl">
+			<div class="orbit-surface rounded-xl p-3 shadow-sm">
 				<div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-plum-light">{stat.label}</div>
 				<div class="mt-1 flex items-end justify-between gap-2">
 					<div class="text-2xl font-bold text-plum">{stat.value}</div>
@@ -181,7 +170,7 @@
 		</nav>
 
 		<div class="min-w-0 flex-1">
-			<div class="rounded-[1.75rem] border border-white/70 bg-white/80 p-4 shadow-2xl shadow-lavender/10 backdrop-blur-xl sm:p-6">
+			<div class="orbit-surface rounded-2xl p-4 sm:p-6">
 				{#key data.full.series.id}
 					{#if activeTab === 'main'}
 						<SeriesMainSection series={data.full.series} genres={data.full.genres} gallery={data.full.gallery} reference={data.reference} onrefresh={refresh} onmetadataDirtyChange={(dirty) => (metadataDirty = dirty)} />

@@ -38,12 +38,12 @@
 			{placeholder}
 			{required}
 			{minlength}
-			class="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-12 rounded-xl bg-white/60 border border-lavender/20 text-plum placeholder:text-plum-light/50 focus:outline-none focus:ring-2 focus:ring-coral/30 focus:border-coral/30 transition-all text-sm sm:text-base touch-target"
+			class="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-12 rounded-lg orbit-control placeholder:text-plum-light/50 transition-all text-sm sm:text-base touch-target"
 		/>
 		<button
 			type="button"
 			onclick={toggle}
-			class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-lavender/20 transition-colors text-plum-light"
+			class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-lavender/30 transition-colors text-plum-light"
 			aria-label={show ? m.password_input_hide_aria() : m.password_input_show_aria()}
 		>
 			{#if show}

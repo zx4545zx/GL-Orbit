@@ -121,18 +121,14 @@
 		<ListingSearch bind:value={searchQuery} placeholder="ค้นหาชื่อคู่จิ้นหรือศิลปิน..." ariaLabel="ค้นหา Ships" oninput={scheduleSearchUpdate} onclear={clearSearch} />
 	</div>
 
-	<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+	<div class="grid grid-cols-2 min-[440px]:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
 		{#if loading}
 			{#each Array(8) as _, i (i)}
-				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+				<div class="overflow-hidden rounded-xl border border-plum/10 bg-white shadow-sm shadow-plum/10">
 					<div class="relative aspect-[3/4] overflow-hidden">
 						<div class="absolute inset-0 bg-lavender/10 animate-pulse"></div>
-						<div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5 space-y-2">
-							<div class="h-3 w-1/2 bg-white/20 rounded animate-pulse"></div>
-							<div class="h-5 w-3/4 bg-white/30 rounded animate-pulse"></div>
-							<div class="h-3 w-2/3 bg-white/20 rounded animate-pulse"></div>
-						</div>
-					</div>
+				</div>
+				<div class="space-y-2 p-3"><div class="h-3 w-1/2 rounded bg-lavender/20 animate-pulse"></div><div class="h-4 w-3/4 rounded bg-lavender/30 animate-pulse"></div></div>
 				</div>
 			{/each}
 		{:else}
@@ -164,7 +160,7 @@
 
 	{#if !loading && hasMore}
 		<div class="text-center mt-8 sm:mt-10">
-			<button type="button" onclick={loadMore} disabled={loadMoreLoading} class="px-8 py-3 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-105 transition-all text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 mx-auto">
+			<button type="button" onclick={loadMore} disabled={loadMoreLoading} class="px-8 py-3 rounded-lg orbit-action font-semibold transition-all text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 mx-auto">
 				{loadMoreLoading ? m.common_loading() : m.common_load_more()}
 			</button>
 			{#if loadMoreError}<p class="mt-3 text-sm text-coral-dark">{loadMoreError}</p>{/if}

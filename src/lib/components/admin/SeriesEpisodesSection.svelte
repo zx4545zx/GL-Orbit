@@ -255,7 +255,7 @@
 
 	<div class="flex items-center justify-between gap-3">
 		<h3 class="text-sm font-semibold text-plum">รายการตอน <span class="text-plum-light font-normal">({episodes.length})</span></h3>
-		<button type="button" onclick={addEpisode} disabled={busy} class="px-4 py-2 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl transition-all text-sm touch-target disabled:opacity-70 flex items-center gap-1.5">
+		<button type="button" onclick={addEpisode} disabled={busy} class="orbit-action px-4 py-2 rounded-xl font-semibold transition-all text-sm touch-target disabled:opacity-70 flex items-center gap-1.5">
 			{#if busy}
 				<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
 				{busyText || 'กำลังทำงาน...'}
@@ -281,7 +281,7 @@
 				<div class="bg-white/70 rounded-2xl border border-lavender/15 overflow-hidden transition-all {open ? 'shadow-md shadow-lavender/10' : ''}">
 					<!-- header row -->
 					<button type="button" onclick={() => toggle(ep.id)} class="w-full flex items-center gap-3 p-3.5 hover:bg-white/50 transition-colors text-left">
-						<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-lavender/30 to-coral/20 flex items-center justify-center font-bold text-plum text-sm flex-shrink-0">
+						<div class="w-10 h-10 rounded-xl bg-lavender/20 flex items-center justify-center font-bold text-plum text-sm flex-shrink-0">
 							{ep.episodeNumber}
 						</div>
 						<div class="flex-1 min-w-0">

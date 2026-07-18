@@ -90,26 +90,26 @@
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<h1 class="text-2xl font-bold text-plum">จัดการประเภทซีรีส์</h1>
-		<button onclick={openCreate} class="rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white hover:bg-coral/90 transition-colors">
+		<button onclick={openCreate} class="orbit-action rounded-lg px-4 py-2 text-sm font-medium transition-colors">
 			+ เพิ่มประเภท
 		</button>
 	</div>
 
 	{#if showForm}
-		<form onsubmit={onFormSubmit} class="bg-white rounded-xl border border-gray-200 p-6 space-y-4 shadow-sm">
+		<form onsubmit={onFormSubmit} class="orbit-surface rounded-xl p-6 space-y-4">
 			<div>
 				<label for="genre-name" class="block text-sm font-medium text-plum mb-1">ชื่อประเภท</label>
 				<input id="genre-name" name="name" type="text" required value={editingId ? items.find(g => g.id === editingId)?.name : ''}
-					class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/20" />
+					class="orbit-control w-full rounded-lg px-4 py-2 text-sm focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/20" />
 			</div>
 			{#if formError}
 				<p class="text-sm text-red-500">{formError}</p>
 			{/if}
 			<div class="flex gap-3">
-				<button type="submit" disabled={formLoading} class="rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white hover:bg-coral/90 disabled:opacity-50 transition-colors">
+				<button type="submit" disabled={formLoading} class="orbit-action rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50 transition-colors">
 					{formLoading ? 'กำลังบันทึก...' : (editingId ? 'บันทึก' : 'สร้าง')}
 				</button>
-				<button type="button" onclick={closeForm} class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-plum hover:bg-gray-50 transition-colors">
+				<button type="button" onclick={closeForm} class="orbit-control rounded-lg px-4 py-2 text-sm font-medium text-plum transition-colors">
 					ยกเลิก
 				</button>
 			</div>
@@ -117,7 +117,7 @@
 	{/if}
 
 	{#if loading}
-		<div class="bg-white rounded-xl border border-gray-200 p-8 animate-pulse">
+		<div class="orbit-surface rounded-xl p-8 animate-pulse">
 			<div class="space-y-3">
 				{#each Array(4) as _}
 					<div class="h-10 bg-gray-100 rounded"></div>
@@ -125,7 +125,7 @@
 			</div>
 		</div>
 	{:else}
-		<div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+		<div class="orbit-surface rounded-xl overflow-hidden">
 			<table class="w-full text-sm">
 				<thead class="bg-gray-50 text-gray-600">
 					<tr>
@@ -160,13 +160,12 @@
 </div>
 
 {#if deleteTarget}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-plum/35 backdrop-blur-sm p-4">
-		<div class="relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/70 bg-white/90 p-6 space-y-4 shadow-2xl shadow-plum/15 backdrop-blur-xl">
-			<div class="pointer-events-none absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-white via-cream/70 to-lavender/10"></div>
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-plum/35 p-4">
+		<div class="relative w-full max-w-sm overflow-hidden rounded-xl bg-white p-6 space-y-4 shadow-2xl shadow-plum/15">
 			<h3 class="text-lg font-semibold text-plum">ยืนยันการลบ</h3>
 			<p class="text-sm text-gray-600">ต้องการลบประเภทนี้ใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้</p>
 			<div class="flex gap-3 justify-end">
-				<button onclick={() => deleteTarget = null} class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-plum hover:bg-gray-50 transition-colors">
+				<button onclick={() => deleteTarget = null} class="orbit-control rounded-lg px-4 py-2 text-sm font-medium text-plum transition-colors">
 					ยกเลิก
 				</button>
 				<button onclick={() => handleDelete(deleteTarget!)} disabled={deleteLoading} class="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-50 transition-colors">

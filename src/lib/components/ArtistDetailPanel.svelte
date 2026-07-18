@@ -43,16 +43,13 @@
 
 	<div class="flex-1 overflow-y-auto overscroll-y-contain px-4 py-4 space-y-6">
 		<section class="glass-card-strong overflow-hidden rounded-[1.5rem]">
-			<div class="relative h-28 bg-gradient-to-br from-coral/25 via-lavender/25 to-mint/20">
-				<div class="absolute inset-0 bg-gradient-mesh opacity-80"></div>
-				<div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/80 to-transparent"></div>
-			</div>
+			<div class="relative h-28 bg-plum"></div>
 			<div class="relative -mt-14 px-4 pb-5 text-center">
-				<div class="mx-auto h-28 w-28 rounded-full bg-gradient-to-br from-coral/35 via-cream to-lavender/35 p-1.5 shadow-xl shadow-lavender/25">
+				<div class="mx-auto h-28 w-28 rounded-full bg-coral/15 p-1.5 shadow-xl shadow-plum/15">
 					<Picture src={detail.profileImageUrl} type="profiles" sizes="(max-width: 768px) 40vw, 320px" alt={detail.nickname} width={112} height={112} loading="lazy" class="h-full w-full rounded-full object-cover bg-cream" />
 				</div>
 				<p class="mt-3 text-[10px] font-bold uppercase tracking-[0.24em] text-coral-dark/70">Artist orbit</p>
-				<h3 class="mt-1 font-[family-name:var(--font-display)] text-3xl font-extrabold leading-tight text-gradient">{detail.nickname}</h3>
+				<h3 class="mt-1 font-[family-name:var(--font-display)] text-3xl font-extrabold leading-tight text-coral">{detail.nickname}</h3>
 				{#if detail.fullNameEn}<p class="mt-1 text-sm font-medium text-plum-light">{detail.fullNameEn}</p>{/if}
 				{#if detail.fullNameTh}<p class="text-sm font-medium text-plum-light/85">{detail.fullNameTh}</p>{/if}
 
@@ -75,7 +72,7 @@
 								{#if social.iconUrl}
 									<img src={social.iconUrl} alt={social.platform} width={36} height={36} loading="lazy" class="h-9 w-9 rounded-xl object-cover" />
 								{:else}
-									<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-coral to-lavender text-xs font-black text-white">{socialLabel(social.platform).charAt(0)}</span>
+									<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-coral text-xs font-black text-white">{socialLabel(social.platform).charAt(0)}</span>
 								{/if}
 								<span class="min-w-0">
 									<span class="block truncate text-sm font-bold text-plum">{socialLabel(social.platform)}</span>

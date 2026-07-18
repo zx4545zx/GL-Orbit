@@ -18,7 +18,7 @@
 		<iframe src={`https://www.tiktok.com/player/v1/${postId}?autoplay=1&controls=1&description=0&music_info=0&rel=0`} {title} class="block aspect-[9/16] w-full border-0" allow="accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 	{:else}
 		<button type="button" onclick={() => { warmup(); activated = true; }} onmouseenter={warmup} onfocus={warmup} ontouchstart={warmup} class="halo-focus-ring group relative block aspect-[9/16] w-full bg-black" aria-label={`เล่น ${title}`}>
-			{#if poster}<img src={poster} alt="" loading="lazy" decoding="async" class="h-full w-full object-contain" />{:else}<span class="grid h-full place-items-center bg-gradient-to-br from-plum via-coral-dark to-lavender-dark text-5xl text-white">♪</span>{/if}
+			{#if poster}<img src={poster} alt="" loading="lazy" decoding="async" class="h-full w-full object-contain" />{:else}<span class="grid h-full place-items-center bg-plum text-5xl text-white">♪</span>{/if}
 			<span class="absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-black/70 text-2xl text-white transition group-hover:scale-110">▶</span>
 		</button>
 	{/if}

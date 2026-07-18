@@ -273,7 +273,7 @@
 					<div class="relative">
 						<button type="button" onclick={() => showEmojiPicker = !showEmojiPicker} disabled={composerState === 'publishing'} class={`halo-focus-ring grid h-10 w-10 place-items-center rounded-full transition hover:bg-lavender/20 hover:text-lavender-dark disabled:opacity-35 sm:h-11 sm:w-11 ${showEmojiPicker ? 'bg-lavender/20 text-lavender-dark' : 'text-plum-light'}`} aria-label={copy.emoji} aria-expanded={showEmojiPicker} aria-controls="moment-emoji-picker"><HaloIcon name="smile" size={20} /></button>
 						{#if showEmojiPicker}
-							<div id="moment-emoji-picker" role="group" aria-label={copy.emoji} class="absolute top-13 left-0 z-10 grid w-52 grid-cols-4 gap-1 rounded-2xl border border-white/80 bg-white/95 p-2 shadow-lg shadow-plum/15 backdrop-blur">
+							<div id="moment-emoji-picker" role="group" aria-label={copy.emoji} class="absolute top-13 left-0 z-10 grid w-52 grid-cols-4 gap-1 rounded-2xl border border-[var(--orbit-line)] bg-white p-2 shadow-lg shadow-plum/15">
 								{#each emojiOptions as emoji}
 									<button type="button" onclick={() => insertEmoji(emoji)} class="halo-focus-ring grid h-10 w-10 place-items-center rounded-xl text-xl transition hover:bg-lavender/20" aria-label={`Add ${emoji}`}>{emoji}</button>
 								{/each}

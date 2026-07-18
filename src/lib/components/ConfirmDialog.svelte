@@ -62,7 +62,7 @@
 	<!-- Backdrop -->
 	<button
 		type="button"
-		class="fixed inset-0 z-50 bg-plum/35 backdrop-blur-sm transition-opacity duration-200"
+		class="fixed inset-0 z-50 bg-plum/35 transition-opacity duration-200"
 		onclick={handleCancel}
 		aria-label={m.common_close()}
 	></button>
@@ -74,8 +74,7 @@
 		aria-modal="true"
 		aria-labelledby="confirm-title"
 	>
-		<div class="glass-card-strong relative max-w-sm w-full overflow-hidden rounded-3xl border border-white/70 bg-white/90 p-6 shadow-2xl shadow-plum/15 backdrop-blur-xl animate-slide-up sm:p-8">
-			<div class="pointer-events-none absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-white via-cream/70 to-lavender/10"></div>
+		<div class="glass-card-strong relative max-w-sm w-full overflow-hidden rounded-2xl p-6 shadow-xl shadow-plum/15 animate-slide-up sm:p-8">
 			<!-- Icon -->
 			<div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl {danger ? 'bg-coral/10' : 'bg-lavender/10'} flex items-center justify-center mx-auto mb-4">
 				{#if danger}
@@ -101,14 +100,14 @@
 					type="button"
 					data-cancel-button
 					onclick={handleCancel}
-					class="flex-1 px-4 py-2.5 sm:py-3 rounded-xl glass-card-strong text-plum font-medium hover:bg-white/90 transition-all text-sm sm:text-base touch-target"
+					class="flex-1 px-4 py-2.5 sm:py-3 rounded-lg orbit-control text-plum font-medium transition-all text-sm sm:text-base touch-target"
 				>
 					{cancelLabel}
 				</button>
 				<button
 					type="button"
 					onclick={handleConfirm}
-					class="flex-1 px-4 py-2.5 sm:py-3 rounded-xl text-white font-semibold transition-all text-sm sm:text-base touch-target {danger ? 'bg-gradient-to-r from-coral to-coral-dark shadow-lg shadow-coral/25 hover:shadow-xl' : 'bg-gradient-to-r from-lavender to-lavender-dark shadow-lg shadow-lavender/25 hover:shadow-xl'}"
+					class="flex-1 px-4 py-2.5 sm:py-3 rounded-lg text-white font-semibold transition-all text-sm sm:text-base touch-target {danger ? 'bg-coral shadow-sm shadow-coral/25 hover:bg-coral-dark' : 'bg-lavender-dark shadow-sm shadow-lavender/25 hover:bg-plum'}"
 				>
 					{confirmLabel}
 				</button>
@@ -117,4 +116,3 @@
 	</div>
 	</div>
 {/if}
-

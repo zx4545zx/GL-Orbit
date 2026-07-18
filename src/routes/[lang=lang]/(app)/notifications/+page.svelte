@@ -159,12 +159,12 @@
 			{/each}
 		</div>
 	{:else if loadError && notifications.length === 0}
-		<div class="glass-card rounded-2xl py-16 px-6 text-center">
+		<div class="orbit-surface rounded-xl py-16 px-6 text-center">
 			<p class="text-coral mb-4">{loadError}</p>
 		</div>
 	{:else if notifications.length === 0}
 		<!-- Empty State (only after initial load completes) -->
-		<div class="glass-card rounded-2xl py-16 px-6 text-center">
+		<div class="orbit-surface rounded-xl py-16 px-6 text-center">
 			<svg class="w-16 h-16 mx-auto text-lavender/40 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
 				<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
 			</svg>
@@ -175,7 +175,7 @@
 			{#each notifications as n}
 				<button
 					onclick={() => markRead(n)}
-					class="w-full text-left glass-card rounded-2xl px-4 py-3.5 transition-all duration-200 hover:bg-lavender/5 flex items-start gap-3.5 {n.isRead ? '' : 'border-l-2 border-l-coral'}"
+					class="w-full text-left orbit-surface rounded-xl px-4 py-3.5 transition-all duration-200 hover:bg-lavender/5 flex items-start gap-3.5 {n.isRead ? '' : 'border-l-2 border-l-coral'}"
 				>
 					<div class="mt-0.5 shrink-0">
 						{@html getTypeIcon(n.type)}
@@ -197,7 +197,7 @@
 				<button
 					onclick={loadMore}
 					disabled={loading}
-					class="px-6 py-3 rounded-xl bg-lavender/10 hover:bg-lavender/20 text-plum font-medium text-sm transition-all duration-200 disabled:opacity-50 touch-target"
+					class="orbit-control px-6 py-3 rounded-xl text-plum font-medium text-sm transition-colors disabled:opacity-50 touch-target"
 				>
 					{#if loading}
 						<span class="flex items-center gap-2 justify-center">

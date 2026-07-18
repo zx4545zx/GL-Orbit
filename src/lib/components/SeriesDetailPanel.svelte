@@ -142,23 +142,23 @@
 			{#if detail.genres.length > 0}
 				<div class="flex flex-wrap gap-1.5">
 					{#each detail.genres as genre}
-						<span class="rounded-full border border-lavender/20 bg-gradient-to-r from-lavender/15 to-coral/10 px-2.5 py-1 text-xs font-semibold text-plum">{genre}</span>
+						<span class="rounded-full border border-lavender/20 bg-lavender/10 px-2.5 py-1 text-xs font-semibold text-plum">{genre}</span>
 					{/each}
 				</div>
 			{/if}
 
 			<div class="grid grid-cols-3 gap-2">
-				<div class="rounded-xl border border-coral/15 bg-gradient-to-br from-white/70 to-coral/10 p-2 text-center">
+				<div class="rounded-xl border border-coral/15 bg-coral/5 p-2 text-center">
 					<div class="text-xl font-extrabold text-coral-dark">{detail.episodes}</div>
 					<div class="text-[10px] font-bold uppercase tracking-wide text-plum-light">{m.common_episodes()}</div>
 				</div>
 				{#if detail.year}
-					<div class="rounded-xl border border-lavender/20 bg-gradient-to-br from-white/70 to-lavender/15 p-2 text-center">
+					<div class="rounded-xl border border-lavender/20 bg-lavender/10 p-2 text-center">
 						<div class="text-xl font-extrabold text-lavender-dark">{detail.year}</div>
 						<div class="text-[10px] font-bold uppercase tracking-wide text-plum-light">{m.common_year()}</div>
 					</div>
 				{/if}
-				<div class="rounded-xl border border-mint/20 bg-gradient-to-br from-white/70 to-mint/10 p-2 text-center">
+				<div class="rounded-xl border border-mint/20 bg-mint/10 p-2 text-center">
 					<div class="text-xl font-extrabold text-mint-dark">{detail.artists.length}</div>
 					<div class="text-[10px] font-bold uppercase tracking-wide text-plum-light">{m.common_cast()}</div>
 				</div>
@@ -226,12 +226,12 @@
 										{#if item.coverUrl}
 											<div class="relative h-10 w-14 shrink-0 overflow-hidden rounded-xl border border-white/70 bg-lavender/10">
 												<Picture src={item.coverUrl} type="posters" sizes="(max-width: 768px) 50vw, 200px" alt={m.series_episode_cover_alt({ episode: item.episode })} width={112} height={63} loading="lazy" class="h-full w-full object-cover" />
-												<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/70 to-transparent px-1.5 py-0.5">
+											<div class="absolute inset-x-0 bottom-0 bg-plum/85 px-1.5 py-0.5">
 													<span class="text-[9px] font-bold text-white">{item.episode}</span>
 												</div>
 											</div>
 										{:else}
-											<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-coral/20 to-lavender/20">
+											<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-coral/10">
 												<span class="text-xs font-bold text-coral-dark">{item.episode}</span>
 											</div>
 										{/if}
@@ -279,7 +279,7 @@
 													</div>
 												</div>
 												{#if sch.streamLink}
-													<a href={sch.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-coral to-coral-dark hover:from-coral-dark hover:to-coral transition shrink-0 touch-target">
+													<a href={sch.streamLink} target="_blank" rel="noopener noreferrer" class="orbit-action inline-flex items-center gap-1 rounded-lg px-3 py-1 text-xs font-semibold transition shrink-0 touch-target">
 														{m.series_detail_watch_now()}
 														<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
 													</a>

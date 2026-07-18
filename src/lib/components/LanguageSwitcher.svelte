@@ -42,7 +42,7 @@
 	<button
 		type="button"
 		onclick={() => switchLanguage(nextLang)}
-		class="group inline-flex h-10 min-w-10 items-center justify-center gap-2 rounded-xl border border-lavender/20 bg-white/65 px-2.5 text-plum-light shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-coral/25 hover:bg-white/85 hover:text-coral-dark hover:shadow-lg hover:shadow-coral/10 touch-target {className}"
+		class="orbit-control group inline-flex h-10 min-w-10 items-center justify-center gap-2 rounded-xl px-2.5 text-plum-light shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-coral/25 hover:text-coral-dark hover:shadow-lg hover:shadow-coral/10 touch-target {className}"
 		aria-label={`Switch to ${nextLang === 'th' ? m.language_th() : m.language_en()}`}
 		title={nextLang === 'th' ? m.language_th() : m.language_en()}
 	>
@@ -55,21 +55,19 @@
 {:else}
 	<div class="inline-flex max-w-full {className}">
 		<div
-			class="relative isolate inline-grid w-fit max-w-full grid-cols-2 items-center overflow-hidden rounded-full border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.78),rgba(255,245,247,0.48))] p-0.5 shadow-[0_8px_24px_rgba(196,181,253,0.2),inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-2xl sm:p-1 sm:shadow-[0_10px_30px_rgba(196,181,253,0.22),inset_0_1px_0_rgba(255,255,255,0.85)]"
+			class="relative isolate inline-grid w-fit max-w-full grid-cols-2 items-center overflow-hidden rounded-xl border border-[var(--orbit-line)] bg-white p-0.5 shadow-sm sm:p-1"
 			aria-label="Language switcher"
 		>
-			<span class="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_18%_12%,rgba(255,107,157,0.18),transparent_36%),radial-gradient(circle_at_88%_82%,rgba(110,231,183,0.18),transparent_38%)]"></span>
 			<span
-				class="pointer-events-none absolute bottom-0.5 left-0.5 top-0.5 w-[calc(50%-0.125rem)] rounded-full bg-gradient-to-br from-coral via-coral-dark to-lavender shadow-[0_7px_16px_rgba(255,107,157,0.32)] transition-transform duration-300 ease-out sm:bottom-1 sm:left-1 sm:top-1 sm:w-[calc(50%-0.25rem)] sm:shadow-[0_8px_18px_rgba(255,107,157,0.34)] {currentLang === 'en' ? 'translate-x-[calc(100%+0.25rem)] sm:translate-x-[calc(100%+0.5rem)]' : 'translate-x-0'}"
+				class="pointer-events-none absolute bottom-0.5 left-0.5 top-0.5 w-[calc(50%-0.125rem)] rounded-lg bg-coral shadow-sm transition-transform duration-300 ease-out sm:bottom-1 sm:left-1 sm:top-1 sm:w-[calc(50%-0.25rem)] {currentLang === 'en' ? 'translate-x-[calc(100%+0.25rem)] sm:translate-x-[calc(100%+0.5rem)]' : 'translate-x-0'}"
 			></span>
-			<span class="pointer-events-none absolute left-1/2 top-1/2 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/30 opacity-45 sm:block"></span>
 
 			{#each availableLanguageTags as lang (lang)}
 				{@const active = currentLang === lang}
 				<button
 					type="button"
 					onclick={() => switchLanguage(lang)}
-					class="group relative z-10 flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full px-2 text-[10px] font-black tracking-[0.12em] transition-all duration-300 sm:min-w-12 sm:gap-1.5 sm:px-3 sm:text-[11px] sm:tracking-[0.16em] {active ? 'text-white' : 'text-plum-light hover:text-plum'}"
+					class="group relative z-10 flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-lg px-2 text-[10px] font-black tracking-[0.12em] transition-all duration-300 sm:min-w-12 sm:gap-1.5 sm:px-3 sm:text-[11px] sm:tracking-[0.16em] {active ? 'text-white' : 'text-plum-light hover:text-plum'}"
 					aria-pressed={active}
 					aria-label={lang === 'th' ? m.language_th() : m.language_en()}
 				>

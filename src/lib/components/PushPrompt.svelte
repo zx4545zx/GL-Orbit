@@ -73,9 +73,9 @@
 		transition:fly={{ y: 24, duration: 250 }}
 		class="fixed bottom-20 md:bottom-6 left-3 right-3 md:left-auto md:right-6 md:w-80 z-[60]"
 	>
-		<div class="glass-card-strong rounded-2xl p-4 shadow-xl shadow-lavender/20 border border-white/60">
+		<div class="glass-card-strong rounded-xl p-4 shadow-xl shadow-plum/10">
 			<div class="flex items-start gap-3">
-				<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-coral to-lavender flex items-center justify-center shrink-0">
+				<div class="w-10 h-10 rounded-lg bg-coral flex items-center justify-center shrink-0">
 					<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
 					</svg>
@@ -97,7 +97,7 @@
 				<button
 					onclick={enable}
 					disabled={loading}
-					class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white text-xs font-semibold shadow-lg shadow-coral/25 hover:shadow-xl transition-all disabled:opacity-60 touch-target flex items-center justify-center gap-1.5"
+					class="flex-1 py-2 px-3 rounded-lg orbit-action text-xs font-semibold transition-all disabled:opacity-60 touch-target flex items-center justify-center gap-1.5"
 				>
 					{#if loading}
 						<svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>

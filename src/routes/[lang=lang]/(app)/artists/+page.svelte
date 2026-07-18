@@ -134,13 +134,16 @@ import ListingSearch from '$lib/components/ListingSearch.svelte';
 	{@html jsonLdScript(localizedJsonLd)}
 </svelte:head>
 
-<div class="py-6 sm:py-8 max-w-6xl mx-auto" aria-busy={loading}>
+<div class="py-8 sm:py-12 max-w-6xl mx-auto" aria-busy={loading}>
 	<!-- Title -->
-	<div class="text-center mb-6 sm:mb-8">
-		<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
+	<div class="mb-8 grid gap-5 border-b border-[var(--orbit-line-strong)] pb-7 sm:mb-10 sm:grid-cols-[1fr_auto] sm:items-end sm:pb-9">
+		<div>
+			<p class="orbit-index">{m.nav_explore()}</p>
+		<h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold text-plum mb-2 sm:mb-3">
 			<span>{m.artist_heading_plain()}</span><span class="text-coral">{m.artist_heading_accent()}</span>
 		</h1>
 		<p class="text-sm sm:text-base text-plum-light">{m.artist_list_subtitle()}</p>
+		</div>
 	</div>
 
 	<!-- Search -->
@@ -149,18 +152,14 @@ import ListingSearch from '$lib/components/ListingSearch.svelte';
 	</div>
 
 	<!-- Artist Grid -->
-	<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+	<div class="grid grid-cols-2 min-[440px]:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
 		{#if loading}
 			{#each Array(8) as _, i (i)}
-				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+				<div class="overflow-hidden border border-[var(--orbit-line)] bg-white">
 					<div class="relative aspect-[3/4] overflow-hidden">
 						<div class="absolute inset-0 bg-lavender/10 animate-pulse"></div>
-						<div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5 space-y-2">
-							<div class="h-3 w-1/2 bg-white/20 rounded animate-pulse"></div>
-							<div class="h-5 w-3/4 bg-white/30 rounded animate-pulse"></div>
-							<div class="h-3 w-2/3 bg-white/20 rounded animate-pulse"></div>
-						</div>
-					</div>
+				</div>
+				<div class="space-y-2 p-3"><div class="h-3 w-1/2 rounded bg-lavender/20 animate-pulse"></div><div class="h-4 w-3/4 rounded bg-lavender/30 animate-pulse"></div></div>
 				</div>
 			{/each}
 		{:else}
@@ -184,7 +183,7 @@ import ListingSearch from '$lib/components/ListingSearch.svelte';
 			<button
 				onclick={loadMore}
 				disabled={loadMoreLoading}
-				class="px-8 py-3 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-105 transition-all text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 mx-auto"
+				class="border border-coral px-8 py-3 orbit-action font-semibold transition-all text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
 			>
 				{#if loadMoreLoading}
 					<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">

@@ -78,7 +78,7 @@
 		<!-- backdrop -->
 		<button
 			type="button"
-			class="absolute inset-0 bg-plum/35 backdrop-blur-sm"
+			class="absolute inset-0 bg-plum/35"
 			transition:fade={{ duration: 150 }}
 			onclick={handleClose}
 			aria-label="ปิด"
@@ -88,9 +88,8 @@
 		<div
 			data-modal-panel
 			transition:scale={{ duration: 180, start: 0.95 }}
-			class="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/70 bg-white/90 p-5 shadow-2xl shadow-plum/15 backdrop-blur-xl sm:p-6 max-h-[calc(100dvh-2rem)] overflow-y-auto"
+			class="relative w-full max-w-md overflow-hidden rounded-2xl border border-plum/10 bg-white p-5 shadow-2xl shadow-plum/15 sm:p-6 max-h-[calc(100dvh-2rem)] overflow-y-auto"
 		>
-			<div class="pointer-events-none absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-white via-cream/70 to-lavender/10"></div>
 
 			<div class="flex items-center justify-between mb-4">
 				<h3 class="text-lg font-semibold text-plum">{title}</h3>
@@ -131,7 +130,7 @@
 					<button
 						type="submit"
 						disabled={loading}
-						class="flex-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl transition-all text-sm sm:text-base touch-target disabled:opacity-60"
+						class="flex-1 px-5 py-2.5 rounded-lg orbit-action font-semibold transition-all text-sm sm:text-base touch-target disabled:opacity-60"
 					>
 						{loading ? 'กำลังบันทึก...' : submitLabel}
 					</button>

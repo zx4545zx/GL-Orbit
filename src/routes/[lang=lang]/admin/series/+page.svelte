@@ -118,7 +118,7 @@
 				createValues = { status: 'UPCOMING' };
 				createOpen = true;
 			}}
-			class="px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm sm:text-base touch-target"
+			class="orbit-action px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base touch-target"
 		>
 			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
 			เพิ่มซีรีส์ใหม่
@@ -133,7 +133,7 @@
 				type="text"
 				bind:value={search}
 				placeholder="ค้นหาซีรีส์..."
-				class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-lavender/30 bg-white/70 text-plum focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm"
+				class="orbit-control w-full pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm"
 			/>
 		</div>
 	</form>

@@ -136,10 +136,10 @@
 </div>
 
 <!-- Artist Grid -->
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6" aria-busy={loading}>
+<div class="grid grid-cols-2 min-[440px]:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5" aria-busy={loading}>
 	{#if loading}
 		{#each Array(8) as _, i (i)}
-			<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+			<div class="orbit-surface rounded-xl overflow-hidden">
 				<div class="relative aspect-[3/4] overflow-hidden">
 					<div class="absolute inset-0 bg-lavender/10 animate-pulse"></div>
 				</div>
@@ -163,7 +163,7 @@
 <!-- Load More -->
 {#if !loading && hasMore}
 	<div class="text-center mt-8 sm:mt-10">
-		<button onclick={loadMore} disabled={loadMoreLoading} class="px-8 py-3 rounded-2xl bg-gradient-to-r from-coral to-coral-dark text-white font-semibold shadow-lg shadow-coral/25 hover:shadow-xl hover:scale-105 transition-all text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 mx-auto">
+		<button onclick={loadMore} disabled={loadMoreLoading} class="orbit-action px-8 py-3 rounded-xl font-semibold transition-colors text-sm sm:text-base touch-target disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 mx-auto">
 			{#if loadMoreLoading}
 				<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
 				{m.common_loading()}

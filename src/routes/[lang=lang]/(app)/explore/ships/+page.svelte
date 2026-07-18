@@ -95,13 +95,14 @@
 <section class="space-y-6">
 	<ListingSearch bind:value={searchQuery} placeholder="ค้นหา Ships หรือศิลปิน..." ariaLabel="ค้นหา Ships" oninput={scheduleSearchUpdate} onclear={clearSearch} />
 
-	<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6" aria-busy={loading}>
+	<div class="grid grid-cols-2 min-[440px]:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5" aria-busy={loading}>
 		{#if loading}
 			{#each Array(8) as _, i (i)}
-				<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+				<div class="orbit-surface overflow-hidden rounded-xl">
 					<div class="relative aspect-[3/4] overflow-hidden">
 						<div class="absolute inset-0 bg-lavender/10 animate-pulse"></div>
 					</div>
+					<div class="h-16 animate-pulse bg-plum/5"></div>
 				</div>
 			{/each}
 		{:else}
@@ -125,12 +126,12 @@
 	</div>
 
 	{#if !loading && allShips.length === 0}
-		<div class="glass-card rounded-[1.5rem] p-8 text-center text-plum-light">ไม่พบ Ships ที่ตรงกับการค้นหา</div>
+		<div class="orbit-surface rounded-xl p-8 text-center text-plum-light">ไม่พบ Ships ที่ตรงกับการค้นหา</div>
 	{/if}
 
 	{#if hasMore}
 		<div class="text-center">
-			<button type="button" onclick={loadMore} disabled={loadMoreLoading} class="touch-target rounded-full bg-gradient-to-r from-coral to-coral-dark px-6 py-3 font-semibold text-white shadow-lg shadow-coral/25 disabled:opacity-60">
+			<button type="button" onclick={loadMore} disabled={loadMoreLoading} class="orbit-action touch-target px-6 py-3 disabled:opacity-60">
 				{loadMoreLoading ? m.common_loading() : m.common_load_more()}
 			</button>
 			{#if loadMoreError}<p class="mt-3 text-sm text-coral-dark">{loadMoreError}</p>{/if}
