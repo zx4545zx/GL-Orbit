@@ -231,9 +231,9 @@
 					</div>
 					<div class="min-w-0 flex-1">
 						<h2 id="menus-theme-heading" class="font-[family-name:var(--font-display)] text-lg font-black leading-tight text-plum sm:text-xl">
-							โหมดการแสดงผล
+							{m.menus_theme_title()}
 						</h2>
-						<p class="text-sm leading-5 text-plum-light">{themeState.theme === 'dark' ? 'กำลังใช้โหมดมืด' : 'กำลังใช้โหมดสว่าง'}</p>
+						<p class="text-sm leading-5 text-plum-light">{themeState.theme === 'dark' ? m.menus_theme_dark() : m.menus_theme_light()}</p>
 					</div>
 					<ThemeToggle />
 				</div>
