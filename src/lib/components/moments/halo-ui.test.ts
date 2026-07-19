@@ -18,7 +18,8 @@ describe('Orbit Halo UI', () => {
 		const preview = read('../../../lib/components/moments/EmbedPreview.svelte');
 		expect(preview).toContain('rel="noreferrer"');
 		expect(preview).toContain('www.youtube-nocookie.com/embed/');
-		expect(preview).toContain('platform.x.com/widgets.js');
+		expect(preview).toContain('XEmbedPlayer');
+		expect(read('../../../lib/x-widgets.ts')).toContain('platform.x.com/widgets.js');
 		expect(preview).toContain('<iframe');
 		expect(read('halo/moments/[id]/+page.svelte')).toContain('expanded');
 	});

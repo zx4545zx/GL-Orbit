@@ -1,20 +1,11 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
-	import { page } from '$app/state';	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { connectNotificationStream } from '$lib/client/notification-stream.js';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+	import { useUnreadNotifications } from '$lib/client/unread-notifications.js';
 	import type { NotificationItem } from '$lib/types.js';
 
-	let {
-		unreadCount = 0,
-		onMarkAllRead,
-		onUnreadCountChange
-	}: {
-		unreadCount: number;
-		onMarkAllRead?: () => void;
-		onUnreadCountChange?: (count: number) => void;
-	} = $props();
-
+	const unreadNotifications = useUnreadNotifications();
 	let isOpen = $state(false);
 	let notifications: NotificationItem[] = $state([]);
 	let loading = $state(false);
@@ -70,33 +61,39 @@
 		const wasUnread = !n.isRead;
 		// optimistic update before navigating
 		n.isRead = true;
-		if (wasUnread) {
-			onUnreadCountChange?.(Math.max(0, unreadCount - 1));
-		}
+		const mutationRevision = wasUnread
+			? unreadNotifications.decrement()
+			: unreadNotifications.beginMutation();
 		goto(`/series/${n.seriesId}`);
 		try {
-			await fetch('/api/notifications', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ notificationId: n.id })
+			const data = await unreadNotifications.runMutation(async () => {
+				const res = await fetch('/api/notifications', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ notificationId: n.id })
+				});
+				return res.ok ? await res.json() : null;
 			});
+			if (data) unreadNotifications.reconcile(data.unreadCount ?? 0, mutationRevision);
 		} catch {
 			// Fail silent — notification will still open
 		}
 	}
 
 	async function markAllRead() {
+		const mutationRevision = unreadNotifications.beginMutation();
 		try {
-			const res = await fetch('/api/notifications', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({})
+			const data = await unreadNotifications.runMutation(async () => {
+				const res = await fetch('/api/notifications', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({})
+				});
+				return res.ok ? await res.json() : null;
 			});
-			if (res.ok) {
-				const data = await res.json();
+			if (data) {
 				notifications = [];
-				onMarkAllRead?.();
-				onUnreadCountChange?.(0);
+				unreadNotifications.reconcile(data.unreadCount ?? 0, mutationRevision);
 			}
 		} catch {
 			// Fail silent
@@ -116,35 +113,6 @@
 		}
 	});
 
-	onMount(() => {
-		const disconnect = connectNotificationStream({
-			onNotification: (item) => {
-				if (!notifications.some((n) => n.id === item.id)) {
-					notifications = [item, ...notifications];
-				}
-				if (!item.isRead) {
-					onUnreadCountChange?.(unreadCount + 1);
-				}
-			},
-			onCount: (count) => {
-				onUnreadCountChange?.(count);
-			},
-			onRead: (id) => {
-				const target = notifications.find((n) => n.id === id);
-				if (target && !target.isRead) {
-					target.isRead = true;
-					onUnreadCountChange?.(Math.max(0, unreadCount - 1));
-				}
-			},
-			onCleared: () => {
-				for (const n of notifications) {
-					n.isRead = true;
-				}
-				onUnreadCountChange?.(0);
-			}
-		});
-		return disconnect;
-	});
 </script>
 
 <div bind:this={dropdownEl} class="relative">
@@ -158,9 +126,9 @@
 		<svg class="w-5 h-5 text-plum-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
 			<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
 		</svg>
-		{#if unreadCount > 0}
+		{#if unreadNotifications.state.count > 0}
 			<span class="absolute top-0.5 right-0.5 w-4 h-4 flex items-center justify-center rounded-full bg-coral text-white text-[9px] font-bold leading-none shadow-lg shadow-coral/30">
-				{unreadCount > 9 ? '9+' : unreadCount}
+				{unreadNotifications.state.count > 9 ? '9+' : unreadNotifications.state.count}
 			</span>
 		{/if}
 	</button>

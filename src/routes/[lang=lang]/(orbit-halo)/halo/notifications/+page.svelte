@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { onMount } from 'svelte';
-	import { connectNotificationStream } from '$lib/client/notification-stream.js';
 	import { m } from '$lib/i18n/paraglide.js';
 	import HaloIcon from '$lib/components/moments/HaloIcon.svelte';
 	import HaloPageHeader from '$lib/components/moments/HaloPageHeader.svelte';
@@ -29,6 +27,13 @@
 	let loadingMore = $state(false);
 	let markingAll = $state(false);
 	let loadError = $state('');
+	let notificationMutationQueue = Promise.resolve();
+
+	function runNotificationMutation<T>(mutation: () => Promise<T>): Promise<T> {
+		const result = notificationMutationQueue.then(mutation, mutation);
+		notificationMutationQueue = result.then(() => undefined, () => undefined);
+		return result;
+	}
 
 	$effect(() => {
 		notifications = data.notifications;
@@ -36,29 +41,6 @@
 		offset = data.offset + data.notifications.length;
 		hasMore = data.hasMore;
 		loadError = '';
-	});
-
-	onMount(() => {
-		return connectNotificationStream({
-			onNotification: (item) => {
-				if (notifications.some((notification) => notification.id === item.id)) return;
-				notifications = [item, ...notifications];
-				offset += 1;
-				if (!item.isRead) unreadCount += 1;
-			},
-			onCount: (count) => {
-				unreadCount = count;
-			},
-			onRead: (notificationId) => {
-				notifications = notifications.map((notification) =>
-					notification.id === notificationId ? { ...notification, isRead: true } : notification
-				);
-			},
-			onCleared: () => {
-				notifications = notifications.map((notification) => ({ ...notification, isRead: true }));
-				unreadCount = 0;
-			}
-		});
 	});
 
 	function formatRelativeTime(dateString: string): string {
@@ -126,13 +108,17 @@
 
 		void goto(notificationHref(notification));
 		try {
-			await fetch('/api/notifications', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ notificationId: notification.id })
+			const result = await runNotificationMutation(async () => {
+				const response = await fetch('/api/notifications', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ notificationId: notification.id })
+				});
+				return response.ok ? await response.json() : null;
 			});
+			if (result) unreadCount = result.unreadCount ?? unreadCount;
 		} catch {
-			// The optimistic state is reconciled by the notification stream on reconnect.
+			// The next page load reconciles the optimistic state.
 		}
 	}
 
@@ -140,14 +126,17 @@
 		markingAll = true;
 		loadError = '';
 		try {
-			const response = await fetch('/api/notifications', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({})
+			const result = await runNotificationMutation(async () => {
+				const response = await fetch('/api/notifications', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({})
+				});
+				if (!response.ok) throw new Error('mark-all-failed');
+				return await response.json();
 			});
-			if (!response.ok) throw new Error('mark-all-failed');
 			notifications = notifications.map((notification) => ({ ...notification, isRead: true }));
-			unreadCount = 0;
+			unreadCount = result.unreadCount ?? 0;
 		} catch {
 			loadError = m.notifications_load_error();
 		} finally {

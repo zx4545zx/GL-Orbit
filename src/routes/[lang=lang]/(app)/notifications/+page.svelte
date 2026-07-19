@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { onMount } from 'svelte';
-	import { connectNotificationStream } from '$lib/client/notification-stream.js';
+	import { useUnreadNotifications } from '$lib/client/unread-notifications.js';
 	import type { PageData } from './$types.js';
 	import type { NotificationItem, NotificationsListResponse } from '$lib/types.js';
 	import { m } from '$lib/i18n/paraglide.js';
 
 	let { data }: { data: PageData } = $props();
+	const unreadNotifications = useUnreadNotifications();
 
 	let notifications = $state<NotificationItem[]>([]);
 	let offset = $state(0);
@@ -23,28 +23,7 @@
 		hasMore = data.hasMore;
 		loadError = '';
 		initialLoading = false;
-	});
-
-	onMount(() => {
-		const disconnect = connectNotificationStream({
-			onNotification: (item) => {
-				if (!notifications.some((n) => n.id === item.id)) {
-					notifications = [item, ...notifications];
-					offset += 1;
-				}
-			},
-			onCount: (count) => {
-				// badge-only update; keep list intact
-			},
-			onRead: (id) => {
-				const target = notifications.find((n) => n.id === id);
-				if (target) target.isRead = true;
-			},
-			onCleared: () => {
-				notifications = notifications.map((n) => ({ ...n, isRead: true }));
-			}
-		});
-		return disconnect;
+		unreadNotifications.set(data.unreadCount);
 	});
 
 	function formatRelativeTime(dateStr: string): string {
@@ -73,13 +52,20 @@
 	async function markRead(n: NotificationItem) {
 		const wasUnread = !n.isRead;
 		n.isRead = true;
+		const mutationRevision = wasUnread
+			? unreadNotifications.decrement()
+			: unreadNotifications.beginMutation();
 		goto(`/series/${n.seriesId}`);
 		try {
-			await fetch('/api/notifications', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ notificationId: n.id })
+			const result = await unreadNotifications.runMutation(async () => {
+				const res = await fetch('/api/notifications', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ notificationId: n.id })
+				});
+				return res.ok ? await res.json() : null;
 			});
+			if (result) unreadNotifications.reconcile(result.unreadCount ?? 0, mutationRevision);
 		} catch {
 			// Fail silent — notification will still open
 		}
@@ -105,14 +91,19 @@
 
 	async function markAllRead() {
 		markingAll = true;
+		const mutationRevision = unreadNotifications.beginMutation();
 		try {
-			const res = await fetch('/api/notifications', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({})
+			const result = await unreadNotifications.runMutation(async () => {
+				const res = await fetch('/api/notifications', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({})
+				});
+				return res.ok ? await res.json() : null;
 			});
-			if (res.ok) {
+			if (result) {
 				notifications = notifications.map((n) => ({ ...n, isRead: true }));
+				unreadNotifications.reconcile(result.unreadCount ?? 0, mutationRevision);
 			}
 		} catch {
 			// Fail silent

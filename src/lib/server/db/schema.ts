@@ -141,7 +141,8 @@ export const favorites = pgTable('favorites', {
 	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 }, (table) => ({
-	pk: { columns: [table.userId, table.seriesId] }
+	pk: { columns: [table.userId, table.seriesId] },
+	seriesUserIndex: index('favorites_series_user_idx').on(table.seriesId, table.userId)
 }));
 
 export const watched = pgTable('watched', {
@@ -306,7 +307,12 @@ export const notifications = pgTable('notifications', {
 	message: text('message').notNull(),
 	isRead: boolean('is_read').notNull().default(false),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
-});
+}, (table) => ({
+	userCreatedIndex: index('notifications_user_created_idx').on(table.userId, table.createdAt.desc()),
+	unreadUserIndex: index('notifications_unread_user_idx')
+		.on(table.userId)
+		.where(sql`${table.isRead} = false`)
+}));
 
 export const pushSubscriptions = pgTable('push_subscriptions', {
 	id: uuid('id').defaultRandom().primaryKey(),
@@ -317,7 +323,9 @@ export const pushSubscriptions = pgTable('push_subscriptions', {
 	userAgent: text('user_agent'),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
-});
+}, (table) => ({
+	userIndex: index('push_subscriptions_user_idx').on(table.userId)
+}));
 
 export const chatConversations = pgTable('chat_conversations', {
 	id: uuid('id').defaultRandom().primaryKey(),

@@ -9,8 +9,7 @@ self.addEventListener('message', (event) => {
 	if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// Activate new versions immediately so old fetch handlers (which intercept every
-// GET request and break streaming/EventSource responses) are replaced right away.
+// Activate new versions immediately so obsolete fetch handlers stop intercepting requests.
 self.skipWaiting();
 
 // `__WB_MANIFEST` is injected by workbox during the build

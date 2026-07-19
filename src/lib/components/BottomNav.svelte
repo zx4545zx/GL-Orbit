@@ -1,62 +1,13 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
 import { navigating, page } from '$app/state';
-import { onMount } from 'svelte';
-import { connectNotificationStream } from '$lib/client/notification-stream.js';
+import { useUnreadNotifications } from '$lib/client/unread-notifications.js';
 import NotificationBadge from './NotificationBadge.svelte';
 
 	let { bottomNavHidden = false }: { bottomNavHidden?: boolean } = $props();
 
 	const currentUser = $derived(page.data.user);
-	let unreadCount = $state(0);
-	let mounted = $state(false);
-
-	onMount(() => {
-		mounted = true;
-		return () => {
-			mounted = false;
-		};
-	});
-
-	$effect(() => {
-		if (!mounted) return;
-
-		if (!currentUser) {
-			unreadCount = 0;
-			return;
-		}
-
-		let disconnect: (() => void) | undefined;
-
-		async function init() {
-			try {
-				const res = await fetch('/api/notifications/unread-count');
-				if (res.ok) {
-					const data = await res.json();
-					unreadCount = data.count ?? 0;
-				}
-			} catch {
-				unreadCount = 0;
-			}
-			disconnect = connectNotificationStream({
-				onNotification: () => {
-					unreadCount += 1;
-				},
-				onCount: (count) => {
-					unreadCount = count;
-				},
-				onCleared: () => {
-					unreadCount = 0;
-				}
-			});
-		}
-
-		init();
-
-		return () => {
-			disconnect?.();
-		};
-	});
+	const unreadNotifications = useUnreadNotifications();
 
 	const homeItem = $derived({
 		href: `/${page.data.lang}/`,
@@ -154,7 +105,7 @@ import NotificationBadge from './NotificationBadge.svelte';
 						<div class="relative">
 							{@html item.icon(active)}
 							{#if item.href === `/${page.data.lang}/notifications`}
-								<NotificationBadge count={unreadCount} />
+								<NotificationBadge count={unreadNotifications.state.count} />
 							{/if}
 						</div>
 					</div>

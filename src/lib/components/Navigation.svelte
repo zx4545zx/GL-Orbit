@@ -1,8 +1,7 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
 import { page } from '$app/state';
-import { onMount } from 'svelte';
-import { connectNotificationStream } from '$lib/client/notification-stream.js';
+import { useUnreadNotifications } from '$lib/client/unread-notifications.js';
 import NotificationDropdown from './NotificationDropdown.svelte';
 import LanguageSwitcher from './LanguageSwitcher.svelte';
 import ThemeToggle from './ThemeToggle.svelte';
@@ -38,9 +37,8 @@ import Picture from './Picture.svelte';
 	}
 
 	const currentUser = $derived(page.data.user);
+	const unreadNotifications = useUnreadNotifications();
 
-	let unreadCount = $state(0);
-	let mounted = $state(false);
 	let profileMenuOpen = $state(false);
 	let profileMenuRoot = $state<HTMLDivElement | null>(null);
 
@@ -62,52 +60,6 @@ import Picture from './Picture.svelte';
 		if (event.key === 'Escape') profileMenuOpen = false;
 	}
 
-	onMount(() => {
-		mounted = true;
-		return () => {
-			mounted = false;
-		};
-	});
-
-	$effect(() => {
-		if (!mounted) return;
-
-		if (!currentUser) {
-			unreadCount = 0;
-			return;
-		}
-
-		let disconnect: (() => void) | undefined;
-
-		async function init() {
-			try {
-				const res = await fetch('/api/notifications/unread-count');
-				if (res.ok) {
-					const data = await res.json();
-					unreadCount = data.count ?? 0;
-				}
-			} catch {
-				unreadCount = 0;
-			}
-			disconnect = connectNotificationStream({
-				onNotification: () => {
-					unreadCount += 1;
-				},
-				onCount: (count) => {
-					unreadCount = count;
-				},
-				onCleared: () => {
-					unreadCount = 0;
-				}
-			});
-		}
-
-		init();
-
-		return () => {
-			disconnect?.();
-		};
-	});
 </script>
 
 <svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
@@ -153,11 +105,7 @@ import Picture from './Picture.svelte';
 				<LanguageSwitcher variant="icon" className="hidden lg:inline-flex" />
 			<ThemeToggle />
 				{#if currentUser}
-				<NotificationDropdown
-					unreadCount={unreadCount}
-					onMarkAllRead={() => { unreadCount = 0; }}
-					onUnreadCountChange={(count) => { unreadCount = count; }}
-				/>
+				<NotificationDropdown />
 					<div bind:this={profileMenuRoot} class="relative">
 						<button
 							type="button"
