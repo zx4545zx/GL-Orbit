@@ -177,7 +177,7 @@
 
 <!-- Search + Filter -->
 <div class="flex flex-col gap-3 max-w-xl mx-auto mb-6 sm:mb-8">
-	<div class="orbit-surface rounded-xl flex items-center px-4 py-3 gap-3 transition-all duration-200 focus-within:ring-2 focus-within:ring-coral/30 focus-within:border-coral/30">
+	<div class="orbit-surface rounded-xl flex items-center px-4 py-3 gap-3 transition-all duration-200">
 		<svg class="w-5 h-5 text-plum-light flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
 		<input type="text" bind:value={searchQuery} oninput={scheduleSearchUpdate} placeholder={m.series_search_placeholder()} aria-label={m.series_search_label()} class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base" />
 		{#if searchQuery}

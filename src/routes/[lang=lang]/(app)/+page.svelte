@@ -168,7 +168,7 @@
 							{m.home_schedule_title_plain()}{page.data.lang === 'en' ? ' ' : ''}{m.home_schedule_title_accent()}
 						</h2>
 					</div>
-					<a href="/{page.data.lang}/calendar" class="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-[var(--orbit-line-strong)] px-4 py-2 text-sm font-bold text-plum transition hover:border-mint hover:bg-plum/5 hover:text-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target">{m.common_see_all()}</a>
+					<a href="/{page.data.lang}/calendar" class="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-bold text-plum transition hover:bg-plum/5 hover:text-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target">{m.common_see_all()}</a>
 				</div>
 
 				{#if loadingSchedule}
@@ -273,7 +273,7 @@
 				</h2>
 				<p class="mt-3 text-plum-light">{m.home_featured_subtitle()}</p>
 			</div>
-			<a href="/{page.data.lang}/series" class="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-[var(--orbit-line-strong)] px-4 py-2 text-sm font-bold text-plum transition hover:border-mint hover:bg-plum/5 hover:text-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target">
+			<a href="/{page.data.lang}/series" class="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-bold text-plum transition hover:bg-plum/5 hover:text-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target">
 				{m.home_featured_see_all()}
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-5-5 5 5-5 5" /></svg>
 			</a>

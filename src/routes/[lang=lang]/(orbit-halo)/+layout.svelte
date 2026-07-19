@@ -85,7 +85,7 @@
 		<main class="min-w-0 border-[#eee9ef] pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:border-x md:pb-0">{@render children()}</main>
 
 		<aside class="sticky top-[var(--pwa-safe-top)] hidden h-dvh px-7 py-3 lg:block">
-			<form action={`${base}/explore`} method="GET" class="flex h-11 items-center gap-3 rounded-full bg-[#f7f7f8] px-4 text-plum-light focus-within:ring-1 focus-within:ring-coral">
+			<form action={`${base}/explore`} method="GET" class="flex h-11 items-center gap-3 rounded-full bg-[#f7f7f8] px-4 text-plum-light">
 				<HaloIcon name="explore" size={17} /><label class="sr-only" for="halo-sidebar-search">Search</label><input id="halo-sidebar-search" name="search" type="search" placeholder={m.halo_explore()} class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-plum-light" />
 			</form>
 			<section class="mt-4 overflow-hidden rounded-2xl bg-[#f7f7f8]">

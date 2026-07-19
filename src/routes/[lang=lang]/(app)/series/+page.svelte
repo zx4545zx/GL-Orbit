@@ -176,7 +176,7 @@ import Picture from '$lib/components/Picture.svelte';
 	<div class="flex flex-col gap-3 max-w-2xl mx-auto">
 		<!-- Search Input -->
 		<div class="relative w-full">
-			<div class="orbit-surface flex items-center border-x-4 border-x-plum px-4 py-3 gap-3 transition-all duration-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-coral">
+			<div class="orbit-surface flex items-center border-x-4 border-x-plum px-4 py-3 gap-3 transition-all duration-200">
 				<svg class="w-5 h-5 text-plum-light flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
 				</svg>

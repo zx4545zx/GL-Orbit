@@ -125,7 +125,7 @@
 	<form class="mb-4 sm:mb-6" onsubmit={(e) => e.preventDefault()}>
 		<div class="relative">
 			<svg class="w-5 h-5 text-plum-light/60 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-			<input type="text" bind:value={search} placeholder="ค้นหาชื่อเล่น / ชื่อ EN / ชื่อ TH..." class="orbit-control w-full pl-11 pr-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-coral/30 text-sm" />
+			<input type="text" bind:value={search} placeholder="ค้นหาชื่อเล่น / ชื่อ EN / ชื่อ TH..." class="orbit-control w-full pl-11 pr-4 py-2.5 rounded-xl focus:outline-none text-sm" />
 		</div>
 	</form>
 

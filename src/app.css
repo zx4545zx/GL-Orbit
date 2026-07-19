@@ -520,7 +520,7 @@ body * {
   border-radius: 9999px !important;
 }
 
-:is(a, button, input, select, textarea):focus-visible {
+:is(a, button, select, textarea):focus-visible {
   outline: 3px solid rgba(217, 47, 105, 0.58);
   outline-offset: 2px;
 }
@@ -872,7 +872,7 @@ h1, h2, h3 {
 }
 
 /* Focus ring stays coral, slightly brighter on dark. */
-[data-theme='dark'] :is(a, button, input, select, textarea):focus-visible {
+[data-theme='dark'] :is(a, button, select, textarea):focus-visible {
   outline-color: rgba(240, 86, 138, 0.65);
 }
 
