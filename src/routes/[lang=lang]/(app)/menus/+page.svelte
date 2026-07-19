@@ -53,23 +53,6 @@
 <!-- Pocket Orbit Console — compact mobile command hub -->
 <div class="-mx-4 min-h-[calc(100dvh-var(--bottom-nav-reserved-space))] px-4 pb-6 pt-4 sm:py-8 md:min-h-[calc(100dvh-6rem)]">
 	<div class="mx-auto flex max-w-2xl flex-col gap-3.5 sm:gap-5">
-		<header class="orbit-surface rounded-2xl p-4 sm:p-5">
-			<div class="flex items-center gap-3.5">
-				<div class="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-lavender/30">
-					<img src="/icons/gl-orbit-logo.svg" alt="GL-Orbit" class="h-full w-full" />
-				</div>
-				<div class="min-w-0 flex-1">
-					<p class="text-[10px] font-black uppercase tracking-[0.34em] text-coral-dark/70">GL-Orbit</p>
-					<h1 class="font-[family-name:var(--font-display)] text-2xl font-black leading-tight text-plum sm:text-3xl">
-						{m.menus_title()}
-					</h1>
-					<p class="mt-0.5 line-clamp-1 text-xs font-medium text-plum-light sm:text-sm">
-						{m.menus_seo_description()}
-					</p>
-				</div>
-			</div>
-		</header>
-
 		<div class="grid gap-3 sm:gap-4">
 			{#if currentUser}
 				<a
@@ -164,23 +147,24 @@
 		{/if}
 
 			{#if currentUser}
-				<div class="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
+				<div class="contents">
 					{#if currentUser.role === 'ADMIN'}
 						<a
 							href={localizedHref('/admin/series', page.data.lang)}
-							class="orbit-action group flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-black transition-colors touch-target"
+							class="order-6 group orbit-surface flex items-center gap-4 p-4 transition-all duration-200 hover:-translate-y-0.5 touch-target sm:p-5"
 						>
-							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 12h9.75M10.5 18h9.75M3.75 6h.008v.008H3.75V6Zm0 6h.008v.008H3.75V12Zm0 6h.008v.008H3.75V18Z" />
-							</svg>
-							{m.nav_admin()}
+							<div class="grid h-14 w-14 shrink-0 place-items-center bg-coral/10 text-coral-dark sm:h-16 sm:w-16">
+								<svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 12h9.75M10.5 18h9.75M3.75 6h.008v.008H3.75V6Zm0 6h.008v.008H3.75V12Zm0 6h.008v.008H3.75V18Z" /></svg>
+							</div>
+							<div class="min-w-0 flex-1"><h2 class="font-[family-name:var(--font-display)] text-lg font-black leading-tight text-plum transition-colors group-hover:text-coral-dark sm:text-xl">{m.nav_admin()}</h2></div>
+							<div class="grid h-10 w-10 shrink-0 place-items-center bg-white text-coral-dark transition-all duration-200 group-hover:translate-x-1 group-hover:bg-coral group-hover:text-white"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg></div>
 						</a>
 					{/if}
 					<button
 						type="button"
 						onclick={handleLogout}
 						disabled={isLoggingOut}
-					class="orbit-control group flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-black text-coral-dark transition-colors hover:bg-coral/10 disabled:opacity-60 touch-target {currentUser.role === 'ADMIN' ? '' : 'sm:col-span-2'}"
+						class="order-7 orbit-control group flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-black text-coral-dark transition-colors hover:bg-coral/10 disabled:opacity-60 touch-target"
 					>
 						{#if isLoggingOut}
 							<svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
@@ -195,7 +179,7 @@
 				</div>
 			{/if}
 
-			<section class="orbit-surface rounded-2xl p-4 sm:p-5" aria-labelledby="menus-language-heading">
+			<section class="order-5 orbit-surface p-4 sm:p-5" aria-labelledby="menus-language-heading">
 				<div class="mb-3 flex items-center gap-3">
 					<div class="grid h-11 w-11 shrink-0 place-items-center rounded-[1.05rem] bg-mint/15 text-mint-dark ring-1 ring-white/70" aria-hidden="true">
 						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -232,7 +216,7 @@
 				</div>
 			</section>
 
-			<section class="orbit-surface rounded-2xl p-4 sm:p-5" aria-labelledby="menus-theme-heading">
+			<section class="order-4 orbit-surface p-4 sm:p-5" aria-labelledby="menus-theme-heading">
 				<div class="flex items-center gap-3">
 					<div class="grid h-11 w-11 shrink-0 place-items-center rounded-[1.05rem] bg-lavender/15 text-lavender-dark" aria-hidden="true">
 						{#if themeState.theme === 'dark'}
