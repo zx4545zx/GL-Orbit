@@ -438,7 +438,7 @@
 									<tr class="border-b border-lavender/5 {row % 2 === 0 ? 'bg-white/20' : ''}">
 										<td class="px-2 sm:px-3 py-3 border-r border-lavender/10 w-28 sm:w-32 md:w-44 lg:w-52">
 											<div class="flex flex-col items-center gap-1.5 md:gap-2">
-												<div class="w-14 h-20 sm:w-16 sm:h-22 md:w-20 md:h-28 bg-lavender/10 rounded-lg animate-pulse"></div>
+												<div class="w-16 h-22 sm:w-18 sm:h-24 md:w-22 md:h-30 bg-lavender/10 rounded-lg animate-pulse"></div>
 												<div class="h-2.5 w-20 md:w-32 bg-lavender/10 rounded animate-pulse"></div>
 												<div class="h-2.5 w-14 md:w-24 bg-lavender/5 rounded animate-pulse"></div>
 											</div>
@@ -489,7 +489,7 @@
 												alt=""
 												width={200}
 												height={300}
-												class="w-14 h-20 sm:w-16 sm:h-22 md:w-20 md:h-28 rounded-lg object-cover shadow-md flex-shrink-0 bg-white/50"
+												class="w-16 h-22 sm:w-18 sm:h-24 md:w-22 md:h-30 rounded-lg object-cover shadow-md flex-shrink-0 bg-white/50"
 												loading="lazy"
 											/>
 											<div class="font-semibold text-plum text-[10px] sm:text-xs md:text-sm leading-snug line-clamp-2 md:line-clamp-none text-center min-w-0" title={seriesName}>{seriesName}</div>
@@ -618,14 +618,14 @@
 							{#each selectedEvents as event}
 								<div class="glass-card-strong rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-lg transition-all">
 									<div class="flex min-h-[117px] sm:min-h-[144px] gap-3 sm:gap-4">
-										<div class="flex aspect-[9/16] self-stretch flex-shrink-0 overflow-hidden">
+										<div class="flex w-20 sm:w-24 self-stretch flex-shrink-0 overflow-hidden">
 											<Picture
 												src={event.posterUrl}
 												type="posters"
-												sizes="4rem"
+												sizes="6rem"
 												alt={event.series}
-												width={64}
-												height={90}
+												width={96}
+												height={135}
 												class="block h-full w-full object-cover shadow-sm bg-white/50"
 												loading="lazy"
 											/>
@@ -711,21 +711,25 @@
 					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
 						<div class="px-4 sm:px-6 py-3 sm:py-4 {dayColorClasses[i] || 'bg-lavender/15'} border-b border-[var(--orbit-line)]">
 							<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum flex items-center gap-2 sm:gap-3">
-							<span class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white flex items-center justify-center text-base sm:text-lg">📅</span>
+							<span class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white flex items-center justify-center text-plum">
+								<svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+								</svg>
+							</span>
 								{weekDayNames[day.dayIndex]}
 							</h2>
 						</div>
 						<div class="divide-y divide-lavender/10">
 							{#each day.items as item}
 								<div class="pr-4 sm:pr-6 min-h-[89px] sm:min-h-[104px] flex items-center gap-3 sm:gap-5 hover:bg-white/40 transition-colors group">
-									<div class="flex aspect-[9/16] self-stretch flex-shrink-0 overflow-hidden">
+									<div class="flex w-16 sm:w-20 self-stretch flex-shrink-0 overflow-hidden">
 										<Picture
 											src={item.posterUrl}
 											type="posters"
-											sizes="4rem"
+											sizes="5rem"
 											alt={item.series}
-											width={64}
-											height={90}
+											width={80}
+											height={113}
 											class="block h-full w-full object-cover shadow-sm bg-white/50"
 											loading="lazy"
 										/>

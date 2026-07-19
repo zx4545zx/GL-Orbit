@@ -112,6 +112,27 @@
   --orbit-mint: #d8f2e9;
   --orbit-shadow: 0 1px 2px rgba(36, 21, 31, 0.08), 0 8px 24px rgba(36, 21, 31, 0.06);
   --orbit-shadow-raised: 0 2px 5px rgba(36, 21, 31, 0.12), 0 14px 36px rgba(36, 21, 31, 0.09);
+  --orbit-rail: #24151f;
+}
+
+/* Dark theme: plum-based surfaces, cream text, brightened accents for contrast. */
+[data-theme='dark'] {
+  --orbit-paper: #24151f;
+  --orbit-paper-deep: #1c1018;
+  --orbit-surface: #2e1d29;
+  --orbit-ink: #f5e9ee;
+  --orbit-muted: #cbb7c1;
+  --orbit-line: #463541;
+  --orbit-line-strong: #5d4956;
+  --orbit-coral: #f0568a;
+  --orbit-coral-dark: #f27ba4;
+  --orbit-coral-soft: #4a2334;
+  --orbit-lavender: #3a2f4d;
+  --orbit-mint: #1f3a31;
+  --orbit-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.32);
+  --orbit-shadow-raised: 0 2px 5px rgba(0, 0, 0, 0.5), 0 14px 36px rgba(0, 0, 0, 0.4);
+  --orbit-rail: #150b12;
+  color-scheme: dark;
 }
 
 :root {
@@ -172,7 +193,7 @@ html {
 
 body {
   font-family: var(--font-body);
-  color: var(--color-plum);
+  color: var(--orbit-ink);
   background: var(--orbit-paper-deep);
   min-height: 100dvh;
   font-size: var(--text-fluid-base);
@@ -418,7 +439,7 @@ body {
 }
 
 .glass-card-strong {
-  background: #ffffff;
+  background: var(--orbit-surface);
   border: 1px solid var(--orbit-line-strong);
   box-shadow: var(--orbit-shadow);
 }
@@ -454,12 +475,12 @@ body {
 }
 
 .orbit-rail {
-  background: var(--orbit-ink);
-  color: var(--orbit-paper);
+  background: var(--orbit-rail);
+  color: #fffafc;
 }
 
 .orbit-control {
-  background: #fff;
+  background: var(--orbit-surface);
   border: 1px solid var(--orbit-line-strong);
   color: var(--orbit-ink);
   box-shadow: 0 1px 2px rgba(36, 21, 31, 0.06);
@@ -719,4 +740,267 @@ h1, h2, h3 {
 /* Card-level layout containment to limit repaint */
 .perf-card {
   contain: layout paint;
+}
+
+/* ===== Dark theme remaps =====
+   Utility-level overrides so existing markup adapts without per-page edits.
+   Mirrors the .minimal-shell override idiom above. */
+
+/* Opaque and translucent white surfaces -> dark plum surfaces. */
+[data-theme='dark'] .bg-white {
+  background-color: var(--orbit-surface);
+}
+
+[data-theme='dark'] :is(
+  .bg-white\/40, .bg-white\/50, .bg-white\/60, .bg-white\/70,
+  .bg-white\/75, .bg-white\/80, .bg-white\/90, .bg-white\/95
+) {
+  background-color: color-mix(in srgb, var(--orbit-surface) 88%, transparent);
+}
+
+[data-theme='dark'] :is(.bg-white\/10, .bg-white\/20, .bg-white\/30) {
+  background-color: color-mix(in srgb, #f5e9ee 12%, transparent);
+}
+
+/* Cream tints (hover washes, page fills) -> lifted dark surface. */
+[data-theme='dark'] :is(.bg-cream, .bg-cream-warm) {
+  background-color: color-mix(in srgb, var(--orbit-surface) 82%, #f5e9ee);
+}
+
+[data-theme='dark'] :is(.bg-cream\/50, .bg-cream\/60, .bg-cream\/70, .bg-cream\/80, .bg-cream\/90) {
+  background-color: color-mix(in srgb, var(--orbit-surface) 88%, #f5e9ee);
+}
+
+/* Plum text -> light ink. */
+[data-theme='dark'] .text-plum {
+  color: var(--orbit-ink);
+}
+
+[data-theme='dark'] .text-plum-light {
+  color: var(--orbit-muted);
+}
+
+[data-theme='dark'] :is(.text-plum\/60, .text-plum\/70, .text-plum\/80) {
+  color: var(--orbit-muted);
+}
+
+/* Low-alpha plum overlays -> low-alpha light overlays. */
+[data-theme='dark'] :is(.bg-plum\/5, .bg-plum\/10) {
+  background-color: color-mix(in srgb, #f5e9ee 8%, transparent);
+}
+
+[data-theme='dark'] :is(.bg-plum\/15, .bg-plum\/20) {
+  background-color: color-mix(in srgb, #f5e9ee 16%, transparent);
+}
+
+/* Low-alpha plum/white borders -> theme line color. */
+[data-theme='dark'] :is(
+  .border-plum\/5, .border-plum\/10, .border-plum\/15, .border-plum\/20,
+  .border-lavender\/10, .border-lavender\/20, .border-lavender\/30,
+  .border-coral\/10, .border-coral\/20, .border-white, .border-white\/20,
+  .border-white\/30, .border-white\/40, .border-white\/50
+) {
+  border-color: var(--orbit-line);
+}
+
+/* Light tint fills used as state/chip backgrounds -> dark tinted fills. */
+[data-theme='dark'] :is(.bg-coral\/5, .bg-coral\/10) {
+  background-color: color-mix(in srgb, var(--orbit-coral) 16%, transparent);
+}
+
+[data-theme='dark'] :is(.bg-coral\/15, .bg-coral\/20, .bg-coral-light) {
+  background-color: color-mix(in srgb, var(--orbit-coral) 26%, transparent);
+}
+
+[data-theme='dark'] :is(.bg-lavender\/5, .bg-lavender\/10, .bg-lavender\/15) {
+  background-color: color-mix(in srgb, #a78bfa 14%, transparent);
+}
+
+[data-theme='dark'] :is(.bg-lavender\/20, .bg-lavender\/30, .bg-lavender-light) {
+  background-color: color-mix(in srgb, #a78bfa 24%, transparent);
+}
+
+[data-theme='dark'] :is(.bg-mint\/10, .bg-mint\/20, .bg-mint-light) {
+  background-color: color-mix(in srgb, #34d399 18%, transparent);
+}
+
+/* Dark-on-light accent text -> brightened accent text. */
+[data-theme='dark'] :is(.text-coral-dark, .text-coral) {
+  color: var(--orbit-coral);
+}
+
+[data-theme='dark'] .text-lavender-dark {
+  color: #c4b5fd;
+}
+
+[data-theme='dark'] :is(.text-mint-dark, .text-mint) {
+  color: #6ee7b7;
+}
+
+/* Minimal-shell solid remaps (light hex) -> dark equivalents. */
+[data-theme='dark'] :is(.minimal-shell, .admin-minimal) .bg-coral\/5 { background-color: #33202b; }
+[data-theme='dark'] :is(.minimal-shell, .admin-minimal) .bg-coral\/10 { background-color: #432535; }
+[data-theme='dark'] :is(.minimal-shell, .admin-minimal) .bg-coral\/20 { background-color: #573044; }
+[data-theme='dark'] :is(.minimal-shell, .admin-minimal) :is(.bg-lavender\/5, .bg-lavender\/10) { background-color: #2c2438; }
+[data-theme='dark'] :is(.minimal-shell, .admin-minimal) :is(.bg-lavender\/15, .bg-lavender\/20) { background-color: #3a2f4d; }
+[data-theme='dark'] :is(.minimal-shell, .admin-minimal) .bg-lavender\/30 { background-color: #4a3d63; }
+[data-theme='dark'] :is(.minimal-shell, .admin-minimal) .bg-mint\/20 { background-color: #1f3a31; }
+
+/* Light gradient-tint fallbacks -> dark tint fallbacks. */
+[data-theme='dark'] :is(
+  .bg-gradient-to-r.from-coral\/10.to-lavender\/10,
+  .bg-gradient-to-r.from-coral\/10.via-white\/30.to-lavender\/10
+) {
+  background-color: color-mix(in srgb, var(--orbit-coral) 14%, transparent);
+}
+
+[data-theme='dark'] :is(
+  .bg-gradient-to-r.from-lavender\/10.via-white\/30.to-mint\/10,
+  .bg-gradient-to-br.from-lavender\/30.to-mint\/20,
+  .bg-gradient-to-br.from-lavender\/30.to-coral\/20
+) {
+  background-color: color-mix(in srgb, #a78bfa 14%, transparent);
+}
+
+/* Halo social surface tokens. */
+[data-theme='dark'] .halo-universe {
+  --halo-paper: #24151f;
+  --halo-paper-deep: #1c1018;
+  --halo-ink: #f5e9ee;
+  --halo-muted: #b8a4ae;
+  --halo-line: #463541;
+}
+
+/* Focus ring stays coral, slightly brighter on dark. */
+[data-theme='dark'] :is(a, button, input, select, textarea):focus-visible {
+  outline-color: rgba(240, 86, 138, 0.65);
+}
+
+/* Scrollbar thumb for dark. */
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(245, 233, 238, 0.22);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 233, 238, 0.36);
+}
+
+/* Mobile glass falls back to solid surface. */
+@media (max-width: 767px) {
+  [data-theme='dark'] .mobile-glass {
+    background: var(--orbit-surface);
+  }
+}
+
+/* iOS PWA status-bar strip: deep plum instead of coral on dark. */
+@supports (-webkit-touch-callout: none) {
+  @media (display-mode: standalone) {
+    [data-theme='dark'] body::before {
+      background: #1c1018;
+    }
+  }
+}
+
+/* Arbitrary-value hex utilities -> tokens (brand hex like LINE/FB/IG/YT untouched). */
+[data-theme='dark'] :is(
+  .border-\[\#eee9ef\], .border-\[\#ded8df\], .border-\[\#e8b8ca\],
+  .border-\[\#bfdce8\], .border-\[\#d8caee\], .border-\[\#b9a7db\]
+) {
+  border-color: var(--orbit-line);
+}
+
+[data-theme='dark'] :is(
+  .bg-\[\#f7f7f8\], .bg-\[\#fafafa\], .bg-\[\#f6f3f6\], .bg-\[\#f4edf4\],
+  .bg-\[\#fdfcfd\], .bg-\[\#faf8ff\], .bg-\[\#fff6f9\]
+) {
+  background-color: var(--orbit-surface);
+}
+
+[data-theme='dark'] :is(.bg-\[\#f8e8ef\], .bg-\[\#f3d5e1\]) {
+  background-color: var(--orbit-coral-soft);
+}
+
+[data-theme='dark'] :is(.bg-\[\#e7dff3\], .bg-\[\#f0ebf8\]) {
+  background-color: var(--orbit-lavender);
+}
+
+[data-theme='dark'] :is(.bg-\[\#e7f2f7\], .bg-\[\#d9edf5\]) {
+  background-color: var(--orbit-mint);
+}
+
+[data-theme='dark'] .text-\[\#b54972\] { color: var(--orbit-coral); }
+[data-theme='dark'] .text-\[\#8068aa\] { color: #c4b5fd; }
+[data-theme='dark'] .text-\[\#4d91b0\] { color: #7cc7e8; }
+
+/* orbit-ink is a light "dark rail" surface; keep it dark under the dark theme. */
+[data-theme='dark'] .bg-\[var\(--orbit-ink\)\] {
+  background-color: var(--orbit-rail);
+}
+
+/* Hover-state surfaces: mirror the base remaps so hover never flips to light. */
+[data-theme='dark'] .hover\:bg-white:hover {
+  background-color: var(--orbit-surface);
+}
+
+[data-theme='dark'] :is(
+  .hover\:bg-white\/40:hover, .hover\:bg-white\/45:hover, .hover\:bg-white\/50:hover,
+  .hover\:bg-white\/60:hover, .hover\:bg-white\/70:hover, .hover\:bg-white\/80:hover
+) {
+  background-color: color-mix(in srgb, var(--orbit-surface) 88%, transparent);
+}
+
+[data-theme='dark'] :is(
+  .hover\:bg-white\/10:hover, .hover\:bg-white\/25:hover, .hover\:bg-white\/30:hover
+) {
+  background-color: color-mix(in srgb, #f5e9ee 12%, transparent);
+}
+
+[data-theme='dark'] .hover\:bg-cream:hover {
+  background-color: color-mix(in srgb, var(--orbit-surface) 82%, #f5e9ee);
+}
+
+[data-theme='dark'] .hover\:bg-plum\/5:hover {
+  background-color: color-mix(in srgb, #f5e9ee 8%, transparent);
+}
+
+/* coral-light hovers are light-pink washes; use dark rose on dark theme. */
+[data-theme='dark'] :is(.hover\:bg-coral-light:hover, .hover\:bg-coral-light\/60:hover) {
+  background-color: var(--orbit-coral-soft);
+}
+
+[data-theme='dark'] .focus-visible\:bg-coral-light:focus-visible {
+  background-color: var(--orbit-coral-soft);
+}
+
+/* Hover text flips to plum are meant as ink-on-light; use ink on dark. */
+[data-theme='dark'] .hover\:text-plum:hover {
+  color: var(--orbit-ink);
+}
+
+[data-theme='dark'] .hover\:text-plum-light\/70:hover {
+  color: var(--orbit-muted);
+}
+
+/* Sub-text with opacity modifiers: plum-light is dark gray and vanishes on
+   dark surfaces — flatten every opacity step to the bright muted tone. */
+[data-theme='dark'] :is(
+  .text-plum-light\/40, .text-plum-light\/45, .text-plum-light\/50,
+  .text-plum-light\/55, .text-plum-light\/60, .text-plum-light\/65,
+  .text-plum-light\/70, .text-plum-light\/75, .text-plum-light\/80,
+  .text-plum-light\/85, .text-plum-light\/90
+) {
+  color: var(--orbit-muted);
+}
+
+/* Accent sub-labels with opacity: brighten to full accent tone. */
+[data-theme='dark'] :is(.text-coral-dark\/70, .text-coral-dark\/80) {
+  color: var(--orbit-coral);
+}
+
+[data-theme='dark'] :is(.text-lavender-dark\/50, .text-lavender-dark\/60, .text-lavender-dark\/70) {
+  color: #c4b5fd;
+}
+
+[data-theme='dark'] :is(.text-mint-dark\/70, .text-mint-dark\/80) {
+  color: #6ee7b7;
 }

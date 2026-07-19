@@ -371,7 +371,12 @@
 														</div>
 														<div class="text-xs text-plum-light mt-0.5">{formatAirDate(sched.airDate)}</div>
 														{#if sched.streamLink}
-															<a href={sched.streamLink} target="_blank" rel="noopener" class="text-xs text-lavender-dark hover:underline truncate block mt-0.5">🔗 {sched.streamLink}</a>
+															<a href={sched.streamLink} target="_blank" rel="noopener" class="mt-0.5 flex items-center gap-1 truncate text-xs text-lavender-dark hover:underline">
+																<svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+																	<path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+																</svg>
+																<span class="truncate">{sched.streamLink}</span>
+															</a>
 														{/if}
 													</div>
 														<div class="flex gap-1 flex-shrink-0">

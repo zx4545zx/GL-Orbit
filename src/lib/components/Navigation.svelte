@@ -5,6 +5,7 @@ import { onMount } from 'svelte';
 import { connectNotificationStream } from '$lib/client/notification-stream.js';
 import NotificationDropdown from './NotificationDropdown.svelte';
 import LanguageSwitcher from './LanguageSwitcher.svelte';
+import ThemeToggle from './ThemeToggle.svelte';
 import Picture from './Picture.svelte';
 
 	let { navHidden = false }: { navHidden?: boolean } = $props();
@@ -150,6 +151,7 @@ import Picture from './Picture.svelte';
 			<!-- Auth Section -->
 			<div class="justify-self-end flex items-center gap-2 xl:gap-3 min-w-0">
 				<LanguageSwitcher variant="icon" className="hidden lg:inline-flex" />
+			<ThemeToggle />
 				{#if currentUser}
 				<NotificationDropdown
 					unreadCount={unreadCount}

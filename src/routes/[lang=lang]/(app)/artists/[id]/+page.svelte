@@ -195,7 +195,7 @@
 					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">01 / Chemistry</p>
 					<h2 id="ships-heading" class="text-4xl font-bold sm:text-6xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.series_detail_ships()}</h2>
 				</header>
-				<div class="grid gap-px bg-[var(--orbit-line-strong)] sm:grid-cols-2 {artist.ships.length === 1 ? 'lg:grid-cols-1' : 'lg:grid-cols-3'}">
+				<div class="grid gap-px bg-[var(--orbit-line-strong)] {artist.ships.length === 1 ? '' : 'sm:grid-cols-2 lg:grid-cols-3'}">
 					{#each artist.ships as ship (ship.id)}
 						<a href={shipPath(ship.slug)} class="group grid min-w-0 grid-cols-[7rem_minmax(0,1fr)] items-center gap-4 bg-[var(--orbit-paper)] p-4 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:grid-cols-[9rem_minmax(0,1fr)] sm:p-6 {artist.ships.length === 1 ? 'sm:grid-cols-[13rem_minmax(0,1fr)]' : ''}">
 							<div class="relative flex items-center justify-center">

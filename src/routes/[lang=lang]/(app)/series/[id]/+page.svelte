@@ -222,7 +222,7 @@
 		<!-- The series artwork leads; actions and facts form a compact program rail. -->
 		<section class="border-y border-[var(--orbit-line-strong)] bg-white shadow-[var(--orbit-shadow)] sm:rounded-xl sm:border" aria-labelledby="series-title">
 			<header class="flex items-center justify-between gap-3 bg-[var(--orbit-ink)] px-3 py-3 text-white sm:rounded-t-xl sm:px-5">
-				<button type="button" onclick={goBack} class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white touch-target">
+				<button type="button" onclick={goBack} class="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/5 px-4 py-2 text-sm font-bold transition hover:border-mint hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white touch-target">
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
 					<span>{m.common_back()}</span>
 				</button>

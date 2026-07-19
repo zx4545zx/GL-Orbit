@@ -168,7 +168,7 @@
 							{m.home_schedule_title_plain()}{page.data.lang === 'en' ? ' ' : ''}{m.home_schedule_title_accent()}
 						</h2>
 					</div>
-					<a href="/{page.data.lang}/calendar" class="touch-target -mr-2 inline-flex items-center justify-center text-sm font-semibold text-plum-light transition-colors hover:text-coral-dark">{m.common_see_all()}</a>
+					<a href="/{page.data.lang}/calendar" class="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-[var(--orbit-line-strong)] px-4 py-2 text-sm font-bold text-plum transition hover:border-mint hover:bg-plum/5 hover:text-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target">{m.common_see_all()}</a>
 				</div>
 
 				{#if loadingSchedule}
@@ -188,7 +188,7 @@
 				{:else}
 					<div class="p-3">
 						{#each upcomingSchedule as item, i (item.seriesId + '-' + i)}
-							<a href="/{page.data.lang}/series/{item.seriesId}" class="group grid grid-cols-[4.5rem_1fr_auto] items-center gap-3 border-b border-plum/10 px-2 py-4 last:border-b-0 hover:bg-coral-light/60 focus-visible:bg-coral-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-coral/60">
+							<a href="/{page.data.lang}/series/{item.seriesId}" class="group grid grid-cols-[4.5rem_1fr_auto] items-center gap-3 border-b border-plum/10 px-2 py-4 last:border-b-0 hover:bg-[var(--orbit-paper-deep)] focus-visible:bg-[var(--orbit-paper-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-coral/60">
 								<div>
 									<p class="text-[11px] font-bold uppercase tracking-wide text-coral-dark">{item.day}</p>
 									<p class="mt-0.5 font-[family-name:var(--font-display)] text-xl font-bold tabular-nums text-plum">{item.time}</p>
@@ -225,7 +225,7 @@
 					</h2>
 					<p class="mt-3 text-plum-light">{m.home_countdown_subtitle()}</p>
 				</div>
-				<a href="/{page.data.lang}/countdown" class="touch-target inline-flex items-center gap-2 font-semibold text-plum-light transition hover:text-coral-dark">{m.common_see_all()}</a>
+				<a href="/{page.data.lang}/countdown" class="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-[var(--orbit-line-strong)] px-4 py-2 text-sm font-bold text-plum transition hover:border-mint hover:bg-plum/5 hover:text-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target">{m.common_see_all()}</a>
 			</header>
 
 			<div class="grid gap-4 lg:grid-cols-3">
@@ -273,9 +273,9 @@
 				</h2>
 				<p class="mt-3 text-plum-light">{m.home_featured_subtitle()}</p>
 			</div>
-			<a href="/{page.data.lang}/series" class="touch-target inline-flex items-center gap-2 font-semibold text-plum transition hover:gap-3 hover:text-coral-dark">
+			<a href="/{page.data.lang}/series" class="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-[var(--orbit-line-strong)] px-4 py-2 text-sm font-bold text-plum transition hover:border-mint hover:bg-plum/5 hover:text-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target">
 				{m.home_featured_see_all()}
-				<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-5-5 5 5-5 5" /></svg>
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-5-5 5 5-5 5" /></svg>
 			</a>
 		</header>
 

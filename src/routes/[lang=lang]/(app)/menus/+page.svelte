@@ -4,6 +4,8 @@
 	import { availableLanguageTags, type AvailableLanguageTag, m } from '$lib/i18n/paraglide.js';
 	import { localizedHref, switchLanguageHref } from '$lib/i18n/link.js';
 	import Picture from '$lib/components/Picture.svelte';
+	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import { themeState } from '$lib/theme.svelte.js';
 
 	const currentUser = $derived(page.data.user);
 	const currentLang = $derived(
@@ -227,6 +229,29 @@
 							{/if}
 						</button>
 					{/each}
+				</div>
+			</section>
+
+			<section class="orbit-surface rounded-2xl p-4 sm:p-5" aria-labelledby="menus-theme-heading">
+				<div class="flex items-center gap-3">
+					<div class="grid h-11 w-11 shrink-0 place-items-center rounded-[1.05rem] bg-lavender/15 text-lavender-dark" aria-hidden="true">
+						{#if themeState.theme === 'dark'}
+							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+							</svg>
+						{:else}
+							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+							</svg>
+						{/if}
+					</div>
+					<div class="min-w-0 flex-1">
+						<h2 id="menus-theme-heading" class="font-[family-name:var(--font-display)] text-lg font-black leading-tight text-plum sm:text-xl">
+							โหมดการแสดงผล
+						</h2>
+						<p class="text-sm leading-5 text-plum-light">{themeState.theme === 'dark' ? 'กำลังใช้โหมดมืด' : 'กำลังใช้โหมดสว่าง'}</p>
+					</div>
+					<ThemeToggle />
 				</div>
 			</section>
 		</div>
