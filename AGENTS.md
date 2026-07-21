@@ -1,307 +1,212 @@
 <!-- From: /Users/syaco/workspace/private/AGENTS.md -->
 # AGENTS.md — GL-Orbit
 
-> ไฟล์นี้เขียนขึ้นสำหรับ AI Coding Agent ที่ต้องการทำความเข้าใจโปรเจกต์
+คู่มือทำงานสำหรับ AI coding agents ใน repository นี้ ข้อมูลในไฟล์นี้ต้องสอดคล้องกับ source code ปัจจุบัน
 
----
+## Project Snapshot
 
-## Project Overview
+GL-Orbit เป็น SvelteKit web app สำหรับแฟนซีรีส์ GL ครอบคลุมฐานข้อมูลซีรีส์/ศิลปิน/คู่จิ้น ตารางฉาย ชุมชน Orbit Halo, AI Chat, การแจ้งเตือน และ Subscription Tracker
 
-**GL-Orbit** เป็นเว็บแอปพลิเคชันที่ออกแบบมาเพื่อเป็นศูนย์กลางข้อมูลและตารางฉายสำหรับแฟนคลับซีรีส์ GL (Girls' Love) ทั่วโลก
+สถานะปัจจุบัน:
 
-จุดเด่นของแอป:
-- แสดงตารางฉายซีรีส์ที่รองรับ Timezone และระบุ Uncut version
-- ระบบจัดการซีรีส์ ตอน สตูดิโอ นักแสดง และแพลตฟอร์มสตรีมมิ่ง (สำหรับ Admin)
-- ระบบสมาชิกพร้อมโปรไฟล์ผู้ใช้
-- ออกแบบให้เข้าถึงง่าย ไม่ซับซ้อน เน้นชุมชนแฟนคลับเป็นหลัก
+- Public catalog, calendar/countdown, profile, favorites/watched ใช้ฐานข้อมูลจริง
+- Orbit Halo, notifications, AI Chat และ Subscription Tracker มี server/API/database implementation แล้ว
+- Admin ใช้ protected live CRUD APIs ไม่ใช่ mock data
+- UI รองรับภาษาไทย/อังกฤษ, light/dark theme, PWA และ responsive layout
+- มี Vitest suite สำหรับ components, routes, APIs, server utilities, schema, SEO และ PWA
 
-**สถานะปัจจุบัน:** โปรเจกต์อยู่ในขั้นตอนการพัฒนา UI/Frontend เป็นหลัก — ส่วนระบบ Authentication และฐานข้อมูลเชื่อมต่อจริงแล้ว หน้า **ซีรีส์ (รายการ + รายละเอียด)** ดึงจากฐานข้อมูลจริงแล้ว แต่หน้า **ตารางฉาย (calendar)** และ **หน้า Admin** ยังใช้ Mock Data อยู่
+## Stack
 
----
+| Layer | Technology |
+|---|---|
+| Framework | SvelteKit 2.x, Svelte 5 Runes |
+| Language | TypeScript 5.8, `strict`, `NodeNext` |
+| Styling | Tailwind CSS 4 via `@tailwindcss/vite` |
+| Database | Neon PostgreSQL via `@neondatabase/serverless` |
+| ORM | Drizzle ORM 0.43 / Drizzle Kit |
+| Auth | Custom JWT HS256 (`jose`) + bcrypt |
+| i18n | Paraglide SvelteKit, Thai + English |
+| Testing | Vitest 4 + Testing Library Svelte |
+| PWA | `@vite-pwa/sveltekit`, injectManifest service worker |
+| Media | Cloudflare R2 + Sharp |
+| Deployment | Vercel adapter, region `sin1` |
 
-## Technology Stack
-
-| ชั้น | เทคโนโลยี | รายละเอียด |
-|------|-----------|-----------|
-| Framework | SvelteKit 2.x | SSR + File-based routing |
-| UI Framework | Svelte 5 | ใช้ Runes (`$state`, `$derived`, `$effect`, `$props`) |
-| Language | TypeScript 5.8 | `strict: true`, `module: NodeNext` |
-| Styling | Tailwind CSS 4.x | ผ่าน `@tailwindcss/vite` plugin |
-| Build Tool | Vite 6.x | — |
-| Database | PostgreSQL (Neon.tech) | Serverless Postgres |
-| ORM | Drizzle ORM 0.43 | พร้อม `drizzle-kit` สำหรับ migration |
-| DB Driver | `@neondatabase/serverless` | HTTP proxy สำหรับ Edge/Serverless |
-| Auth | Custom JWT Session | ใช้ `jose` (HS256) + `bcryptjs` |
-| Env | `dotenv` | โหลดจาก `.env` |
-
----
-
-## Build and Development Commands
-
-คำสั่งหลักทั้งหมดอยู่ใน `package.json`:
+## Commands
 
 ```bash
-# Development
 npm run dev
-
-# Production build
 npm run build
-
-# Preview production build locally
 npm run preview
-
-# Type check (Svelte + TypeScript)
+npm test
+npm run test:watch
 npm run check
 npm run check:watch
-
-# Database
-npm run db:generate   # สร้างไฟล์ migration
-npm run db:push       # push schema ไปยัง database
-npm run db:studio     # เปิด Drizzle Studio GUI
+npm run i18n:compile
+npm run db:generate
+npm run db:push
+npm run db:studio
 ```
 
----
+Seed commands:
 
-## Environment Variables
+```bash
+npx tsx scripts/seed-admin.ts --email=admin@example.com --password=SECRET --username=admin
+npx tsx scripts/seed-data.ts
+```
 
-ตัวแปรที่จำเป็นต้องมีใน `.env`:
+`seed-data.ts` ทำลายข้อมูลตัวอย่างเดิมก่อน seed ใหม่ แม้จะคง ADMIN users ไว้ ห้ามรันโดยไม่ตรวจ target database
 
-| ตัวแปร | คำอธิบาย |
-|--------|---------|
-| `DATABASE_URL` | Connection string ของ Neon PostgreSQL |
-| `AUTH_SECRET` | Secret string สำหรับ sign JWT session |
+## Environment
 
-ตัวอย่างดูได้จาก `.env.example`
+ดูรูปแบบทั้งหมดใน `.env.example`
 
----
+- Core: `DATABASE_URL`, `AUTH_SECRET`
+- AI Chat: `READONLY_DATABASE_URL`, `MINIMAX_API_KEY`, `MINIMAX_API_BASE_URL`, `MINIMAX_MODEL`
+- Web Push: VAPID server keys + `VITE_VAPID_PUBLIC_KEY`
+- Media: Cloudflare R2 endpoint, credentials, bucket และ public URL
+
+ห้ามอ่าน แสดง log หรือ commit ค่าจาก `.env` จริง ใช้เครื่องมือที่ไม่เปิดเผย secret เมื่อจำเป็นต้องตรวจ env
+
+## Routes and Data Flow
+
+ทุกหน้า user-facing อยู่ใต้ `src/routes/[lang=lang]/` และใช้ URL `/th/*` หรือ `/en/*`
+
+```txt
+[lang=lang]/
+├── (app)/
+│   ├── home, about, menus
+│   ├── series/[id], artists/[id], ships/[id], explore/*
+│   ├── calendar, countdown, notifications
+│   ├── subscriptions, subscriptions/new, subscriptions/[id]/edit
+│   └── login, register, profile
+├── (orbit-halo)/halo/
+│   ├── feed, explore, compose, saved, notifications
+│   ├── moments/[id], moments/[id]/edit
+│   └── u/[username], profile/moments
+├── (chat)/chat/[id]
+├── admin/
+└── logout/
+```
+
+Top-level routes:
+
+- `src/routes/api/` — auth, catalog, member, subscription, chat, moments, notification และ admin APIs
+- `src/routes/robots.txt/`, `sitemap.xml/`, `llms.txt/`, `og-image/` — SEO/crawler assets
+
+Request flow:
+
+1. `src/hooks.server.ts` validates `session` cookie.
+2. Locale comes from URL → user preference → cookie → `Accept-Language` fallback.
+3. Non-localized browser routes redirect to `/{lang}/*`; API and special routes are excluded.
+4. Page server load or API handler calls query/service layer.
+5. Server code obtains Drizzle through `await getDb()`.
 
 ## Database Architecture
 
-Schema หลักอยู่ใน `src/lib/server/db/schema.ts` ออกแบบตามหลัก Normalization:
+Source of truth: `src/lib/server/db/schema.ts` (39 tables)
 
-### ตารางหลัก
-- `users` — ผู้ใช้งานระบบ (`role`: ADMIN, USER)
-- `sessions` — JWT session tokens (เก็บ SHA-256 hash)
-- `studios` — สตูดิโอผลิตซีรีส์
-- `platforms` — แพลตฟอร์มสตรีมมิ่ง
-- `artists` — นักแสดง/ศิลปิน
-- `artist_socials` — โซเชียลมีเดียของศิลปิน
-- `series` — ซีรีส์ (`status`: UPCOMING, ONGOING, ENDED)
-- `series_artists` — ความสัมพันธ์ many-to-many
-- `series_schedules` — ตารางฉายประจำ (วันในสัปดาห์ + เวลา)
-- `episodes` — ตอนของซีรีส์
-- `episode_schedules` — ตารางฉายรายตอน (วันที่ + ลิงก์สตรีม)
+- Identity: users, sessions
+- Catalog: studios/socials, platforms, artists/socials, ships, series, galleries, genres และ joins
+- Scheduling: series schedules, episodes, episode schedules
+- User library: favorites, watched
+- Subscriptions: currencies, user subscriptions, payments, budgets
+- Orbit Halo: moments, media, likes, bookmarks, comments, entity joins, reports, moderation actions
+- Notifications: notifications, push subscriptions
+- Chat: conversations, messages, conversation-message history
+- Safety: PostgreSQL-backed rate-limit windows
 
-### หลักการออกแบบฐานข้อมูล
-- **ID Strategy:** UUID v4 (`defaultRandom()`) ทุกตาราง
-- **Audit Fields:** ทุกตารางหลักมี `created_at`, `updated_at`, `deleted_at` (Soft Delete)
-- **Time Strategy:** ใช้ `timestamptz` สำหรับวันที่ฉายจริง เพื่อรองรับ Timezone
-- **Session Security:** เก็บ token hash (SHA-256) ไม่ใช่ token ดิบ
+Conventions:
 
-### DB Connection
-- ไฟล์ `src/lib/server/db/index.ts` ใช้ lazy initialization + Proxy pattern
-- **ใน Server Files (`+page.server.ts`, `+server.ts`, `hooks.server.ts`) ต้องใช้ `getDb()` เท่านั้น** — `db` proxy ไม่ทำงานใน SSR context (`TypeError: db.select is not a function`)
-- ตัวอย่าง: `const db = await getDb(); const result = await db.select(...)`
-- `db` proxy ใช้ได้เฉพาะบริบทที่รองรับ async property access (ไม่รองรับ Vite SSR)
+- UUID primary keys via `defaultRandom()`
+- Soft-delete queries ต้อง filter `deletedAt` เมื่อ table รองรับ
+- Actual air times use timezone-aware timestamps
+- Use Drizzle expressions/parameters; never interpolate untrusted SQL
+- Server files must use `const db = await getDb()`; the async `db` proxy is unsafe in Vite SSR
+- Schema change requires `npm run db:generate`, review migration, then explicit approval before `npm run db:push`
 
----
+## Authentication and Authorization
 
-## Code Organization
+- Session JWT: HS256, 30 days, 60-second clock tolerance
+- Cookie: `session`, `httpOnly`, production-secure, `sameSite=lax`, root path
+- Session DB row stores SHA-256 token hash, not raw JWT
+- Passwords use bcrypt 12 rounds
+- Roles: `USER`, `ADMIN`; disabled users fail validation
+- `src/routes/[lang=lang]/admin/+layout.server.ts` guards admin pages
+- Every `/api/admin/*` endpoint must independently enforce ADMIN role
+- Member-owned resources (subscriptions, conversations, moments) must scope reads/mutations by `locals.user.id`
 
-```
-src/
-├── app.html                 # HTML template (โหลดฟอนต์ Google Fonts)
-├── app.css                  # Global styles + Tailwind theme + animations
-├── app.d.ts                 # Type declarations (App.Locals)
-├── hooks.server.ts          # Session validation middleware
-├── lib/
-│   ├── server/
-│   │   ├── db/
-│   │   │   ├── schema.ts    # Drizzle schema definitions
-│   │   │   └── index.ts     # DB connection (Neon HTTP)
-│   │   └── auth/
-│   │       ├── session.ts   # JWT create/validate/destroy
-│   │       ├── user.ts      # User DB queries
-│   │       └── password.ts  # bcrypt hash/verify
-│   └── components/
-│       ├── Navigation.svelte    # Desktop nav (md:block)
-│       ├── BottomNav.svelte     # Mobile nav (md:hidden)
-│       ├── Footer.svelte
-│       └── PasswordInput.svelte # Reusable password with toggle
-└── routes/
-    ├── +layout.svelte       # Root layout (Nav + BottomNav + Footer)
-    ├── +layout.server.ts    # Expose user to all pages
-    ├── (app)/               # Public pages group
-    │   ├── +layout.svelte   # Centered container
-    │   ├── +page.svelte     # Landing / Hero page
-    │   ├── series/
-    │   │   ├── +page.svelte     # Series listing (DB)
-    │   │   └── [id]/
-    │   │       └── +page.svelte # Series detail (DB)
-    │   ├── calendar/
-    │   │   └── +page.svelte     # Schedule views (mock data)
-    │   ├── login/
-    │   │   ├── +page.svelte
-    │   │   └── +page.server.ts  # Auth actions
-    │   └── register/
-    │       ├── +page.svelte
-    │       └── +page.server.ts
-    ├── profile/
-    │   ├── +page.svelte         # User profile UI
-    │   └── +page.server.ts      # updateProfile + changePassword
-    ├── logout/
-    │   └── +server.ts           # POST endpoint to clear session
-    └── admin/                   # Admin panel (protected)
-        ├── +layout.svelte       # Admin layout (gray bg, header)
-        ├── +layout.server.ts    # Auth guard (must be ADMIN)
-        ├── login/
-        │   ├── +page.svelte
-        │   └── +page.server.ts
-        ├── series/
-        │   └── +page.svelte     # Series CRUD UI (mock data)
-        └── schedules/
-            └── +page.svelte     # Schedule management (mock data)
-```
+## Major Server Modules
 
----
+- `src/lib/server/auth/` — password, user, session
+- `src/lib/server/db/` — connection and schema
+- `src/lib/server/queries/` — calendar/listing page queries
+- `src/lib/server/series/`, `ships/` — catalog domain logic
+- `src/lib/server/subscriptions/` — validation, queries, mutations, summary
+- `src/lib/server/moments/` — Halo queries, mutations, permissions, serializers
+- `src/lib/server/chat/` — deterministic answers, history, context, SQL safety
+- `src/lib/server/embeds/` — external URL normalization/security/resolution
+- `src/lib/server/images/`, `r2.ts` — image processing/storage
+- `src/lib/server/rate-limit/`, `security/` — abuse prevention and CSP helpers
+- `src/lib/server/notifications.ts`, `push-notifications.ts` — in-app/Web Push
 
-## Authentication & Authorization
+## i18n
 
-### Session Flow
-1. `hooks.server.ts` อ่าน cookie `session` → เรียก `validateSession()`
-2. `validateSession()` verify JWT (jose) → ตรวจ token hash ในฐานข้อมูล → ตรวจว่าไม่หมดอายุ
-3. ผลลัพธ์อยู่ใน `locals.user` และ `locals.session`
-4. `+layout.server.ts` ส่ง `user` ลงไปยัง client ผ่าน `page.data.user`
+- Source messages: `messages/th.json`, `messages/en.json`
+- Generated output: `src/lib/i18n/paraglide/`; do not hand-edit generated files
+- After message changes run `npm run i18n:compile` or `npm run check`
+- User-facing copy and errors need both Thai and English keys unless intentionally language-specific
+- Build localized links with project helpers; do not hardcode non-localized public URLs
 
-### Role-based Access
-- **USER** — เข้าถึงหน้า public และ `/profile` ได้
-- **ADMIN** — เข้าถึง `/admin/*` ได้
-- `admin/+layout.server.ts` redirect ไป `/admin/login` ถ้าไม่มี session หรือไม่ใช่ ADMIN
+## Svelte and TypeScript Conventions
 
-### Security Practices
-- Cookie: `httpOnly`, `secure` (production only), `sameSite: 'lax'`, `path: '/'`
-- Password: bcrypt 12 rounds
-- JWT: HS256, 30 days expiry, clock tolerance 60s
-- Token storage: เก็บ SHA-256 hash ไม่ใช่ token ดิบ
+- Use `<script lang="ts">` and Svelte 5 Runes (`$props`, `$state`, `$derived`, `$effect`)
+- Do not add legacy `export let`
+- Use `$bindable()` only for intentional two-way bindings
+- NodeNext imports include `.js` for local TypeScript modules
+- Import generated route types from `./$types.js`
+- Prefer typed server loads/actions and explicit API response shapes
+- Preserve SSR/client boundaries; browser globals require client-safe execution
 
----
+## Orbit Editorial Design System
 
-## Styling & Design System
+- Reuse tokens from `src/app.css`: `--orbit-paper`, `--orbit-surface`, `--orbit-line`, `--orbit-line-strong`, semantic coral/lavender/mint/plum colors
+- Edited/new cards, controls, menus, modals and image frames remain rectangular; no decorative `rounded-*`
+- Circles only for inherently circular data such as avatars/status dots, marked `.orbit-round-data`
+- Avoid generic card soup, pills, gradient blobs, rainbow dividers and heavy shadows
+- Use shared grids/borders for information hierarchy; no decorative `<hr>`
+- Buttons and icon actions need visible focus, disabled/loading states and minimum 44×44px touch target
+- Verify mobile at narrow width, desktop, light/dark theme, keyboard focus and reduced motion
 
-### Tailwind v4 Custom Theme (`app.css`)
-- **Colors:** `coral` (#FF6B9D), `lavender` (#C4B5FD), `mint` (#6EE7B7), `plum` (#2D1B2E), `cream` (#FFF5F7)
-- **Fonts:** Syne (display), DM Sans (body), Mali (Thai)
-- **Fluid Type & Spacing:** ใช้ `clamp()` สำหรับ responsive โดยไม่ต้องพึ่ง breakpoint
+Pending Shell components were intentionally removed. Layouts render children directly. Do not restore navigation skeleton switching without a new explicit requirement.
 
-### Orbit Editorial Grid
-- **Direction:** ใช้ grid เป็นโครงสร้าง, พื้นผิวสี่เหลี่ยม, เส้นคั่นบาง และ spacing เพื่อสร้างลำดับข้อมูล
-- **Corners:** ห้ามใช้มุมโค้งกับ container, card, input, button, menu, modal, หรือ image frame ใหม่/ที่แก้ไข ให้ใช้ `rounded-none` หรือไม่ใส่ utility แทน
-- **Exceptions:** วงกลมใช้ได้เฉพาะข้อมูลที่เป็นวงกลมโดยธรรมชาติ เช่น status dot หรือ avatar; ห้ามใช้เป็นกรอบตกแต่ง และต้องใส่ `.orbit-round-data` โดยเจตนา
-- **Surfaces:** หลีกเลี่ยงเงาหนัก, gradient blob, pill และ card มุมมนซ้ำ ๆ; ใช้ `border` สีจาก `--orbit-line` / `--orbit-line-strong` เพื่อแบ่งกลุ่มข้อมูล
-- **Buttons:** ใช้ rectangular action surface, เส้นคั่นบาง และสี semantic ที่นิ่ง; รักษา focus ring, touch target อย่างน้อย 44×44px และ disabled/loading states
+## Testing and Validation
 
-### Key CSS Utilities
-- `.glass-card` / `.glass-card-strong` — Glassmorphism surface (ต้องทำเป็นเหลี่ยมเมื่อใช้/แก้ไข)
-- `.text-gradient` / `.text-gradient-coral` — Gradient text
-- `.touch-target` — Min 44×44px (accessibility)
-- `.animate-float`, `.animate-orbit`, `.animate-pulse-glow` — Motion effects
-- `@media (prefers-reduced-motion: reduce)` — Respect user preference
+Tests are colocated as `*.test.ts` across `src/`.
 
-### Responsive Strategy
-- Mobile-first: ใช้ `sm:`, `md:`, `lg:` breakpoints
-- Navigation: Desktop (`md:block`) / Mobile Bottom Nav (`md:hidden`)
-- **Sticky Search Bar & Bottom Nav ใช้ `glass-card` เหมือนกัน** — เพื่อความสอดคล้องของดีไซน์ (bg ขาว 70% + blur 20px + border ขาว 50% + shadow สี lavender)
-- ทุกหน้ามี responsive padding, text size, และ touch targets
+For focused changes:
 
----
+1. Run nearest Vitest file(s), e.g. `npm test -- path/to/file.test.ts`.
+2. Run `npm run check` for Svelte/TypeScript/i18n validation.
+3. Run `git diff --check`.
+4. Use full `npm test` and/or `npm run build` when blast radius justifies it.
+5. UI work should be browser-checked at relevant mobile/desktop widths and themes.
 
-## Pending Shells (Navigation Loading States)
+Do not claim success from intent; report command result and distinguish pre-existing warnings from new failures.
 
-เมื่อผู้ใช้คลิก link เพื่อไปยังหน้าอื่น แอปจะแสดง **Pending Shell** (skeleton UI) ทันทีระหว่างรอโหลดหน้าใหม่ เพื่อลด perceived latency
+## Security Rules
 
-### Architecture
-- **Base Shells:** `PublicBaseShell.svelte` และ `AdminBaseShell.svelte` — layout + animation + accessibility
-- **Page Shells:** แต่ละหน้ามี shell ของตัวเอง (เช่น `CalendarPendingShell.svelte`, `AdminSeriesPendingShell.svelte`)
-- **Composition:** Page shells ใช้ `{#snippet content()}` เพื่อ inject skeleton เข้าไปใน base shell
+- Never expose `DATABASE_URL`, `READONLY_DATABASE_URL`, `AUTH_SECRET`, API keys, VAPID private key or R2 credentials
+- Preserve ownership checks, ADMIN guards, CSRF-safe SvelteKit patterns and URL validation
+- Treat `@html`, external embeds, uploads, redirects and SQL generation as security-sensitive
+- AI Chat must use the read-only database connection and existing SQL safety layer
+- Destructive DB/seed/migration operations require explicit user approval and verified target
+- CSP lives in `svelte.config.js`; new external origins require narrow, justified directives
 
-### Navigation Detection
-- ใช้ `$derived` กับ `$app/state` (NOT `$app/stores`) เพื่อ detect navigation
-- ตรวจว่า `navigating.to?.url.pathname` ต่างจาก `page.url.pathname` (navigate FROM หน้าอื่น TO หน้าเป้าหมาย)
-- Shell จะแสดงเฉพาะเมื่อ navigate TO หน้าเท่านั้น ไม่แสดงเมื่ออยู่หน้าเดิม
+## Agent Notes
 
-### Components
-- **Public:** `SeriesPendingShell`, `SeriesDetailPendingShell`, `CalendarPendingShell`, `ProfilePendingShell`
-- **Admin:** `AdminSeriesPendingShell`, `AdminArtistsPendingShell`, `AdminStudiosPendingShell`, `AdminPlatformsPendingShell`, `AdminEpisodesPendingShell`, `AdminSchedulesPendingShell`, `AdminArtistSocialsPendingShell`, `AdminSeriesArtistsPendingShell`, `AdminEpisodeSchedulesPendingShell`
-
-### Key Principles
-- **SSR-safe:** Shells ไม่ render บน server (client-side only)
-- **Accessibility:** `aria-busy="true"`, `aria-live="polite"`, เคารพ `prefers-reduced-motion`
-- **Thai UI:** ข้อความใน shell เป็นภาษาไทย
-- **Design:** ใช้ glassmorphism + สี project (coral, lavender, mint, plum)
-
----
-
-## Code Style Guidelines
-
-### Svelte / TypeScript
-- ใช้ `<script lang="ts">` ทุกไฟล์
-- Svelte 5 Runes เท่านั้น (`$state`, `$derived`, `$effect`, `$props`)
-- **ไม่ใช้** `export let` (legacy Svelte 4)
-- `$bindable()` สำหรับ two-way binding ใน component
-
-### Module Resolution
-- ใช้ `NodeNext` → import ทุกไฟล์ต้องมีนามสกุล `.js` (แม้เป็น `.ts`)
-- ตัวอย่าง: `import { getDb } from '../db/index.js'`
-
-### Server Load / Actions
-- ใช้ `export const load` และ `export const actions`
-- Type imports จาก `'./$types.js'`
-- Form errors แสดงเป็นภาษาไทยเสมอ
-
-### Naming Conventions
-- Components: PascalCase (e.g., `PasswordInput.svelte`)
-- Server files: camelCase (e.g., `page.server.ts`)
-- DB tables: snake_case ใน schema, camelCase ใน TypeScript
-
----
-
-## Testing Instructions
-
-**ณ ปัจจุบันยังไม่มี Test Suite ในโปรเจกต์**
-
-หากต้องการเพิ่ม tests แนะนำ:
-- Unit tests: `vitest` (เข้ากันได้กับ Vite/SvelteKit)
-- E2E tests: `Playwright`
-- DB tests: ใช้ `pglite` หรือ setup test database บน Neon
-
----
-
-## Security Considerations
-
-1. **Never expose `AUTH_SECRET`** — ใช้สำหรับ sign JWT เท่านั้น
-2. **Never expose `DATABASE_URL`** — มี credentials ของ PostgreSQL
-3. **SQL Injection** — ปลอดภัยเนื่องจากใช้ Drizzle ORM ทั้งหมด
-4. **XSS** — Svelte มี escaping  built-in, แต่ต้องระวัง `@html` directive
-5. **CSRF** — SvelteKit form actions มี CSRF protection โดย default
-6. **Session Hijacking** — เก็บ token hash ไม่ใช่ token ดิบในฐานข้อมูล, สามารถ revoke ได้
-
----
-
-## Deployment
-
-1. **Database:** Neon.tech project พร้อม `DATABASE_URL`
-2. **Environment:** ตั้งค่า `DATABASE_URL` และ `AUTH_SECRET`
-3. **Migration:** `npm run db:push` ก่อน deploy ครั้งแรก
-4. **Platform:** รองรับ Vercel (adapter-auto จะ detect เอง)
-
----
-
-## Key Notes for Agents
-
-- **ภาษาหลักของ UI คือภาษาไทย** — ข้อความใน component, error message, label ต่างๆ เป็นภาษาไทย
-- **หน้า Series (รายการ + รายละเอียด) ดึงจาก DB จริงแล้ว** — หน้า Calendar และ Admin ยังใช้ Mock Data อยู่ หากต้องการเชื่อมต่อกับฐานข้อมูลจริง ต้องเขียน `+page.server.ts` สำหรับ load data
-- **Auth ทำงานจริงแล้ว** — สามารถสมัครสมาชิก เข้าสู่ระบบ แก้ไขโปรไฟล์ และเปลี่ยนรหัสผ่านได้
-- **สร้าง Admin คนแรก:** ต้อง insert ผ่าน database โดยตรง (ยังไม่มีหน้าสร้าง admin) หรือเปลี่ยน role ใน DB
-- **ถ้าแก้ไข schema อย่าลืม:** `npm run db:generate` แล้ว `npm run db:push`
-- **Drizzle Studio:** ใช้ `npm run db:studio` สำหรับดู/แก้ไขข้อมูลในฐานข้อมูลได้สะดวก
-- **Design preference:** ห้ามใช้แถบหรือเส้นไล่สีรุ้งใน UI เว้นแต่ผู้ใช้ขอโดยตรง และห้ามใช้เส้นคั่นบาง/HR เป็นองค์ประกอบตกแต่ง UI
+- Start from current source, not old assumptions. Calendar and Admin are live, not mocks.
+- Thai and English are both supported; Thai remains primary product voice.
+- Keep changes scoped. No unrelated refactors, dependencies or visual churn.
+- Preserve user-owned data boundaries in subscriptions, chat and Halo.
+- Do not commit generated screenshots or local debug artifacts unless explicitly requested.
+- Update README.md, AGENTS.md and CLAUDE.md when architecture, commands, env requirements or major feature status changes.
