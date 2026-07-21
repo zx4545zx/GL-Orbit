@@ -1,4 +1,23 @@
-import { check, index, jsonb, pgEnum, pgTable, primaryKey, text, time, timestamp, uniqueIndex, uuid, varchar, boolean, integer } from 'drizzle-orm/pg-core';
+import {
+	boolean,
+	check,
+	date,
+	foreignKey,
+	index,
+	integer,
+	jsonb,
+	numeric,
+	pgEnum,
+	pgTable,
+	primaryKey,
+	text,
+	time,
+	timestamp,
+	unique,
+	uniqueIndex,
+	uuid,
+	varchar
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const userRoleEnum = pgEnum('user_role', ['ADMIN', 'USER']);
@@ -11,6 +30,9 @@ export const momentMediaSourceEnum = pgEnum('moment_media_source', ['EXTERNAL', 
 export const momentCommentStatusEnum = pgEnum('moment_comment_status', ['PUBLISHED', 'HIDDEN', 'DELETED']);
 export const momentReportReasonEnum = pgEnum('moment_report_reason', ['SPAM', 'HARASSMENT', 'INAPPROPRIATE', 'COPYRIGHT', 'MISLEADING', 'OTHER']);
 export const momentReportStatusEnum = pgEnum('moment_report_status', ['PENDING', 'REVIEWED', 'DISMISSED', 'ACTIONED']);
+export const subscriptionStatusEnum = pgEnum('subscription_status', ['ACTIVE', 'CANCELED']);
+export const subscriptionBillingUnitEnum = pgEnum('subscription_billing_unit', ['DAY', 'MONTH', 'YEAR']);
+export const subscriptionPaymentKindEnum = pgEnum('subscription_payment_kind', ['INITIAL', 'RENEWAL', 'MANUAL']);
 
 export const users = pgTable('users', {
 	id: uuid('id').defaultRandom().primaryKey(),
@@ -62,6 +84,108 @@ export const platforms = pgTable('platforms', {
 	baseUrl: text('base_url'),
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
 });
+
+export const currencies = pgTable('currencies', {
+	code: varchar('code', { length: 3 }).primaryKey(),
+	nameTh: varchar('name_th', { length: 100 }).notNull(),
+	nameEn: varchar('name_en', { length: 100 }).notNull(),
+	minorUnit: integer('minor_unit').notNull(),
+	isActive: boolean('is_active').notNull().default(true),
+	sortOrder: integer('sort_order').notNull(),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({
+	codeShape: check('currencies_code_shape', sql`${table.code} ~ '^[A-Z]{3}$'`),
+	minorUnitRange: check('currencies_minor_unit_range', sql`${table.minorUnit} BETWEEN 0 AND 4`),
+	sortOrderNonnegative: check('currencies_sort_order_nonnegative', sql`${table.sortOrder} >= 0`),
+	activeOrderIndex: index('currencies_active_order_idx').on(table.isActive, table.sortOrder, table.code)
+}));
+
+export const userSubscriptions = pgTable('user_subscriptions', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	platformId: uuid('platform_id').references(() => platforms.id, { onDelete: 'restrict' }),
+	customPlatformName: varchar('custom_platform_name', { length: 255 }),
+	planName: varchar('plan_name', { length: 120 }),
+	accountLabel: varchar('account_label', { length: 120 }),
+	amount: numeric('amount', { precision: 18, scale: 4 }).notNull(),
+	currency: varchar('currency', { length: 3 }).notNull().references(() => currencies.code, { onDelete: 'restrict', onUpdate: 'cascade' }),
+	billingUnit: subscriptionBillingUnitEnum('billing_unit').notNull(),
+	billingInterval: integer('billing_interval').notNull(),
+	currentPeriodStart: date('current_period_start').notNull(),
+	currentPeriodEnd: date('current_period_end').notNull(),
+	renewalAnchorDate: date('renewal_anchor_date').notNull(),
+	renewalSequence: integer('renewal_sequence').notNull().default(0),
+	renewsAutomatically: boolean('renews_automatically').notNull().default(true),
+	status: subscriptionStatusEnum('status').notNull().default('ACTIVE'),
+	alertDays: integer('alert_days').array().notNull().default(sql`ARRAY[]::integer[]`),
+	canceledAt: timestamp('canceled_at', { withTimezone: true }),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+	deletedAt: timestamp('deleted_at', { withTimezone: true })
+}, (table) => ({
+	userIdIdUnique: unique('user_subscriptions_user_id_id_unique').on(table.userId, table.id),
+	activeDueIndex: index('user_subscriptions_active_due_idx').on(table.userId, table.currentPeriodEnd).where(sql`${table.deletedAt} IS NULL AND ${table.status} = 'ACTIVE'`),
+	userLookupIndex: index('user_subscriptions_user_lookup_idx').on(table.userId, table.id).where(sql`${table.deletedAt} IS NULL`),
+	sourceXor: check('user_subscriptions_source_xor', sql`((${table.platformId} IS NOT NULL)::int + (NULLIF(BTRIM(${table.customPlatformName}), '') IS NOT NULL)::int) = 1`),
+	amountNonNegative: check('user_subscriptions_amount_non_negative', sql`${table.amount} >= 0`),
+	currencyShape: check('user_subscriptions_currency_shape', sql`${table.currency} ~ '^[A-Z]{3}$'`),
+	periodOrder: check('user_subscriptions_period_order', sql`${table.currentPeriodStart} <= ${table.currentPeriodEnd}`),
+	intervalRange: check('user_subscriptions_interval_range', sql`(${table.billingUnit} = 'DAY' AND ${table.billingInterval} BETWEEN 1 AND 365) OR (${table.billingUnit} = 'MONTH' AND ${table.billingInterval} BETWEEN 1 AND 120) OR (${table.billingUnit} = 'YEAR' AND ${table.billingInterval} BETWEEN 1 AND 20)`),
+	sequenceNonNegative: check('user_subscriptions_sequence_non_negative', sql`${table.renewalSequence} >= 0`),
+	alertDaysRange: check('user_subscriptions_alert_days_range', sql`cardinality(${table.alertDays}) <= 10 AND array_position(${table.alertDays}, NULL) IS NULL AND 0 < ALL(${table.alertDays}) AND 366 > ALL(${table.alertDays})`),
+	canceledState: check('user_subscriptions_canceled_state', sql`(${table.status} = 'CANCELED') = (${table.canceledAt} IS NOT NULL)`)
+}));
+
+export const subscriptionPayments = pgTable('subscription_payments', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	subscriptionId: uuid('subscription_id').notNull(),
+	kind: subscriptionPaymentKindEnum('kind').notNull(),
+	amount: numeric('amount', { precision: 18, scale: 4 }).notNull(),
+	currency: varchar('currency', { length: 3 }).notNull().references(() => currencies.code, { onDelete: 'restrict', onUpdate: 'cascade' }),
+	paidDate: date('paid_date').notNull(),
+	servicePeriodStart: date('service_period_start').notNull(),
+	servicePeriodEnd: date('service_period_end').notNull(),
+	renewalFromPeriodStart: date('renewal_from_period_start'),
+	renewalFromPeriodEnd: date('renewal_from_period_end'),
+	renewalAnchorBefore: date('renewal_anchor_before'),
+	renewalSequenceBefore: integer('renewal_sequence_before'),
+	billingUnitSnapshot: subscriptionBillingUnitEnum('billing_unit_snapshot'),
+	billingIntervalSnapshot: integer('billing_interval_snapshot'),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+	deletedAt: timestamp('deleted_at', { withTimezone: true })
+}, (table) => ({
+	ownershipForeignKey: foreignKey({
+		columns: [table.userId, table.subscriptionId],
+		foreignColumns: [userSubscriptions.userId, userSubscriptions.id],
+		name: 'subscription_payments_user_subscription_fk'
+	}).onDelete('cascade'),
+	userPaidIndex: index('subscription_payments_user_paid_idx').on(table.userId, table.paidDate.desc(), table.id).where(sql`${table.deletedAt} IS NULL`),
+	subscriptionHistoryIndex: index('subscription_payments_subscription_history_idx').on(table.subscriptionId, table.paidDate.desc(), table.createdAt.desc(), table.id.desc()).where(sql`${table.deletedAt} IS NULL`),
+	liveRenewalUnique: uniqueIndex('subscription_payments_live_renewal_unique').on(table.subscriptionId, table.renewalFromPeriodEnd).where(sql`${table.kind} = 'RENEWAL' AND ${table.deletedAt} IS NULL`),
+	amountNonNegative: check('subscription_payments_amount_non_negative', sql`${table.amount} >= 0`),
+	currencyShape: check('subscription_payments_currency_shape', sql`${table.currency} ~ '^[A-Z]{3}$'`),
+	periodOrder: check('subscription_payments_period_order', sql`${table.servicePeriodStart} <= ${table.servicePeriodEnd}`),
+	renewalSnapshots: check('subscription_payments_renewal_snapshots', sql`(${table.kind} = 'RENEWAL' AND ${table.renewalFromPeriodStart} IS NOT NULL AND ${table.renewalFromPeriodEnd} IS NOT NULL AND ${table.renewalAnchorBefore} IS NOT NULL AND ${table.renewalSequenceBefore} IS NOT NULL AND ${table.billingUnitSnapshot} IS NOT NULL AND ${table.billingIntervalSnapshot} IS NOT NULL) OR (${table.kind} <> 'RENEWAL' AND ${table.renewalFromPeriodStart} IS NULL AND ${table.renewalFromPeriodEnd} IS NULL AND ${table.renewalAnchorBefore} IS NULL AND ${table.renewalSequenceBefore} IS NULL AND ${table.billingUnitSnapshot} IS NULL AND ${table.billingIntervalSnapshot} IS NULL)`)
+}));
+
+export const subscriptionBudgets = pgTable('subscription_budgets', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	currency: varchar('currency', { length: 3 }).notNull().references(() => currencies.code, { onDelete: 'restrict', onUpdate: 'cascade' }),
+	monthlyLimit: numeric('monthly_limit', { precision: 18, scale: 4 }).notNull(),
+	warningPercent: integer('warning_percent').notNull().default(80),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({
+	userCurrencyUnique: unique('subscription_budgets_user_currency_unique').on(table.userId, table.currency),
+	userCurrencyIndex: index('subscription_budgets_user_currency_idx').on(table.userId, table.currency),
+	limitPositive: check('subscription_budgets_limit_positive', sql`${table.monthlyLimit} > 0`),
+	currencyShape: check('subscription_budgets_currency_shape', sql`${table.currency} ~ '^[A-Z]{3}$'`),
+	warningRange: check('subscription_budgets_warning_range', sql`${table.warningPercent} BETWEEN 1 AND 100`)
+}));
 
 export const artists = pgTable('artists', {
 	id: uuid('id').defaultRandom().primaryKey(),

@@ -143,6 +143,17 @@ import Picture from './Picture.svelte';
 									</svg>
 									{m.menus_profile_title()}
 								</a>
+								<a
+									href="/{page.data.lang}/subscriptions"
+									role="menuitem"
+									onclick={closeProfileMenu}
+									class="flex min-h-11 items-center gap-3 rounded-none px-3 py-2.5 text-sm font-semibold text-plum transition-colors hover:bg-plum/5 hover:text-coral-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+								>
+									<svg class="h-5 w-5 text-mint-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5h16.5m-16.5 0A2.25 2.25 0 0 1 6 5.25h12a2.25 2.25 0 0 1 2.25 2.25m-16.5 0v9A2.25 2.25 0 0 0 6 18.75h12a2.25 2.25 0 0 0 2.25-2.25v-9M7.5 14.25h3" />
+									</svg>
+									{m.subscriptions_nav()}
+								</a>
 								{#if currentUser.role === 'ADMIN'}
 									<a
 										href="/{page.data.lang}/admin/series"

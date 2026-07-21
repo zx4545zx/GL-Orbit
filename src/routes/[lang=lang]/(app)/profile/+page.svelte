@@ -477,6 +477,17 @@
 									</div>
 								</div>
 
+								<a
+									href={localizedHref('/subscriptions', page.data.lang)}
+									class="flex min-h-14 items-center justify-between gap-4 border border-[var(--orbit-line-strong)] bg-white p-4 text-plum transition-colors hover:bg-cream touch-target sm:p-5"
+								>
+									<span>
+										<strong class="block font-[family-name:var(--font-display)]">{m.subscriptions_nav()}</strong>
+										<span class="mt-1 block text-sm text-plum-light">{m.subscriptions_subtitle()}</span>
+									</span>
+									<span aria-hidden="true" class="text-xl text-coral-dark">→</span>
+								</a>
+
 								{#if isPushSupported()}
 									<div class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6">
 										<div class="flex items-center gap-2 mb-4">

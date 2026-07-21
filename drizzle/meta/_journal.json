@@ -169,6 +169,20 @@
       "when": 1784486166229,
       "tag": "0023_notification_delivery_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1784603939654,
+      "tag": "0024_subscription_tracker",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1784610805919,
+      "tag": "0025_subscription_currency_catalog",
+      "breakpoints": true
     }
   ]
 }

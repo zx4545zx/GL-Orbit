@@ -780,7 +780,11 @@ h1, h2, h3 {
   color: var(--orbit-muted);
 }
 
-[data-theme='dark'] :is(.text-plum\/60, .text-plum\/70, .text-plum\/80) {
+[data-theme='dark'] :is(
+  .text-plum\/40, .text-plum\/45, .text-plum\/50, .text-plum\/55,
+  .text-plum\/60, .text-plum\/65, .text-plum\/70, .text-plum\/75,
+  .text-plum\/80, .text-plum\/85, .text-plum\/90
+) {
   color: var(--orbit-muted);
 }
 

@@ -84,6 +84,22 @@
 						</svg>
 					</div>
 				</a>
+
+				<a
+					href={localizedHref('/subscriptions', page.data.lang)}
+					class="group orbit-surface flex min-h-14 items-center gap-4 border border-[var(--orbit-line)] p-4 transition-colors hover:bg-cream touch-target sm:p-5"
+				>
+					<div class="grid h-14 w-14 shrink-0 place-items-center bg-mint/20 text-plum">
+						<svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h10M7 4v6m10-6v6" />
+						</svg>
+					</div>
+					<div class="min-w-0 flex-1">
+						<h2 class="font-[family-name:var(--font-display)] text-lg font-black text-plum">{m.subscriptions_nav()}</h2>
+						<p class="mt-1 text-sm text-plum-light">{m.subscriptions_subtitle()}</p>
+					</div>
+					<span aria-hidden="true" class="text-xl text-coral-dark">→</span>
+				</a>
 			{:else}
 				<div class="grid grid-cols-2 gap-3">
 					<a
