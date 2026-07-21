@@ -97,7 +97,7 @@ describe('SubscriptionList', () => {
 		expect(screen.queryByText('Premium')).toBeNull();
 	});
 
-	it('omits inferred series for custom platforms and shows catalog remainder', () => {
+	it('omits related series from subscription rows', () => {
 		const { container } = render(SubscriptionList, {
 			props: {
 				subscriptions,
@@ -105,9 +105,8 @@ describe('SubscriptionList', () => {
 				onRenew: vi.fn()
 			}
 		});
-		const custom = container.querySelector('[data-subscription-id="44444444-4444-4444-8444-444444444444"]')!;
-		expect(custom.querySelector('[data-related-series]')).toBeNull();
-		expect(screen.getByText('+2')).toBeTruthy();
+		expect(container.querySelector('[data-related-series]')).toBeNull();
+		expect(screen.queryByText('+2')).toBeNull();
 	});
 
 	it('gives renew and manage actions accessible touch targets', () => {

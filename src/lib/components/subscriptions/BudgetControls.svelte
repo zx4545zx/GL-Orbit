@@ -12,7 +12,6 @@
 	import CurrencySelect from './CurrencySelect.svelte';
 
 	type Budget = { currency: string; monthlyLimit: string; warningPercent: number };
-	type Draft = { monthlyLimit: string; warningPercent: number };
 	type Request = (input: RequestInfo | URL, init?: RequestInit) => Promise<unknown>;
 
 	let {
@@ -27,21 +26,33 @@
 		onChanged: () => Promise<void> | void;
 	} = $props();
 
-	let drafts = $state<Record<string, Partial<Draft>>>({});
-	let newCurrency = $state('');
-	let newMonthlyLimit = $state('');
-	let newWarningPercent = $state(80);
+	let selectedCurrency = $state('');
+	let monthlyLimit = $state('');
+	let warningPercent = $state(80);
 	let pendingKey = $state<string | null>(null);
 	let error = $state<string | null>(null);
 	let fieldErrors = $state<Record<string, FieldErrorCode[]>>({});
 	const activeCodes = $derived(new Set(currencies.map((item) => item.code)));
+	const selectedBudget = $derived(
+		budgets.find((item) => item.currency === selectedCurrency) ?? null
+	);
 
 	onMount(() => {
-		newCurrency = selectSuggestedCurrency(currencies, {
+		selectedCurrency =
+			budgets[0]?.currency ??
+			selectSuggestedCurrency(currencies, {
 			stored: readCurrencyPreference(),
 			locale: navigator.language,
 			timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-		});
+			});
+	});
+
+	$effect(() => {
+		const budget = budgets.find((item) => item.currency === selectedCurrency);
+		monthlyLimit = budget?.monthlyLimit ?? '';
+		warningPercent = budget?.warningPercent ?? 80;
+		error = null;
+		fieldErrors = {};
 	});
 
 	const fieldMessage = (field: string) =>
@@ -57,25 +68,19 @@
 		fieldErrors = {};
 	}
 
-	async function saveExisting(currency: string) {
+	async function saveBudget() {
 		if (pendingKey) return;
+		const currency = selectedCurrency.trim().toUpperCase();
 		if (!activeCodes.has(currency)) return;
-		const budget = budgets.find((item) => item.currency === currency);
-		if (!budget) return;
-		const draft = {
-			monthlyLimit: drafts[currency]?.monthlyLimit ?? budget.monthlyLimit,
-			warningPercent: drafts[currency]?.warningPercent ?? budget.warningPercent
-		};
 		pendingKey = currency;
 		error = null;
 		fieldErrors = {};
 		try {
 			await request(`/api/subscription-budgets/${encodeURIComponent(currency)}`, {
 				method: 'PUT',
-				body: JSON.stringify(draft)
+				body: JSON.stringify({ monthlyLimit, warningPercent })
 			});
 			await onChanged();
-			delete drafts[currency];
 		} catch (caught) {
 			captureError(caught);
 		} finally {
@@ -99,154 +104,86 @@
 			pendingKey = null;
 		}
 	}
-
-	async function createBudget() {
-		if (pendingKey) return;
-		const currency = newCurrency.trim().toUpperCase();
-		pendingKey = 'NEW';
-		error = null;
-		fieldErrors = {};
-		try {
-			await request(`/api/subscription-budgets/${encodeURIComponent(currency)}`, {
-				method: 'PUT',
-				body: JSON.stringify({
-					monthlyLimit: newMonthlyLimit,
-					warningPercent: newWarningPercent
-				})
-			});
-			await onChanged();
-			newCurrency = selectSuggestedCurrency(currencies, {
-				stored: readCurrencyPreference(),
-				locale: navigator.language,
-				timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-			});
-			newMonthlyLimit = '';
-			newWarningPercent = 80;
-		} catch (caught) {
-			captureError(caught);
-		} finally {
-			pendingKey = null;
-		}
-	}
 </script>
 
-<section class="border border-[var(--orbit-line)] bg-white p-5 sm:p-6">
-	<h2 class="font-display text-xl text-plum">{m.subscriptions_budget_title()}</h2>
-	{#if error}<p class="mt-3 border border-coral/40 bg-coral/10 p-3 text-sm" role="alert">{error}</p>{/if}
-
-	<div class="mt-4 grid gap-3">
-		{#each budgets as budget (budget.currency)}
-			<form
-				class="grid gap-3 border border-[var(--orbit-line)] p-4 md:grid-cols-[auto_1fr_9rem_auto] md:items-end"
-				onsubmit={(event) => {
-					event.preventDefault();
-					void saveExisting(budget.currency);
-				}}
-			>
-				<strong class="touch-target flex items-center">{budget.currency}</strong>
-				<label class="grid gap-1 text-sm">
-					<span>{m.subscriptions_budget_limit()} {budget.currency}</span>
-					<input
-						type="text"
-						inputmode="decimal"
-						value={drafts[budget.currency]?.monthlyLimit ?? budget.monthlyLimit}
-						oninput={(event) => {
-							drafts[budget.currency] = {
-								...drafts[budget.currency],
-								monthlyLimit: event.currentTarget.value
-							};
-						}}
-					class="touch-target border border-[var(--orbit-line-strong)] px-3"
-					aria-invalid={fieldErrors.monthlyLimit ? 'true' : undefined}
-					disabled={!activeCodes.has(budget.currency)}
-					/>
-					{#if fieldMessage('monthlyLimit')}<span class="text-xs text-coral">{fieldMessage('monthlyLimit')}</span>{/if}
-				</label>
-				<label class="grid gap-1 text-sm">
-					<span>{m.subscriptions_budget_warning_percent()} {budget.currency}</span>
-					<input
-						type="number"
-						min="1"
-						max="100"
-						value={drafts[budget.currency]?.warningPercent ?? budget.warningPercent}
-						oninput={(event) => {
-							drafts[budget.currency] = {
-								...drafts[budget.currency],
-								warningPercent: event.currentTarget.valueAsNumber
-							};
-						}}
-					class="touch-target border border-[var(--orbit-line-strong)] px-3"
-					aria-invalid={fieldErrors.warningPercent ? 'true' : undefined}
-					disabled={!activeCodes.has(budget.currency)}
-					/>
-				</label>
-				<div class="grid grid-cols-2 gap-2 md:grid-cols-1">
-					<button
-						type="submit"
-						class="touch-target border border-plum bg-plum px-3 text-sm text-white disabled:opacity-50"
-						disabled={pendingKey !== null || !activeCodes.has(budget.currency)}
-					>
-						{pendingKey === budget.currency ? m.subscriptions_saving() : m.subscriptions_budget_save()}
-					</button>
-					<button
-						type="button"
-						class="touch-target border border-coral/50 px-3 text-sm text-coral disabled:opacity-50"
-						disabled={pendingKey !== null}
-						onclick={() => void remove(budget.currency)}
-					>
-						{m.subscriptions_budget_delete()}
-					</button>
-				</div>
-			</form>
-		{/each}
+<details class="group border border-[var(--orbit-line)] bg-[var(--orbit-surface)]">
+	<summary class="touch-target flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-4 marker:content-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--orbit-coral)] sm:px-5 [&::-webkit-details-marker]:hidden">
+		<span class="font-display text-lg text-[var(--orbit-ink)]">{m.subscriptions_budget_title()}</span>
+		<span class="flex items-center gap-3">
+			<span class="text-xs font-bold tracking-wider text-[var(--orbit-muted)]">{budgets.length}</span>
+			<svg class="h-4 w-4 text-[var(--orbit-muted)] transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+				<path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.5" />
+			</svg>
+		</span>
+	</summary>
+	<div class="border-t border-[var(--orbit-line)]">
+	{#if error}<p class="m-4 border border-[var(--orbit-coral)] bg-[var(--orbit-coral-soft)] p-3 text-sm text-[var(--orbit-ink)]" role="alert">{error}</p>{/if}
 
 		<form
-			class="grid gap-3 border border-dashed border-[var(--orbit-line-strong)] bg-mint/5 p-4 md:grid-cols-[8rem_1fr_9rem_auto] md:items-end"
+			class="grid gap-3 p-4 md:grid-cols-[8rem_1fr_9rem_auto] md:items-end sm:p-5"
 			onsubmit={(event) => {
 				event.preventDefault();
-				void createBudget();
+				void saveBudget();
 			}}
 		>
-			<label class="grid gap-1 text-sm">
+			<label class="grid gap-1 text-sm text-[var(--orbit-ink)]">
 				<span>{m.subscriptions_currency()}</span>
 				<CurrencySelect
 					id="budget-currency"
-					bind:value={newCurrency}
+					bind:value={selectedCurrency}
 					{currencies}
-					legacyCode={currencies.length ? null : newCurrency}
+					legacyCode={selectedBudget && !activeCodes.has(selectedCurrency) ? selectedCurrency : null}
 					invalid={Boolean(fieldErrors.currency)}
 					describedBy={fieldMessage('currency') ? 'budget-currency-error' : undefined}
 				/>
 				{#if fieldMessage('currency')}<span id="budget-currency-error" class="text-xs text-coral">{fieldMessage('currency')}</span>{/if}
 			</label>
-			<label class="grid gap-1 text-sm">
+			<label class="grid gap-1 text-sm text-[var(--orbit-ink)]">
 				<span>{m.subscriptions_budget_limit()}</span>
 				<input
 					type="text"
 					inputmode="decimal"
-					bind:value={newMonthlyLimit}
-					class="touch-target border border-[var(--orbit-line-strong)] bg-white px-3"
+					bind:value={monthlyLimit}
+					class="touch-target border border-[var(--orbit-line-strong)] bg-[var(--orbit-surface)] px-3 text-[var(--orbit-ink)] outline-none focus:border-[var(--orbit-coral)] focus:ring-2 focus:ring-[var(--orbit-coral-soft)]"
 					aria-invalid={fieldErrors.monthlyLimit ? 'true' : undefined}
+					disabled={!activeCodes.has(selectedCurrency)}
 				/>
 			</label>
-			<label class="grid gap-1 text-sm">
+			<label class="grid gap-1 text-sm text-[var(--orbit-ink)]">
 				<span>{m.subscriptions_budget_warning_percent()}</span>
 				<input
 					type="number"
 					min="1"
 					max="100"
-					bind:value={newWarningPercent}
-					class="touch-target border border-[var(--orbit-line-strong)] bg-white px-3"
+					bind:value={warningPercent}
+					class="touch-target border border-[var(--orbit-line-strong)] bg-[var(--orbit-surface)] px-3 text-[var(--orbit-ink)] outline-none focus:border-[var(--orbit-coral)] focus:ring-2 focus:ring-[var(--orbit-coral-soft)]"
 					aria-invalid={fieldErrors.warningPercent ? 'true' : undefined}
+					disabled={!activeCodes.has(selectedCurrency)}
 				/>
 			</label>
-			<button
-				type="submit"
-				class="touch-target border border-plum bg-plum px-3 text-sm text-white disabled:opacity-50"
-				disabled={pendingKey !== null}
-			>
-				{pendingKey === 'NEW' ? m.subscriptions_saving() : m.subscriptions_budget_add()}
-			</button>
+			<div class="grid grid-cols-2 gap-2 md:grid-cols-1">
+				<button
+					type="submit"
+					class="touch-target border border-[var(--orbit-coral-dark)] bg-[var(--orbit-coral)] px-3 text-sm font-semibold text-white hover:bg-[var(--orbit-coral-dark)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--orbit-coral)] disabled:opacity-50"
+					disabled={pendingKey !== null || !activeCodes.has(selectedCurrency)}
+				>
+					{pendingKey === selectedCurrency
+						? m.subscriptions_saving()
+						: selectedBudget
+							? m.subscriptions_budget_save()
+							: m.subscriptions_budget_add()}
+				</button>
+				{#if selectedBudget}
+					<button
+						type="button"
+						class="touch-target border border-[var(--orbit-coral)] px-3 text-sm text-[var(--orbit-coral)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--orbit-coral)] disabled:opacity-50"
+						disabled={pendingKey !== null}
+						onclick={() => void remove(selectedCurrency)}
+					>
+						{m.subscriptions_budget_delete()}
+					</button>
+				{/if}
+			</div>
 		</form>
 	</div>
-</section>
+</details>

@@ -28,8 +28,9 @@ describe('BudgetControls', () => {
 				onChanged: changed
 			}
 		});
+		await user.click(screen.getByText(/monthly budgets|งบรายเดือน/i));
 
-		const limit = screen.getAllByLabelText(/monthly limit|วงเงินรายเดือน/i)[0];
+		const limit = screen.getByLabelText(/monthly limit|วงเงินรายเดือน/i);
 		await user.clear(limit);
 		await user.type(limit, '1200');
 		await user.click(screen.getByRole('button', { name: /save budget|บันทึกงบ/i }));
@@ -48,6 +49,7 @@ describe('BudgetControls', () => {
 		render(BudgetControls, {
 			props: { budgets: [], currencies, request, onChanged: changed }
 		});
+		await user.click(screen.getByText(/monthly budgets|งบรายเดือน/i));
 
 		await user.selectOptions(screen.getByLabelText(/^currency$|^สกุลเงิน$/i), 'USD');
 		await user.type(screen.getByLabelText(/monthly limit|วงเงินรายเดือน/i), '100');
@@ -75,8 +77,9 @@ describe('BudgetControls', () => {
 				onChanged: changed
 			}
 		});
+		await user.click(screen.getByText(/monthly budgets|งบรายเดือน/i));
 
-		expect((screen.getByLabelText(/monthly limit CAD|วงเงินรายเดือน CAD/i) as HTMLInputElement).disabled).toBe(true);
+		expect((screen.getByLabelText(/monthly limit|วงเงินรายเดือน/i) as HTMLInputElement).disabled).toBe(true);
 		expect((screen.getByRole('button', { name: /save budget|บันทึกงบ/i }) as HTMLButtonElement).disabled).toBe(true);
 		await user.click(screen.getByRole('button', { name: /delete budget|ลบงบ/i }));
 

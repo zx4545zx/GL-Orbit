@@ -96,7 +96,7 @@ describe('RenewalDialog', () => {
 			}
 		});
 
-		const confirm = await screen.findByRole('button', { name: /confirm renewed|ยืนยันว่าต่ออายุแล้ว/i });
+		const confirm = await screen.findByRole('button', { name: /confirm renewed|ยืนยัน/i });
 		await user.dblClick(confirm);
 		expect(request).toHaveBeenCalledOnce();
 		expect((confirm as HTMLButtonElement).disabled).toBe(true);
@@ -125,7 +125,7 @@ describe('RenewalDialog', () => {
 		const amount = (await screen.findByLabelText(/amount|ราคา/i)) as HTMLInputElement;
 		await user.clear(amount);
 		await user.type(amount, '199');
-		await user.click(screen.getByRole('button', { name: /confirm renewed|ยืนยันว่าต่ออายุแล้ว/i }));
+		await user.click(screen.getByRole('button', { name: /confirm renewed|ยืนยัน/i }));
 		await waitFor(() => expect(onConflict).toHaveBeenCalledOnce());
 		expect(screen.getByRole('alert').textContent).toMatch(/period changed|ข้อมูลรอบเปลี่ยน/i);
 		expect(amount.value).toBe('199');

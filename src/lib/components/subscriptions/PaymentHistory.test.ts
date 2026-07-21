@@ -110,7 +110,7 @@ describe('PaymentHistory', () => {
 		const amount = screen.getByLabelText(/amount|ราคา/i) as HTMLInputElement;
 		await user.clear(amount);
 		await user.type(amount, '199.50');
-		await user.click(screen.getByRole('button', { name: /save payment|บันทึกรายการจ่าย/i }));
+		await user.click(screen.getByRole('button', { name: /save payment|บันทึก/i }));
 
 		expect(request).toHaveBeenCalledOnce();
 		const [url, init] = request.mock.calls[0]!;
@@ -204,7 +204,7 @@ describe('PaymentHistory', () => {
 		const amount = screen.getByLabelText(/amount|ราคา/i) as HTMLInputElement;
 		await user.clear(amount);
 		await user.type(amount, '219.999');
-		await user.click(screen.getByRole('button', { name: /save payment|บันทึกรายการจ่าย/i }));
+		await user.click(screen.getByRole('button', { name: /save payment|บันทึก/i }));
 
 		await screen.findByRole('alert');
 		expect(amount.value).toBe('219.999');
@@ -241,7 +241,7 @@ describe('PaymentHistory', () => {
 		render(PaymentHistory, { props: { subscriptionId, page: { items: [], nextCursor: null }, request, onChanged } });
 		await user.click(screen.getByRole('button', { name: /add payment|เพิ่มรายการจ่าย/i }));
 		await user.type(screen.getByLabelText(/amount|ราคา/i), '100');
-		const save = screen.getByRole('button', { name: /save payment|บันทึกรายการจ่าย/i });
+		const save = screen.getByRole('button', { name: /save payment|บันทึก/i });
 		await user.click(save);
 		await screen.findByRole('alert');
 		await user.click(save);
@@ -259,7 +259,7 @@ describe('PaymentHistory', () => {
 		render(PaymentHistory, { props: { subscriptionId, page: { items: [], nextCursor: null }, request, onChanged } });
 		await user.click(screen.getByRole('button', { name: /add payment|เพิ่มรายการจ่าย/i }));
 		await user.type(screen.getByLabelText(/amount|ราคา/i), '100');
-		const save = screen.getByRole('button', { name: /save payment|บันทึกรายการจ่าย/i });
+		const save = screen.getByRole('button', { name: /save payment|บันทึก/i });
 		await user.click(save);
 		await screen.findByRole('alert');
 		await user.click(save);
