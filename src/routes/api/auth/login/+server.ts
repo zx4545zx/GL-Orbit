@@ -4,8 +4,9 @@ import { getUserByIdentifier } from '$lib/server/auth/user.js';
 import { verifyPassword } from '$lib/server/auth/password.js';
 import { createSession } from '$lib/server/auth/session.js';
 import { toPublicUser } from '$lib/server/auth/public-user.js';
+import { collectSessionMetadata } from '$lib/server/auth/session-metadata.js';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, getClientAddress }) => {
 	let body: { identifier?: unknown; password?: unknown };
 	try {
 		body = await request.json();
@@ -27,7 +28,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const valid = await verifyPassword(password, user.passwordHash);
 	if (!valid) return json({ error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' }, { status: 400 });
 
-	const { token, expiresAt } = await createSession(user.id);
+	const metadata = collectSessionMetadata(request, getClientAddress);
+	const { token, expiresAt } = await createSession(user.id, metadata);
 	cookies.set('session', token, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === 'production',

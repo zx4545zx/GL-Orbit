@@ -50,13 +50,27 @@ export const users = pgTable('users', {
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
 });
 
-export const sessions = pgTable('sessions', {
-	id: uuid('id').defaultRandom().primaryKey(),
-	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-	tokenHash: varchar('token_hash', { length: 255 }).notNull().unique(),
-	expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
-});
+export const sessions = pgTable(
+	'sessions',
+	{
+		id: uuid('id').defaultRandom().primaryKey(),
+		userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+		tokenHash: varchar('token_hash', { length: 255 }).notNull().unique(),
+		expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+		browser: varchar('browser', { length: 50 }),
+		operatingSystem: varchar('operating_system', { length: 50 }),
+		deviceType: varchar('device_type', { length: 20 }),
+		maskedIp: varchar('masked_ip', { length: 64 }),
+		city: varchar('city', { length: 100 }),
+		countryCode: varchar('country_code', { length: 2 }),
+		lastSeenAt: timestamp('last_seen_at', { withTimezone: true })
+	},
+	(table) => [
+		index('sessions_user_expires_idx').on(table.userId, table.expiresAt),
+		index('sessions_expires_idx').on(table.expiresAt)
+	]
+);
 
 export const studios = pgTable('studios', {
 	id: uuid('id').defaultRandom().primaryKey(),

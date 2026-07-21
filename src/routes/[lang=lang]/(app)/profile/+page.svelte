@@ -7,6 +7,7 @@
 	import { localizedHref } from '$lib/i18n/link.js';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import Picture from '$lib/components/Picture.svelte';
+	import SessionDeviceManager from '$lib/components/profile/SessionDeviceManager.svelte';
 	import {
 		isPushSupported,
 		getExistingSubscription,
@@ -17,6 +18,7 @@
 	import type {
 		ProfileResponse,
 		ProfileUpdateResponse,
+		PasswordUpdateResponse,
 		ApiErrorResponse,
 		FavoriteSeriesItem,
 		WatchedSeriesItem
@@ -160,8 +162,10 @@
 				errorMessage = data.error || m.profile_password_error();
 				return;
 			}
-			const data = await res.json() as { success: true; message: string };
-			successMessage = data.message;
+			const data = await res.json() as PasswordUpdateResponse;
+			successMessage = data.revokedCount > 0
+				? m.profile_password_sessions_revoked({ count: data.revokedCount })
+				: data.message;
 			currentPassword = '';
 			newPassword = '';
 			confirmNewPassword = '';
@@ -542,9 +546,9 @@
 													{m.profile_save_profile()}
 												{/if}
 											</button>
-										</form>
-									</div>
+									</form>
 								</div>
+							</div>
 							{:else}
 								<div in:fly={{ y: 8, duration: 200 }} class="space-y-3">
 									<!-- change password form -->
@@ -565,9 +569,10 @@
 													{m.profile_change_password()}
 												{/if}
 											</button>
-										</form>
-									</div>
+									</form>
 								</div>
+								<SessionDeviceManager lang={page.data.lang} />
+							</div>
 							{/if}
 						</div>
 

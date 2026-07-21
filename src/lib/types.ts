@@ -95,4 +95,28 @@ export interface ProfileUpdateResponse {
 export interface PasswordUpdateResponse {
 	success: true;
 	message: string;
+	revokedCount: number;
+}
+
+export interface DeviceSessionItem {
+	id: string;
+	browser: string | null;
+	operatingSystem: string | null;
+	deviceType: 'desktop' | 'mobile' | 'tablet' | 'unknown';
+	maskedIp: string | null;
+	city: string | null;
+	countryCode: string | null;
+	createdAt: string;
+	lastSeenAt: string;
+	expiresAt: string;
+	isCurrent: boolean;
+}
+
+export interface SessionsResponse {
+	sessions: DeviceSessionItem[];
+}
+
+export interface SessionMutationResponse {
+	success: true;
+	revokedCount: number;
 }

@@ -3,9 +3,10 @@ import { fail, redirect } from '@sveltejs/kit';
 import { getUserByIdentifier } from '$lib/server/auth/user.js';
 import { verifyPassword } from '$lib/server/auth/password.js';
 import { createSession } from '$lib/server/auth/session.js';
+import { collectSessionMetadata } from '$lib/server/auth/session-metadata.js';
 
 export const actions: Actions = {
-	default: async ({ request, cookies, params }) => {
+	default: async ({ request, cookies, params, getClientAddress }) => {
 		const formData = await request.formData();
 		const identifier = formData.get('identifier')?.toString().trim() ?? '';
 		const password = formData.get('password')?.toString() ?? '';
@@ -32,7 +33,8 @@ export const actions: Actions = {
 			return fail(400, { error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
 		}
 
-		const { token, expiresAt } = await createSession(user.id);
+		const metadata = collectSessionMetadata(request, getClientAddress);
+		const { token, expiresAt } = await createSession(user.id, metadata);
 
 		cookies.set('session', token, {
 			httpOnly: true,

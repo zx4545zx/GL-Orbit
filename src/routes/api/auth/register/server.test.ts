@@ -5,10 +5,17 @@ const getUserByUsername = vi.fn();
 const createUser = vi.fn();
 const hashPassword = vi.fn();
 const createSession = vi.fn();
+const collectSessionMetadata = vi.fn();
 
 vi.mock('$lib/server/auth/user.js', () => ({ getUserByEmail, getUserByUsername, createUser }));
 vi.mock('$lib/server/auth/password.js', () => ({ hashPassword }));
 vi.mock('$lib/server/auth/session.js', () => ({ createSession }));
+vi.mock('$lib/server/auth/session-metadata.js', () => ({ collectSessionMetadata }));
+
+const DEVICE_METADATA = {
+	browser: 'Chrome', operatingSystem: 'Windows', deviceType: 'desktop',
+	maskedIp: '203.0.113.xxx', city: 'Bangkok', countryCode: 'TH'
+};
 
 const makeCookies = () => ({ set: vi.fn() });
 
@@ -17,7 +24,10 @@ async function jsonBody(response: Response) {
 }
 
 describe('POST /api/auth/register', () => {
-	beforeEach(() => vi.clearAllMocks());
+	beforeEach(() => {
+		vi.clearAllMocks();
+		collectSessionMetadata.mockReturnValue(DEVICE_METADATA);
+	});
 
 	it('returns 400 when required fields are missing', async () => {
 		const { POST } = await import('./+server.js');
@@ -103,13 +113,15 @@ describe('POST /api/auth/register', () => {
 		const cookies = makeCookies();
 
 		const { POST } = await import('./+server.js');
-		const response = await POST({
-			request: new Request('http://localhost/api/auth/register', {
+		const request = new Request('http://localhost/api/auth/register', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({ username: 'newuser', email: 'new@test.com', password: 'secret123', confirmPassword: 'secret123' })
-			}),
-			cookies
+			});
+		const response = await POST({
+			request,
+			cookies,
+			getClientAddress: () => '203.0.113.42'
 		} as never) as Response;
 
 		expect(response.status).toBe(200);
@@ -123,5 +135,7 @@ describe('POST /api/auth/register', () => {
 			success: true,
 			user: { id: 'user-1', username: 'newuser', email: 'new@test.com', displayName: 'newuser', avatarUrl: null, role: 'USER' }
 		});
+		expect(collectSessionMetadata).toHaveBeenCalledWith(request, expect.any(Function));
+		expect(createSession).toHaveBeenCalledWith('user-1', DEVICE_METADATA);
 	});
 });

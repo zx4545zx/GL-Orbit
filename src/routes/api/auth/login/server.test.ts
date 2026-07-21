@@ -3,10 +3,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const getUserByIdentifier = vi.fn();
 const verifyPassword = vi.fn();
 const createSession = vi.fn();
+const collectSessionMetadata = vi.fn();
 
 vi.mock('$lib/server/auth/user.js', () => ({ getUserByIdentifier }));
 vi.mock('$lib/server/auth/password.js', () => ({ verifyPassword }));
 vi.mock('$lib/server/auth/session.js', () => ({ createSession }));
+vi.mock('$lib/server/auth/session-metadata.js', () => ({ collectSessionMetadata }));
+
+const DEVICE_METADATA = {
+	browser: 'Chrome', operatingSystem: 'Windows', deviceType: 'desktop',
+	maskedIp: '203.0.113.xxx', city: 'Bangkok', countryCode: 'TH'
+};
 
 const makeCookies = () => ({ set: vi.fn() });
 
@@ -15,7 +22,10 @@ async function jsonBody(response: Response) {
 }
 
 describe('POST /api/auth/login', () => {
-	beforeEach(() => vi.clearAllMocks());
+	beforeEach(() => {
+		vi.clearAllMocks();
+		collectSessionMetadata.mockReturnValue(DEVICE_METADATA);
+	});
 
 	it('returns 400 with Thai error when identifier or password is missing', async () => {
 		const { POST } = await import('./+server.js');
@@ -61,13 +71,15 @@ describe('POST /api/auth/login', () => {
 		const cookies = makeCookies();
 		const { POST } = await import('./+server.js');
 
-		const response = await POST({
-			request: new Request('http://localhost/api/auth/login', {
+		const request = new Request('http://localhost/api/auth/login', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({ identifier: 'orbit', password: 'secret123' })
-			}),
-			cookies
+			});
+		const response = await POST({
+			request,
+			cookies,
+			getClientAddress: () => '203.0.113.42'
 		} as never) as Response;
 
 		expect(response.status).toBe(200);
@@ -81,5 +93,7 @@ describe('POST /api/auth/login', () => {
 			success: true,
 			user: { id: 'user-1', username: 'orbit', email: 'orbit@example.com', displayName: 'Orbit', avatarUrl: null, role: 'USER' }
 		});
+		expect(collectSessionMetadata).toHaveBeenCalledWith(request, expect.any(Function));
+		expect(createSession).toHaveBeenCalledWith('user-1', DEVICE_METADATA);
 	});
 });

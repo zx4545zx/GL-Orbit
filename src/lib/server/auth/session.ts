@@ -1,18 +1,21 @@
 import { SignJWT, jwtVerify } from 'jose';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, lt } from 'drizzle-orm';
 import { getDb } from '../db/index.js';
 import * as schema from '../db/schema.js';
+import type { SessionMetadata } from './session-metadata.js';
 
 const SECRET = new TextEncoder().encode(process.env.AUTH_SECRET!);
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
+const ACTIVITY_UPDATE_INTERVAL_MS = 1000 * 60 * 15;
 
 export interface SessionPayload {
 	userId: string;
 	sessionId: string;
 }
 
-export async function createSession(userId: string) {
+export async function createSession(userId: string, metadata: SessionMetadata) {
 	const db = await getDb();
+	const now = new Date();
 	const sessionId = crypto.randomUUID();
 	const token = await new SignJWT({ userId, sessionId })
 		.setProtectedHeader({ alg: 'HS256' })
@@ -21,15 +24,21 @@ export async function createSession(userId: string) {
 		.setExpirationTime('30d')
 		.sign(SECRET);
 
-	const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
+	const expiresAt = new Date(now.getTime() + SESSION_DURATION_MS);
 
 	// Store hash of token for lookup
 	const tokenHash = await hashToken(token);
 
+	await db
+		.delete(schema.sessions)
+		.where(and(eq(schema.sessions.userId, userId), lt(schema.sessions.expiresAt, now)));
+
 	await db.insert(schema.sessions).values({
 		userId,
 		tokenHash,
-		expiresAt
+		expiresAt,
+		...metadata,
+		lastSeenAt: now
 	});
 
 	return { token, expiresAt };
@@ -55,12 +64,27 @@ export async function validateSession(token: string) {
 			.limit(1);
 
 		if (!result) return null;
-		if (new Date() > result.session.expiresAt) {
+		const now = new Date();
+		if (now > result.session.expiresAt) {
 			await destroySession(token);
 			return null;
 		}
 
 		if (!result.user.isActive) return null;
+		if (
+			!result.session.lastSeenAt ||
+			now.getTime() - result.session.lastSeenAt.getTime() >= ACTIVITY_UPDATE_INTERVAL_MS
+		) {
+			try {
+				await db
+					.update(schema.sessions)
+					.set({ lastSeenAt: now })
+					.where(eq(schema.sessions.id, result.session.id));
+				return { ...result, session: { ...result.session, lastSeenAt: now } };
+			} catch {
+				return result;
+			}
+		}
 
 		return result;
 	} catch {
