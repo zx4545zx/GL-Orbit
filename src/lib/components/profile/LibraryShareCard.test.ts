@@ -81,9 +81,11 @@ describe('LibraryShareCard', () => {
 	it('shows outcome-specific feedback and treats cancellation as idle', async () => {
 		const user = userEvent.setup();
 		const { unmount } = render(LibraryShareCard, { props });
+		expect(screen.queryByRole('status')).toBeNull();
 		shareCardMock.mockResolvedValueOnce('downloaded');
 		await user.click(screen.getByRole('button', { name: /แชร์คลังของฉัน|share my library/i }));
 		expect(await screen.findByText(/ดาวน์โหลดการ์ดแล้ว|library card downloaded/i)).toBeTruthy();
+		expect(screen.getByRole('status').className).toContain('fixed');
 		unmount();
 
 		shareCardMock.mockResolvedValueOnce('cancelled');

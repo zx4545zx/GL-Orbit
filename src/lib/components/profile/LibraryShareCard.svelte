@@ -5,6 +5,7 @@
 	} from '$lib/client/library-share-card.js';
 	import { m, type AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { FavoriteSeriesItem } from '$lib/types.js';
+	import { onDestroy } from 'svelte';
 
 	interface Props {
 		lang: AvailableLanguageTag;
@@ -25,10 +26,20 @@
 	}: Props = $props();
 	let busy = $state(false);
 	let status = $state<'idle' | 'shared' | 'downloaded' | 'error'>('idle');
+	let toastTimer: ReturnType<typeof setTimeout> | undefined;
+
+	function showToast(next: Exclude<typeof status, 'idle'>) {
+		clearTimeout(toastTimer);
+		status = next;
+		toastTimer = setTimeout(() => (status = 'idle'), 3_000);
+	}
+
+	onDestroy(() => clearTimeout(toastTimer));
 
 	async function createAndShare() {
 		if (busy) return;
 		busy = true;
+		clearTimeout(toastTimer);
 		status = 'idle';
 
 		try {
@@ -45,9 +56,9 @@
 				title: m.profile_library_share_native_title(),
 				text: m.profile_library_share_native_text()
 			});
-			if (result !== 'cancelled') status = result;
+			if (result !== 'cancelled') showToast(result);
 		} catch {
-			status = 'error';
+			showToast('error');
 		} finally {
 			busy = false;
 		}
@@ -75,13 +86,18 @@
 		</button>
 	</div>
 
-	<div class="min-h-6 border-t border-[var(--orbit-line)] px-4 py-2 text-sm sm:px-5" aria-live="polite">
-		{#if status === 'shared'}
-			<p class="font-semibold text-mint-dark">{m.profile_library_share_success()}</p>
-		{:else if status === 'downloaded'}
-			<p class="font-semibold text-mint-dark">{m.profile_library_share_downloaded()}</p>
-		{:else if status === 'error'}
-			<p class="font-semibold text-coral-dark" role="alert">{m.profile_library_share_error()}</p>
-		{/if}
-	</div>
 </section>
+
+{#if status !== 'idle'}
+	<div
+		class="fixed inset-x-4 bottom-5 z-50 mx-auto w-fit max-w-[calc(100%-2rem)] border px-4 py-3 text-sm font-semibold shadow-[var(--orbit-shadow-raised)] {status === 'error' ? 'border-coral bg-[var(--orbit-surface)] text-coral-dark' : 'border-mint bg-[var(--orbit-surface)] text-mint-dark'}"
+		role={status === 'error' ? 'alert' : 'status'}
+		aria-live="polite"
+	>
+		{status === 'shared'
+			? m.profile_library_share_success()
+			: status === 'downloaded'
+				? m.profile_library_share_downloaded()
+				: m.profile_library_share_error()}
+	</div>
+{/if}
