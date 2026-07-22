@@ -7,6 +7,7 @@
 	import { localizedHref } from '$lib/i18n/link.js';
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import Picture from '$lib/components/Picture.svelte';
+	import LibraryShareCard from '$lib/components/profile/LibraryShareCard.svelte';
 	import SessionDeviceManager from '$lib/components/profile/SessionDeviceManager.svelte';
 	import {
 		isPushSupported,
@@ -382,6 +383,17 @@
 			<div class="mt-4">
 				{#if activeTab === 'library'}
 					<div in:fly={{ y: 8, duration: 250 }}>
+						<div class="mb-5">
+							<LibraryShareCard
+								lang={page.data.lang}
+								displayName={profileUser.displayName}
+								avatarUrl={profileUser.avatarUrl}
+								favoriteCount={favoriteSeries.length}
+								watchedCount={watchedSeries.length}
+								favorites={favoriteSeries}
+							/>
+						</div>
+
 						<!-- Sub-toggle: Favorite / Watched -->
 						<div class="relative grid grid-cols-2 border border-[var(--orbit-line-strong)] bg-white mb-5 max-w-xs mx-auto">
 							<div
