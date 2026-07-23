@@ -69,9 +69,11 @@ describe('subscription feature integration', () => {
 		expect(budgets).toContain('id="budget-currency-error"');
 	});
 
-	it('remaps every muted plum text opacity used by subscription surfaces in dark mode', () => {
-		for (const opacity of [55, 60, 65, 70, 75]) {
-			expect(appCss).toContain(`.text-plum\\/${opacity}`);
+	it('maps plum text utilities through the active theme tokens', () => {
+		expect(appCss).toContain('--color-plum: var(--orbit-ink);');
+		expect(appCss).toContain('--color-plum-light: var(--orbit-muted);');
+		for (const opacity of [50, 55, 60, 65, 75]) {
+			expect(`${detail}${currencySurfaces.join('')}`).toContain(`text-plum/${opacity}`);
 		}
 	});
 });

@@ -4,7 +4,7 @@ import { page } from '$app/state';
 import { useUnreadNotifications } from '$lib/client/unread-notifications.js';
 import NotificationDropdown from './NotificationDropdown.svelte';
 import LanguageSwitcher from './LanguageSwitcher.svelte';
-import ThemeToggle from './ThemeToggle.svelte';
+import ThemeMenu from './ThemeMenu.svelte';
 import Picture from './Picture.svelte';
 
 	let { navHidden = false }: { navHidden?: boolean } = $props();
@@ -103,7 +103,7 @@ import Picture from './Picture.svelte';
 			<!-- Auth Section -->
 			<div class="justify-self-end flex items-center gap-2 xl:gap-3 min-w-0">
 				<LanguageSwitcher variant="icon" className="hidden lg:inline-flex" />
-			<ThemeToggle />
+			<ThemeMenu />
 				{#if currentUser}
 				<NotificationDropdown />
 					<div bind:this={profileMenuRoot} class="relative">

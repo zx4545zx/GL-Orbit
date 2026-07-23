@@ -40,7 +40,7 @@
      overflow-hidden ที่ shell → มีแค่ list ข้อความตัวเดียวที่เลื่อนได้ -->
 <div
 	data-chat-shell
-	class="flex h-[100vh] w-full flex-col overflow-hidden bg-[#f7f7f8] pt-[var(--pwa-safe-top)] text-plum"
+	class="flex h-[100vh] w-full flex-col overflow-hidden bg-[var(--orbit-paper-deep)] pt-[var(--pwa-safe-top)] text-[var(--orbit-ink)]"
 >
 	{@render children()}
 </div>
