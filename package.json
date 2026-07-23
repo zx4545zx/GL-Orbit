@@ -45,6 +45,7 @@
     "@fontsource/syne": "^5.2.7",
     "@inlang/paraglide-sveltekit": "^0.16.1",
     "@neondatabase/serverless": "^1.0.0",
+    "@vercel/speed-insights": "^2.0.0",
     "aws4fetch": "^1.0.20",
     "bcryptjs": "^3.0.3",
     "dotenv": "^16.5.0",
