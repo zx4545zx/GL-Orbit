@@ -90,7 +90,7 @@
 
 {#if status !== 'idle'}
 	<div
-		class="fixed inset-x-4 bottom-5 z-50 mx-auto w-fit max-w-[calc(100%-2rem)] border px-4 py-3 text-sm font-semibold shadow-[var(--orbit-shadow-raised)] {status === 'error' ? 'border-coral bg-[var(--orbit-surface)] text-coral-dark' : 'border-mint bg-[var(--orbit-surface)] text-mint-dark'}"
+		class="fixed inset-x-4 bottom-[var(--floating-action-bottom)] z-[60] mx-auto w-fit max-w-[calc(100%-2rem)] border px-4 py-3 text-sm font-semibold shadow-[var(--orbit-shadow-raised)] md:bottom-6 {status === 'error' ? 'border-coral bg-[var(--orbit-surface)] text-coral-dark' : 'border-mint bg-[var(--orbit-surface)] text-mint-dark'}"
 		role={status === 'error' ? 'alert' : 'status'}
 		aria-live="polite"
 	>

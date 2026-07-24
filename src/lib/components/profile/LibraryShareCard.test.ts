@@ -85,7 +85,11 @@ describe('LibraryShareCard', () => {
 		shareCardMock.mockResolvedValueOnce('downloaded');
 		await user.click(screen.getByRole('button', { name: /แชร์คลังของฉัน|share my library/i }));
 		expect(await screen.findByText(/ดาวน์โหลดการ์ดแล้ว|library card downloaded/i)).toBeTruthy();
-		expect(screen.getByRole('status').className).toContain('fixed');
+		const toast = screen.getByRole('status');
+		expect(toast.className).toContain('fixed');
+		expect(toast.className).toContain('bottom-[var(--floating-action-bottom)]');
+		expect(toast.className).toContain('md:bottom-6');
+		expect(toast.className).toContain('z-[60]');
 		unmount();
 
 		shareCardMock.mockResolvedValueOnce('cancelled');
