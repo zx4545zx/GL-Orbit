@@ -80,7 +80,7 @@
 
 <div class="admin-minimal min-h-dvh bg-[var(--orbit-paper-deep)] flex text-plum">
 	<!-- Desktop Sidebar -->
-	<aside class="hidden lg:flex flex-col border-r border-[var(--orbit-line)] bg-white text-plum fixed inset-y-0 left-0 z-30 {sidebarExpanded ? 'w-64' : 'w-16'} transition-[width] duration-300 ease-in-out motion-reduce:transition-none {resolved ? '' : 'transition-none'}">
+	<aside class="hidden lg:flex flex-col border-r border-[var(--orbit-line)] bg-[var(--orbit-paper-deep)] text-[var(--orbit-ink)] fixed inset-y-0 left-0 z-30 {sidebarExpanded ? 'w-64' : 'w-16'} transition-[width] duration-300 ease-in-out motion-reduce:transition-none {resolved ? '' : 'transition-none'}">
 		<div class="h-16 flex items-center border-b border-[var(--orbit-line)] {sidebarExpanded ? 'px-6 justify-between' : 'px-2 justify-center'}">
 			{#if sidebarExpanded}
 				<div class="flex items-center">
@@ -139,7 +139,7 @@
 	</aside>
 
 	<!-- Mobile Header -->
-	<header class="lg:hidden fixed top-[var(--pwa-safe-top)] left-0 right-0 z-40 border-b border-[var(--orbit-line)] bg-white text-plum">
+	<header class="lg:hidden fixed top-[var(--pwa-safe-top)] left-0 right-0 z-40 border-b border-[var(--orbit-line)] bg-[var(--orbit-paper-deep)] text-[var(--orbit-ink)]">
 		<div class="flex items-center justify-between h-14 px-4">
 			<button onclick={() => mobileOpen = !mobileOpen} class="p-2 -ml-2 rounded-lg hover:bg-white/10 transition-colors touch-target" aria-label="เปิดเมนู">
 				<svg class="w-6 h-6 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -156,7 +156,7 @@
 	{#if mobileOpen}
 		<div class="lg:hidden fixed inset-0 z-50" role="dialog" aria-modal="true">
 			<button type="button" class="absolute inset-0 bg-plum/50" onclick={closeMobile} aria-label="ปิดเมนู"></button>
-			<div transition:slide={{ axis: 'x', duration: 200 }} class="absolute left-0 top-0 bottom-0 w-72 bg-white text-plum flex flex-col">
+			<div transition:slide={{ axis: 'x', duration: 200 }} class="absolute left-0 top-0 bottom-0 w-72 bg-[var(--orbit-surface)] text-[var(--orbit-ink)] flex flex-col">
 				<div class="h-14 flex items-center justify-between px-4 border-b border-[var(--orbit-line)]">
 					<div class="flex items-center gap-2">
 						<span class="text-base font-bold text-plum">GL-Orbit</span>

@@ -1,11 +1,13 @@
 <script lang="ts">
 	import '../app.css';
 	import { navigating, page } from '$app/state';
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 	import { DEFAULT_OG_IMAGE, buildLanguageAlternates, defaultSeoDescription, defaultSeoTitle, OG_IMAGE_HEIGHT, OG_IMAGE_TYPE, OG_IMAGE_WIDTH, siteLocale, SITE_NAME, absoluteUrl, stripLanguageFromPath } from '$lib/seo.js';
 	import { availableLanguageTags, setLanguageTag, type AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import PushPrompt from '$lib/components/PushPrompt.svelte';
 
 	let { children } = $props();
+	injectSpeedInsights();
 
 	const currentLanguageTag = $derived(
 		availableLanguageTags.includes(page.data.lang as AvailableLanguageTag)

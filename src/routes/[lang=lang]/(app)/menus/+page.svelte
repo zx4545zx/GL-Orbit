@@ -4,7 +4,7 @@
 	import { availableLanguageTags, type AvailableLanguageTag, m } from '$lib/i18n/paraglide.js';
 	import { localizedHref, switchLanguageHref } from '$lib/i18n/link.js';
 	import Picture from '$lib/components/Picture.svelte';
-	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import ThemeMenu from '$lib/components/ThemeMenu.svelte';
 	import { themeState } from '$lib/theme.svelte.js';
 
 	const currentUser = $derived(page.data.user);
@@ -235,7 +235,7 @@
 			<section class="order-4 orbit-surface p-4 sm:p-5" aria-labelledby="menus-theme-heading">
 				<div class="flex items-center gap-3">
 					<div class="grid h-11 w-11 shrink-0 place-items-center rounded-[1.05rem] bg-lavender/15 text-lavender-dark" aria-hidden="true">
-						{#if themeState.theme === 'dark'}
+						{#if themeState.theme === 'space'}
 							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
 							</svg>
@@ -249,9 +249,9 @@
 						<h2 id="menus-theme-heading" class="font-[family-name:var(--font-display)] text-lg font-black leading-tight text-plum sm:text-xl">
 							{m.menus_theme_title()}
 						</h2>
-						<p class="text-sm leading-5 text-plum-light">{themeState.theme === 'dark' ? m.menus_theme_dark() : m.menus_theme_light()}</p>
+						<p class="text-sm leading-5 text-plum-light">{m.theme_selected({ theme: themeState.theme })}</p>
 					</div>
-					<ThemeToggle />
+					<ThemeMenu />
 				</div>
 			</section>
 		</div>

@@ -1,51 +1,28 @@
 import { browser } from '$app/environment';
 
-export type Theme = 'light' | 'dark';
+export type ThemeName = 'orbit' | 'space' | 'sakura' | 'love';
+export const THEME_NAMES = ['orbit', 'space', 'sakura', 'love'] as const satisfies readonly ThemeName[];
+export const DEFAULT_THEME: ThemeName = 'orbit';
+export const THEME_STORAGE_KEY = 'theme';
+const META_COLORS: Record<ThemeName, string> = { orbit: '#fffafc', space: '#f4f8ff', sakura: '#fff7fa', love: '#fff8f1' };
 
-const STORAGE_KEY = 'theme';
-
-function readInitialTheme(): Theme {
-	if (!browser) return 'light';
-	const root = document.documentElement;
-	return root.dataset.theme === 'dark' ? 'dark' : 'light';
+export function isThemeName(value: unknown): value is ThemeName {
+	return typeof value === 'string' && (THEME_NAMES as readonly string[]).includes(value);
 }
-
-export const themeState = $state<{ theme: Theme }>({ theme: readInitialTheme() });
-
-function applyTheme(next: Theme) {
+export function parseThemeName(value: unknown): ThemeName { return isThemeName(value) ? value : DEFAULT_THEME; }
+export function readStoredTheme(storage?: Storage): ThemeName {
+	try { return parseThemeName((storage ?? (browser ? localStorage : undefined))?.getItem(THEME_STORAGE_KEY)); } catch { return DEFAULT_THEME; }
+}
+export const themeState = $state<{ theme: ThemeName }>({ theme: browser && typeof document !== 'undefined' ? parseThemeName(document.documentElement.dataset.theme) : DEFAULT_THEME });
+export function applyTheme(theme: ThemeName): void {
 	if (!browser) return;
-	document.documentElement.dataset.theme = next;
-	const meta = document.querySelector('meta[name="theme-color"]');
-	if (meta) meta.setAttribute('content', next === 'dark' ? '#24151F' : '#FF6B9D');
+	const selected = parseThemeName(theme);
+	document.documentElement.dataset.theme = selected;
+	document.querySelector('meta[name="theme-color"]')?.setAttribute('content', META_COLORS[selected]);
 }
-
-export function setTheme(next: Theme, persist = true) {
-	themeState.theme = next;
-	applyTheme(next);
-	if (persist && browser) {
-		try {
-			localStorage.setItem(STORAGE_KEY, next);
-		} catch {}
-	}
-}
-
-export function toggleTheme() {
-	setTheme(themeState.theme === 'dark' ? 'light' : 'dark');
-}
-
-let mediaListenerAttached = false;
-
-export function watchSystemTheme() {
-	if (!browser || mediaListenerAttached) return;
-	mediaListenerAttached = true;
-	const media = window.matchMedia('(prefers-color-scheme: dark)');
-	media.addEventListener('change', (event) => {
-		let stored: string | null = null;
-		try {
-			stored = localStorage.getItem(STORAGE_KEY);
-		} catch {}
-		if (stored !== 'dark' && stored !== 'light') {
-			setTheme(event.matches ? 'dark' : 'light', false);
-		}
-	});
+export function setTheme(next: ThemeName, persist = true, storage?: Storage): void {
+	const theme = parseThemeName(next);
+	themeState.theme = theme;
+	applyTheme(theme);
+	if (persist && browser) try { (storage ?? localStorage).setItem(THEME_STORAGE_KEY, theme); } catch {}
 }
