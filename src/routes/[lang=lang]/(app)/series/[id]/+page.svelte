@@ -217,11 +217,11 @@
 	{@html jsonLdScript(seriesJsonLd)}
 </svelte:head>
 
-<div class="relative -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[var(--orbit-paper)] pb-[calc(3rem+var(--bottom-nav-reserved-space))] md:-mt-24 md:mb-0 md:pb-20 md:pt-24">
+<div class="-mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[var(--orbit-paper)] pb-[calc(3rem+var(--bottom-nav-reserved-space))] md:-mt-24 md:mb-0 md:pb-20 md:pt-24">
 	<main class="relative mx-auto max-w-[90rem] px-4 pt-4 sm:px-6 sm:pt-6 md:px-8">
 		<!-- The series artwork leads; actions and facts form a compact program rail. -->
-		<section class="border-y border-[var(--orbit-line-strong)] bg-white shadow-[var(--orbit-shadow)] sm:rounded-xl sm:border" aria-labelledby="series-title">
-			<header class="flex items-center justify-between gap-3 bg-[var(--orbit-ink)] px-3 py-3 text-white sm:rounded-t-xl sm:px-5">
+		<section class="overflow-hidden border-y border-[var(--orbit-line-strong)] bg-white shadow-[var(--orbit-shadow)] sm:rounded-xl sm:border" aria-labelledby="series-title">
+			<header class="flex !rounded-none items-center justify-between gap-3 bg-[var(--orbit-ink)] px-3 py-3 text-white sm:px-5">
 				<button type="button" onclick={goBack} class="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/5 px-4 py-2 text-sm font-bold transition hover:border-mint hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white touch-target">
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
 					<span>{m.common_back()}</span>
@@ -235,7 +235,7 @@
 			</header>
 
 			<div class="grid min-w-0 lg:grid-cols-[minmax(20rem,0.78fr)_minmax(0,1.45fr)]">
-				<figure class="relative bg-[var(--orbit-ink)] p-3 sm:p-6 lg:flex lg:flex-col lg:justify-between lg:rounded-bl-xl lg:p-8">
+				<figure class="relative !rounded-none bg-[var(--orbit-ink)] p-3 sm:p-6 lg:flex lg:flex-col lg:justify-between lg:p-8">
 					<div class="mx-auto w-full max-w-[25rem] overflow-hidden rounded-md border border-white/20 bg-[var(--orbit-paper-deep)] shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
 						<Picture src={series.poster} type="posters" sizes="(max-width: 639px) calc(100vw - 3.5rem), (max-width: 1023px) 400px, 430px" alt={series.titleEn} width={720} height={1080} loading="eager" fetchpriority="high" class="aspect-[2/3] w-full object-cover" />
 					</div>
@@ -256,9 +256,9 @@
 						{/if}
 						<p class="mt-4 break-words text-sm font-bold text-[var(--orbit-muted)] [overflow-wrap:anywhere] sm:text-base">{series.studio}</p>
 
-						<div class="mt-8 -mx-5 grid border-y border-[var(--orbit-line)] px-5 {primaryMeta.length === 3 ? 'grid-cols-[0.75fr_1.5fr_0.75fr]' : 'grid-cols-2'} sm:mt-10 sm:-mx-8 sm:px-8 sm:auto-cols-fr sm:grid-flow-col sm:grid-cols-none lg:-mx-12 lg:px-12 xl:-mx-14 xl:px-14">
+						<div class="mt-8 -mx-5 grid !rounded-none border-y border-[var(--orbit-line)] px-5 {primaryMeta.length === 3 ? 'grid-cols-[0.75fr_1.5fr_0.75fr]' : 'grid-cols-2'} sm:mt-10 sm:-mx-8 sm:px-8 sm:auto-cols-fr sm:grid-flow-col sm:grid-cols-none lg:-mx-12 lg:px-12 xl:-mx-14 xl:px-14">
 							{#each primaryMeta as item, index}
-								<div class="min-w-0 py-4 {index > 0 ? 'border-l border-[var(--orbit-line)] px-3 sm:pl-4 sm:pr-0' : 'pr-3 sm:pr-4'}">
+								<div class="min-w-0 !rounded-none py-4 {index > 0 ? 'border-l border-[var(--orbit-line)] px-3 sm:pl-4 sm:pr-0' : 'pr-3 sm:pr-4'}">
 									<div class="whitespace-nowrap font-[family-name:var(--font-display)] text-[clamp(1.125rem,6vw,1.5rem)] font-black leading-none text-[var(--orbit-ink)] sm:text-3xl">{item.value}</div>
 									<div class="mt-1 truncate text-[9px] font-black uppercase tracking-[0.15em] text-[var(--orbit-muted)]">{item.label}</div>
 								</div>
@@ -286,7 +286,7 @@
 						</div>
 					</div>
 
-					<div class="grid grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] grid-rows-2 border-t border-[var(--orbit-line-strong)]">
+					<div class="grid !rounded-none grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] grid-rows-2 border-t border-[var(--orbit-line-strong)]">
 						<FavoriteButton seriesId={series.id} variant="orbit" className="row-span-2 min-h-[10.5rem] !rounded-none !border-y-0 !border-l-0 !border-r !border-[var(--orbit-line-strong)]" />
 						<WatchedButton seriesId={series.id} variant="orbit" className="min-h-[5.25rem] !rounded-none !border-x-0 !border-t-0 !border-b !border-[var(--orbit-line-strong)]" />
 						<div class="h-full min-w-0">
@@ -298,13 +298,13 @@
 		</section>
 
 		{#if description}
-			<section class="mt-20 grid border-t border-[var(--orbit-line-strong)] sm:mt-28 lg:grid-cols-12" aria-labelledby="synopsis-heading">
+			<section class="mt-20 grid !rounded-none border-t border-[var(--orbit-line-strong)] sm:mt-28 lg:grid-cols-12" aria-labelledby="synopsis-heading">
 				<header class="pt-6 lg:col-span-3 lg:pr-8 lg:pt-8">
 					<p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">Story file</p>
 					<h2 id="synopsis-heading" class="mt-2 max-w-xs text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-[0.95] tracking-[-0.05em]'}">{m.series_detail_synopsis()}</h2>
 				</header>
 
-				<div class="min-w-0 pt-7 lg:col-span-9 lg:border-l lg:border-[var(--orbit-line)] lg:px-10 lg:pt-8 xl:px-14">
+				<div class="min-w-0 !rounded-none pt-7 lg:col-span-9 lg:border-l lg:border-[var(--orbit-line)] lg:px-10 lg:pt-8 xl:px-14">
 					<p class:line-clamp-6={!descriptionExpanded && hasLongDescription} class="max-w-[52rem] whitespace-pre-line font-[family-name:var(--font-thai)] text-base font-medium leading-[1.95] text-plum sm:text-lg sm:leading-[2] lg:text-xl lg:leading-[2.1]">{description}</p>
 					{#if hasLongDescription}
 						<button type="button" onclick={() => (descriptionExpanded = !descriptionExpanded)} aria-expanded={descriptionExpanded} class="mt-6 inline-flex items-center gap-2 rounded-md bg-plum px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#24151f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint touch-target">
@@ -313,13 +313,13 @@
 						</button>
 					{/if}
 
-					<div class="mt-10 grid min-w-0 border-y border-[var(--orbit-line)] sm:grid-cols-2 lg:-mx-10 lg:px-10 xl:-mx-14 xl:px-14">
+					<div class="mt-10 grid min-w-0 !rounded-none border-y border-[var(--orbit-line)] sm:grid-cols-2 lg:-mx-10 lg:px-10 xl:-mx-14 xl:px-14">
 						<div class="min-w-0 py-5 sm:pr-6">
 							<p class="text-[10px] font-black uppercase tracking-[0.28em] text-coral-dark">Studio</p>
 							<p class="mt-2 break-words font-[family-name:var(--font-display)] text-xl font-black leading-tight text-plum [overflow-wrap:anywhere] sm:text-2xl">{series.studio}</p>
 						</div>
 						{#if series.studioOfficialSite || series.studioSocials.length > 0}
-							<div class="flex min-w-0 flex-wrap content-center gap-2 border-t border-[var(--orbit-line)] py-4 sm:border-l sm:border-t-0 sm:pl-6">
+							<div class="flex min-w-0 !rounded-none flex-wrap content-center gap-2 border-t border-[var(--orbit-line)] py-4 sm:border-l sm:border-t-0 sm:pl-6">
 								{#if series.studioOfficialSite}
 									<a href={series.studioOfficialSite} target="_blank" rel="noopener noreferrer" class="inline-flex max-w-full items-center gap-1.5 rounded-md border border-[var(--orbit-line)] bg-white px-3.5 py-2 text-xs font-bold text-plum transition hover:border-coral hover:text-coral-dark touch-target">
 										<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" /></svg>
@@ -340,7 +340,7 @@
 		{/if}
 
 		{#if series.artists.length > 0}
-			<section class="mt-24 border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8" aria-labelledby="cast-heading">
+			<section class="mt-24 !rounded-none border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8" aria-labelledby="cast-heading">
 				<header class="mb-8 flex flex-wrap items-end justify-between gap-5 sm:mb-12">
 					<div>
 						<h2 id="cast-heading" class="text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.common_cast()}</h2>
@@ -352,7 +352,7 @@
 
 				<div class="grid grid-cols-2 gap-x-2 gap-y-5 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-10 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-12">
 					{#each series.artists as artist, index (artist.id)}
-						<a href={artistPath(artist.id)} class="group min-w-0 border-t border-[var(--orbit-line)] pt-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:pt-3">
+						<a href={artistPath(artist.id)} class="group min-w-0 !rounded-none border-t border-[var(--orbit-line)] pt-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:pt-3">
 							<div class="grid min-w-0 grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-2 sm:block">
 								<div class="relative overflow-hidden rounded-md bg-lavender/25">
 									<Picture src={artist.image} type="profiles" sizes="(max-width: 639px) 56px, (max-width: 1024px) 24vw, 220px" alt={artist.name} width={320} height={400} loading="lazy" class="aspect-square w-full object-cover transition duration-300 group-hover:scale-[1.025] sm:aspect-[4/5]" />
@@ -370,19 +370,19 @@
 		{/if}
 
 		{#if series.ships.length > 0}
-			<section class="mt-24 border-t border-[var(--orbit-line-strong)] pt-6 text-plum sm:mt-32 sm:pt-8" aria-labelledby="ships-heading">
+			<section class="mt-24 !rounded-none border-t border-[var(--orbit-line-strong)] pt-6 text-plum sm:mt-32 sm:pt-8" aria-labelledby="ships-heading">
 				<header class="mb-8 sm:mb-12">
 					<p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">03 / Chemistry</p>
 					<h2 id="ships-heading" class="mt-2 text-3xl font-bold sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.series_detail_ships()}</h2>
 				</header>
-				<div class="grid grid-cols-1 gap-px border border-[var(--orbit-line)] bg-[var(--orbit-line)] min-[340px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+				<div class="grid grid-cols-1 gap-px overflow-hidden border border-[var(--orbit-line)] bg-[var(--orbit-line)] min-[340px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
 					{#each series.ships as ship (ship.id)}
-						<a href={shipPath(ship.slug)} class="group min-w-0 bg-white p-3 transition hover:bg-[var(--orbit-coral-soft)] focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral sm:p-5">
+						<a href={shipPath(ship.slug)} class="group min-w-0 !rounded-none bg-white p-3 transition hover:bg-[var(--orbit-coral-soft)] focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral sm:p-5">
 							<div class="mx-auto flex max-w-[10rem] items-center justify-center">
-								<div class="relative z-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-coral-light shadow-sm">
+								<div class="orbit-round-data relative z-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-coral-light shadow-sm">
 									<Picture src={ship.artist1Image} type="profiles" sizes="(max-width: 639px) 84px, 140px" alt={ship.artist1Name} width={280} height={280} loading="lazy" class="aspect-square w-full object-cover transition duration-300 group-hover:-rotate-2" />
 								</div>
-								<div class="relative -ml-[23%] mt-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-lavender-light shadow-sm">
+								<div class="orbit-round-data relative -ml-[23%] mt-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-lavender-light shadow-sm">
 									<Picture src={ship.artist2Image} type="profiles" sizes="(max-width: 639px) 84px, 140px" alt={ship.artist2Name} width={280} height={280} loading="lazy" class="aspect-square w-full object-cover transition duration-300 group-hover:rotate-2" />
 								</div>
 							</div>
@@ -397,7 +397,7 @@
 		{/if}
 
 		{#if galleryCandidates.length >= 3}
-			<section class="mt-24 border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8" aria-labelledby="gallery-heading">
+			<section class="mt-24 !rounded-none border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8" aria-labelledby="gallery-heading">
 				<header class="mb-8 sm:mb-10">
 					<p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">04 / Stills</p>
 					<h2 id="gallery-heading" class="mt-2 text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.series_detail_gallery()}</h2>
@@ -417,7 +417,7 @@
 		{/if}
 
 		{#if series.schedule.length > 0}
-			<section class="mt-24 grid border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-12" aria-labelledby="schedule-heading">
+			<section class="mt-24 grid !rounded-none border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-12" aria-labelledby="schedule-heading">
 				<header class="pb-8 lg:sticky lg:top-28 lg:self-start lg:pb-0">
 					<h2 id="schedule-heading" class="max-w-xs text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-[0.95] tracking-[-0.05em]'}">{m.common_schedule()}</h2>
 					<p class="mt-4 max-w-[14rem] text-sm font-medium leading-6 text-plum-light/60">{series.schedule.length} {m.common_episodes()}</p>
@@ -427,16 +427,16 @@
 					</button>
 				</header>
 
-				<ol class="min-w-0 divide-y divide-[var(--orbit-line)] border-y border-[var(--orbit-line-strong)] bg-white">
+				<ol class="min-w-0 divide-y divide-[var(--orbit-line)] !rounded-none border-y border-[var(--orbit-line-strong)] bg-white">
 					{#each series.schedule as item (item.episode)}
 						{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((schedule: { platform: string }) => schedule.platform !== 'TBA')}
 						{@const hasEpisodeMedia = Boolean(item.trailerUrl)}
 						{@const hasEpisodeContent = hasSchedules || hasEpisodeMedia}
 						{@const trailerEmbedUrl = youtubeEmbedUrl(item.trailerUrl)}
 						{@const isOpen = hasEpisodeContent && expandedEpisodes.has(item.episode)}
-						<li class="min-w-0">
-							<article class="min-w-0 max-w-full overflow-hidden">
-								<button type="button" disabled={!hasEpisodeContent} onclick={() => toggleEpisode(item.episode)} aria-expanded={hasEpisodeContent ? isOpen : undefined} class="grid w-full grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-3 gap-y-3 p-3 text-left transition hover:bg-[var(--orbit-paper-deep)] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-coral disabled:cursor-default disabled:hover:bg-white sm:grid-cols-[5.25rem_minmax(0,1fr)_auto] sm:gap-x-5 sm:p-5">
+						<li class="min-w-0 !rounded-none">
+							<article class="min-w-0 max-w-full !rounded-none overflow-hidden">
+								<button type="button" disabled={!hasEpisodeContent} onclick={() => toggleEpisode(item.episode)} aria-expanded={hasEpisodeContent ? isOpen : undefined} class="grid w-full !rounded-none grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-3 gap-y-3 p-3 text-left transition hover:bg-[var(--orbit-paper-deep)] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-coral disabled:cursor-default disabled:hover:bg-white sm:grid-cols-[5.25rem_minmax(0,1fr)_auto] sm:gap-x-5 sm:p-5">
 									<div class="grid aspect-square place-items-center rounded-md border border-[var(--orbit-line)] {isOpen ? 'bg-coral text-white' : 'bg-cream text-plum'} transition-colors">
 										<span class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.06em] sm:text-4xl">{String(item.episode).padStart(2, '0')}</span>
 									</div>
@@ -456,14 +456,14 @@
 								</button>
 
 								{#if isOpen}
-									<div class="grid min-w-0 gap-3 border-t border-[var(--orbit-line)] bg-[var(--orbit-paper-deep)] p-3 sm:p-5 {item.trailerUrl && hasSchedules ? 'lg:grid-cols-2' : ''}">
+									<div class="grid min-w-0 !rounded-none gap-3 border-t border-[var(--orbit-line)] bg-[var(--orbit-paper-deep)] p-3 sm:p-5 {item.trailerUrl && hasSchedules ? 'lg:grid-cols-2' : ''}">
 										{#if item.trailerUrl}
 											{#if trailerEmbedUrl}
 												{#if activatedTrailers.has(item.episode)}
 													<div class="overflow-hidden rounded-md bg-plum"><iframe src={trailerEmbedUrl} title={`Trailer ${item.title}`} class="aspect-video w-full" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 												{:else}
 													<button type="button" onclick={(event) => activateTrailer(item.episode, event)} class="group relative flex min-h-[12rem] w-full items-end overflow-hidden rounded-md bg-plum p-5 text-left text-white transition hover:bg-coral-dark touch-target">
-														<div aria-hidden="true" class="absolute right-5 top-5 grid h-14 w-14 place-items-center rounded-full bg-white text-plum transition group-hover:scale-105"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg></div>
+														<div aria-hidden="true" class="orbit-round-data absolute right-5 top-5 grid h-14 w-14 place-items-center rounded-full bg-white text-plum transition group-hover:scale-105"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg></div>
 														<span><span class="block text-[9px] font-black uppercase tracking-[0.25em] text-coral-light">Trailer</span><span class="mt-1 block text-base font-bold">{currentLang === 'th' ? 'แตะเพื่อโหลดวิดีโอ' : 'Tap to load video'}</span></span>
 													</button>
 												{/if}
@@ -478,7 +478,7 @@
 													{@const hasStreamLink = schedule.streamLink && schedule.streamLink.length > 0}
 													<div class="flex min-w-0 max-w-full items-center justify-between gap-2 rounded-md bg-cream/70 px-3 py-2.5 min-[360px]:gap-3">
 														<div class="flex min-w-0 flex-1 items-center gap-2 min-[360px]:gap-3">
-															{#if schedule.platformLogo}<img src={schedule.platformLogo} alt={schedule.platform} width={32} height={32} loading="lazy" decoding="async" class="h-8 w-8 shrink-0 rounded-full object-cover" />{:else}<span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-xs font-black text-plum">{schedule.platform.charAt(0)}</span>{/if}
+															{#if schedule.platformLogo}<img src={schedule.platformLogo} alt={schedule.platform} width={32} height={32} loading="lazy" decoding="async" class="orbit-round-data h-8 w-8 shrink-0 rounded-full object-cover" />{:else}<span class="orbit-round-data grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-xs font-black text-plum">{schedule.platform.charAt(0)}</span>{/if}
 															<div class="min-w-0 flex-1"><p class="truncate text-sm font-bold text-plum">{schedule.title || schedule.platform}</p>{#if schedule.title}<p class="mt-0.5 truncate text-[10px] font-semibold text-plum-light/55">{schedule.platform}</p>{/if}<p class="mt-0.5 truncate text-[10px] font-semibold text-plum-light/55">{schedule.airDate}{schedule.isUncut ? ` · ${m.common_uncut()}` : ''}</p></div>
 														</div>
 														{#if hasStreamLink}<a href={schedule.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex shrink-0 items-center gap-1 rounded-md bg-coral px-3 py-2 text-xs font-bold text-white transition hover:bg-coral-dark max-[359px]:h-11 max-[359px]:w-11 max-[359px]:justify-center max-[359px]:px-0 touch-target"><span class="max-[359px]:sr-only">{m.series_detail_watch_now()}</span><svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>{/if}

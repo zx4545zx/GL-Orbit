@@ -121,6 +121,7 @@
 	{@html jsonLdScript(jsonLd)}
 </svelte:head>
 
+<div class="mx-auto max-w-6xl py-6 sm:py-8">
 <!-- Hero -->
 <header class="cd-hero">
 	<div class="cd-hero-main">
@@ -266,6 +267,7 @@
 		<p class="cd-empty-desc">{m.countdown_empty_desc()}</p>
 	</div>
 {/snippet}
+</div>
 
 <style>
 	/* ===== hero ===== */
@@ -274,7 +276,7 @@
 		grid-template-columns: 3fr 2fr;
 		gap: 32px;
 		align-items: end;
-		padding: 32px 0;
+		padding: 8px 0 32px;
 	}
 	.cd-kicker {
 		display: inline-flex;
@@ -483,6 +485,10 @@
 		background: var(--orbit-lavender);
 		min-height: 100%;
 	}
+	/* flush with the panel edge: app.css `body *` legacy rounding would leave corner gaps */
+	.cd-spotlight-poster,
+	.cd-spotlight-poster :global(picture),
+	.cd-spotlight-poster :global(img) { border-radius: 0 !important; }
 	.cd-spotlight-body {
 		padding: 24px 28px;
 		display: grid;

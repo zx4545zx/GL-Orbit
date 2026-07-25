@@ -706,9 +706,16 @@ body {
 
  /* Token-driven legacy geometry: square themes keep 0 while rounded themes
     (ocean, candy) soften legacy surfaces uniformly. Named shared recipes above
-    deliberately use stronger selectors so their tokens survive. */
+    deliberately use stronger selectors so their tokens survive. Media elements
+    are zeroed separately at matching specificity: they must stay square so clipped
+    containers crop them cleanly (a rounded img inside a rounded surface leaves
+    corner gaps). Element-level selectors keep .orbit-round-data circles intact. */
  body * {
    border-radius: var(--orbit-radius-legacy, 0px) !important;
+ }
+
+ body img, body picture, body video {
+   border-radius: 0 !important;
  }
 
  :is(body .glass-card, body .glass-card-strong, body .orbit-surface, body .orbit-rail, body .orbit-control, body .orbit-menu, body .orbit-menu-item, body .orbit-action, body .orbit-menu-dialog, body .orbit-dialog, body .orbit-dialog-panel, body .orbit-dialog-icon, body .orbit-input, body .orbit-focusable, body .orbit-badge, body .orbit-nav-item) {
@@ -2087,7 +2094,8 @@ h1, h2, h3 {
   border-radius: 22px !important;
   box-shadow: var(--orbit-shadow-accent);
   transform: none;
-  overflow: hidden;
+  /* no overflow: hidden — .zine-sticker pops out of the card on purpose;
+     the countdown poster rail matches the 22px corner itself instead */
   transition: transform var(--orbit-motion-standard) var(--orbit-motion-ease), box-shadow var(--orbit-motion-standard) var(--orbit-motion-ease);
 }
 
@@ -2554,6 +2562,14 @@ h1, h2, h3 {
 }
 
 [data-theme='candy'] .zine-card { box-shadow: 6px 6px 0 #ff9b3d; }
+
+/* The countdown poster rail must match the card corner exactly: the card clips
+   nothing (stickers overflow on purpose) and the legacy blanket flattens radii,
+   so a smaller rail radius would poke out of the 26px/3px card corner. */
+[data-theme='candy'] .zine-countdown-poster { border-radius: 23px 0 0 23px !important; }
+
+/* Ocean: the card does not clip (sticker pops out), so the rail follows the corner. */
+[data-theme='ocean'] .zine-countdown-poster { border-radius: 22px 0 0 22px !important; }
 
 [data-theme='candy'] .zine-schedule {
   background: transparent;

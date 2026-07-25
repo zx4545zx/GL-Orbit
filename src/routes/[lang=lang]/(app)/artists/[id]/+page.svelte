@@ -122,8 +122,8 @@
 
 <div class="-mx-4 -mb-[var(--bottom-nav-reserved-space)] bg-[var(--orbit-paper)] pb-[calc(3rem+var(--bottom-nav-reserved-space))] md:-mt-24 md:mb-0 md:pb-20 md:pt-24">
 	<main class="mx-auto max-w-[90rem] px-4 pt-4 sm:px-6 sm:pt-6 md:px-8" aria-label={artist.nickname}>
-		<section class="overflow-visible bg-plum text-white shadow-[0_30px_80px_-42px_rgba(45,27,46,0.7)] sm:rounded-t-xl" aria-labelledby="artist-name">
-			<div class="flex items-center justify-between gap-3 border-b border-white/15 p-4 sm:p-6">
+		<section class="overflow-hidden bg-plum text-white shadow-[0_30px_80px_-42px_rgba(45,27,46,0.7)] sm:rounded-t-xl" aria-labelledby="artist-name">
+			<div class="flex !rounded-none items-center justify-between gap-3 border-b border-white/15 p-4 sm:p-6">
 				<button
 					type="button"
 					onclick={goBack}
@@ -139,7 +139,7 @@
 			</div>
 
 			<div class="grid md:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)]">
-				<figure class="relative min-h-[22rem] bg-coral sm:min-h-[31rem] lg:min-h-[38rem] lg:rounded-bl-xl">
+				<figure class="relative !rounded-none min-h-[22rem] bg-coral sm:min-h-[31rem] lg:min-h-[38rem]">
 					<Picture src={artist.profileImageUrl} type="profiles" sizes="(max-width: 1023px) 100vw, 42vw" alt={artist.nickname} width={720} height={1080} loading="eager" class="absolute inset-0 h-full w-full object-cover" />
 					<div class="absolute inset-0 bg-gradient-to-t from-plum/70 via-transparent to-transparent"></div>
 					<figcaption class="absolute bottom-5 left-5 rounded-md bg-plum/85 px-3 py-2 font-[family-name:var(--font-display)] text-xs font-black tracking-[0.14em] text-white sm:bottom-8 sm:left-8">GL-ORBIT / ARTIST FILE</figcaption>
@@ -161,10 +161,10 @@
 			</div>
 		</section>
 
-		<section class="border-x border-b border-[var(--orbit-line-strong)] bg-white text-plum" aria-label="Artist signals">
+		<section class="!rounded-none border-x border-b border-[var(--orbit-line-strong)] bg-white text-plum" aria-label="Artist signals">
 			<div class="grid grid-cols-2 divide-x divide-y divide-[var(--orbit-line)] sm:grid-cols-4">
 				{#each primaryMeta as item, index}
-					<div class="relative flex min-h-28 min-w-0 flex-col justify-between p-4 sm:min-h-32 sm:p-5">
+					<div class="relative flex !rounded-none min-h-28 min-w-0 flex-col justify-between p-4 sm:min-h-32 sm:p-5">
 						<span class="font-[family-name:var(--font-display)] text-[9px] font-black tracking-[0.18em] text-coral-dark">0{index + 1}</span>
 						<div class="font-[family-name:var(--font-display)] text-4xl font-bold leading-none text-plum sm:text-5xl">{item.value}</div>
 						<div class="truncate text-[9px] font-black uppercase tracking-[0.18em] text-plum-light sm:text-[10px]">{item.label}</div>
@@ -174,7 +174,7 @@
 			</div>
 
 			{#if artist.socials.length > 0}
-				<div class="flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-[var(--orbit-line)] p-4 sm:p-6">
+				<div class="flex !rounded-none flex-wrap items-center gap-x-4 gap-y-3 border-t border-[var(--orbit-line)] p-4 sm:p-6">
 					<span class="mr-1 text-[9px] font-black uppercase tracking-[0.24em] text-plum-light">Elsewhere</span>
 					{#each artist.socials as social (social.id)}
 						{@const meta = socialMeta(social.platform)}
@@ -190,19 +190,19 @@
 		</section>
 
 		{#if artist.ships.length > 0}
-			<section class="mt-20 border-t-2 border-plum pt-6 text-plum sm:mt-28 sm:pt-9" aria-labelledby="ships-heading">
+			<section class="mt-20 !rounded-none border-t-2 border-plum pt-6 text-plum sm:mt-28 sm:pt-9" aria-labelledby="ships-heading">
 				<header class="mb-7 grid gap-3 sm:mb-10 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-end">
 					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">01 / Chemistry</p>
 					<h2 id="ships-heading" class="text-4xl font-bold sm:text-6xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.series_detail_ships()}</h2>
 				</header>
-				<div class="grid gap-px bg-[var(--orbit-line-strong)] {artist.ships.length === 1 ? '' : 'sm:grid-cols-2 lg:grid-cols-3'}">
+				<div class="grid gap-px overflow-hidden !rounded-none bg-[var(--orbit-line-strong)] {artist.ships.length === 1 ? '' : 'sm:grid-cols-2 lg:grid-cols-3'}">
 					{#each artist.ships as ship (ship.id)}
-						<a href={shipPath(ship.slug)} class="group grid min-w-0 grid-cols-[7rem_minmax(0,1fr)] items-center gap-4 bg-[var(--orbit-paper)] p-4 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:grid-cols-[9rem_minmax(0,1fr)] sm:p-6 {artist.ships.length === 1 ? 'sm:grid-cols-[13rem_minmax(0,1fr)]' : ''}">
+						<a href={shipPath(ship.slug)} class="group grid !rounded-none min-w-0 grid-cols-[7rem_minmax(0,1fr)] items-center gap-4 bg-[var(--orbit-paper)] p-4 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:grid-cols-[9rem_minmax(0,1fr)] sm:p-6 {artist.ships.length === 1 ? 'sm:grid-cols-[13rem_minmax(0,1fr)]' : ''}">
 							<div class="relative flex items-center justify-center">
-								<div class="relative z-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-coral-light">
+								<div class="orbit-round-data relative z-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-coral-light">
 									<Picture src={artist.profileImageUrl} type="profiles" sizes="(max-width: 639px) 84px, 190px" alt={artist.nickname} width={320} height={320} loading="lazy" class="aspect-square w-full object-cover transition duration-500 group-hover:-rotate-2 group-hover:scale-105" />
 								</div>
-								<div class="relative -ml-[24%] mt-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-lavender-light sm:mt-16 sm:border-4">
+								<div class="orbit-round-data relative -ml-[24%] mt-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-lavender-light sm:mt-16 sm:border-4">
 									<Picture src={ship.partner.imageUrl} type="profiles" sizes="(max-width: 639px) 84px, 190px" alt={ship.partner.nickname} width={320} height={320} loading="lazy" class="aspect-square w-full object-cover transition duration-500 group-hover:rotate-2 group-hover:scale-105" />
 								</div>
 							</div>
@@ -220,7 +220,7 @@
 		{/if}
 
 		{#if artist.series.length > 0}
-			<section class="mt-20 border-t-2 border-plum pt-6 sm:mt-28 sm:pt-9" aria-labelledby="filmography-heading">
+			<section class="mt-20 !rounded-none border-t-2 border-plum pt-6 sm:mt-28 sm:pt-9" aria-labelledby="filmography-heading">
 				<header class="mb-8 flex flex-wrap items-end justify-between gap-5 sm:mb-12">
 					<div>
 						<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">02 / Filmography</p>
@@ -257,7 +257,7 @@
 				</div>
 			</section>
 		{:else}
-			<section class="mt-20 border-t-2 border-plum pt-6 sm:mt-28 sm:pt-9" aria-labelledby="filmography-heading">
+			<section class="mt-20 !rounded-none border-t-2 border-plum pt-6 sm:mt-28 sm:pt-9" aria-labelledby="filmography-heading">
 				<header class="mb-6 sm:mb-14">
 					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">02 / Filmography</p>
 					<h2 id="filmography-heading" class="mt-2 text-[clamp(1.875rem,9vw,3rem)] font-black text-plum sm:text-6xl lg:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.06em]'}">{m.artist_works_heading()}</h2>
@@ -274,7 +274,7 @@
 		{/if}
 
 		{#if artist.socials.length > 0}
-			<section class="mt-20 grid gap-8 border-t-2 border-plum pt-6 sm:mt-28 sm:pt-9 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-12" aria-labelledby="socials-heading">
+			<section class="mt-20 grid !rounded-none gap-8 border-t-2 border-plum pt-6 sm:mt-28 sm:pt-9 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-12" aria-labelledby="socials-heading">
 				<header class="lg:sticky lg:top-28 lg:self-start">
 					<p class="text-[10px] font-black uppercase tracking-[0.38em] text-coral-dark">03 / Social</p>
 					<h2 id="socials-heading" class="mt-2 flex flex-wrap gap-x-3 text-4xl font-black text-plum sm:text-7xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.1] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-[0.88] tracking-[-0.065em]'}">

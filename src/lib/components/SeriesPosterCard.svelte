@@ -15,7 +15,7 @@
 
 <a {href} class="group block h-full rounded-xl focus-visible:outline-offset-4">
 	<div class="flex h-full flex-col overflow-hidden rounded-xl border border-[var(--orbit-line)] bg-white shadow-[var(--orbit-shadow)] transition-[border-color,box-shadow] group-hover:border-coral/60 group-hover:shadow-[var(--orbit-shadow-raised)]">
-		<div class="relative aspect-[3/4] overflow-hidden">
+		<div class="spc-poster relative aspect-[3/4] overflow-hidden">
 			<Picture src={item.poster} type="posters" sizes="(max-width: 420px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw" alt={item.title} width={400} height={533} loading="lazy" class="w-full h-full object-cover transition duration-300 group-hover:opacity-90" />
 			<div class="absolute left-2.5 top-2.5 sm:left-3 sm:top-3">
 				<span class="rounded-md px-2 py-1 text-[0.65rem] font-semibold {badge.class}">{badge.text}</span>
@@ -28,3 +28,8 @@
 		</div>
 	</div>
 </a>
+
+<style>
+	/* Poster stays square; only the outer card rounds (beats the app.css legacy blanket). */
+	.spc-poster { border-radius: 0 !important; }
+</style>

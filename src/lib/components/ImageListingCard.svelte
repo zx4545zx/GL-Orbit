@@ -33,8 +33,8 @@
 </script>
 
 <a href={href} class="group block h-full focus-visible:outline-offset-4">
-	<div class="flex h-full flex-col overflow-hidden border border-[var(--orbit-line)] bg-white p-2 transition-[border-color,box-shadow] group-hover:border-coral/60 group-hover:shadow-[var(--orbit-shadow)]">
-		<div class="relative aspect-[3/4] overflow-hidden bg-lavender/10">
+	<div class="flex h-full flex-col overflow-hidden border border-[var(--orbit-line)] bg-white transition-[border-color,box-shadow] group-hover:border-coral/60 group-hover:shadow-[var(--orbit-shadow)]">
+		<div class="ilc-poster relative aspect-[3/4] overflow-hidden bg-lavender/10">
 			{#if secondaryImage}
 				<div class="absolute inset-0 bg-lavender/25"></div>
 				<div class="relative h-full px-2.5 py-3 sm:px-3 sm:py-4">
@@ -67,7 +67,7 @@
 				</div>
 			{/if}
 		</div>
-		<div class="min-w-0 px-1 pb-1 pt-3">
+		<div class="min-w-0 p-3">
 			{#if eyebrow}<p class="mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-coral line-clamp-1">{eyebrow}</p>{/if}
 			<h3 class="text-plum font-semibold text-sm sm:text-base leading-snug line-clamp-2 transition-colors group-hover:text-coral-dark">{title}</h3>
 			{#if subtitle}<p class="mt-1 text-plum-light text-xs sm:text-sm line-clamp-1">{subtitle}</p>{/if}
@@ -81,3 +81,8 @@
 		</div>
 	</div>
 </a>
+
+<style>
+	/* Poster stays square; only the outer card rounds (beats the app.css legacy blanket). */
+	.ilc-poster { border-radius: 0 !important; }
+</style>

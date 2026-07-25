@@ -519,4 +519,13 @@
 		.board-wevent { transition: none; }
 		.board-wevent:hover { transform: none; }
 	}
+
+	/* app.css `body * { border-radius: var(--orbit-radius-legacy) !important }` also rounds
+	   flush children (columns, headers, posters, images), leaving gaps at the corners —
+	   keep them square and let .board-week / .board-wevent clip instead. */
+	.board-wday,
+	.board-wday-head,
+	.board-wevent-poster,
+	.board-wevent-poster :global(picture),
+	.board-wevent-poster :global(img) { border-radius: 0 !important; }
 </style>

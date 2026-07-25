@@ -486,7 +486,7 @@
 					</table>
 				</div>
 
-				<div class="flex flex-wrap items-center gap-2 px-3 pb-3 pt-3 text-[10px] text-plum-light sm:gap-3 sm:px-4 sm:pb-4 sm:text-xs" style="border-top: var(--orbit-border-width) solid var(--orbit-line)">
+				<div class="cal-flush flex flex-wrap items-center gap-2 px-3 pb-3 pt-3 text-[10px] text-plum-light sm:gap-3 sm:px-4 sm:pb-4 sm:text-xs" style="border-top: var(--orbit-border-width) solid var(--orbit-line)">
 					<span>{m.calendar_platform_label()}</span>
 					{#each Object.entries(platformColors) as [platform, colorClass]}
 						<span class="cal-chip border {colorClass}">{platform}</span>
@@ -549,7 +549,7 @@
 						{/each}
 					</div>
 
-					<div class="flex items-center gap-3 px-3 py-2 text-[10px] text-plum-light sm:gap-4 sm:px-4 sm:text-xs" style="border-top: var(--orbit-border-width) solid var(--orbit-line)">
+					<div class="cal-flush flex items-center gap-3 px-3 py-2 text-[10px] text-plum-light sm:gap-4 sm:px-4 sm:text-xs" style="border-top: var(--orbit-border-width) solid var(--orbit-line)">
 						<span class="flex items-center gap-1.5">
 							<i class="cal-dot orbit-round-data" aria-hidden="true"></i>
 							{m.calendar_legend_has_event()}
@@ -909,6 +909,8 @@
 		justify-content: center;
 		gap: 6px;
 		border-right: var(--orbit-border-width) solid var(--orbit-line-strong);
+		/* flush segments: the container clips the outer corners (overflow: hidden) */
+		border-radius: 0 !important;
 		transition: background-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
 	}
 	.cal-toggle-btn:last-child { border-right: none; }
@@ -1104,7 +1106,7 @@
 	}
 
 	/* ===== selected day panel ===== */
-	.cal-panel { display: flex; flex-direction: column; }
+	.cal-panel { display: flex; flex-direction: column; overflow: hidden; }
 	@media (min-width: 1024px) {
 		.cal-panel { position: sticky; top: 112px; }
 	}
@@ -1285,7 +1287,8 @@
 		flex: none;
 		background: var(--orbit-lavender);
 		border: var(--orbit-border-width) solid var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-control);
+		/* standalone framed poster: keep its own token radius over the global media squaring */
+		border-radius: var(--orbit-radius-control) !important;
 		box-shadow: var(--orbit-shadow);
 	}
 	.cal-gname { font-weight: 700; font-size: 12px; color: var(--orbit-ink); }
@@ -1406,4 +1409,18 @@
 		.cal-banner:hover .cal-banner-go,
 		.cal-lrow:hover .cal-lrow-arrow { transform: none; }
 	}
+
+	/* Only outer cards stay rounded: app.css `body *` legacy rounding would otherwise
+	   curve these flush children and leave gaps at the card corners. */
+	.cal-lday-head,
+	.cal-lrow,
+	.cal-weekdays,
+	.cal-grid,
+	.cal-cell,
+	.cal-weekdays > div,
+	.cal-gridtable th,
+	.cal-gridtable td,
+	.cal-panel-head,
+	.cal-panel-foot,
+	.cal-flush { border-radius: 0 !important; }
 </style>
