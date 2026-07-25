@@ -38,7 +38,7 @@ npx tsx scripts/seed-data.ts
 
 - SvelteKit 2 + Svelte 5 Runes + TypeScript 5.8 (`strict`, `NodeNext`)
 - Tailwind CSS 4 with tokens/utilities in `src/app.css`
-- Neon PostgreSQL + Drizzle ORM; schema at `src/lib/server/db/schema.ts`
+- Neon/Supabase PostgreSQL + Postgres.js + Drizzle ORM; schema at `src/lib/server/db/schema.ts`
 - Custom JWT/bcrypt auth in `src/lib/server/auth/`
 - Paraglide Thai/English i18n (`messages/`, `src/lib/i18n/`)
 - Vitest + Testing Library Svelte
@@ -69,7 +69,8 @@ User-facing pages use `/th/*` or `/en/*`. `src/hooks.server.ts` validates sessio
 ### Database
 
 - In server code always use `const db = await getDb()` from `src/lib/server/db/index.ts`.
-- Do not use the async `db` proxy in SvelteKit SSR handlers.
+- `DB_PROVIDER` selects provider-specific runtime/read-only URLs; Supabase runtime uses port 6543.
+- Drizzle Kit uses direct `DATABASE_MIGRATION_URL`, never a Supabase transaction pooler URL.
 - Filter soft-deleted rows where applicable.
 - Use Drizzle parameters; never interpolate untrusted SQL.
 - Schema changes: generate and review migration before approved push.
@@ -81,7 +82,7 @@ User-facing pages use `/th/*` or `/en/*`. `src/hooks.server.ts` validates sessio
 - Roles: `USER`, `ADMIN`; disabled users are rejected.
 - Admin layout guards pages, but every `/api/admin/*` endpoint must enforce ADMIN independently.
 - Scope subscription/chat/Halo resources by `locals.user.id`.
-- AI Chat database context must use `READONLY_DATABASE_URL` and existing SQL-safety code.
+- AI Chat database context must use the selected provider's `*_READONLY_DATABASE_URL` and existing SQL-safety code.
 
 ### Svelte and i18n
 

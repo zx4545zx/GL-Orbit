@@ -3,6 +3,8 @@
 **Status:** Approved
 **Date:** 2026-07-23
 
+> **Update (2026-07-24):** During implementation the theme allowlist was expanded from the four names below to seven themes: `fanzine` (default), `midnight`, `y2k`, `sakura`, `ocean`, `candy`, and `mission`. References to the four original names and the light-only constraint reflect the original approved scope.
+
 ## Summary
 
 Replace the current light/dark switch with a rectangular header **Theme** swatch menu. The menu offers exactly four predefined, full-palette pastel light themes:

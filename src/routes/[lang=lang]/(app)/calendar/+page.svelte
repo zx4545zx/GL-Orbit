@@ -51,9 +51,6 @@
 	function getMonthName(date: Date, l: string) {
 		return new Intl.DateTimeFormat(l, { month: 'long' }).format(date);
 	}
-	function getMonthShort(date: Date, l: string) {
-		return new Intl.DateTimeFormat(l, { month: 'short' }).format(date);
-	}
 	function getWeekDayLong(date: Date, l: string) {
 		return new Intl.DateTimeFormat(l, { weekday: 'long' }).format(date);
 	}
@@ -81,10 +78,6 @@
 	function getEndOfWeek(date: Date): Date {
 		const start = getStartOfWeek(date);
 		return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7);
-	}
-
-	function isSameDate(a: Date, b: Date): boolean {
-		return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 	}
 
 	const currentWeekStart = $derived(getStartOfWeek(currentWeek));
@@ -167,9 +160,7 @@
 	}
 
 	function selectDate(fullDate: string) {
-		if (hasEvents(fullDate)) {
-			selectedDate = selectedDate === fullDate ? null : fullDate;
-		}
+		selectedDate = selectedDate === fullDate ? null : fullDate;
 	}
 
 	const calendarDays = $derived(generateCalendarDays(currentMonth));
@@ -235,16 +226,6 @@
 		return map;
 	})());
 
-	const dayColorClasses = [
-		'bg-coral/10',
-		'bg-orange-300/10',
-		'bg-lavender/15',
-		'bg-emerald-300/10',
-		'bg-teal-300/10',
-		'bg-blue-300/10',
-		'bg-rose-300/10'
-	];
-
 	const seoTitle = m.calendar_seo_title();
 	const seoDescription = m.calendar_seo_description();
 	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
@@ -259,10 +240,10 @@
 	]));
 
 	const viewButtons = [
-		{ key: 'card' as const, label: m.calendar_view_week(), short: m.calendar_view_week(), group: 'primary', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
-		{ key: 'list' as const, label: m.calendar_view_list(), short: m.calendar_view_list(), group: 'primary', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>' },
-		{ key: 'calendar' as const, label: m.calendar_view_month_calendar(), short: m.calendar_view_month_calendar(), group: 'monthly', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M7 14h.01M11 14h.01M15 14h.01M7 18h.01M11 18h.01M15 18h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
-		{ key: 'grid' as const, label: m.calendar_view_month_grid(), short: m.calendar_view_month_grid(), group: 'monthly', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M3 10h18M3 16h18M8 4v16M14 4v16"/>' }
+		{ key: 'card' as const, label: m.calendar_view_week(), icon: '<rect x="1.5" y="2" width="13" height="12"/><path d="M1.5 6h13M5.5 2v12M10.5 2v12"/>' },
+		{ key: 'list' as const, label: m.calendar_view_list(), icon: '<path d="M1.5 3.5h13M1.5 8h13M1.5 12.5h13"/>' },
+		{ key: 'calendar' as const, label: m.calendar_view_month_calendar(), icon: '<rect x="1.5" y="2" width="13" height="12"/><path d="M1.5 6h13M5.5 2v4M10.5 2v4"/>' },
+		{ key: 'grid' as const, label: m.calendar_view_month_grid(), icon: '<rect x="1.5" y="1.5" width="5.5" height="5.5"/><rect x="9" y="1.5" width="5.5" height="5.5"/><rect x="1.5" y="9" width="5.5" height="5.5"/><rect x="9" y="9" width="5.5" height="5.5"/>' }
 	];
 </script>
 
@@ -285,170 +266,156 @@
 </svelte:head>
 
 {#snippet viewToggle()}
-	<div class="w-full lg:w-auto lg:flex lg:justify-center">
-		<div class="glass-card grid grid-cols-4 gap-0 border border-[var(--orbit-line-strong)] lg:flex lg:items-center lg:min-w-max">
-			{#each viewButtons as btn, index}
-				{@const active = viewMode === btn.key}
-				<button
-					aria-label={btn.label}
-					title={btn.label}
-					onclick={() => {
-						viewMode = btn.key;
-						navigateCalendar(getViewUrl(btn.key, lang, params_y, params_m, params_sd, params_ed));
-					}}
-					class="min-w-0 justify-center border-r border-[var(--orbit-line)] px-2 lg:px-4 py-2.5 lg:py-2 text-xs lg:text-sm font-semibold transition-colors duration-200 last:border-r-0 flex items-center gap-1.5 lg:gap-2 touch-target {active ? 'bg-plum text-white' : btn.group === 'monthly' ? 'text-plum-light hover:bg-lavender-light hover:text-plum' : 'text-plum-light hover:bg-cream hover:text-coral-dark'}"
-				>
-					<svg class="w-5 h-5 lg:w-4 lg:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">{@html btn.icon}</svg>
-					<span class="hidden lg:inline">{btn.label}</span>
-				</button>
-			{/each}
-		</div>
+	<div class="cal-toggle" role="group" aria-label={m.calendar_title_plain()}>
+		{#each viewButtons as btn}
+			{@const active = viewMode === btn.key}
+			<button
+				type="button"
+				class="cal-toggle-btn {active ? 'cal-toggle-btn--active' : ''}"
+				aria-label={btn.label}
+				aria-pressed={active}
+				title={btn.label}
+				onclick={async () => {
+					viewMode = btn.key;
+					await navigateCalendar(getViewUrl(btn.key, lang, params_y, params_m, params_sd, params_ed));
+					await scrollToSchedule();
+				}}
+			>
+				<svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16" aria-hidden="true">{@html btn.icon}</svg>
+				<span class="hidden sm:inline">{btn.label}</span>
+			</button>
+		{/each}
 	</div>
 {/snippet}
 
 {#snippet monthHeader()}
-	<div class="glass-card border border-[var(--orbit-line-strong)] p-3 sm:p-5 mb-4 sm:mb-6">
-		<div class="flex items-center gap-3">
-			<button
-				aria-label={m.calendar_month_prev_aria()}
-				onclick={prevMonth}
-				class="w-11 h-11 orbit-control flex items-center justify-center transition-all hover:bg-coral-light touch-target flex-shrink-0"
-			>
-				<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-			</button>
+	<nav class="cal-monthnav" aria-label={viewMode === 'grid' ? m.calendar_view_month_grid() : m.calendar_view_month_calendar()}>
+		<button
+			type="button"
+			aria-label={m.calendar_month_prev_aria()}
+			onclick={prevMonth}
+			class="cal-sqbtn"
+		>
+			<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+		</button>
 
-			<div class="flex-1 min-w-0 text-center">
-				<div class="text-[11px] sm:text-xs font-bold text-coral-dark uppercase tracking-wide mb-0.5">
-					{viewMode === 'grid' ? m.calendar_view_month_grid() : m.calendar_view_month_calendar()}
-				</div>
-				<h2 class="font-[family-name:var(--font-display)] text-base sm:text-2xl md:text-3xl font-bold text-plum truncate">
-					<span class="sm:hidden">{new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'short' }).format(currentMonth)}</span>
-					<span class="hidden sm:inline">{new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' }).format(currentMonth)}</span>
-				</h2>
+		<div class="min-w-0 flex-1 text-center">
+			<div class="cal-monthnav-label">
+				{viewMode === 'grid' ? m.calendar_view_month_grid() : m.calendar_view_month_calendar()}
 			</div>
-
-			<div class="flex items-center gap-2 flex-shrink-0">
-				<button
-					onclick={goToToday}
-					aria-label={m.calendar_month_today_aria()}
-					class="hidden sm:inline-flex h-11 border border-coral px-5 items-center justify-center orbit-action text-sm font-bold transition-all touch-target"
-				>
-					{m.calendar_month_today_text()}
-				</button>
-				<button
-					onclick={goToToday}
-					aria-label={m.calendar_month_today_aria()}
-					class="sm:hidden w-11 h-11 border border-coral orbit-action flex items-center justify-center touch-target"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-					</svg>
-				</button>
-				<button
-					aria-label={m.calendar_month_next_aria()}
-					onclick={nextMonth}
-				class="w-11 h-11 orbit-control flex items-center justify-center transition-all hover:bg-coral-light touch-target"
-				>
-					<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-				</button>
-			</div>
+			<h2 class="cal-monthnav-name">
+				<span class="sm:hidden">{new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'short' }).format(currentMonth)}</span>
+				<span class="hidden sm:inline">{new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' }).format(currentMonth)}</span>
+			</h2>
 		</div>
-	</div>
+
+		<button
+			type="button"
+			onclick={goToToday}
+			aria-label={m.calendar_month_today_aria()}
+			class="cal-today-btn hidden sm:inline-flex"
+		>
+			{m.calendar_month_today_text()}
+		</button>
+		<button
+			type="button"
+			onclick={goToToday}
+			aria-label={m.calendar_month_today_aria()}
+			class="cal-today-btn cal-today-btn--icon sm:hidden"
+		>
+			<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+			</svg>
+		</button>
+		<button
+			type="button"
+			aria-label={m.calendar_month_next_aria()}
+			onclick={nextMonth}
+			class="cal-sqbtn"
+		>
+			<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+		</button>
+	</nav>
 {/snippet}
 
-<div class="py-6 sm:py-8 max-w-6xl mx-auto">
-	<!-- Today / This Week Hero -->
-	<section class="mb-8 py-3 sm:py-5">
-		<div class="grid gap-5 lg:grid-cols-[1.4fr_1fr] lg:items-end">
-			<div>
-				<div class="inline-flex items-center gap-2 border border-coral/30 bg-coral/10 px-3 py-1 text-xs font-bold text-coral-dark mb-3">
-					<span class="orbit-round-data w-1.5 h-1.5 bg-coral animate-pulse"></span>
-					Today / This Week
-				</div>
-				<h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-bold text-plum leading-tight mb-2">
-					{m.calendar_title_plain()}<span class="text-coral"> GL</span>
-				</h1>
-				<p class="text-sm sm:text-base text-plum-light max-w-2xl leading-relaxed">
-					{m.calendar_subtitle()}
-				</p>
-			</div>
-
-			<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
-				<div class="border border-coral/25 bg-coral-light px-4 py-3">
-					<div class="text-xs font-medium text-plum-light mb-1">{m.calendar_today_label()}</div>
-					<div class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum">{weekSummary.todayCount}</div>
-					<div class="text-[11px] text-plum-light">{m.calendar_today_count_label()}</div>
-				</div>
-				<div class="border border-lavender/40 bg-lavender-light px-4 py-3">
-					<div class="text-xs font-medium text-plum-light mb-1">{m.calendar_week_label()}</div>
-					<div class="font-[family-name:var(--font-display)] text-2xl font-bold text-plum">{weekSummary.weekCount}</div>
-					<div class="text-[11px] text-plum-light">{m.calendar_week_count_label()}</div>
-				</div>
-				<div class="col-span-2 border border-mint/40 bg-mint-light px-4 py-3 sm:col-span-1 lg:col-span-2 xl:col-span-1">
-					<div class="text-xs font-medium text-plum-light mb-1">{m.calendar_featured_label()}</div>
-					{#if weekSummary.featuredEvent}
-						<div class="text-sm font-bold text-plum truncate">{weekSummary.featuredEvent.series}</div>
-						<div class="text-xs text-coral-dark font-semibold mt-1">{weekSummary.featuredDay} · {weekSummary.featuredEvent.time}</div>
-					{:else}
-						<div class="text-sm font-bold text-plum">{m.calendar_featured_empty()}</div>
-						<div class="text-xs text-plum-light mt-1">{m.calendar_featured_empty_sub()}</div>
-					{/if}
-				</div>
-			</div>
-		</div>
-
-		<div class="mt-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-			<button
-				onclick={() => goToThisWeek('card')}
-				class="inline-flex w-full lg:w-auto items-center justify-center gap-2 border border-coral orbit-action px-5 py-3 text-sm font-bold transition-all touch-target"
-			>
-				{m.calendar_this_week_cta()}
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-			</button>
-			<div class="w-full lg:max-w-max">
+<div class="mx-auto max-w-6xl py-6 sm:py-8">
+	<!-- ============ 1. HERO ============ -->
+	<header class="cal-hero">
+		<div>
+			<span class="cal-kicker">
+				<span class="cal-blink orbit-round-data" aria-hidden="true"></span>
+				Today / This Week
+			</span>
+			<h1 class="cal-title">
+				{m.calendar_title_plain()} <span class="cal-title-accent">GL</span> ✦
+			</h1>
+			<p class="cal-sub">{m.calendar_subtitle()}</p>
+			<div class="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+				<button type="button" onclick={() => goToThisWeek('card')} class="cal-cta">
+					{m.calendar_this_week_cta()}
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+				</button>
 				{@render viewToggle()}
 			</div>
 		</div>
-	</section>
+
+		<div class="cal-stats">
+			<div class="cal-stat">
+				<div class="cal-stat-label">{m.calendar_today_label()}</div>
+				<div class="cal-stat-num">{weekSummary.todayCount}</div>
+				<div class="cal-stat-detail">{m.calendar_today_count_label()}</div>
+			</div>
+			<div class="cal-stat">
+				<div class="cal-stat-label">{m.calendar_week_label()}</div>
+				<div class="cal-stat-num">{weekSummary.weekCount}</div>
+				<div class="cal-stat-detail">{m.calendar_week_count_label()}</div>
+			</div>
+			<div class="cal-stat col-span-2 sm:col-span-1">
+				<div class="cal-stat-label">{m.calendar_featured_label()}</div>
+				{#if weekSummary.featuredEvent}
+					<div class="cal-stat-num cal-stat-num--text truncate">{weekSummary.featuredEvent.series}</div>
+					<div class="cal-stat-detail"><b>{weekSummary.featuredDay}</b> · {weekSummary.featuredEvent.time}{#if weekSummary.featuredEvent.isUncut} · UNCUT{/if}</div>
+				{:else}
+					<div class="cal-stat-num cal-stat-num--text">{m.calendar_featured_empty()}</div>
+					<div class="cal-stat-detail">{m.calendar_featured_empty_sub()}</div>
+				{/if}
+			</div>
+		</div>
+	</header>
 
 	<div bind:this={scheduleSection} class="scroll-mt-24 sm:scroll-mt-28">
-	<!-- Grid View -->
+	<!-- ============ 6. GRID VIEW ============ -->
 	{#if viewMode === 'grid'}
 		{@render monthHeader()}
-		<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+		<div class="cal-card overflow-hidden">
 			{#if contentLoading}
-				<div class="grid-loading-skeleton p-4 sm:p-6">
+				<div class="grid-loading-skeleton p-3 sm:p-4">
 					<div class="overflow-x-auto">
-						<table class="w-full min-w-[640px]">
+						<table class="cal-gridtable">
 							<thead>
-								<tr class="border-b border-lavender/10">
-									<th class="px-2 sm:px-3 py-3 text-left w-28 sm:w-32 md:w-44 lg:w-52 border-r border-lavender/10">
-										<div class="h-4 w-16 bg-lavender/10 rounded animate-pulse"></div>
-									</th>
-									{#each Array(7) as _, i}
-										<th class="px-1 sm:px-2 py-3 text-center min-w-[32px] sm:min-w-[44px]">
-											<div class="h-3 w-5 mx-auto bg-lavender/10 rounded animate-pulse mb-1"></div>
-											<div class="h-2 w-3 mx-auto bg-lavender/5 rounded animate-pulse"></div>
+								<tr>
+									<th class="cal-gseries"><div class="h-4 w-16 animate-pulse bg-lavender/20"></div></th>
+									{#each Array(7) as _}
+										<th>
+											<div class="mx-auto mb-1 h-3 w-5 animate-pulse bg-lavender/20"></div>
+											<div class="mx-auto h-2 w-3 animate-pulse bg-lavender/10"></div>
 										</th>
 									{/each}
 								</tr>
 							</thead>
 							<tbody>
 								{#each Array(5) as _, row}
-									<tr class="border-b border-lavender/5 {row % 2 === 0 ? 'bg-white/20' : ''}">
-										<td class="px-2 sm:px-3 py-3 border-r border-lavender/10 w-28 sm:w-32 md:w-44 lg:w-52">
-											<div class="flex flex-col items-center gap-1.5 md:gap-2">
-												<div class="w-16 h-22 sm:w-18 sm:h-24 md:w-22 md:h-30 bg-lavender/10 rounded-lg animate-pulse"></div>
-												<div class="h-2.5 w-20 md:w-32 bg-lavender/10 rounded animate-pulse"></div>
-												<div class="h-2.5 w-14 md:w-24 bg-lavender/5 rounded animate-pulse"></div>
+									<tr>
+										<th class="cal-gseries">
+											<div class="flex items-center gap-2">
+												<div class="h-11 w-8 animate-pulse bg-lavender/20"></div>
+												<div class="h-3 w-20 animate-pulse bg-lavender/20"></div>
 											</div>
-										</td>
+										</th>
 										{#each Array(7) as _, col}
-											<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center">
+											<td>
 												{#if (row * 7 + col) % 3 === 0}
-													<div class="h-8 sm:h-10 bg-lavender/5 rounded-md sm:rounded-lg animate-pulse"></div>
-												{:else}
-													<div class="h-8 sm:h-10"></div>
+													<div class="mx-auto h-8 w-12 animate-pulse bg-lavender/10"></div>
 												{/if}
 											</td>
 										{/each}
@@ -460,64 +427,56 @@
 				</div>
 			{:else}
 				<div class="overflow-x-auto">
-					<table class="w-full min-w-[640px]">
+					<table class="cal-gridtable">
 						<thead>
-							<tr class="border-b border-lavender/10">
-								<th class="sticky left-0 z-10 bg-white px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-semibold text-plum-light w-28 sm:w-32 md:w-44 lg:w-52 border-r border-lavender/10 align-top">
-									{m.calendar_grid_series_header()}
-								</th>
+							<tr>
+								<th class="cal-gseries">{m.calendar_grid_series_header()}</th>
 								{#each monthDays as day}
 									{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
 									{@const isTodayDate = formatDateLocal(dateObj) === formatDateLocal(new Date())}
-									{@const dayOfWeek = dateObj.getDay()}
-									<th class="px-1 sm:px-2 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-medium min-w-[32px] sm:min-w-[44px] align-top {isTodayDate ? 'bg-coral/10' : ''} {dayOfWeek === 0 || dayOfWeek === 6 ? 'text-coral-dark' : 'text-plum-light'}">
+									<th class={isTodayDate ? 'cal-gtoday' : ''}>
 										<div class="font-bold">{day}</div>
-										<div class="text-[8px] sm:text-[10px] opacity-70">{weekDays[dayOfWeek]}</div>
+										<small>{weekDays[dateObj.getDay()]}</small>
 									</th>
 								{/each}
 							</tr>
 						</thead>
 						<tbody>
-							{#each monthAllSeries as seriesName, seriesIndex}
-								<tr class="border-b border-lavender/5 hover:bg-white/30 transition-colors {seriesIndex % 2 === 0 ? 'bg-white/20' : ''}">
-									<td class="sticky left-0 z-10 bg-white px-2 sm:px-3 py-2 sm:py-3 border-r border-lavender/10 align-top w-28 sm:w-32 md:w-44 lg:w-52">
-										<div class="flex flex-col items-center gap-1.5 md:gap-2">
+							{#each monthAllSeries as seriesName}
+								<tr>
+									<th class="cal-gseries">
+										<span class="cal-gseries-inner">
 											<Picture
 												src={monthSeriesPosters[seriesName] ?? '/placeholders/poster.svg'}
 												type="posters"
-												sizes="(max-width: 768px) 33vw, 200px"
+												sizes="88px"
 												alt=""
-												width={200}
-												height={300}
-												class="w-16 h-22 sm:w-18 sm:h-24 md:w-22 md:h-30 rounded-lg object-cover shadow-md flex-shrink-0 bg-white/50"
+												width={64}
+												height={96}
+												class="cal-gposter"
 												loading="lazy"
 											/>
-											<div class="font-semibold text-plum text-[10px] sm:text-xs md:text-sm leading-snug line-clamp-2 md:line-clamp-none text-center min-w-0" title={seriesName}>{seriesName}</div>
-										</div>
-									</td>
+											<span class="cal-gname" title={seriesName}>{seriesName}</span>
+										</span>
+									</th>
 									{#each monthDays as day}
 										{@const dayEvents = getEventsForSeriesAndDay(seriesName, day)}
 										{@const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)}
 										{@const isTodayDate = formatDateLocal(dateObj) === formatDateLocal(new Date())}
-										<td class="px-0.5 sm:px-1 py-1 sm:py-2 text-center {isTodayDate ? 'bg-coral/5' : ''}">
+										<td class={isTodayDate ? 'cal-gtoday' : ''}>
 											{#if dayEvents.length > 0}
-												<div class="space-y-0.5">
-													{#each dayEvents as event}
-														<div class="relative group rounded-md sm:rounded-lg p-1 sm:p-1.5 text-[9px] sm:text-[10px] leading-tight border {platformColors[event.platforms[0]] || 'bg-gray-50 text-gray-600 border-gray-200'} cursor-pointer hover:shadow-md transition-all touch-target">
-															<div class="font-bold">{event.time}</div>
-															<div class="mt-0.5">{event.episode}</div>
-															{#if event.isUncut}
-																<div class="mt-0.5 text-[7px] sm:text-[8px] font-medium text-coral-dark">UNCUT</div>
-															{/if}
-															<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-plum text-white text-[8px] sm:text-[9px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-																{event.platforms.join(', ')}
-																<div class="absolute top-full left-1/2 -translate-x-1/2 border-2 border-transparent border-t-plum"></div>
-															</div>
-														</div>
-													{/each}
-												</div>
-											{:else}
-												<div class="w-full h-6 sm:h-8"></div>
+												{#each dayEvents as event}
+													<div class="cal-gcell">
+														<b>{event.time}</b>
+														<span>{event.episode}</span>
+														{#if event.platforms[0]}
+															<span class="cal-chip border {platformColors[event.platforms[0]] || 'bg-gray-50 text-gray-600 border-gray-200'}">{event.platforms[0]}</span>
+														{/if}
+														{#if event.isUncut}
+															<span class="cal-badge-uncut">UNCUT</span>
+														{/if}
+													</div>
+												{/each}
 											{/if}
 										</td>
 									{/each}
@@ -527,153 +486,143 @@
 					</table>
 				</div>
 
-				<div class="mt-4 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-plum-light px-4 sm:px-6 pb-4 sm:pb-6">
+				<div class="flex flex-wrap items-center gap-2 px-3 pb-3 pt-3 text-[10px] text-plum-light sm:gap-3 sm:px-4 sm:pb-4 sm:text-xs" style="border-top: var(--orbit-border-width) solid var(--orbit-line)">
 					<span>{m.calendar_platform_label()}</span>
 					{#each Object.entries(platformColors) as [platform, colorClass]}
-						<div class="flex items-center gap-1">
-							<div class="w-3 h-3 rounded {colorClass.split(' ')[0]}"></div>
-							<span>{platform}</span>
-						</div>
+						<span class="cal-chip border {colorClass}">{platform}</span>
 					{/each}
 				</div>
 			{/if}
 		</div>
 
+	<!-- ============ 3. MONTH CALENDAR VIEW ============ -->
 	{:else if viewMode === 'calendar'}
 		{@render monthHeader()}
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-			<div class="lg:col-span-2">
-				<div class="glass-card rounded-2xl sm:rounded-3xl p-3 sm:p-6">
-					{#if contentLoading}
-						<div class="calendar-loading-skeleton">
-							<div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
-								{#each weekDays as day}
-									<div class="h-3 sm:h-4 bg-lavender/10 rounded animate-pulse"></div>
-								{/each}
-							</div>
-							<div class="grid grid-cols-7 gap-0.5 sm:gap-1">
-								{#each Array(35) as _, i}
-									<div class="aspect-square rounded-lg sm:rounded-xl bg-lavender/5 animate-pulse"></div>
-								{/each}
-							</div>
-						</div>
-					{:else}
-						<div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
-							{#each weekDays as day}
-								<div class="text-center py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold text-plum-light uppercase">{day}</div>
+		<div class="cal-month-layout">
+			<div class="cal-card overflow-hidden">
+				{#if contentLoading}
+					<div class="calendar-loading-skeleton">
+						<div class="cal-weekdays">
+							{#each weekDays as _}
+								<div><div class="mx-auto h-3 w-6 animate-pulse bg-lavender/30"></div></div>
 							{/each}
 						</div>
-
-						<div class="grid grid-cols-7 gap-0.5 sm:gap-1">
-							{#each calendarDays as day}
-								{@const eventCount = getEventCount(day.fullDate)}
-								{@const isSelected = selectedDate === day.fullDate}
-								<button
-									onclick={() => selectDate(day.fullDate)}
-									class="relative aspect-square rounded-lg sm:rounded-xl p-0.5 sm:p-1 transition-all duration-300 flex flex-col items-center justify-center gap-0.5 touch-target
-										{day.month !== 'current' ? 'text-plum-light/40' : 'text-plum'}
-										{isToday(day.fullDate) ? 'ring-1 sm:ring-2 ring-coral' : ''}
-										{isSelected ? 'bg-coral text-white' : 'hover:bg-coral-light'}
-										{eventCount > 0 && !isSelected ? 'bg-white/30' : ''}"
-								>
-									<span class="text-xs sm:text-sm font-medium">{day.date}</span>
-									{#if eventCount > 0}
-										<div class="flex gap-0.5">
-											{#each Array(Math.min(eventCount, 3)) as _, i}
-											<div class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full {isSelected ? 'bg-white' : 'bg-coral'}"></div>
-											{/each}
-										</div>
-									{/if}
-									{#if isToday(day.fullDate)}
-										<span class="absolute -top-1.5 -right-1 px-1.5 py-0.5 bg-coral rounded-md text-[8px] sm:text-[10px] text-white font-bold shadow-sm leading-none">{m.calendar_today_badge()}</span>
-									{/if}
-								</button>
+						<div class="cal-grid">
+							{#each Array(42) as _}
+								<div class="cal-cell cal-cell--skeleton animate-pulse"></div>
 							{/each}
 						</div>
+					</div>
+				{:else}
+					<div class="cal-weekdays" role="row">
+						{#each weekDays as day, i}
+							<div class={i === 0 || i === 6 ? 'cal-weekday--wkend' : ''}>{day}</div>
+						{/each}
+					</div>
 
-						<div class="mt-3 sm:mt-4 flex items-center gap-3 sm:gap-4 text-[10px] sm:text-xs text-plum-light">
-							<div class="flex items-center gap-1 sm:gap-1.5">
-								<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-coral"></div>
-								<span>{m.calendar_legend_has_event()}</span>
-							</div>
-							<div class="flex items-center gap-1 sm:gap-1.5">
-								<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-coral ring-1 sm:ring-1 ring-coral"></div>
-								<span>{m.calendar_today_badge()}</span>
-							</div>
-						</div>
-					{/if}
-				</div>
-			</div>
-
-			<div class="lg:col-span-1">
-				<div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:sticky lg:top-28">
-					{#if selectedDate && selectedEvents.length > 0}
-						{@const d = new Date(selectedDate)}
-						<h3 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum mb-1">
-							{d.getDate()} {getMonthName(d, lang)}
-						</h3>
-						<p class="text-xs sm:text-sm text-plum-light mb-4 sm:mb-5">{m.calendar_selected_count({ count: selectedEvents.length })}</p>
-
-						<div class="space-y-2 sm:space-y-3">
-							{#each selectedEvents as event}
-								<div class="glass-card-strong rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-lg transition-all">
-									<div class="flex min-h-[117px] sm:min-h-[144px] gap-3 sm:gap-4">
-										<div class="flex w-20 sm:w-24 self-stretch flex-shrink-0 overflow-hidden">
-											<Picture
-												src={event.posterUrl}
-												type="posters"
-												sizes="6rem"
-												alt={event.series}
-												width={96}
-												height={135}
-												class="block h-full w-full object-cover shadow-sm bg-white/50"
-												loading="lazy"
-											/>
-										</div>
-										<div class="flex-1 min-w-0 py-3 sm:py-4 pr-3 sm:pr-4">
-											<div class="flex items-center gap-2 mb-1.5 sm:mb-2">
-												<span class="px-2 py-0.5 rounded-lg bg-coral/10 text-coral-dark text-xs font-bold">{event.time}</span>
-												{#if event.isUncut}
-													<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-xs font-medium">Uncut</span>
-												{/if}
-											</div>
-											<h4 class="font-semibold text-plum text-sm mb-0.5 sm:mb-1 truncate">{event.series}</h4>
-											<div class="flex items-center gap-2 text-xs text-plum-light">
-												<span class="truncate">{event.episode}</span>
-												<span class="flex-shrink-0">•</span>
-												<span class="truncate">{event.platforms.join(', ')}</span>
-											</div>
-											<a href="/{page.data.lang}/series/{event.seriesId}" class="mt-2 sm:mt-3 inline-flex items-center gap-1 text-xs font-medium text-coral-dark hover:text-coral transition-colors">
-												{m.calendar_detail_link()}
-												<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-											</a>
-										</div>
-									</div>
-								</div>
-							{/each}
-						</div>
-					{:else}
-						<div class="text-center py-8 sm:py-10">
-							<div class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
-								<svg class="w-6 h-6 sm:w-8 sm:h-8 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-								</svg>
-							</div>
-							<p class="text-plum-light text-xs sm:text-sm">
-								{#if selectedDate}
-									{m.calendar_selected_empty()}
-								{:else}
-									{@html m.calendar_selected_hint().replace('\n', '<br/>')}
+					<div class="cal-grid" role="grid" aria-label={new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' }).format(currentMonth)}>
+						{#each calendarDays as day}
+							{@const eventCount = getEventCount(day.fullDate)}
+							{@const isSelected = selectedDate === day.fullDate}
+							<button
+								type="button"
+								onclick={() => selectDate(day.fullDate)}
+								aria-pressed={isSelected}
+								aria-current={isToday(day.fullDate) ? 'date' : undefined}
+								class="cal-cell
+									{day.month !== 'current' ? 'cal-cell--dim' : ''}
+									{isToday(day.fullDate) ? 'cal-cell--today' : ''}
+									{isSelected ? 'cal-cell--selected' : ''}"
+							>
+								<span class="cal-dnum">{day.date}</span>
+								{#if isToday(day.fullDate)}
+									<span class="cal-sticker cal-cell-today-sticker">{m.calendar_today_badge()}</span>
 								{/if}
-							</p>
-						</div>
-					{/if}
-				</div>
+								{#if eventCount > 0}
+									<span class="cal-dots" aria-hidden="true">
+										{#each Array(Math.min(eventCount, 3)) as _}
+											<i class="cal-dot orbit-round-data"></i>
+										{/each}
+									</span>
+								{/if}
+							</button>
+						{/each}
+					</div>
+
+					<div class="flex items-center gap-3 px-3 py-2 text-[10px] text-plum-light sm:gap-4 sm:px-4 sm:text-xs" style="border-top: var(--orbit-border-width) solid var(--orbit-line)">
+						<span class="flex items-center gap-1.5">
+							<i class="cal-dot orbit-round-data" aria-hidden="true"></i>
+							{m.calendar_legend_has_event()}
+						</span>
+					</div>
+				{/if}
 			</div>
+
+			<aside class="cal-card cal-panel" aria-label={m.calendar_selected_count({ count: selectedEvents.length })}>
+				{#if selectedDate && selectedEvents.length > 0}
+					{@const d = new Date(selectedDate)}
+					<div class="cal-panel-head">
+						<h3>{getWeekDayLong(d, lang)} {d.getDate()} {getMonthName(d, lang)}</h3>
+						<span class="cal-panel-count">{m.calendar_selected_count({ count: selectedEvents.length })}</span>
+					</div>
+					<div class="cal-panel-body">
+						{#each selectedEvents as event}
+							<article class="cal-event">
+								<div class="cal-event-poster">
+									<Picture
+										src={event.posterUrl}
+										type="posters"
+										sizes="64px"
+										alt={event.series}
+										width={96}
+										height={135}
+										class="block h-full w-full object-cover"
+										loading="lazy"
+									/>
+								</div>
+								<div class="cal-event-info">
+									<div class="cal-event-meta">
+										<span class="cal-time-badge">{event.time}</span>
+										{#if event.isUncut}
+											<span class="cal-badge-uncut">UNCUT</span>
+										{/if}
+									</div>
+									<div class="cal-event-name">{event.series}</div>
+									<div class="cal-event-ep">{event.episode}</div>
+									<div class="cal-event-meta">
+										{#each event.platforms as platform}
+											<span class="cal-chip border {platformColors[platform] || 'bg-gray-50 text-gray-600 border-gray-200'}">{platform}</span>
+										{/each}
+									</div>
+									<a class="cal-event-more" href="/{page.data.lang}/series/{event.seriesId}">
+										{m.calendar_detail_link()} →
+									</a>
+								</div>
+							</article>
+						{/each}
+					</div>
+					<div class="cal-panel-foot">✦ {m.calendar_selected_hint().replace('\n', ' ')}</div>
+				{:else}
+					<div class="px-4 py-8 text-center sm:py-10">
+						<div class="cal-empty-icon mx-auto mb-3">
+							<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+							</svg>
+						</div>
+						<p class="text-xs text-plum-light sm:text-sm">
+							{#if selectedDate}
+								{m.calendar_selected_empty()}
+							{:else}
+								{@html m.calendar_selected_hint().replace('\n', '<br/>')}
+							{/if}
+						</p>
+					</div>
+				{/if}
+			</aside>
 		</div>
 
+	<!-- ============ 5. LIST VIEW ============ -->
 	{:else if viewMode === 'list'}
-		<!-- List View -->
 		<CalendarWeekHeader
 			currentWeek={currentWeek}
 			onPrevWeek={prevWeek}
@@ -682,90 +631,77 @@
 		/>
 
 		{#if contentLoading}
-			<div class="list-loading-skeleton space-y-4 sm:space-y-6">
-				{#each Array(3) as _, card}
-					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
-						<div class="px-4 sm:px-6 py-3 sm:py-4 bg-lavender/10 border-b border-white/50">
-							<div class="h-5 sm:h-6 w-24 sm:w-32 bg-lavender/10 rounded animate-pulse"></div>
+			<div class="list-loading-skeleton grid gap-4 sm:gap-5">
+				{#each Array(3) as _}
+					<div class="cal-card overflow-hidden">
+						<div class="cal-lday-head">
+							<div class="h-4 w-28 animate-pulse bg-lavender/30"></div>
 						</div>
-						<div class="divide-y divide-lavender/10">
-							{#each Array(2) as _, item}
-								<div class="px-4 sm:px-6 py-4 sm:py-5 flex items-center gap-3 sm:gap-5">
-									<div class="flex-shrink-0 w-12 sm:w-16">
-										<div class="h-4 w-10 sm:w-12 mx-auto bg-lavender/10 rounded animate-pulse"></div>
-									</div>
-									<div class="flex-1 space-y-2 min-w-0">
-										<div class="h-4 w-40 sm:w-56 bg-lavender/10 rounded animate-pulse"></div>
-										<div class="h-3 w-28 sm:w-36 bg-lavender/5 rounded animate-pulse"></div>
-									</div>
-									<div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-lavender/5 animate-pulse"></div>
+						{#each Array(2) as _}
+							<div class="flex items-center gap-3 px-3 py-3 sm:gap-4 sm:px-4" style="border-top: var(--orbit-border-width) solid var(--orbit-line)">
+								<div class="h-16 w-11 flex-shrink-0 animate-pulse bg-lavender/20"></div>
+								<div class="h-4 w-12 flex-shrink-0 animate-pulse bg-lavender/20"></div>
+								<div class="min-w-0 flex-1 space-y-2">
+									<div class="h-4 w-40 animate-pulse bg-lavender/20"></div>
+									<div class="h-3 w-28 animate-pulse bg-lavender/10"></div>
 								</div>
-							{/each}
-						</div>
+							</div>
+						{/each}
 					</div>
 				{/each}
 			</div>
 		{:else}
-			<div class="space-y-4 sm:space-y-6">
-				{#each weekScheduleByDay as day, i}
-					<div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
-						<div class="px-4 sm:px-6 py-3 sm:py-4 {dayColorClasses[i] || 'bg-lavender/15'} border-b border-[var(--orbit-line)]">
-							<h2 class="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-plum flex items-center gap-2 sm:gap-3">
-							<span class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white flex items-center justify-center text-plum">
-								<svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-								</svg>
-							</span>
-								{weekDayNames[day.dayIndex]}
-							</h2>
+			<div class="grid gap-4 sm:gap-5">
+				{#each weekScheduleByDay as day}
+					{@const dayDate = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth(), currentWeekStart.getDate() + day.dayIndex)}
+					<section class="cal-card cal-lday">
+						<div class="cal-lday-head">
+							<span class="cal-lday-title">{weekDayNames[day.dayIndex]} {dayDate.getDate()} {getMonthName(dayDate, lang)}</span>
+							<span class="cal-lday-count">{m.calendar_selected_count({ count: day.items.length })}</span>
 						</div>
-						<div class="divide-y divide-lavender/10">
+						{#if day.items.length > 0}
 							{#each day.items as item}
-								<div class="pr-4 sm:pr-6 min-h-[89px] sm:min-h-[104px] flex items-center gap-3 sm:gap-5 hover:bg-white/40 transition-colors group">
-									<div class="flex w-16 sm:w-20 self-stretch flex-shrink-0 overflow-hidden">
+								<a class="cal-lrow" href="/{page.data.lang}/series/{item.seriesId}">
+									<span class="cal-lrow-poster">
 										<Picture
 											src={item.posterUrl}
 											type="posters"
-											sizes="5rem"
+											sizes="44px"
 											alt={item.series}
-											width={80}
-											height={113}
-											class="block h-full w-full object-cover shadow-sm bg-white/50"
+											width={66}
+											height={99}
+											class="block h-full w-full object-cover"
 											loading="lazy"
 										/>
-									</div>
-									<div class="flex-1 min-w-0">
-										<div class="mb-0.5 text-xs sm:text-sm font-bold text-coral-dark">{item.time}</div>
-										<div class="flex items-center gap-2 mb-1">
-											<h3 class="font-semibold text-plum text-sm sm:text-base">{item.series}</h3>
+									</span>
+									<span class="cal-lrow-time">{item.time}</span>
+									<span class="cal-lrow-main">
+										<span class="cal-lrow-name">
+											{item.series}
 											{#if item.isUncut}
-												<span class="px-2 py-0.5 rounded-full bg-coral/10 text-coral-dark text-[10px] sm:text-xs font-medium">Uncut</span>
+												<span class="cal-badge-uncut">UNCUT</span>
 											{/if}
-										</div>
-										<div class="flex items-center gap-2 text-xs sm:text-sm text-plum-light">
-											<span class="font-medium">{item.episode}</span>
-											<span class="text-lavender">•</span>
-											<span>{item.platforms.join(', ')}</span>
-										</div>
-									</div>
-									<a
-										href="/{page.data.lang}/series/{item.seriesId}"
-										aria-label={m.calendar_list_detail_aria()}
-										class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-coral/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-coral/20 touch-target"
-									>
-										<svg class="w-4 h-4 sm:w-5 sm:h-5 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-										</svg>
-									</a>
-								</div>
+										</span>
+										<span class="cal-lrow-meta">
+											{item.episode} ·
+											{#each item.platforms as platform}
+												<span class="cal-chip border {platformColors[platform] || 'bg-gray-50 text-gray-600 border-gray-200'}">{platform}</span>
+											{/each}
+										</span>
+									</span>
+									<span class="cal-lrow-arrow" aria-hidden="true">→</span>
+								</a>
 							{/each}
-						</div>
-					</div>
+						{:else}
+							<p class="px-3 py-4 text-center text-xs text-plum-light sm:px-4">{m.calendar_card_no_events()}</p>
+						{/if}
+					</section>
 				{/each}
 			</div>
 		{/if}
+
+	<!-- ============ 4. WEEK BOARD (CARD VIEW) ============ -->
 	{:else if viewMode === 'card'}
-		<!-- Card View -->
 		<CalendarWeekHeader
 			currentWeek={currentWeek}
 			onPrevWeek={prevWeek}
@@ -774,13 +710,13 @@
 		/>
 
 		{#if contentLoading}
-			<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-				{#each Array(7) as _, i}
-					<div class="glass-card rounded-2xl p-3 space-y-3 animate-pulse">
-						<div class="h-4 w-16 bg-lavender/10 rounded mx-auto"></div>
-						<div class="aspect-[2/3] bg-lavender/10 rounded-lg"></div>
-						<div class="h-3 w-full bg-lavender/10 rounded"></div>
-						<div class="h-3 w-2/3 bg-lavender/5 rounded"></div>
+			<div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+				{#each Array(7) as _}
+					<div class="cal-card animate-pulse space-y-3 p-3">
+						<div class="mx-auto h-4 w-16 bg-lavender/20"></div>
+						<div class="aspect-[2/3] bg-lavender/20"></div>
+						<div class="h-3 w-full bg-lavender/20"></div>
+						<div class="h-3 w-2/3 bg-lavender/10"></div>
 					</div>
 				{/each}
 			</div>
@@ -790,30 +726,684 @@
 	{/if}
 	</div>
 
-	<!-- Countdown CTA -->
-	<a href="/{page.data.lang}/countdown" class="group flex items-center gap-4 sm:gap-5 mt-6 sm:mt-8 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 hover:shadow-lg transition-all duration-300">
-		<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-coral flex items-center justify-center flex-shrink-0 shadow-sm shadow-coral/20">
-			<svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-3 4-4 7-4 10v2l-1 2h10l-1-2v-2c0-3-1-6-4-10z"/><circle cx="12" cy="10" r="1.5" fill="white" opacity="0.6"/><path d="M10 17c0 1.5 2 2.5 2 2.5s2-1 2-2.5" fill="currentColor" opacity="0.4"/></svg>
-		</div>
-		<div class="flex-1 min-w-0">
-			<h3 class="font-[family-name:var(--font-display)] text-sm sm:text-base font-bold text-plum group-hover:text-coral-dark transition-colors">{m.calendar_countdown_cta_title()}</h3>
-			<p class="text-xs sm:text-sm text-plum-light">{m.calendar_countdown_cta_desc()}</p>
-		</div>
-		<svg class="w-5 h-5 sm:w-6 sm:h-6 text-coral-dark group-hover:translate-x-1 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+	<!-- ============ 6. COUNTDOWN CTA BANNER ============ -->
+	<a href="/{page.data.lang}/countdown" class="cal-banner group" aria-label={m.calendar_countdown_cta_title()}>
+		<span class="cal-banner-icon" aria-hidden="true">
+			<svg class="h-7 w-7 sm:h-8 sm:w-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-3 4-4 7-4 10v2l-1 2h10l-1-2v-2c0-3-1-6-4-10z"/><circle cx="12" cy="10" r="1.5" fill="white" opacity="0.6"/><path d="M10 17c0 1.5 2 2.5 2 2.5s2-1 2-2.5" fill="currentColor" opacity="0.4"/></svg>
+		</span>
+		<span class="min-w-0 flex-1">
+			<h2 class="cal-banner-title">{m.calendar_countdown_cta_title()}</h2>
+			<p class="cal-banner-desc">{m.calendar_countdown_cta_desc()}</p>
+		</span>
+		<span class="cal-banner-go" aria-hidden="true">→</span>
 	</a>
 
-	<!-- Notes section (always visible, independent of contentLoading) -->
-	<div class="mt-4 sm:mt-6 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex items-start gap-3 sm:gap-4 opacity-95">
-		<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-lavender/20 flex items-center justify-center flex-shrink-0">
-			<svg class="w-4 h-4 sm:w-5 sm:h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-			</svg>
-		</div>
+	<!-- ============ 7. NOTES ============ -->
+	<div class="cal-notes">
+		<span class="cal-notes-icon" aria-hidden="true">i</span>
 		<div>
-			<h3 class="font-semibold text-plum mb-1 text-sm sm:text-base">{m.calendar_notes_title()}</h3>
-			<p class="text-xs sm:text-sm text-plum-light leading-relaxed">
-				{m.calendar_notes_body()}
-			</p>
+			<h2 class="cal-notes-title">{m.calendar_notes_title()}</h2>
+			<p class="cal-notes-body">{m.calendar_notes_body()}</p>
 		</div>
 	</div>
 </div>
+
+<style>
+	/* ===== shared primitives (token-driven, adapt to every theme) ===== */
+	.cal-card {
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow);
+	}
+	.cal-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 11px;
+		font-weight: 600;
+		padding: 2px 8px;
+		line-height: 1.4;
+		white-space: nowrap;
+		border-radius: var(--orbit-radius-badge);
+	}
+	.cal-time-badge {
+		display: inline-block;
+		font-family: var(--orbit-font-display);
+		font-size: 12px;
+		background: var(--orbit-ink);
+		color: var(--orbit-mint);
+		padding: 2px 8px;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-badge);
+	}
+	.cal-badge-uncut {
+		display: inline-block;
+		font-family: var(--orbit-font-display);
+		font-size: 10px;
+		letter-spacing: 0.08em;
+		padding: 2px 7px;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-badge);
+		background: var(--orbit-coral);
+		color: #fff;
+	}
+	.cal-sticker {
+		display: inline-block;
+		font-family: var(--orbit-font-display);
+		font-size: 9px;
+		letter-spacing: 0.06em;
+		padding: 2px 6px;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-badge);
+		background: var(--orbit-coral);
+		color: #fff;
+		line-height: 1.3;
+	}
+	.cal-dot {
+		display: inline-block;
+		width: 8px;
+		height: 8px;
+		background: var(--orbit-coral);
+		border: 1px solid var(--orbit-line-strong);
+	}
+
+	/* ===== hero ===== */
+	.cal-hero {
+		padding: 16px 0 28px;
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 24px;
+		align-items: end;
+	}
+	@media (min-width: 1024px) {
+		.cal-hero { grid-template-columns: 3fr 2fr; gap: 32px; padding: 32px 0 32px; }
+	}
+	.cal-kicker {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-family: var(--orbit-font-display);
+		font-size: 12px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		background: var(--orbit-mint);
+		color: var(--orbit-ink);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-badge);
+		padding: 6px 12px;
+		box-shadow: var(--orbit-shadow);
+		margin-bottom: 16px;
+	}
+	.cal-blink {
+		width: 10px;
+		height: 10px;
+		flex: none;
+		background: var(--orbit-coral);
+		border: 1px solid var(--orbit-line-strong);
+		animation: cal-blink 1.1s steps(2, start) infinite;
+	}
+	@keyframes cal-blink { to { visibility: hidden; } }
+	.cal-title {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight, 700);
+		font-size: clamp(34px, 6vw, 60px);
+		line-height: 1.1;
+		color: var(--orbit-ink);
+		margin: 0;
+	}
+	.cal-title-accent {
+		color: var(--orbit-coral);
+		text-shadow: 2px 2px 0 var(--orbit-lavender);
+	}
+	.cal-sub {
+		margin: 12px 0 0;
+		color: var(--orbit-muted);
+		font-size: 15px;
+		max-width: 52ch;
+		line-height: 1.6;
+	}
+	.cal-cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		min-height: 44px;
+		padding: 10px 18px;
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-label-weight, 700);
+		font-size: 14px;
+		background: var(--orbit-coral);
+		color: #fff;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+		box-shadow: var(--orbit-shadow-raised);
+		cursor: pointer;
+		transition: transform var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease), box-shadow var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+	}
+	.cal-cta:hover { transform: translate(-1px, -1px); }
+	.cal-cta:active { transform: translate(1px, 1px); box-shadow: var(--orbit-shadow); }
+
+	.cal-toggle {
+		display: inline-flex;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+		background: var(--orbit-surface);
+		box-shadow: var(--orbit-shadow);
+		overflow: hidden;
+	}
+	.cal-toggle-btn {
+		appearance: none;
+		border: none;
+		background: transparent;
+		cursor: pointer;
+		min-width: 48px;
+		min-height: 44px;
+		padding: 10px 14px;
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-label-weight, 600);
+		font-size: 12px;
+		color: var(--orbit-ink);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		border-right: var(--orbit-border-width) solid var(--orbit-line-strong);
+		transition: background-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+	}
+	.cal-toggle-btn:last-child { border-right: none; }
+	.cal-toggle-btn:hover { background: var(--orbit-coral-soft); }
+	.cal-toggle-btn--active,
+	.cal-toggle-btn--active:hover {
+		background: var(--orbit-ink);
+		color: var(--orbit-mint);
+	}
+
+	.cal-stats {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 12px;
+	}
+	@media (min-width: 640px) { .cal-stats { grid-template-columns: repeat(3, 1fr); } }
+	@media (min-width: 1024px) { .cal-stats { grid-template-columns: 1fr; gap: 14px; } }
+	.cal-stat {
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow);
+		padding: 12px 16px;
+		min-width: 0;
+	}
+	.cal-stat-label { font-size: 13px; font-weight: 600; color: var(--orbit-muted); }
+	.cal-stat-num {
+		font-family: var(--orbit-font-display);
+		font-size: 28px;
+		color: var(--orbit-coral-dark);
+		line-height: 1.15;
+	}
+	.cal-stat-num--text { font-size: 16px; padding-top: 4px; color: var(--orbit-ink); }
+	.cal-stat-detail { font-size: 13px; margin-top: 2px; color: var(--orbit-muted); }
+	.cal-stat-detail b { color: var(--orbit-ink); }
+
+	/* ===== month nav ===== */
+	.cal-monthnav {
+		margin: 8px 0 16px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: nowrap;
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow);
+		padding: 10px 14px;
+	}
+	.cal-monthnav-label {
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--orbit-coral-dark);
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		margin-bottom: 2px;
+	}
+	.cal-monthnav-name {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight, 700);
+		font-size: 20px;
+		color: var(--orbit-ink);
+		margin: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	@media (max-width: 639px) {
+		.cal-monthnav { gap: 6px; padding: 8px 10px; }
+		.cal-monthnav-name { font-size: 15px; }
+		.cal-toggle-btn { min-width: 44px; padding: 10px 11px; }
+		.cal-toggle { align-self: flex-start; max-width: 100%; }
+	}
+	.cal-sqbtn {
+		flex: 0 0 auto;
+		width: 44px;
+		height: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--orbit-lavender);
+		color: var(--orbit-ink);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+		box-shadow: var(--orbit-shadow);
+		cursor: pointer;
+		transition: background-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease), transform var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+	}
+	.cal-sqbtn:hover { background: var(--orbit-coral-soft); }
+	.cal-sqbtn:active { transform: translate(1px, 1px); box-shadow: none; }
+	.cal-today-btn {
+		flex: 0 0 auto;
+		min-height: 44px;
+		padding: 10px 18px;
+		align-items: center;
+		justify-content: center;
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-label-weight, 700);
+		font-size: 13px;
+		background: var(--orbit-coral);
+		color: #fff;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+		box-shadow: var(--orbit-shadow);
+		cursor: pointer;
+	}
+	.cal-today-btn:hover { background: var(--orbit-coral-dark); }
+	.cal-today-btn--icon { width: 44px; padding: 0; display: inline-flex; }
+
+	/* ===== month calendar view ===== */
+	.cal-month-layout {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 20px;
+		align-items: start;
+	}
+	@media (min-width: 1024px) {
+		.cal-month-layout { grid-template-columns: 2fr 1fr; gap: 24px; }
+	}
+	.cal-weekdays {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: var(--orbit-border-width);
+		background: var(--orbit-line-strong);
+		border-bottom: var(--orbit-border-width) solid var(--orbit-line-strong);
+	}
+	.cal-weekdays > div {
+		font-family: var(--orbit-font-display);
+		font-size: 11px;
+		letter-spacing: 0.06em;
+		text-align: center;
+		padding: 8px 4px;
+		background: var(--orbit-lavender);
+		color: var(--orbit-ink);
+	}
+	.cal-weekdays > .cal-weekday--wkend { background: var(--orbit-coral-soft); }
+	.cal-grid {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: var(--orbit-border-width);
+		background: var(--orbit-line);
+	}
+	.cal-cell {
+		position: relative;
+		appearance: none;
+		border: none;
+		border-radius: 0;
+		min-height: 92px;
+		padding: 6px;
+		cursor: pointer;
+		background: var(--orbit-surface);
+		color: var(--orbit-ink);
+		text-align: left;
+		transition: background-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+	}
+	.cal-cell:hover { background: var(--orbit-paper); }
+	.cal-cell--dim { background: var(--orbit-paper-deep); color: var(--orbit-muted); }
+	.cal-cell--skeleton { min-height: 92px; background: var(--orbit-paper); }
+	.cal-dnum {
+		font-family: var(--orbit-font-display);
+		font-size: 14px;
+	}
+	.cal-cell--today { background: var(--orbit-mint); }
+	.cal-cell--today::before {
+		content: '';
+		position: absolute;
+		inset: 3px;
+		border: max(2px, var(--orbit-border-width)) solid var(--orbit-coral);
+		border-radius: var(--orbit-radius-control);
+		pointer-events: none;
+	}
+	.cal-cell--today .cal-dnum { color: var(--orbit-coral-dark); }
+	.cal-cell-today-sticker { position: absolute; top: 4px; right: 4px; }
+	.cal-dots {
+		position: absolute;
+		bottom: 8px;
+		left: 8px;
+		display: flex;
+		gap: 5px;
+	}
+	.cal-cell--selected,
+	.cal-cell--selected:hover {
+		background: var(--orbit-ink);
+		color: var(--orbit-surface);
+	}
+	.cal-cell--selected .cal-dnum { color: var(--orbit-mint); }
+	.cal-cell--selected .cal-dot { background: var(--orbit-surface); border-color: var(--orbit-surface); }
+	@media (max-width: 639px) {
+		.cal-cell { min-height: 56px; }
+		.cal-dots { bottom: 5px; left: 5px; }
+		.cal-dots .cal-dot { width: 6px; height: 6px; }
+		.cal-cell-today-sticker { font-size: 7px; padding: 1px 4px; }
+	}
+
+	/* ===== selected day panel ===== */
+	.cal-panel { display: flex; flex-direction: column; }
+	@media (min-width: 1024px) {
+		.cal-panel { position: sticky; top: 112px; }
+	}
+	.cal-panel-head {
+		background: var(--orbit-ink);
+		color: var(--orbit-surface);
+		padding: 12px 16px;
+		border-bottom: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface) var(--orbit-radius-surface) 0 0;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+	}
+	.cal-panel-head h3 {
+		font-family: var(--orbit-font-display);
+		font-size: 15px;
+		margin: 0;
+	}
+	.cal-panel-count {
+		font-family: var(--orbit-font-display);
+		font-size: 11px;
+		color: var(--orbit-mint);
+		white-space: nowrap;
+	}
+	.cal-panel-body { padding: 16px; display: grid; gap: 16px; }
+	.cal-event { display: flex; gap: 12px; align-items: flex-start; }
+	.cal-event-poster {
+		width: 64px;
+		aspect-ratio: 2 / 3;
+		flex: none;
+		overflow: hidden;
+		background: var(--orbit-lavender);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+	}
+	.cal-event-info { display: grid; gap: 4px; min-width: 0; justify-items: start; }
+	.cal-event-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+	.cal-event-name { font-weight: 700; font-size: 15px; color: var(--orbit-ink); }
+	.cal-event-ep { font-size: 13px; color: var(--orbit-muted); }
+	.cal-event-more {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--orbit-link);
+		text-decoration: none;
+	}
+	.cal-event-more:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+	.cal-panel-foot {
+		margin-top: auto;
+		padding: 12px 16px;
+		border-top: var(--orbit-border-width) dashed var(--orbit-line);
+		font-size: 13px;
+		color: var(--orbit-muted);
+	}
+	.cal-empty-icon {
+		width: 48px;
+		height: 48px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--orbit-lavender);
+		color: var(--orbit-ink);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+	}
+
+	/* ===== list view ===== */
+	.cal-lday { overflow: hidden; }
+	.cal-lday-head {
+		display: flex;
+		align-items: baseline;
+		gap: 10px;
+		padding: 10px 16px;
+		background: var(--orbit-ink);
+		color: var(--orbit-surface);
+		border-bottom: var(--orbit-border-width) solid var(--orbit-line-strong);
+	}
+	.cal-lday-title {
+		font-family: var(--orbit-font-display);
+		font-size: 13px;
+	}
+	.cal-lday-count {
+		font-family: var(--orbit-font-display);
+		font-size: 11px;
+		color: var(--orbit-mint);
+		margin-left: auto;
+		white-space: nowrap;
+	}
+	.cal-lrow {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		padding: 12px 16px;
+		border-top: var(--orbit-border-width) solid var(--orbit-line);
+		color: var(--orbit-ink);
+		text-decoration: none;
+		transition: background-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+	}
+	.cal-lrow:hover { background: var(--orbit-paper); text-decoration: none; }
+	.cal-lrow-poster {
+		width: 44px;
+		aspect-ratio: 2 / 3;
+		flex: none;
+		overflow: hidden;
+		background: var(--orbit-lavender);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+	}
+	.cal-lrow-time {
+		font-family: var(--orbit-font-display);
+		font-size: 15px;
+		color: var(--orbit-coral-dark);
+		min-width: 58px;
+	}
+	.cal-lrow-main { min-width: 0; flex: 1; display: grid; gap: 2px; }
+	.cal-lrow-name { font-weight: 700; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+	.cal-lrow-meta {
+		font-size: 13px;
+		color: var(--orbit-muted);
+		display: flex;
+		gap: 6px;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+	.cal-lrow-arrow {
+		font-family: var(--orbit-font-display);
+		font-size: 18px;
+		color: var(--orbit-link);
+		opacity: 0;
+		transition: opacity var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease), transform var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+	}
+	.cal-lrow:hover .cal-lrow-arrow,
+	.cal-lrow:focus-visible .cal-lrow-arrow { opacity: 1; transform: translateX(2px); }
+
+	/* ===== grid view ===== */
+	.cal-gridtable {
+		border-collapse: collapse;
+		table-layout: fixed;
+		min-width: 720px;
+		width: 100%;
+		font-size: 12px;
+	}
+	.cal-gridtable th,
+	.cal-gridtable td {
+		border: 1px solid var(--orbit-line);
+		padding: 8px;
+		text-align: center;
+		vertical-align: top;
+	}
+	.cal-gridtable th:not(.cal-gseries),
+	.cal-gridtable td:not(.cal-gseries) { width: 120px; min-width: 120px; padding: 8px 6px; }
+	.cal-gridtable thead th {
+		background: var(--orbit-paper-deep);
+		font-family: var(--orbit-font-display);
+		font-size: 12px;
+		border-bottom: var(--orbit-border-width) solid var(--orbit-line-strong);
+	}
+	.cal-gridtable thead small { color: var(--orbit-muted); font-size: 10px; }
+	.cal-gridtable .cal-gtoday { background: var(--orbit-coral-soft); }
+	.cal-gridtable thead .cal-gtoday { background: var(--orbit-coral); color: #fff; }
+	.cal-gridtable thead .cal-gtoday small { color: #fff; }
+	.cal-gseries {
+		position: sticky;
+		left: 0;
+		background: var(--orbit-surface);
+		width: 180px;
+		min-width: 180px;
+		max-width: 180px;
+		z-index: 1;
+	}
+	.cal-gridtable th.cal-gseries { text-align: center; vertical-align: middle; }
+	.cal-gridtable thead .cal-gseries { background: var(--orbit-paper-deep); }
+	.cal-gseries-inner { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+	.cal-gseries :global(.cal-gposter) {
+		width: 88px;
+		height: 120px;
+		object-fit: cover;
+		flex: none;
+		background: var(--orbit-lavender);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+		box-shadow: var(--orbit-shadow);
+	}
+	.cal-gname { font-weight: 700; font-size: 12px; color: var(--orbit-ink); }
+	.cal-gcell { display: grid; gap: 3px; justify-items: center; font-size: 11px; }
+	.cal-gcell b { font-family: var(--orbit-font-display); font-size: 12px; color: var(--orbit-coral-dark); }
+	.cal-gcell .cal-chip { max-width: 100%; padding: 1px 4px; font-size: 10px; overflow: hidden; text-overflow: ellipsis; }
+	.cal-gcell .cal-badge-uncut { font-size: 9px; padding: 1px 5px; }
+	@media (max-width: 639px) {
+		.cal-gridtable { table-layout: fixed; min-width: 640px; }
+		.cal-gridtable th:not(.cal-gseries),
+		.cal-gridtable td:not(.cal-gseries) { width: 64px; min-width: 64px; padding: 4px 2px; }
+		.cal-gridtable .cal-gseries { width: 104px; min-width: 104px; max-width: 104px; padding: 6px; }
+		.cal-gseries-inner { gap: 4px; }
+		.cal-gseries :global(.cal-gposter) { width: 48px; height: 66px; }
+		.cal-gname { display: block; line-height: 1.25; overflow-wrap: anywhere; }
+	}
+
+	/* ===== countdown banner ===== */
+	.cal-banner {
+		margin-top: 32px;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		background: var(--orbit-ink);
+		color: var(--orbit-surface);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow-raised);
+		padding: 20px 24px;
+		position: relative;
+		overflow: hidden;
+		text-decoration: none;
+	}
+	.cal-banner:hover { text-decoration: none; }
+	.cal-banner::after {
+		content: '✦ ✧ ★ ✧ ✦';
+		position: absolute;
+		right: 16px;
+		top: 8px;
+		color: var(--orbit-lavender);
+		font-size: 14px;
+		letter-spacing: 6px;
+		opacity: 0.7;
+		pointer-events: none;
+	}
+	.cal-banner-icon { flex: none; color: var(--orbit-mint); display: inline-flex; }
+	.cal-banner-title {
+		font-family: var(--orbit-font-display);
+		font-size: 18px;
+		color: var(--orbit-mint);
+		margin: 0 0 4px;
+	}
+	.cal-banner-desc { margin: 0; color: var(--orbit-lavender); font-size: 14px; max-width: 56ch; }
+	.cal-banner-go {
+		margin-left: auto;
+		font-family: var(--orbit-font-display);
+		font-size: 22px;
+		color: var(--orbit-mint);
+		min-width: 44px;
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex: none;
+		transition: transform var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+	}
+	.cal-banner:hover .cal-banner-go { transform: translateX(3px); }
+	@media (max-width: 639px) {
+		.cal-banner { flex-wrap: wrap; }
+		.cal-banner-go { margin-left: 0; }
+	}
+
+	/* ===== notes ===== */
+	.cal-notes {
+		margin-top: 24px;
+		display: flex;
+		gap: 14px;
+		align-items: flex-start;
+		background: var(--orbit-mint);
+		color: var(--orbit-ink);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow);
+		padding: 16px 20px;
+	}
+	.cal-notes-icon {
+		flex: none;
+		width: 32px;
+		height: 32px;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+		background: var(--orbit-surface);
+		font-family: var(--orbit-font-display);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 16px;
+	}
+	.cal-notes-title {
+		font-family: var(--orbit-font-display);
+		font-size: 15px;
+		margin: 0 0 2px;
+	}
+	.cal-notes-body { margin: 0; font-size: 14px; line-height: 1.6; }
+
+	@media (prefers-reduced-motion: reduce) {
+		.cal-blink { animation: none; }
+		.cal-cta,
+		.cal-toggle-btn,
+		.cal-sqbtn,
+		.cal-cell,
+		.cal-lrow,
+		.cal-lrow-arrow,
+		.cal-banner-go { transition: none; }
+		.cal-cta:hover,
+		.cal-cta:active,
+		.cal-sqbtn:active,
+		.cal-banner:hover .cal-banner-go,
+		.cal-lrow:hover .cal-lrow-arrow { transform: none; }
+	}
+</style>

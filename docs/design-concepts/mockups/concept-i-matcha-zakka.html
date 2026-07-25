@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept I — Matcha Zakka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f3f4ec;
+    --surface: #fafaf4;
+    --ink: #39412f;
+    --muted: #8b9078;
+    --matcha: #8fa876;
+    --matcha-deep: #5d7a48;
+    --matcha-soft: #e4ead8;
+    --clay: #c8a288;
+    --line: #dde0cd;
+    --font-display: 'Marcellus', 'Sarabun', serif;
+    --font-body: 'Sarabun', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--matcha-soft);
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 24px 4px;
+  }
+  .brand { font-family: var(--font-display); font-size: 21px; letter-spacing: 0.06em; }
+  .brand i {
+    font-style: normal;
+    display: inline-block;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--matcha-deep);
+    margin: 0 5px;
+    vertical-align: 2px;
+  }
+  .hello { font-size: 12px; color: var(--muted); font-weight: 300; }
+
+  .countdown {
+    margin: 18px 24px 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    position: relative;
+  }
+  .countdown::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 14px; bottom: 14px;
+    width: 4px;
+    border-radius: 0 4px 4px 0;
+    background: var(--matcha-deep);
+  }
+  .countdown .kicker {
+    font-size: 10.5px;
+    letter-spacing: 0.2em;
+    color: var(--matcha-deep);
+    font-weight: 600;
+  }
+  .countdown h2 { font-family: var(--font-display); font-size: 19px; font-weight: 400; margin: 4px 0 6px; }
+  .countdown .meta { font-size: 12.5px; color: var(--muted); }
+  .countdown .meta b { color: var(--ink); font-weight: 600; }
+
+  section { padding: 20px 24px 0; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+  }
+  .section-head h2 { font-family: var(--font-display); font-size: 15px; font-weight: 400; letter-spacing: 0.04em; }
+  .more { font-size: 12px; color: var(--matcha-deep); text-decoration: none; }
+
+  .rows .row {
+    display: grid;
+    grid-template-columns: 54px 1fr auto;
+    gap: 12px;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13.5px;
+  }
+  .row .t { font-family: var(--font-display); color: var(--matcha-deep); font-size: 14px; }
+  .row .ch { font-size: 10.5px; color: var(--muted); }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding-top: 14px; }
+  .card { text-decoration: none; color: inherit; display: block; }
+  .card .art {
+    aspect-ratio: 3 / 3.8;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    transition: transform 180ms ease;
+  }
+  .card:hover .art, .card:focus-visible .art { transform: translateY(-3px); }
+  .card:focus-visible { outline: 2px solid var(--matcha-deep); outline-offset: 3px; }
+  .art.a1 { background: linear-gradient(160deg, #b7c9a0, #7d9a63); }
+  .art.a2 { background: linear-gradient(210deg, #d9c3a9, #b08d6b); }
+  .card .meta { padding: 10px 2px 0; }
+  .card h3 { font-size: 13.5px; font-weight: 500; }
+  .card p { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  .halo {
+    background: var(--matcha-soft);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .halo-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--matcha), var(--clay)); flex: none; }
+  .halo-head strong { font-size: 13px; font-weight: 600; }
+  .halo-head span { display: block; font-size: 11px; color: var(--muted); }
+  .halo p { font-size: 13px; line-height: 1.75; font-weight: 300; }
+  .halo-stats { margin-top: 10px; font-size: 11.5px; color: var(--muted); }
+  .halo-stats b { color: var(--matcha-deep); }
+
+  .bottomnav {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 12px 0 14px;
+    font-size: 10.5px;
+    color: var(--muted);
+    text-decoration: none;
+    min-height: 58px;
+    justify-content: center;
+    font-weight: 300;
+  }
+  .nav-item .icon { font-size: 15px; }
+  .nav-item.active { color: var(--matcha-deep); font-weight: 500; }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    margin-top: -26px;
+    width: 22px; height: 3px;
+    border-radius: 2px;
+    background: var(--matcha-deep);
+  }
+  .nav-item { position: relative; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card .art { transition: none; }
+    .card:hover .art { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <div class="brand">GL<i></i>ORBIT</div>
+      <div class="hello">วันศุกร์ที่ 24</div>
+    </header>
+
+    <div class="countdown">
+      <span class="kicker">ตอนต่อไป · อีก 42 นาที</span>
+      <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+      <p class="meta">คืนนี้ <b>22:30</b> ทาง <b>GMMTV</b></p>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>ตารางฉายวันนี้</h2>
+        <a class="more" href="#">ทั้งสัปดาห์ →</a>
+      </div>
+      <div class="rows">
+        <div class="row"><span class="t">22:30</span><span>23.5 องศาที่โลกเอียง</span><span class="ch">GMMTV</span></div>
+        <div class="row"><span class="t">23:15</span><span>Affair รักเล่นกล</span><span class="ch">ช่อง 3</span></div>
+        <div class="row"><span class="t">23:45</span><span>Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>ซีรีส์น่าติดตาม</h2>
+        <a class="more" href="#">สำรวจ →</a>
+      </div>
+      <div class="cards">
+        <a class="card" href="#">
+          <div class="art a1"></div>
+          <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · ศุกร์ 21:00</p></div>
+        </a>
+        <a class="card" href="#">
+          <div class="art a2"></div>
+          <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · เสาร์ 20:30</p></div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>จาก Orbit Halo</h2>
+        <a class="more" href="#">อ่านฟีด →</a>
+      </div>
+      <div class="halo">
+        <div class="halo-head">
+          <span class="avatar"></span>
+          <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+        </div>
+        <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+        <div class="halo-stats"><b>1,204</b> ถูกใจ · <b>86</b> ความคิดเห็น</div>
+      </div>
+    </section>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">⌂</span>หน้าแรก</a>
+      <a class="nav-item" href="#"><span class="icon">☷</span>ปฏิทิน</a>
+      <a class="nav-item" href="#"><span class="icon">✧</span>ฮาโล</a>
+      <a class="nav-item" href="#"><span class="icon">♡</span>บันทึก</a>
+      <a class="nav-item" href="#"><span class="icon">☺</span>ฉัน</a>
+    </nav>
+  </div>
+</body>
+</html>

@@ -12,6 +12,10 @@ export async function checkRateLimit(key: string, limit: number, windowSeconds: 
 			updated_at = now()
 		RETURNING request_count, window_started_at
 	`);
-	const row = result.rows[0] as { request_count: number; window_started_at: Date };
+	const compatibleResult = result as unknown as { rows?: unknown[] };
+	const row = (compatibleResult.rows ?? result)[0] as {
+		request_count: number;
+		window_started_at: Date;
+	};
 	return { allowed: row.request_count <= limit, retryAfterSeconds: row.request_count <= limit ? 0 : windowSeconds };
 }

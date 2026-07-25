@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Update (2026-07-24):** During implementation the theme allowlist was expanded from the four names below to seven themes: `fanzine` (default), `midnight`, `y2k`, `sakura`, `ocean`, `candy`, and `mission`. The goal, architecture, and step text below reflect the original approved scope.
+
 **Goal:** Replace the light/dark toggle with four allowlisted, persisted pastel themes available from the shared global header and applied consistently to public, admin, and chat surfaces.
 
 **Architecture:** Keep theme state in the existing `$lib/theme.svelte.ts` runes module and keep the pre-paint selection in `static/theme-init.js`. Define complete semantic palettes in `src/app.css` under `data-theme="orbit|space|sakura|love"`; components consume those variables instead of raw palette values. Replace `ThemeToggle.svelte` with one shared rectangular menu component rendered by `Navigation.svelte`, while root layout integration ensures the document attribute exists for every route group.

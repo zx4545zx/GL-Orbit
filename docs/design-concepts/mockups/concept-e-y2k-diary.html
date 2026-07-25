@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept E — Y2K Diary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #e8e6f5;
+    --win: #fdfcff;
+    --ink: #241a3a;
+    --muted: #6f6390;
+    --chrome1: #ffd6f5;
+    --chrome2: #b8f0ff;
+    --chrome3: #d9c8ff;
+    --hot: #ff3fbf;
+    --blue: #3f7dff;
+    --line: #b3a8d6;
+    --font-pixel: 'Silkscreen', monospace;
+    --font-body: 'Prompt', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: linear-gradient(135deg, #ffd6f5, #b8f0ff 55%, #d9c8ff);
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg);
+    background-image: linear-gradient(rgba(179,168,214,0.25) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(179,168,214,0.25) 1px, transparent 1px);
+    background-size: 22px 22px;
+    border: 2px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--hot);
+    overflow: hidden;
+  }
+
+  .titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(90deg, var(--hot), var(--blue));
+    color: #fff;
+    padding: 8px 12px;
+    font-family: var(--font-pixel);
+    font-size: 12px;
+  }
+  .titlebar .dots { margin-left: auto; display: flex; gap: 6px; }
+  .titlebar .dots span {
+    width: 12px; height: 12px;
+    background: #fff;
+    border: 1.5px solid var(--ink);
+    display: inline-block;
+  }
+
+  .topbar { text-align: center; padding: 20px 20px 12px; }
+  .brand {
+    font-family: var(--font-pixel);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    text-shadow: 3px 3px 0 var(--chrome2), 6px 6px 0 var(--chrome1);
+  }
+  .tagline { font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+  .sparkle { color: var(--hot); }
+
+  .window {
+    margin: 6px 18px 0;
+    background: var(--win);
+    border: 2px solid var(--ink);
+    box-shadow: 5px 5px 0 rgba(36,26,58,0.25);
+  }
+  .win-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(90deg, var(--chrome1), var(--chrome2));
+    border-bottom: 2px solid var(--ink);
+    padding: 5px 10px;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+  }
+  .win-bar .x { margin-left: auto; border: 1.5px solid var(--ink); background: #fff; padding: 0 5px; font-size: 9px; }
+  .win-body { padding: 14px 16px; }
+
+  .countdown .kicker { font-size: 11.5px; color: var(--blue); font-weight: 600; letter-spacing: 0.08em; }
+  .countdown h2 { font-size: 17px; font-weight: 600; margin: 3px 0 8px; }
+  .ticker {
+    font-family: var(--font-pixel);
+    font-size: 20px;
+    color: var(--hot);
+    background: repeating-linear-gradient(0deg, #fff0fb 0 2px, transparent 2px 4px);
+    border: 1.5px dashed var(--hot);
+    text-align: center;
+    padding: 6px 0;
+  }
+
+  section { padding: 16px 18px 2px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .section-head h2 {
+    font-family: var(--font-pixel);
+    font-size: 13px;
+    background: var(--ink);
+    color: #fff;
+    display: inline-block;
+    padding: 4px 10px;
+    box-shadow: 3px 3px 0 var(--chrome3);
+  }
+  .more { font-size: 12px; color: var(--blue); text-decoration: underline; }
+
+  .guestbook { font-size: 13px; }
+  .gb-row {
+    display: grid;
+    grid-template-columns: 58px 1fr;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--line);
+    margin-bottom: -1.5px;
+    background: var(--win);
+  }
+  .gb-row .t { font-family: var(--font-pixel); font-size: 10px; color: var(--blue); padding-top: 2px; }
+  .gb-row .name { font-weight: 500; display: block; }
+  .gb-row .ch { font-size: 10.5px; color: var(--muted); }
+
+  .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cd {
+    background: var(--win);
+    border: 2px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--chrome3);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 140ms ease, box-shadow 140ms ease;
+  }
+  .cd:hover, .cd:focus-visible {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--hot);
+    outline: none;
+  }
+  .cd .disc {
+    aspect-ratio: 1;
+    background: conic-gradient(var(--chrome1), var(--chrome2), var(--chrome3), var(--chrome1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cd .disc span {
+    width: 34%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--win);
+    border: 2px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-pixel);
+    font-size: 9px;
+  }
+  .cd .meta { padding: 8px 10px 10px; }
+  .cd h3 { font-size: 13px; font-weight: 600; }
+  .cd p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .halo {
+    background: var(--win);
+    border: 2px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--chrome1);
+    padding: 14px;
+  }
+  .halo-head { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--hot), var(--blue));
+    border: 2px solid var(--ink);
+    flex: none;
+  }
+  .halo-head strong { font-size: 13px; }
+  .halo-head span { display: block; font-family: var(--font-pixel); font-size: 9px; color: var(--muted); margin-top: 2px; }
+  .halo p { font-size: 13px; line-height: 1.65; }
+  .halo-stats { margin-top: 10px; font-family: var(--font-pixel); font-size: 9.5px; color: var(--blue); }
+
+  .bottomnav {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 2px solid var(--ink);
+    background: var(--win);
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 0 12px;
+    font-family: var(--font-pixel);
+    font-size: 8.5px;
+    color: var(--muted);
+    text-decoration: none;
+    min-height: 58px;
+    justify-content: center;
+  }
+  .nav-item .icon { font-size: 17px; }
+  .nav-item.active { color: var(--hot); background: repeating-linear-gradient(45deg, transparent 0 6px, rgba(255,63,191,0.08) 6px 12px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cd { transition: none; }
+    .cd:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="titlebar">
+      <span>♥ gl-orbit.exe — กำลังเชื่อมต่อ...</span>
+      <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+    </div>
+
+    <header class="topbar">
+      <div class="brand">GL*ORBIT</div>
+      <p class="tagline">ไดอารี่ของคนรักซีรีส์ <span class="sparkle">✧</span> since 2024 <span class="sparkle">✧</span></p>
+    </header>
+
+    <div class="window countdown">
+      <div class="win-bar"><span>now_airing.txt</span><span class="x">×</span></div>
+      <div class="win-body">
+        <span class="kicker">ตอนนี้ทุกคนกำลังรอ</span>
+        <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+        <div class="ticker">อีก 00:42:17</div>
+      </div>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>GUESTBOOK ตารางฉาย</h2>
+        <a class="more" href="#">ทั้งสัปดาห์</a>
+      </div>
+      <div class="guestbook">
+        <div class="gb-row"><span class="t">22:30</span><div><span class="name">23.5 องศาที่โลกเอียง</span><span class="ch">ช่อง GMMTV · คืนนี้</span></div></div>
+        <div class="gb-row"><span class="t">23:15</span><div><span class="name">Affair รักเล่นกล</span><span class="ch">ช่อง 3 · คืนนี้</span></div></div>
+        <div class="gb-row"><span class="t">23:45</span><div><span class="name">Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR · คืนนี้</span></div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>CD แนะนำ</h2>
+        <a class="more" href="#">ชั้นเพลงทั้งหมด</a>
+      </div>
+      <div class="gallery">
+        <a class="cd" href="#">
+          <div class="disc"><span>DISC 1</span></div>
+          <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · ศุกร์ 21:00</p></div>
+        </a>
+        <a class="cd" href="#">
+          <div class="disc"><span>DISC 2</span></div>
+          <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · เสาร์ 20:30</p></div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>ฝากข้อความ ♥</h2>
+        <a class="more" href="#">Orbit Halo</a>
+      </div>
+      <div class="halo">
+        <div class="halo-head">
+          <span class="avatar"></span>
+          <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+        </div>
+        <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+        <div class="halo-stats">♥ 1204 likes · ✉ 86 comments</div>
+      </div>
+    </section>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">⌂</span>HOME</a>
+      <a class="nav-item" href="#"><span class="icon">✎</span>DIARY</a>
+      <a class="nav-item" href="#"><span class="icon">✉</span>HALO</a>
+      <a class="nav-item" href="#"><span class="icon">♥</span>FAVES</a>
+      <a class="nav-item" href="#"><span class="icon">☺</span>ME</a>
+    </nav>
+  </div>
+</body>
+</html>

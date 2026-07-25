@@ -33,6 +33,19 @@ export interface CountdownItem {
 	isUncut: boolean;
 }
 
+export interface HomeLatestMoment {
+	id: string;
+	body: string;
+	likeCount: number;
+	commentCount: number;
+	createdAt: string;
+	author: {
+		username: string;
+		displayName: string | null;
+		avatarUrl: string | null;
+	};
+}
+
 export interface HomeApiResponse {
 	featuredSeries: FeaturedSeriesItem[];
 	upcomingSchedule: UpcomingScheduleItem[];

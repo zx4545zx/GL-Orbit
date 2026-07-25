@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept F — Bauhaus Orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f2efe7;
+    --ink: #14120e;
+    --red: #e0301e;
+    --blue: #1e46c8;
+    --yellow: #f5b700;
+    --muted: #6e685c;
+    --line: #14120e;
+    --font-display: 'Archivo', 'Anuphan', sans-serif;
+    --font-body: 'Anuphan', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #e3ded2;
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--paper);
+    border: 2px solid var(--line);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 2px solid var(--line);
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand .orbit-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 2px solid var(--ink);
+  }
+  .date { font-family: var(--font-display); font-size: 11px; font-weight: 600; letter-spacing: 0.14em; }
+
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 110px;
+    border-bottom: 2px solid var(--line);
+  }
+  .hero-main { padding: 20px; border-right: 2px solid var(--line); }
+  .hero .kicker {
+    display: inline-block;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    padding: 3px 8px;
+    margin-bottom: 10px;
+  }
+  .hero h1 { font-family: var(--font-display); font-size: 24px; font-weight: 800; line-height: 1.2; }
+  .hero .sub { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  .hero .count {
+    margin-top: 12px;
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--blue);
+  }
+  .hero .count small { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .hero-shapes { position: relative; }
+  .hero-shapes .half {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 50%;
+    background: var(--blue);
+    border-bottom: 2px solid var(--ink);
+    border-radius: 0 0 110px 110px / 0 0 55px 55px;
+  }
+  .hero-shapes .tri {
+    position: absolute;
+    bottom: 12px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 26px solid transparent;
+    border-right: 26px solid transparent;
+    border-bottom: 44px solid var(--yellow);
+  }
+  .hero-shapes .tri::after {
+    content: '';
+    position: absolute;
+    top: 6px; left: -20px;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 34px solid var(--paper);
+  }
+
+  section { border-bottom: 2px solid var(--line); }
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 2px solid var(--line);
+  }
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-head h2::before {
+    content: '';
+    width: 10px; height: 10px;
+    background: var(--red);
+    border: 2px solid var(--ink);
+    display: inline-block;
+  }
+  .section-head.blue h2::before { background: var(--blue); border-radius: 50%; }
+  .more {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 2px solid var(--red);
+  }
+
+  .sched-row {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13.5px;
+  }
+  .sched-row:last-child { border-bottom: 0; }
+  .sched-row .t { font-family: var(--font-display); font-weight: 800; color: var(--blue); font-size: 15px; }
+  .sched-row .ch {
+    font-family: var(--font-display);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 3px 7px;
+  }
+  .sched-row.live { background: var(--yellow); }
+  .sched-row.live .t { color: var(--ink); }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; }
+  .card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    border-right: 2px solid var(--line);
+    transition: background 140ms ease;
+  }
+  .card:last-child { border-right: 0; }
+  .card:hover, .card:focus-visible { background: #fff; outline: 2px solid var(--blue); outline-offset: -2px; }
+  .card .art { aspect-ratio: 3 / 3.4; position: relative; overflow: hidden; }
+  .art.a1 { background: linear-gradient(160deg, var(--red) 55%, var(--ink) 55%); }
+  .art.a2 { background: radial-gradient(circle at 30% 35%, var(--yellow) 34%, var(--blue) 35%); }
+  .art .label {
+    position: absolute;
+    left: 10px; bottom: 10px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    font-family: var(--font-display);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    padding: 2px 6px;
+  }
+  .card .meta { padding: 12px; border-top: 2px solid var(--line); }
+  .card h3 { font-family: var(--font-display); font-size: 13.5px; font-weight: 700; }
+  .card p { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+
+  .halo { display: grid; grid-template-columns: 64px 1fr; }
+  .halo-shape {
+    background: var(--blue);
+    border-right: 2px solid var(--line);
+    border-radius: 0 64px 64px 0;
+    min-height: 110px;
+  }
+  .halo-body { padding: 14px 16px; }
+  .halo-body strong { font-family: var(--font-display); font-size: 13px; font-weight: 700; }
+  .halo-body .who { font-size: 10.5px; color: var(--muted); display: block; margin-bottom: 6px; }
+  .halo-body p { font-size: 12.5px; line-height: 1.65; }
+  .halo-stats { margin-top: 8px; font-family: var(--font-display); font-size: 11px; font-weight: 700; }
+  .halo-stats b { color: var(--red); }
+
+  .bottomnav {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    background: var(--paper);
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 0 14px;
+    font-family: var(--font-display);
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-decoration: none;
+    min-height: 58px;
+    justify-content: center;
+    border-right: 1px solid var(--line);
+  }
+  .nav-item:last-child { border-right: 0; }
+  .nav-item .shape {
+    width: 14px; height: 14px;
+    border: 2px solid currentColor;
+  }
+  .nav-item.active { color: var(--ink); }
+  .nav-item.active .shape { background: var(--red); border-color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <div class="brand"><span class="orbit-dot" aria-hidden="true"></span>GL ORBIT</div>
+      <div class="date">FRI 24 · 2026</div>
+    </header>
+
+    <div class="hero">
+      <div class="hero-main">
+        <span class="kicker">ตอนต่อไป</span>
+        <h1>23.5 องศาที่โลกเอียง EP.9</h1>
+        <p class="sub">GMMTV · คืนนี้ 22:30</p>
+        <div class="count">00:42:17 <small>นับถอยหลัง</small></div>
+      </div>
+      <div class="hero-shapes" aria-hidden="true">
+        <span class="half"></span>
+        <span class="tri"></span>
+      </div>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>ตารางฉายวันนี้</h2>
+        <a class="more" href="#">ทั้งสัปดาห์ →</a>
+      </div>
+      <div class="sched-row live"><span class="t">22:30</span><span>23.5 องศาที่โลกเอียง</span><span class="ch">GMMTV</span></div>
+      <div class="sched-row"><span class="t">23:15</span><span>Affair รักเล่นกล</span><span class="ch">CH3</span></div>
+      <div class="sched-row"><span class="t">23:45</span><span>Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR</span></div>
+    </section>
+
+    <section>
+      <div class="section-head blue">
+        <h2>สำรวจซีรีส์</h2>
+        <a class="more" href="#">คลังทั้งหมด →</a>
+      </div>
+      <div class="cards">
+        <a class="card" href="#">
+          <div class="art a1"><span class="label">SERIES 01</span></div>
+          <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · ศุกร์ 21:00</p></div>
+        </a>
+        <a class="card" href="#">
+          <div class="art a2"><span class="label">SERIES 02</span></div>
+          <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · เสาร์ 20:30</p></div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>ORBIT HALO</h2>
+        <a class="more" href="#">อ่านฟีด →</a>
+      </div>
+      <div class="halo">
+        <div class="halo-shape" aria-hidden="true"></div>
+        <div class="halo-body">
+          <strong>ออมกรณ์นภัส</strong>
+          <span class="who">@omgk · 12 นาทีที่แล้ว</span>
+          <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+          <div class="halo-stats"><b>1,204</b> ถูกใจ · 86 ความคิดเห็น</div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="shape"></span>HOME</a>
+      <a class="nav-item" href="#"><span class="shape" style="border-radius:50%"></span>CAL</a>
+      <a class="nav-item" href="#"><span class="shape" style="transform:rotate(45deg)"></span>HALO</a>
+      <a class="nav-item" href="#"><span class="shape" style="border-radius:0 0 14px 14px"></span>SAVED</a>
+      <a class="nav-item" href="#"><span class="shape" style="border-color:var(--blue)"></span>YOU</a>
+    </nav>
+  </div>
+</body>
+</html>

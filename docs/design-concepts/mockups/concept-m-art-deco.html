@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept M — Art Deco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #101a17;
+    --panel: #16241f;
+    --ink: #f0e6cf;
+    --muted: #9b9078;
+    --gold: #d4af5a;
+    --gold-soft: rgba(212,175,90,0.35);
+    --emerald: #1f5c46;
+    --font-display: 'Cinzel', 'Sarabun', serif;
+    --font-body: 'Sarabun', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a110f;
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg);
+    border: 1px solid var(--gold-soft);
+    outline: 1px solid rgba(212,175,90,0.15);
+    outline-offset: 4px;
+    overflow: hidden;
+  }
+
+  .deco-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 24px;
+  }
+  .deco-line i {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .deco-line span { color: var(--gold); font-size: 12px; }
+
+  .topbar { text-align: center; padding: 26px 24px 4px; }
+  .brand {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    color: var(--gold);
+  }
+  .tagline { font-size: 11.5px; color: var(--muted); letter-spacing: 0.3em; margin-top: 6px; }
+  .fan {
+    margin: 12px auto 0;
+    width: 120px; height: 34px;
+    background:
+      repeating-conic-gradient(from 180deg at 50% 100%, var(--gold-soft) 0 8deg, transparent 8deg 24deg);
+    border-radius: 120px 120px 0 0;
+    border-bottom: 1px solid var(--gold);
+  }
+
+  .countdown {
+    margin: 18px 24px 0;
+    background: var(--panel);
+    border: 1px solid var(--gold-soft);
+    padding: 20px;
+    text-align: center;
+    position: relative;
+  }
+  .countdown::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px solid rgba(212,175,90,0.18);
+    pointer-events: none;
+  }
+  .countdown .kicker { font-size: 10px; letter-spacing: 0.4em; color: var(--gold); font-weight: 500; }
+  .countdown h2 { font-size: 16px; font-weight: 400; margin: 8px 0 4px; }
+  .countdown .time {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+  }
+  .countdown .time small { font-size: 12px; color: var(--muted); font-family: var(--font-body); letter-spacing: 0.05em; }
+
+  section { padding: 20px 24px 0; }
+  .section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .section-head i { flex: 1; height: 1px; background: var(--gold-soft); }
+  .more { font-size: 11.5px; color: var(--muted); text-decoration: none; white-space: nowrap; }
+
+  .sched { border: 1px solid var(--gold-soft); background: var(--panel); }
+  .sched-row {
+    display: grid;
+    grid-template-columns: 58px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  .sched-row + .sched-row { border-top: 1px solid rgba(212,175,90,0.14); }
+  .sched-row .t { font-family: var(--font-display); font-weight: 600; color: var(--gold); letter-spacing: 0.08em; }
+  .sched-row .ch { font-size: 9.5px; letter-spacing: 0.12em; color: var(--gold); border: 1px solid var(--gold-soft); padding: 2px 8px; }
+  .sched-row.live { background: rgba(212,175,90,0.08); }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--gold-soft);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: border-color 160ms ease;
+  }
+  .card:hover, .card:focus-visible { border-color: var(--gold); outline: none; }
+  .card .art { aspect-ratio: 3 / 3.6; border-bottom: 1px solid var(--gold-soft); position: relative; }
+  .art.a1 { background: linear-gradient(160deg, #2a6a52, #143327); }
+  .art.a2 { background: linear-gradient(210deg, #6a522a, #332514); }
+  .art .corner {
+    position: absolute;
+    width: 16px; height: 16px;
+    border-color: var(--gold);
+    border-style: solid;
+    border-width: 0;
+  }
+  .art .corner.tl { top: 6px; left: 6px; border-top-width: 1px; border-left-width: 1px; }
+  .art .corner.br { bottom: 6px; right: 6px; border-bottom-width: 1px; border-right-width: 1px; }
+  .card .meta { padding: 12px; text-align: center; }
+  .card h3 { font-size: 13px; font-weight: 500; }
+  .card p { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  .halo {
+    background: var(--panel);
+    border: 1px solid var(--gold-soft);
+    padding: 18px;
+    text-align: center;
+  }
+  .halo blockquote {
+    font-family: var(--font-display);
+    font-size: 15px;
+    line-height: 1.9;
+    font-weight: 400;
+  }
+  .halo blockquote::before { content: '❝ '; color: var(--gold); }
+  .halo blockquote::after { content: ' ❞'; color: var(--gold); }
+  .halo cite {
+    display: block;
+    margin-top: 12px;
+    font-style: normal;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .halo cite b { color: var(--gold); font-weight: 500; }
+
+  .bottomnav {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid var(--gold-soft);
+    background: var(--panel);
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 12px 0 14px;
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-decoration: none;
+    min-height: 58px;
+    justify-content: center;
+  }
+  .nav-item .icon { font-size: 15px; }
+  .nav-item.active { color: var(--gold); }
+  .nav-item.active .icon::after { content: ' ◆'; font-size: 7px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <div class="brand">GL·ORBIT</div>
+      <p class="tagline">THE GOLDEN HOUR OF SERIES</p>
+      <div class="fan" aria-hidden="true"></div>
+    </header>
+
+    <div class="countdown">
+      <span class="kicker">TONIGHT · ตอนต่อไป</span>
+      <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+      <div class="time">00:42:17 <small>· 22:30 GMMTV</small></div>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>PROGRAMME</h2><i></i>
+        <a class="more" href="#">ทั้งสัปดาห์ →</a>
+      </div>
+      <div class="sched">
+        <div class="sched-row live"><span class="t">22:30</span><span>23.5 องศาที่โลกเอียง</span><span class="ch">GMMTV</span></div>
+        <div class="sched-row"><span class="t">23:15</span><span>Affair รักเล่นกล</span><span class="ch">CH3</span></div>
+        <div class="sched-row"><span class="t">23:45</span><span>Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>COLLECTION</h2><i></i>
+        <a class="more" href="#">สำรวจ →</a>
+      </div>
+      <div class="cards">
+        <a class="card" href="#">
+          <div class="art a1"><span class="corner tl"></span><span class="corner br"></span></div>
+          <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · ศุกร์ 21:00</p></div>
+        </a>
+        <a class="card" href="#">
+          <div class="art a2"><span class="corner tl"></span><span class="corner br"></span></div>
+          <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · เสาร์ 20:30</p></div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>GUEST REMARKS</h2><i></i>
+        <a class="more" href="#">Orbit Halo →</a>
+      </div>
+      <div class="halo">
+        <blockquote>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว</blockquote>
+        <cite>ออมกรณ์นภัส @omgk · <b>1,204</b> ถูกใจ · <b>86</b> ความคิดเห็น</cite>
+      </div>
+    </section>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">⌂</span>HOME</a>
+      <a class="nav-item" href="#"><span class="icon">☷</span>CALENDAR</a>
+      <a class="nav-item" href="#"><span class="icon">✧</span>HALO</a>
+      <a class="nav-item" href="#"><span class="icon">♡</span>SAVED</a>
+      <a class="nav-item" href="#"><span class="icon">☺</span>YOU</a>
+    </nav>
+  </div>
+</body>
+</html>

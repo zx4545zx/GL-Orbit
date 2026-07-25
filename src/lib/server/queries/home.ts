@@ -56,7 +56,7 @@ export async function getHomeData(lang: 'th' | 'en' = 'th'): Promise<HomeApiResp
 				isNull(series.deletedAt)
 			))
 			.orderBy(asc(episodeSchedules.airDate))
-			.limit(5),
+			.limit(4),
 		db
 			.select({
 				id: episodeSchedules.id,
@@ -76,7 +76,9 @@ export async function getHomeData(lang: 'th' | 'en' = 'th'): Promise<HomeApiResp
 			.innerJoin(platforms, eq(episodeSchedules.platformId, platforms.id))
 			.where(and(
 				gte(episodeSchedules.airDate, new Date()),
-				lte(episodeSchedules.airDate, new Date(Date.now() + 24 * 60 * 60 * 1000)),
+				// Cover a full week so the hero countdown stays populated even on days
+				// with no releases in the next 24 hours.
+				lte(episodeSchedules.airDate, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
 				inArray(series.status, ['ONGOING', 'UPCOMING']),
 				isNull(episodeSchedules.deletedAt),
 				isNull(episodes.deletedAt),

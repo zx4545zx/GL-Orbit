@@ -37,52 +37,129 @@
 	})());
 </script>
 
-<div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-5 mb-4 sm:mb-6">
-	<div class="flex items-center gap-3">
-		<button
-			aria-label={m.calendar_week_header_prev_aria()}
-			onclick={onPrevWeek}
-			class="w-11 h-11 rounded-xl orbit-control flex items-center justify-center transition-all hover:-translate-x-0.5 touch-target flex-shrink-0"
-		>
-			<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-			</svg>
-		</button>
+<nav class="weeknav" aria-label={m.calendar_week_header_current_label()}>
+	<button
+		type="button"
+		aria-label={m.calendar_week_header_prev_aria()}
+		onclick={onPrevWeek}
+		class="weeknav-sqbtn"
+	>
+		<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+		</svg>
+	</button>
 
-		<div class="flex-1 min-w-0 text-center">
-			<div class="text-[11px] sm:text-xs font-bold text-coral-dark uppercase tracking-wide mb-0.5">{m.calendar_week_header_current_label()}</div>
-			<h2 class="font-[family-name:var(--font-display)] text-base sm:text-2xl md:text-3xl font-bold text-plum truncate">
-				<span class="sm:hidden">{weekRangeText.short}</span>
-				<span class="hidden sm:inline">{weekRangeText.full}</span>
-			</h2>
-		</div>
-
-		<div class="flex items-center gap-2 flex-shrink-0">
-			<button
-				onclick={onThisWeek}
-				aria-label={m.calendar_week_header_this_week_aria()}
-				class="hidden sm:inline-flex h-11 px-5 rounded-xl items-center justify-center orbit-action text-sm font-bold hover:-translate-y-0.5 transition-all touch-target"
-			>
-				{m.calendar_week_header_this_week_text()}
-			</button>
-			<button
-				onclick={onThisWeek}
-				aria-label={m.calendar_week_header_this_week_aria()}
-				class="sm:hidden w-11 h-11 rounded-xl orbit-action flex items-center justify-center touch-target"
-			>
-				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-				</svg>
-			</button>
-			<button
-				aria-label={m.calendar_week_header_next_aria()}
-				onclick={onNextWeek}
-			class="w-11 h-11 rounded-xl orbit-control flex items-center justify-center transition-all hover:translate-x-0.5 touch-target"
-			>
-				<svg class="w-5 h-5 text-plum" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-				</svg>
-			</button>
-		</div>
+	<div class="min-w-0 flex-1 text-center">
+		<div class="weeknav-label">{m.calendar_week_header_current_label()}</div>
+		<h2 class="weeknav-name">
+			<span class="sm:hidden">{weekRangeText.short}</span>
+			<span class="hidden sm:inline">{weekRangeText.full}</span>
+		</h2>
 	</div>
-</div>
+
+	<button
+		type="button"
+		onclick={onThisWeek}
+		aria-label={m.calendar_week_header_this_week_aria()}
+		class="weeknav-today hidden sm:inline-flex"
+	>
+		{m.calendar_week_header_this_week_text()}
+	</button>
+	<button
+		type="button"
+		onclick={onThisWeek}
+		aria-label={m.calendar_week_header_this_week_aria()}
+		class="weeknav-today weeknav-today--icon sm:hidden"
+	>
+		<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+		</svg>
+	</button>
+	<button
+		type="button"
+		aria-label={m.calendar_week_header_next_aria()}
+		onclick={onNextWeek}
+		class="weeknav-sqbtn"
+	>
+		<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+		</svg>
+	</button>
+</nav>
+
+<style>
+	.weeknav {
+		margin: 0 0 16px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: nowrap;
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow);
+		padding: 10px 14px;
+	}
+	.weeknav-label {
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--orbit-coral-dark);
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		margin-bottom: 2px;
+	}
+	.weeknav-name {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight, 700);
+		font-size: 20px;
+		color: var(--orbit-ink);
+		margin: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	@media (max-width: 639px) {
+		.weeknav { gap: 6px; padding: 8px 10px; }
+		.weeknav-name { font-size: 14px; }
+	}
+	.weeknav-sqbtn {
+		flex: 0 0 auto;
+		width: 44px;
+		height: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--orbit-lavender);
+		color: var(--orbit-ink);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+		box-shadow: var(--orbit-shadow);
+		cursor: pointer;
+		transition: background-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease), transform var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+	}
+	.weeknav-sqbtn:hover { background: var(--orbit-coral-soft); }
+	.weeknav-sqbtn:active { transform: translate(1px, 1px); box-shadow: none; }
+	.weeknav-today {
+		flex: 0 0 auto;
+		min-height: 44px;
+		padding: 10px 18px;
+		align-items: center;
+		justify-content: center;
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-label-weight, 700);
+		font-size: 13px;
+		background: var(--orbit-coral);
+		color: #fff;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+		box-shadow: var(--orbit-shadow);
+		cursor: pointer;
+	}
+	.weeknav-today:hover { background: var(--orbit-coral-dark); }
+	.weeknav-today--icon { width: 44px; padding: 0; display: inline-flex; }
+
+	@media (prefers-reduced-motion: reduce) {
+		.weeknav-sqbtn { transition: none; }
+		.weeknav-sqbtn:active { transform: none; }
+	}
+</style>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept P — Candy Pop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fff6ec;
+    --ink: #37204a;
+    --muted: #9a85ad;
+    --pink: #ff5c9e;
+    --orange: #ff9b3d;
+    --mint: #2fd6a3;
+    --grape: #9b5de5;
+    --sky: #4bb7f0;
+    --line: #f3ddc4;
+    --font-display: 'Baloo 2', 'Prompt', sans-serif;
+    --font-body: 'Prompt', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: linear-gradient(150deg, #ffe3ef, #fff6ec 55%, #e3f7ff);
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg);
+    border: 3px solid var(--ink);
+    border-radius: 30px;
+    box-shadow: 8px 8px 0 var(--pink);
+    overflow: hidden;
+  }
+
+  .topbar { text-align: center; padding: 22px 20px 6px; }
+  .brand {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 800;
+  }
+  .brand .l1 { color: var(--pink); }
+  .brand .l2 { color: var(--orange); }
+  .brand .l3 { color: var(--grape); }
+  .brand .l4 { color: var(--mint); }
+  .brand .l5 { color: var(--sky); }
+  .tagline { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+  .countdown {
+    margin: 14px 20px 0;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 22px;
+    box-shadow: 5px 5px 0 var(--orange);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .countdown .badge {
+    font-family: var(--font-display);
+    background: var(--pink);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    border: 3px solid var(--ink);
+    border-radius: 16px;
+    padding: 10px 12px;
+    transform: rotate(-4deg);
+    flex: none;
+    text-align: center;
+    line-height: 1.15;
+  }
+  .countdown h2 { font-family: var(--font-display); font-size: 16px; font-weight: 700; line-height: 1.3; }
+  .countdown p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  section { padding: 18px 20px 0; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 800;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 4px 16px;
+    box-shadow: 3px 3px 0 var(--mint);
+  }
+  .section-head.s2 h2 { box-shadow: 3px 3px 0 var(--grape); }
+  .section-head.s3 h2 { box-shadow: 3px 3px 0 var(--sky); }
+  .more { font-size: 12px; font-weight: 600; color: var(--pink); text-decoration: none; }
+
+  .sched { display: flex; flex-direction: column; gap: 8px; }
+  .sched-row {
+    display: grid;
+    grid-template-columns: 62px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 16px;
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+  .sched-row .t { font-family: var(--font-display); font-weight: 700; color: var(--grape); font-size: 15px; }
+  .sched-row .ch {
+    font-size: 9.5px;
+    font-weight: 600;
+    background: var(--sky);
+    color: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+  .sched-row.live { background: #ffe9f3; box-shadow: 4px 4px 0 var(--pink); }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card {
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+  .card:hover, .card:focus-visible {
+    transform: translate(-2px, -2px) rotate(-1deg);
+    box-shadow: 6px 6px 0 var(--grape);
+    outline: none;
+  }
+  .card .art { aspect-ratio: 3 / 3.2; border-bottom: 3px solid var(--ink); }
+  .art.a1 { background: linear-gradient(150deg, var(--mint), #1aa377); }
+  .art.a2 { background: linear-gradient(220deg, var(--sky), #2a7ec2); }
+  .card .meta { padding: 10px 12px 12px; }
+  .card h3 { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
+  .card p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .halo {
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 22px;
+    box-shadow: 5px 5px 0 var(--mint);
+    padding: 14px 16px;
+  }
+  .halo-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--orange));
+    border: 3px solid var(--ink);
+    flex: none;
+  }
+  .halo-head strong { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
+  .halo-head span { display: block; font-size: 10.5px; color: var(--muted); }
+  .halo p { font-size: 13px; line-height: 1.7; }
+  .halo-stats { margin-top: 10px; font-family: var(--font-display); font-size: 12px; font-weight: 700; }
+  .halo-stats b { color: var(--pink); }
+
+  .bottomnav {
+    margin: 20px 16px 16px;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    box-shadow: 5px 5px 0 var(--sky);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 6px;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 0;
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 999px;
+    min-height: 52px;
+    justify-content: center;
+  }
+  .nav-item .icon { font-size: 17px; }
+  .nav-item.active { background: var(--ink); color: #fff; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+    .card:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <div class="brand"><span class="l1">G</span><span class="l2">L</span><span class="l3">O</span><span class="l4">R</span><span class="l5">B</span><span class="l1">I</span><span class="l2">T</span></div>
+      <p class="tagline">สนุกได้ทุกคืน เลือกรสที่ชอบ!</p>
+    </header>
+
+    <div class="countdown">
+      <div class="badge">42<br>นาที</div>
+      <div>
+        <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+        <p>คืนนี้ 22:30 · GMMTV</p>
+      </div>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>ตารางฉายวันนี้</h2>
+        <a class="more" href="#">ทั้งสัปดาห์ →</a>
+      </div>
+      <div class="sched">
+        <div class="sched-row live"><span class="t">22:30</span><span>23.5 องศาที่โลกเอียง</span><span class="ch">GMMTV</span></div>
+        <div class="sched-row"><span class="t">23:15</span><span>Affair รักเล่นกล</span><span class="ch">CH3</span></div>
+        <div class="sched-row"><span class="t">23:45</span><span>Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head s2">
+        <h2>ซีรีส์น่าติดตาม</h2>
+        <a class="more" href="#">สำรวจ →</a>
+      </div>
+      <div class="cards">
+        <a class="card" href="#">
+          <div class="art a1"></div>
+          <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · ศุกร์ 21:00</p></div>
+        </a>
+        <a class="card" href="#">
+          <div class="art a2"></div>
+          <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · เสาร์ 20:30</p></div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head s3">
+        <h2>จาก Orbit Halo</h2>
+        <a class="more" href="#">อ่านฟีด →</a>
+      </div>
+      <div class="halo">
+        <div class="halo-head">
+          <span class="avatar"></span>
+          <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+        </div>
+        <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+        <div class="halo-stats"><b>1,204</b> ถูกใจ · <b>86</b> ความคิดเห็น</div>
+      </div>
+    </section>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">⌂</span>หน้าแรก</a>
+      <a class="nav-item" href="#"><span class="icon">☷</span>ปฏิทิน</a>
+      <a class="nav-item" href="#"><span class="icon">✧</span>ฮาโล</a>
+      <a class="nav-item" href="#"><span class="icon">♡</span>บันทึก</a>
+      <a class="nav-item" href="#"><span class="icon">☺</span>ฉัน</a>
+    </nav>
+  </div>
+</body>
+</html>

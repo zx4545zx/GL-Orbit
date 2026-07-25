@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept G — Peach Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Bai+Jamjuree:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf8f4;
+    --surface: #ffffff;
+    --ink: #3a2e2a;
+    --muted: #a08d85;
+    --peach: #f7b8a0;
+    --peach-deep: #e08a6c;
+    --peach-soft: #fdeae2;
+    --line: #f0e2da;
+    --font-display: 'DM Serif Display', 'Bai Jamjuree', serif;
+    --font-body: 'Bai Jamjuree', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--peach-soft);
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg);
+    border-radius: 28px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 24px 6px;
+  }
+  .brand { font-family: var(--font-display); font-size: 22px; letter-spacing: 0.01em; }
+  .brand span { color: var(--peach-deep); }
+  .hello { font-size: 12px; color: var(--muted); font-weight: 300; }
+
+  .countdown {
+    margin: 18px 24px 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .countdown .ring {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: conic-gradient(var(--peach-deep) 0 78%, var(--peach-soft) 78% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+  .countdown .ring span {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--peach-deep);
+  }
+  .countdown h2 { font-size: 15.5px; font-weight: 600; line-height: 1.4; }
+  .countdown p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  section { padding: 20px 24px 0; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .section-head h2 { font-size: 14px; font-weight: 600; }
+  .section-head h2::after {
+    content: '';
+    display: block;
+    width: 22px; height: 3px;
+    border-radius: 2px;
+    background: var(--peach);
+    margin-top: 4px;
+  }
+  .more { font-size: 12px; color: var(--peach-deep); text-decoration: none; font-weight: 500; }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+  }
+  .chip b { color: var(--peach-deep); font-weight: 600; font-size: 12px; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 160ms ease, transform 160ms ease;
+  }
+  .card:hover, .card:focus-visible {
+    box-shadow: 0 10px 24px rgba(224, 138, 108, 0.18);
+    transform: translateY(-2px);
+    outline: none;
+  }
+  .card .art { aspect-ratio: 3 / 3.6; border-radius: 18px 18px 0 0; }
+  .art.a1 { background: linear-gradient(165deg, #f7b8a0, #e08a6c); }
+  .art.a2 { background: linear-gradient(205deg, #f6d9b8, #dfa878); }
+  .card .meta { padding: 12px 14px 14px; }
+  .card h3 { font-size: 13.5px; font-weight: 600; }
+  .card p { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+
+  .halo {
+    background: var(--peach-soft);
+    border-radius: 20px;
+    padding: 16px;
+  }
+  .halo-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--peach), var(--peach-deep)); flex: none; }
+  .halo-head strong { font-size: 13px; font-weight: 600; }
+  .halo-head span { display: block; font-size: 11px; color: var(--muted); }
+  .halo p { font-size: 13px; line-height: 1.7; }
+  .halo-stats { margin-top: 10px; font-size: 11.5px; color: var(--muted); }
+  .halo-stats b { color: var(--peach-deep); font-weight: 600; }
+
+  .bottomnav {
+    margin: 22px 16px 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 6px;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 9px 0;
+    font-size: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 16px;
+    min-height: 52px;
+    justify-content: center;
+  }
+  .nav-item .icon { font-size: 16px; }
+  .nav-item.active { background: var(--peach-soft); color: var(--peach-deep); font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+    .card:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <div class="brand">GL <span>Orbit</span></div>
+      <div class="hello">สวัสดีตอนเย็น ☁</div>
+    </header>
+
+    <div class="countdown">
+      <div class="ring" aria-hidden="true"><span>42 นาที</span></div>
+      <div>
+        <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+        <p>คืนนี้ 22:30 · GMMTV</p>
+      </div>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>ตารางฉายวันนี้</h2>
+        <a class="more" href="#">ทั้งสัปดาห์</a>
+      </div>
+      <div class="chips">
+        <span class="chip"><b>22:30</b> 23.5 องศาที่โลกเอียง</span>
+        <span class="chip"><b>23:15</b> Affair รักเล่นกล</span>
+        <span class="chip"><b>23:45</b> Blank เติมคำว่ารัก</span>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>ซีรีส์น่าติดตาม</h2>
+        <a class="more" href="#">สำรวจ</a>
+      </div>
+      <div class="cards">
+        <a class="card" href="#">
+          <div class="art a1"></div>
+          <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · ศุกร์ 21:00</p></div>
+        </a>
+        <a class="card" href="#">
+          <div class="art a2"></div>
+          <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · เสาร์ 20:30</p></div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>จาก Orbit Halo</h2>
+        <a class="more" href="#">อ่านฟีด</a>
+      </div>
+      <div class="halo">
+        <div class="halo-head">
+          <span class="avatar"></span>
+          <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+        </div>
+        <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+        <div class="halo-stats"><b>1,204</b> ถูกใจ · <b>86</b> ความคิดเห็น</div>
+      </div>
+    </section>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">⌂</span>หน้าแรก</a>
+      <a class="nav-item" href="#"><span class="icon">☷</span>ปฏิทิน</a>
+      <a class="nav-item" href="#"><span class="icon">✧</span>ฮาโล</a>
+      <a class="nav-item" href="#"><span class="icon">♡</span>บันทึก</a>
+      <a class="nav-item" href="#"><span class="icon">☺</span>ฉัน</a>
+    </nav>
+  </div>
+</body>
+</html>

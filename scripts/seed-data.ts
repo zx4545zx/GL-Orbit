@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
-import { getDb } from '../src/lib/server/db/index.js';
+import { closeDb, getDb } from '../src/lib/server/db/index.js';
 import * as schema from '../src/lib/server/db/schema.js';
 import { hashPassword } from '../src/lib/server/auth/password.js';
 
@@ -211,7 +211,9 @@ async function seedData() {
 	console.log('\n🎉 Mock data seeded successfully!');
 }
 
-seedData().catch((err) => {
-	console.error('❌ Failed to seed data:', err);
-	process.exit(1);
-});
+seedData()
+	.catch((err) => {
+		console.error('❌ Failed to seed data:', err);
+		process.exitCode = 1;
+	})
+	.finally(closeDb);

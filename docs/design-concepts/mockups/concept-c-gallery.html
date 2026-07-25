@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept C — Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Trirong:wght@400;500;600&family=Sarabun:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --wall: #f6f4ef;
+    --wall-deep: #edeae2;
+    --ink: #1c1a16;
+    --muted: #8a8175;
+    --accent: #c2402a;
+    --line: #d5d0c4;
+    --font-display: 'Fraunces', 'Trirong', serif;
+    --font-thai: 'Trirong', serif;
+    --font-body: 'Sarabun', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--wall-deep);
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--wall);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .topbar {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { font-family: var(--font-display); font-size: 21px; font-weight: 500; letter-spacing: 0.02em; }
+  .brand sup { font-size: 10px; color: var(--accent); font-family: var(--font-body); margin-left: 4px; }
+  .room { font-size: 11px; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; }
+  section { padding: 22px 24px 4px; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  .index { font-family: var(--font-display); font-size: 26px; font-weight: 400; color: var(--accent); }
+  .section-head h2 { font-family: var(--font-thai); font-size: 17px; font-weight: 500; flex: 1; }
+  .more { font-size: 11.5px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; }
+  .more:hover, .more:focus-visible { color: var(--accent); }
+  .exhibition { text-align: center; padding: 8px 0 4px; }
+  .exhibition .frame {
+    margin: 0 auto;
+    width: 62%;
+    border: 1px solid var(--ink);
+    padding: 12px;
+    background: #fff;
+  }
+  .exhibition .art {
+    aspect-ratio: 3 / 4;
+    background: linear-gradient(165deg, #b98a94, #5e3a4a 70%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 10px;
+    color: rgba(255,255,255,0.85);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+  }
+  .museum-label { margin: 14px auto 0; max-width: 240px; text-align: center; }
+  .museum-label h3 { font-family: var(--font-thai); font-size: 19px; font-weight: 600; }
+  .museum-label .latin { font-family: var(--font-display); font-style: italic; font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .museum-label dl {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 10px;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .museum-label dt { letter-spacing: 0.1em; }
+  .museum-label dd { color: var(--ink); font-weight: 500; }
+  .next-chip {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 7px 16px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    min-height: 44px;
+    line-height: 28px;
+    transition: background 150ms ease, color 150ms ease;
+  }
+  .next-chip:hover, .next-chip:focus-visible { background: var(--accent); color: #fff; outline: none; }
+  .calendar { border-top: 1px solid var(--line); }
+  .cal-row {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 12px;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .cal-row .day { font-family: var(--font-display); font-size: 13px; color: var(--muted); }
+  .cal-row .name { font-family: var(--font-thai); font-size: 14.5px; }
+  .cal-row .time { font-size: 12px; color: var(--muted); }
+  .cal-row.today .day, .cal-row.today .name { color: var(--accent); }
+  .cal-row.today .name::after { content: ' — คืนนี้'; font-family: var(--font-body); font-size: 11px; }
+  .halo-quote { border-left: 2px solid var(--ink); padding: 4px 0 4px 16px; }
+  .halo-quote blockquote { font-family: var(--font-thai); font-size: 15px; line-height: 1.8; }
+  .halo-quote cite { display: block; margin-top: 8px; font-style: normal; font-size: 12px; color: var(--muted); }
+  .bottomnav {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid var(--ink);
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 12px 0 14px;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-decoration: none;
+    min-height: 58px;
+    justify-content: center;
+  }
+  .nav-item .icon { font-size: 16px; }
+  .nav-item.active { color: var(--ink); }
+  .nav-item.active .icon { color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) {
+    .next-chip { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <div class="brand">GL Orbit<sup>est.</sup></div>
+      <div class="room">Room 01 — Now Showing</div>
+    </header>
+
+    <section class="exhibition">
+      <div class="frame">
+        <div class="art">EXHIBIT 001</div>
+      </div>
+      <div class="museum-label">
+        <h3>23.5 องศาที่โลกเอียง</h3>
+        <p class="latin">23.5 The Tilt of the Earth, 2024</p>
+        <dl>
+          <div><dt>สตูดิโอ</dt><dd>GMMTV</dd></div>
+          <div><dt>ตอน</dt><dd>EP.9 / 12</dd></div>
+          <div><dt>เวลา</dt><dd>22:30</dd></div>
+        </dl>
+        <a class="next-chip" href="#">รับชมตอนถัดไป · อีก 42 นาที</a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <span class="index">02</span>
+        <h2>ปฏิทินนิทรรศการประจำสัปดาห์</h2>
+        <a class="more" href="#">ทั้งหมด</a>
+      </div>
+      <div class="calendar">
+        <div class="cal-row today"><span class="day">ศุกร์ 24</span><span class="name">23.5 องศาที่โลกเอียง</span><span class="time">22:30</span></div>
+        <div class="cal-row"><span class="day">ศุกร์ 24</span><span class="name">Affair รักเล่นกล</span><span class="time">23:15</span></div>
+        <div class="cal-row"><span class="day">เสาร์ 25</span><span class="name">Pluto นิทาน ดวงดาว ความรัก</span><span class="time">20:30</span></div>
+        <div class="cal-row"><span class="day">อาทิตย์ 26</span><span class="name">The Loyal Pin ปิ่นภักดิ์</span><span class="time">21:00</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <span class="index">03</span>
+        <h2>บันทึกจากผู้ชม</h2>
+        <a class="more" href="#">Orbit Halo</a>
+      </div>
+      <div class="halo-quote">
+        <blockquote>“ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้ แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล”</blockquote>
+        <cite>— ออมกรณ์นภัส @omgk · ถูกใจ 1,204 ครั้ง</cite>
+      </div>
+    </section>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">◱</span>GALLERY</a>
+      <a class="nav-item" href="#"><span class="icon">☷</span>CALENDAR</a>
+      <a class="nav-item" href="#"><span class="icon">✧</span>HALO</a>
+      <a class="nav-item" href="#"><span class="icon">◇</span>COLLECTION</a>
+      <a class="nav-item" href="#"><span class="icon">◯</span>VISITOR</a>
+    </nav>
+  </div>
+</body>
+</html>

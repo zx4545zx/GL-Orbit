@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import Navigation from '$lib/components/Navigation.svelte';
 	import BottomNav from '$lib/components/BottomNav.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 	import BackToTopButton from '$lib/components/BackToTopButton.svelte';
 	import {
 		createUnreadNotifications,
@@ -20,9 +21,6 @@
 
 	const langPrefix = $derived(`/${page.data.lang}`);
 	const currentUser = $derived(page.data.user);
-	const isHomePage = $derived(
-		page.url.pathname === langPrefix || page.url.pathname === `${langPrefix}/`
-	);
 
 	// Show the floating back-to-top button on long list pages, but NOT on detail pages.
 	const showBackToTop = $derived(
@@ -34,9 +32,8 @@
 		page.url.pathname.startsWith(`${langPrefix}/explore/artists`)
 	);
 
-	// Shared scroll state — drives both the auto-hide nav bars and the floating button position.
+	// Scroll state — drives the mobile bottom-nav auto-hide and the floating button position.
 	let bottomNavHidden = $state(false);
-	let navHidden = $state(false);
 
 	$effect(() => {
 		const userId = currentUser?.id;
@@ -75,13 +72,10 @@
 				const atTop = currentY <= 0;
 
 				if (atTop) {
-					navHidden = false;
 					bottomNavHidden = false;
 				} else if (delta > 10) {
-					navHidden = true;
 					bottomNavHidden = true;
 				} else if (delta < -2) {
-					navHidden = false;
 					bottomNavHidden = false;
 				}
 
@@ -101,10 +95,13 @@
 
 <svelte:document onvisibilitychange={refreshUnreadCountWhenVisible} />
 
-<div class="minimal-shell min-h-dvh flex flex-col">
-	<Navigation {navHidden} />
-	<div class="flex-1 mobile-bottom-safe-space px-4 {isHomePage ? '' : 'md:pt-24'}">
-		{@render children()}
+<div class="minimal-shell">
+	<div class="noise-overlay flex min-h-dvh flex-col">
+		<Navigation />
+		<div class="flex-1 mobile-bottom-safe-space px-4">
+			{@render children()}
+		</div>
+		<Footer />
 	</div>
 	<BottomNav {bottomNavHidden} />
 	{#if showBackToTop}

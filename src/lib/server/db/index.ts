@@ -1,39 +1,46 @@
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/neon-http';
-import type { NeonQueryFunction } from '@neondatabase/serverless';
+import postgres, { type Sql } from 'postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { resolveDatabaseConfig } from './config.js';
 import * as schema from './schema.js';
 
-export type Db = ReturnType<typeof drizzle<typeof schema>>;
+type TransactionStatement = { strings: TemplateStringsArray; args: readonly any[] };
+type TransactionSql = Sql & {
+	transaction(statements: unknown[]): Promise<unknown[]>;
+};
+
+export type Db = ReturnType<typeof drizzle<typeof schema>> & { $client: TransactionSql };
 
 let _db: Db | null = null;
-let _sql: NeonQueryFunction<false, false> | null = null;
+let _sql: TransactionSql | null = null;
 
-async function getSql(): Promise<NeonQueryFunction<false, false>> {
+function getSql(): TransactionSql {
 	if (!_sql) {
-		const url = process.env.DATABASE_URL;
-		if (!url) {
-			throw new Error('DATABASE_URL is not set');
-		}
-		const { neon } = await import('@neondatabase/serverless');
-		_sql = neon(url);
+		const { url } = resolveDatabaseConfig();
+		const sql = postgres(url, { prepare: false }) as TransactionSql;
+		sql.transaction = (statements) =>
+			sql.begin((transactionSql) =>
+				statements.map((value) => {
+					const statement = value as TransactionStatement;
+					return transactionSql(statement.strings, ...statement.args);
+				})
+			) as Promise<unknown[]>;
+		_sql = sql;
 	}
 	return _sql;
 }
 
 export async function getDb(): Promise<Db> {
 	if (!_db) {
-		const sql = await getSql();
-		_db = drizzle(sql, { schema });
+		const sql = getSql();
+		_db = drizzle(sql, { schema }) as Db;
 	}
 	return _db;
 }
 
-export const db = new Proxy({} as Db, {
-	async get(_, prop: string | symbol) {
-		if (!_db) {
-			const sql = await getSql();
-			_db = drizzle(sql, { schema });
-		}
-		return (_db as unknown as Record<string | symbol, unknown>)[prop];
-	}
-});
+export async function closeDb(): Promise<void> {
+	const sql = _sql;
+	_db = null;
+	_sql = null;
+	if (sql) await sql.end();
+}

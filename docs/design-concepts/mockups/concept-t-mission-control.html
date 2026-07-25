@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept T — Mission Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #edeae2;
+    --panel: #f7f5ef;
+    --ink: #1c1f26;
+    --muted: #757a6e;
+    --nasa: #0b3d91;
+    --red: #c8352b;
+    --amber: #d98e2b;
+    --green: #2e8a4e;
+    --line: #c9c4b6;
+    --font-cond: 'Barlow Condensed', 'Sarabun', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-body: 'Sarabun', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #d5d1c5;
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg);
+    border: 2px solid var(--ink);
+    overflow: hidden;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 2px solid var(--ink);
+    background: var(--panel);
+  }
+  .patch {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #4a6ac8, var(--nasa));
+    border: 2px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: var(--font-cond);
+    font-weight: 700;
+    font-size: 14px;
+    flex: none;
+  }
+  .brand { font-family: var(--font-cond); font-size: 21px; font-weight: 700; letter-spacing: 0.06em; }
+  .brand small { display: block; font-family: var(--font-mono); font-size: 8.5px; font-weight: 400; color: var(--muted); letter-spacing: 0.18em; }
+  .status {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--green);
+    border: 1.5px solid var(--green);
+    padding: 3px 8px;
+    letter-spacing: 0.1em;
+  }
+
+  .tminus {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    border-bottom: 2px solid var(--ink);
+    background: var(--nasa);
+    color: #fff;
+    padding: 16px;
+    align-items: center;
+  }
+  .tminus .kicker { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.3em; opacity: 0.75; }
+  .tminus h2 { font-family: var(--font-cond); font-size: 21px; font-weight: 600; margin-top: 3px; }
+  .tminus .clock {
+    font-family: var(--font-mono);
+    font-size: 23px;
+    font-weight: 600;
+    background: rgba(0,0,0,0.3);
+    border: 1.5px solid rgba(255,255,255,0.4);
+    padding: 8px 12px;
+  }
+  .tminus .clock small { display: block; font-size: 8px; text-align: center; opacity: 0.7; margin-top: 2px; }
+
+  .telemetry {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-bottom: 2px solid var(--ink);
+    background: var(--panel);
+  }
+  .telemetry div {
+    padding: 10px 12px;
+    border-right: 1px solid var(--line);
+    font-family: var(--font-mono);
+  }
+  .telemetry div:last-child { border-right: 0; }
+  .telemetry dt { font-size: 8px; letter-spacing: 0.18em; color: var(--muted); }
+  .telemetry dd { font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .telemetry .ok { color: var(--green); }
+  .telemetry .warn { color: var(--amber); }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 2px solid var(--ink);
+    background: var(--panel);
+  }
+  .section-head h2 {
+    font-family: var(--font-cond);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+  }
+  .section-head h2::before { content: '▮ '; color: var(--red); }
+  .more { font-family: var(--font-mono); font-size: 9px; color: var(--nasa); text-decoration: none; letter-spacing: 0.1em; }
+
+  .sched-row {
+    display: grid;
+    grid-template-columns: 92px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    background: var(--bg);
+  }
+  .sched-row .t { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--nasa); }
+  .sched-row .ch {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    background: var(--ink);
+    color: #fff;
+    padding: 2px 6px;
+    letter-spacing: 0.08em;
+  }
+  .sched-row.go { background: rgba(46,138,78,0.1); }
+  .sched-row.go .t { color: var(--green); }
+  .sched-row.go .name::after { content: ' · GO'; color: var(--green); font-family: var(--font-mono); font-size: 9px; font-weight: 600; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 2px solid var(--ink); }
+  .card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    background: var(--panel);
+    border-right: 2px solid var(--ink);
+  }
+  .card:last-child { border-right: 0; }
+  .card .art { aspect-ratio: 3 / 3.1; border-bottom: 2px solid var(--ink); position: relative; }
+  .art.a1 { background: linear-gradient(160deg, #2c4f9e, #101f42); }
+  .art.a2 { background: linear-gradient(210deg, #9e4a2c, #421a10); }
+  .art .patch-tag {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: var(--panel);
+    border: 1.5px solid var(--ink);
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    padding: 2px 6px;
+  }
+  .card .meta { padding: 12px; }
+  .card h3 { font-family: var(--font-cond); font-size: 15px; font-weight: 600; }
+  .card p { font-family: var(--font-mono); font-size: 9px; color: var(--muted); margin-top: 3px; }
+  .card:hover, .card:focus-visible { background: #fff; outline: 2px solid var(--nasa); outline-offset: -2px; }
+
+  .halo {
+    padding: 16px;
+    background: var(--bg);
+    border-bottom: 2px solid var(--ink);
+  }
+  .halo .comm {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--red);
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+  .halo p {
+    font-size: 13px;
+    line-height: 1.75;
+    border-left: 3px solid var(--nasa);
+    padding-left: 12px;
+  }
+  .halo cite {
+    display: block;
+    margin-top: 10px;
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: var(--muted);
+  }
+  .halo cite b { color: var(--nasa); }
+
+  .bottomnav { display: grid; grid-template-columns: repeat(5, 1fr); background: var(--ink); }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 11px 0 13px;
+    font-family: var(--font-cond);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: #9a9d94;
+    text-decoration: none;
+    min-height: 58px;
+    justify-content: center;
+    border-right: 1px solid #33363e;
+  }
+  .nav-item:last-child { border-right: 0; }
+  .nav-item.active { color: #fff; background: var(--nasa); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <span class="patch">GL</span>
+      <div class="brand">ORBIT CONTROL<small>SERIES TRACKING STATION — BANGKOK</small></div>
+      <span class="status">NOMINAL</span>
+    </header>
+
+    <div class="tminus">
+      <div>
+        <span class="kicker">T-MINUS · 23.5 องศาที่โลกเอียง EP.9</span>
+        <h2>เตรียมออกอากาศ · GMMTV 22:30</h2>
+      </div>
+      <div class="clock">00:42:17<small>COUNTDOWN</small></div>
+    </div>
+
+    <dl class="telemetry">
+      <div><dt>SIGNAL</dt><dd class="ok">STRONG</dd></div>
+      <div><dt>SUBTITLES</dt><dd class="ok">READY</dd></div>
+      <div><dt>EP REMAIN</dt><dd class="warn">4 / 12</dd></div>
+    </dl>
+
+    <div class="section-head">
+      <h2>FLIGHT PLAN · วันนี้</h2>
+      <a class="more" href="#">FULL LOG →</a>
+    </div>
+    <div class="sched-row go"><span class="t">T-0 22:30</span><span class="name">23.5 องศาที่โลกเอียง</span><span class="ch">GMMTV</span></div>
+    <div class="sched-row"><span class="t">T-0 23:15</span><span class="name">Affair รักเล่นกล</span><span class="ch">CH3</span></div>
+    <div class="sched-row"><span class="t">T-0 23:45</span><span class="name">Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR</span></div>
+
+    <div class="section-head">
+      <h2>MISSIONS · แนะนำ</h2>
+      <a class="more" href="#">REGISTRY →</a>
+    </div>
+    <div class="cards">
+      <a class="card" href="#">
+        <div class="art a1"><span class="patch-tag">MSN-05</span></div>
+        <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · FRI 21:00</p></div>
+      </a>
+      <a class="card" href="#">
+        <div class="art a2"><span class="patch-tag">MSN-12</span></div>
+        <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · SAT 20:30</p></div>
+      </a>
+    </div>
+
+    <div class="halo">
+      <div class="comm">INCOMING TRANSMISSION · ORBIT HALO</div>
+      <p>"ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล"</p>
+      <cite>— @omgk · LIKES <b>1204</b> · COMMENTS <b>86</b></cite>
+    </div>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span>⌂</span>HOME</a>
+      <a class="nav-item" href="#"><span>▦</span>PLAN</a>
+      <a class="nav-item" href="#"><span>✦</span>COMMS</a>
+      <a class="nav-item" href="#"><span>▼</span>ARCHIVE</a>
+      <a class="nav-item" href="#"><span>●</span>CREW</a>
+    </nav>
+  </div>
+</body>
+</html>

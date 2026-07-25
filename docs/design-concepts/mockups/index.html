@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GL-Orbit Redesign Concepts</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Sarabun', 'Segoe UI', sans-serif;
+    background: #f4f1ec;
+    color: #1c1a16;
+    min-height: 100vh;
+    padding: 48px 20px;
+  }
+  main { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 28px; margin-bottom: 6px; }
+  .sub { color: #8a8175; margin-bottom: 32px; }
+  .hero-switch {
+    display: block;
+    background: #1c1a16;
+    color: #f6f4ef;
+    padding: 22px;
+    text-decoration: none;
+    margin-bottom: 24px;
+    border: 1px solid #1c1a16;
+  }
+  .hero-switch:hover { background: #2c2822; }
+  .hero-switch h2 { font-size: 19px; margin-bottom: 6px; color: #f6f4ef; }
+  .hero-switch p { font-size: 13.5px; color: #b8b2a6; }
+  .hero-switch .open { color: #ffd98a; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+  a.card {
+    display: block;
+    background: #fff;
+    border: 1px solid #d5d0c4;
+    padding: 22px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+  a.card:hover, a.card:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(28,26,22,0.12);
+    outline: none;
+  }
+  .letter { font-size: 13px; font-weight: 700; letter-spacing: 0.2em; margin-bottom: 10px; }
+  .a .letter { color: #7a5cff; }
+  .b .letter { color: #e4572e; }
+  .c .letter { color: #c2402a; }
+  .d .letter { color: #ff5ea8; }
+  .e .letter { color: #3f7dff; }
+  .f .letter { color: #e0301e; }
+  .g .letter { color: #e08a6c; }
+  .h .letter { color: #7c5ce8; }
+  .i .letter { color: #5d7a48; }
+  .j .letter { color: #4aa8ff; }
+  .k .letter { color: #c9517c; }
+  .l .letter { color: #c73e3a; }
+  .m .letter { color: #b8923f; }
+  .n .letter { color: #0d6d8a; }
+  .o .letter { color: #e8290b; }
+  .p .letter { color: #ff5c9e; }
+  .q .letter { color: #5d9c72; }
+  .r .letter { color: #3c5a8a; }
+  .s .letter { color: #4a5aa8; }
+  .t .letter { color: #0b3d91; }
+  .u .letter { color: #7a6fc8; }
+  h2 { font-size: 20px; margin-bottom: 8px; }
+  p { font-size: 14px; color: #5c554a; line-height: 1.6; }
+  .open { display: inline-block; margin-top: 16px; font-size: 13px; font-weight: 600; }
+</style>
+</head>
+<body>
+  <main>
+    <h1>GL-Orbit Redesign Concepts</h1>
+    <p class="sub">21 ทิศทาง design language ใหม่ · เปิดดู mockup แต่ละแบบ แล้วเลือกทิศทางที่ชอบ</p>
+    <a class="hero-switch" href="theme-switch.html">
+      <h2>★ Theme Switch — 7 ธีมที่คัดเลือกในหน้าเดียว</h2>
+      <p>สลับดูธีม A · B · E · L · N · P · T ได้ทันทีบนหน้าจอเดียวกัน ธีมที่เลือกจะถูกจำไว้</p>
+      <span class="open">เปิด Theme Switch →</span>
+    </a>
+    <div class="grid">
+      <a class="card a" href="concept-a-midnight-broadcast.html">
+        <div class="letter">CONCEPT A</div>
+        <h2>Midnight Broadcast</h2>
+        <p>สถานีแพร่ภาพยามค่ำคืน · dark, tech, countdown/ตารางฉายเป็นพระเอก</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card b" href="concept-b-fan-zine.html">
+        <div class="letter">CONCEPT B</div>
+        <h2>Fan Zine</h2>
+        <p>สมุดสแครปแฟนคลับ · อบอุ่น ขี้เล่น เทป washi และ polaroid</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card c" href="concept-c-gallery.html">
+        <div class="letter">CONCEPT C</div>
+        <h2>Gallery</h2>
+        <p>นิทรรศการเรียบหรู · artwork เป็นศูนย์กลาง serif สง่างาม</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card d" href="concept-d-night-market.html">
+        <div class="letter">CONCEPT D</div>
+        <h2>Night Market</h2>
+        <p>ตลาดนัดกลางคืน · นีออนไทย หลอดไฟ ร้านค้าคึกคัก สนุกสนาน</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card e" href="concept-e-y2k-diary.html">
+        <div class="letter">CONCEPT E</div>
+        <h2>Y2K Diary</h2>
+        <p>บล็อกยุค 2000 · chrome, pixel font, guestbook, retro internet</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card f" href="concept-f-bauhaus-orbit.html">
+        <div class="letter">CONCEPT F</div>
+        <h2>Bauhaus Orbit</h2>
+        <p>เรขาคณิตโมเดิร์นนิสต์ · สีจัด primary, วงกลม/สามเหลี่ยม เป็นวงโคจร</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card g" href="concept-g-peach-studio.html">
+        <div class="letter">CONCEPT G · MINIMAL PASTEL</div>
+        <h2>Peach Studio</h2>
+        <p>โทนพีชอบอุ่น · ขาวสะอาด ชิปกลม วงแหวน countdown นุ่มนวล</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card h" href="concept-h-lavender-mist.html">
+        <div class="letter">CONCEPT H · MINIMAL PASTEL</div>
+        <h2>Lavender Mist</h2>
+        <p>ลาเวนเดอร์หมอก · glassmorphism, gradient pastel, ละมุนฝัน</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card i" href="concept-i-matcha-zakka.html">
+        <div class="letter">CONCEPT I · MINIMAL PASTEL</div>
+        <h2>Matcha Zakka</h2>
+        <p>เขียวมัทฉะญี่ปุ่น · สงบ เรียบง่าย เส้นบาง โปร่งสบาย</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card j" href="concept-j-liquid-glass.html">
+        <div class="letter">CONCEPT J</div>
+        <h2>Liquid Glass</h2>
+        <p>สไตล์ Apple iOS 26 · กระจกโปร่งแสง specular edge, floating dock</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card k" href="concept-k-coquette-pink.html">
+        <div class="letter">CONCEPT K · PINK AESTHETIC</div>
+        <h2>Coquette Pink</h2>
+        <p>ชมพู aesthetic หวานละมุน · โบว์, lace, serif italic, dreamy vibe</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card l" href="concept-l-sakura.html">
+        <div class="letter">CONCEPT L</div>
+        <h2>Sakura</h2>
+        <p>ซากุระญี่ปุ่น · กลีบดอกร่วง, กระดาษ washi, ตราประทับ vermillion</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card m" href="concept-m-art-deco.html">
+        <div class="letter">CONCEPT M</div>
+        <h2>Art Deco</h2>
+        <p>ยุคทอง 1920s · ทองบนเขียวมรกต, ลายพัด, หรูหราแบบ Gatsby</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card n" href="concept-n-ocean-breeze.html">
+        <div class="letter">CONCEPT N</div>
+        <h2>Ocean Breeze</h2>
+        <p>ลมทะเลสดชื่น · ฟ้าอควา, คลื่น, ปะการัง, โปร่งสบาย</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card o" href="concept-o-swiss-brutalist.html">
+        <div class="letter">CONCEPT O</div>
+        <h2>Swiss Brutalist</h2>
+        <p>ขาวดำดิบเท่ · mono, กริดเส้นหนา, marquee, แดงเดียวที่ตัด</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card p" href="concept-p-candy-pop.html">
+        <div class="letter">CONCEPT P</div>
+        <h2>Candy Pop</h2>
+        <p>ขนมหวานสดใส · กรอบดำหนา, เงาเยื้องสี, สติกเกอร์ Gen Z</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card q" href="concept-q-twilight-garden.html">
+        <div class="letter">CONCEPT Q</div>
+        <h2>Twilight Garden</h2>
+        <p>สวนกลางคืน · เขียวเข้ม, หิ่งห้อยเรืองแสง, กล้วยไม้, ลึกลับ</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card r" href="concept-r-travel-journal.html">
+        <div class="letter">CONCEPT R</div>
+        <h2>Travel Journal</h2>
+        <p>จดหมายเหตุเดินทาง · กระดาษคราฟท์, ตราไปรษณีย์, airmail</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card s" href="concept-s-celestial-map.html">
+        <div class="letter">CONCEPT S · ORBIT</div>
+        <h2>Celestial Map</h2>
+        <p>แผนที่ท้องฟ้า · วงโคจรบาง, orrery, พิกัดดาราศาสตร์, สง่างาม</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card t" href="concept-t-mission-control.html">
+        <div class="letter">CONCEPT T · ORBIT</div>
+        <h2>Mission Control</h2>
+        <p>ศูนย์ควบคุมภารกิจ · T-minus, telemetry, สไตล์ NASA retro</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card u" href="concept-u-stargazer.html">
+        <div class="letter">CONCEPT U · ORBIT</div>
+        <h2>Stargazer</h2>
+        <p>ดูดาวยามค่ำ · ท้องฟ้ากะพริบ, ดวงจันทร์, เนบิวลา, ฝันหวาน</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+    </div>
+    <p class="sub" style="margin-top: 48px; font-weight: 700;">Desktop — เวอร์ชันเต็มจอ responsive ของ 7 ธีมที่คัดเลือก (countdown tick สด · 3 ขนาดจอ)</p>
+    <div class="grid">
+      <a class="card b" href="concept-b-fan-zine-desktop.html">
+        <div class="letter">DESKTOP · B</div>
+        <h2>Fan Zine</h2>
+        <p>สมุดสแครปเต็มจอ · เทป washi, polaroid 4 คอลัมน์, bottom nav มือถือ</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card a" href="concept-a-midnight-broadcast-desktop.html">
+        <div class="letter">DESKTOP · A</div>
+        <h2>Midnight Broadcast</h2>
+        <p>สถานีกลางคืนเต็มจอ · ON AIR, corner ticks, scanline</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card e" href="concept-e-y2k-diary-desktop.html">
+        <div class="letter">DESKTOP · E</div>
+        <h2>Y2K Diary</h2>
+        <p>เดสก์ท็อปยุค 2000 เต็มจอ · window chrome, pixel font, hard shadow</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card l" href="concept-l-sakura-desktop.html">
+        <div class="letter">DESKTOP · L</div>
+        <h2>Sakura</h2>
+        <p>เครื่องเขียนญี่ปุ่นเต็มจอ · Mincho serif, hanko, กลีบซากุระ</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card n" href="concept-n-ocean-breeze-desktop.html">
+        <div class="letter">DESKTOP · N</div>
+        <h2>Ocean Breeze</h2>
+        <p>ลมทะเลเต็มจอ · มุมมนใหญ่, ขอบคลื่น, bottom nav แบบ pill ลอย</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card p" href="concept-p-candy-pop-desktop.html">
+        <div class="letter">DESKTOP · P</div>
+        <h2>Candy Pop</h2>
+        <p>แคนดี้เต็มจอ · ขอบหมึก 3px, hard shadow สีลูกกวาด, chip แบบ pill</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+      <a class="card t" href="concept-t-mission-control-desktop.html">
+        <div class="letter">DESKTOP · T</div>
+        <h2>Mission Control</h2>
+        <p>คอนโซล NASA เต็มจอ · T-minus, telemetry, section แบบ FLIGHT PLAN</p>
+        <span class="open">เปิด mockup →</span>
+      </a>
+    </div>
+  </main>
+</body>
+</html>

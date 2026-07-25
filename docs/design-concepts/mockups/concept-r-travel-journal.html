@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept R — Travel Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Anuphan:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --kraft: #e9dcc3;
+    --paper: #f7efdc;
+    --surface: #fdf8ec;
+    --ink: #43392a;
+    --muted: #9a8867;
+    --stamp: #b4553c;
+    --airmail: #3c5a8a;
+    --line: #d5c5a3;
+    --font-type: 'Special Elite', 'Anuphan', monospace;
+    --font-body: 'Anuphan', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #d9cbae;
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--paper);
+    background-image: repeating-linear-gradient(0deg, transparent 0 27px, rgba(60,90,138,0.09) 27px 28px);
+    border: 1px solid var(--line);
+    box-shadow: 5px 5px 0 rgba(67,57,42,0.18);
+    overflow: hidden;
+  }
+
+  .airmail {
+    height: 14px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--stamp) 0 14px, var(--paper) 14px 28px,
+      var(--airmail) 28px 42px, var(--paper) 42px 56px
+    );
+    border-bottom: 1px solid var(--line);
+  }
+
+  .topbar { text-align: center; padding: 22px 24px 6px; }
+  .brand {
+    font-family: var(--font-type);
+    font-size: 25px;
+    letter-spacing: 0.06em;
+  }
+  .tagline { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .tagline i { color: var(--stamp); font-style: normal; }
+
+  .countdown {
+    margin: 14px 22px 0;
+    background: var(--surface);
+    border: 1.5px solid var(--ink);
+    padding: 16px 18px;
+    position: relative;
+    transform: rotate(-0.6deg);
+    box-shadow: 3px 3px 0 rgba(67,57,42,0.15);
+  }
+  .countdown .stampmark {
+    position: absolute;
+    top: -14px; right: 14px;
+    width: 46px; height: 46px;
+    border: 2px dashed var(--stamp);
+    border-radius: 50%;
+    color: var(--stamp);
+    font-family: var(--font-type);
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transform: rotate(10deg);
+    background: var(--paper);
+    line-height: 1.3;
+  }
+  .countdown .kicker { font-family: var(--font-type); font-size: 11px; color: var(--airmail); letter-spacing: 0.12em; }
+  .countdown h2 { font-size: 17px; font-weight: 600; margin: 4px 0 4px; }
+  .countdown .time { font-family: var(--font-type); font-size: 24px; color: var(--stamp); }
+  .countdown .time small { font-size: 12px; color: var(--muted); font-family: var(--font-body); }
+
+  section { padding: 18px 22px 0; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+  .section-head h2 {
+    font-family: var(--font-type);
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    border-bottom: 2px solid var(--stamp);
+    padding-bottom: 3px;
+  }
+  .more { font-size: 11.5px; color: var(--airmail); text-decoration: none; }
+
+  .sched { background: var(--surface); border: 1px solid var(--line); }
+  .sched-row {
+    display: grid;
+    grid-template-columns: 58px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 11px 14px;
+    font-size: 13px;
+  }
+  .sched-row + .sched-row { border-top: 1px dashed var(--line); }
+  .sched-row .t { font-family: var(--font-type); color: var(--airmail); font-size: 14px; }
+  .sched-row .ch { font-size: 10px; color: var(--muted); border: 1px solid var(--line); padding: 2px 7px; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 8px 8px 12px;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    box-shadow: 3px 3px 6px rgba(67,57,42,0.14);
+    transition: transform 160ms ease;
+  }
+  .card:nth-child(1) { transform: rotate(-1.2deg); }
+  .card:nth-child(2) { transform: rotate(1deg); }
+  .card:hover, .card:focus-visible { transform: rotate(0); outline: 2px solid var(--stamp); outline-offset: 2px; }
+  .card .art { aspect-ratio: 3 / 3.4; border: 1px solid var(--line); position: relative; }
+  .art.a1 { background: linear-gradient(160deg, #8aa3c2, #4a6285); }
+  .art.a2 { background: linear-gradient(210deg, #c2a38a, #85604a); }
+  .art .postmark {
+    position: absolute;
+    top: 6px; left: 6px;
+    font-family: var(--font-type);
+    font-size: 8.5px;
+    color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.5);
+    padding: 1px 5px;
+    border-radius: 999px;
+  }
+  .card h3 { font-size: 13px; font-weight: 600; margin-top: 10px; }
+  .card p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .halo {
+    background: var(--kraft);
+    border: 1px solid var(--line);
+    padding: 16px 18px;
+    position: relative;
+  }
+  .halo::before {
+    content: 'PAR AVION';
+    position: absolute;
+    top: 8px; right: 12px;
+    font-family: var(--font-type);
+    font-size: 9px;
+    color: var(--airmail);
+    border: 1.5px solid var(--airmail);
+    padding: 2px 8px;
+    transform: rotate(3deg);
+    opacity: 0.75;
+  }
+  .halo-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--airmail), var(--stamp)); flex: none; }
+  .halo-head strong { font-size: 13px; font-weight: 600; }
+  .halo-head span { display: block; font-size: 10.5px; color: var(--muted); }
+  .halo p { font-family: var(--font-type); font-size: 14px; line-height: 1.85; }
+  .halo-stats { margin-top: 10px; font-size: 11.5px; color: var(--muted); font-family: var(--font-body); }
+  .halo-stats b { color: var(--stamp); }
+
+  .bottomnav {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1.5px solid var(--ink);
+    background: var(--surface);
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 11px 0 13px;
+    font-family: var(--font-type);
+    font-size: 9.5px;
+    color: var(--muted);
+    text-decoration: none;
+    min-height: 58px;
+    justify-content: center;
+  }
+  .nav-item .icon { font-size: 15px; }
+  .nav-item.active { color: var(--stamp); text-decoration: underline; text-underline-offset: 4px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+    .card:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="airmail" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">GL ORBIT POST</div>
+      <p class="tagline">จดหมายเหตุซีรีส์ ฉบับวันศุกร์ที่ 24 <i>· ส่งถึงมือคุณ</i></p>
+    </header>
+
+    <div class="countdown">
+      <span class="stampmark" aria-hidden="true">FIRST<br>AIRING</span>
+      <span class="kicker">NEXT DEPARTURE · เที่ยวถัดไป</span>
+      <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+      <div class="time">00:42:17 <small>· ออกเดินทาง 22:30 ทาง GMMTV</small></div>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>ตารางเดินทางวันนี้</h2>
+        <a class="more" href="#">ทั้งสัปดาห์ →</a>
+      </div>
+      <div class="sched">
+        <div class="sched-row"><span class="t">22:30</span><span>23.5 องศาที่โลกเอียง</span><span class="ch">GMMTV</span></div>
+        <div class="sched-row"><span class="t">23:15</span><span>Affair รักเล่นกล</span><span class="ch">CH3</span></div>
+        <div class="sched-row"><span class="t">23:45</span><span>Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>โปสการ์ดแนะนำ</h2>
+        <a class="more" href="#">สำรวจ →</a>
+      </div>
+      <div class="cards">
+        <a class="card" href="#">
+          <div class="art a1"><span class="postmark">24 JUL</span></div>
+          <h3>Mate รักเธอเท่าโลก</h3>
+          <p>EP.5 · ศุกร์ 21:00</p>
+        </a>
+        <a class="card" href="#">
+          <div class="art a2"><span class="postmark">25 JUL</span></div>
+          <h3>Pluto นิทาน ดวงดาว ความรัก</h3>
+          <p>EP.12 · เสาร์ 20:30</p>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>จดหมายจากเพื่อน</h2>
+        <a class="more" href="#">Orbit Halo →</a>
+      </div>
+      <div class="halo">
+        <div class="halo-head">
+          <span class="avatar"></span>
+          <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+        </div>
+        <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+        <div class="halo-stats"><b>1,204</b> ถูกใจ · <b>86</b> ความคิดเห็น</div>
+      </div>
+    </section>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">⌂</span>หน้าแรก</a>
+      <a class="nav-item" href="#"><span class="icon">☷</span>ปฏิทิน</a>
+      <a class="nav-item" href="#"><span class="icon">✧</span>ฮาโล</a>
+      <a class="nav-item" href="#"><span class="icon">♡</span>บันทึก</a>
+      <a class="nav-item" href="#"><span class="icon">☺</span>ฉัน</a>
+    </nav>
+  </div>
+</body>
+</html>

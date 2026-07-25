@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept P — Candy Pop · Desktop (Responsive)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fff6ec;
+    --paper-deep: #ffe9d6;
+    --surface: #ffffff;
+    --ink: #37204a;
+    --muted: #9a85ad;
+    --line: #f3ddc4;
+    --pink: #ff5c9e;
+    --pink-dark: #d93d82;
+    --pink-soft: #ffe3ef;
+    --orange: #ff9b3d;
+    --mint: #2fd6a3;
+    --mint-soft: #c8f4e4;
+    --grape: #9b5de5;
+    --lavender-soft: #e8d8f8;
+    --sky: #4bb7f0;
+    --font-display: 'Baloo 2', 'Prompt', sans-serif;
+    --font-body: 'Prompt', 'Mali', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: linear-gradient(150deg, var(--pink-soft), var(--paper) 55%, #e3f7ff);
+    background-attachment: fixed;
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── Sheet: full-bleed, no surrounding gutter ── */
+  .sheet {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* ── Topbar ── */
+  .topbar {
+    position: relative;
+    text-align: center;
+    padding: 34px 32px 18px;
+    border-bottom: 3px solid var(--ink);
+    background: var(--paper);
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 4vw, 40px);
+    font-weight: 800;
+    display: inline-block;
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+  .brand .l1 { color: var(--pink); }
+  .brand .l2 { color: var(--orange); }
+  .brand .l3 { color: var(--grape); }
+  .brand .l4 { color: var(--mint); }
+  .brand .l5 { color: var(--sky); }
+  .tagline { font-size: 13.5px; color: var(--muted); margin-top: 5px; }
+  .controls {
+    position: absolute;
+    top: 24px; right: 28px;
+    display: flex;
+    gap: 8px;
+  }
+  .ctrl {
+    font-family: var(--font-display);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--surface);
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 7px 16px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--pink-soft);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+  .ctrl:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--pink); border-color: var(--ink); color: var(--pink-dark); }
+  .ctrl .dot { width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--orange)); border: 2px solid var(--ink); }
+
+  /* ── Desktop nav row ── */
+  .navrow {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 32px;
+    border-bottom: 3px solid var(--ink);
+    background: var(--paper);
+  }
+  .navrow a {
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 9px 18px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    border: 3px solid transparent;
+    border-radius: 999px;
+  }
+  .navrow a:hover { color: var(--pink-dark); }
+  .navrow a.active {
+    color: #fff;
+    background: var(--ink);
+    border-color: var(--ink);
+    border-radius: 999px;
+    box-shadow: 3px 3px 0 var(--pink);
+  }
+  .navrow .badge {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--pink);
+    color: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 1px 7px;
+    margin-left: 6px;
+  }
+
+  /* ── Sections: full-bleed bands, content centered at reading width ── */
+  section { padding: 30px max(40px, calc((100% - 1120px) / 2 + 40px)) 6px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+  .pill-head {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 16px;
+    background: var(--surface);
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 5px 20px;
+    box-shadow: 4px 4px 0 var(--mint);
+  }
+  .pill-head.grape { box-shadow: 4px 4px 0 var(--grape); }
+  .pill-head.sky { box-shadow: 4px 4px 0 var(--sky); }
+  .more {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+    color: var(--pink);
+    text-decoration: none;
+    border-bottom: 2px solid var(--pink);
+    padding: 4px 2px;
+  }
+  .more:hover { color: var(--pink-dark); border-color: var(--pink-dark); }
+
+  /* ── Hero: countdown + schedule ── */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 36px;
+    align-items: start;
+  }
+  .countdown-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface);
+    border: 3px solid var(--ink);
+    border-radius: 26px;
+    padding: 24px 24px 22px;
+    box-shadow: 6px 6px 0 var(--orange);
+    position: relative;
+    margin-top: 14px;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+  .countdown-card:hover, .countdown-card:focus-visible {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--orange);
+    outline: none;
+  }
+  .countdown-card::before {
+    content: '★';
+    position: absolute;
+    top: -18px; right: 22px;
+    font-size: 26px;
+    color: var(--orange);
+    -webkit-text-stroke: 1.5px var(--ink);
+    transform: rotate(12deg);
+  }
+  .kicker {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--pink);
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 3px 14px;
+    transform: rotate(-2deg);
+  }
+  .countdown-card h2 { font-family: var(--font-display); font-size: 21px; font-weight: 800; margin: 10px 0 8px; }
+  .bignum { font-family: var(--font-display); font-size: clamp(34px, 3.4vw, 42px); font-weight: 800; color: var(--pink); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .bignum small { display: block; font-size: 13.5px; color: var(--muted); font-weight: 600; margin-top: 6px; font-variant-numeric: normal; }
+  .sticker {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--lavender-soft);
+    color: var(--ink);
+    padding: 4px 14px;
+    border-radius: 999px;
+    border: 3px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--grape);
+    transform: rotate(1.5deg);
+    margin-top: 16px;
+  }
+
+  .schedule { display: flex; flex-direction: column; gap: 10px; }
+  .sched-row {
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 11px 16px;
+    background: var(--surface);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    font-size: 14.5px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+  .sched-row:hover, .sched-row:focus-visible {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--mint-soft);
+    outline: none;
+  }
+  .sched-row.live { background: var(--pink-soft); box-shadow: 5px 5px 0 var(--pink); }
+  .sched-row .t { font-family: var(--font-display); font-weight: 800; font-size: 17px; color: var(--grape); font-variant-numeric: tabular-nums; }
+  .sched-row .name { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sched-row .name small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .sched-row .ch {
+    font-size: 10.5px;
+    font-weight: 600;
+    background: var(--sky);
+    color: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 3px 10px;
+    white-space: nowrap;
+  }
+  .uncut {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--pink-dark);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 1px 7px;
+    margin-left: 6px;
+    letter-spacing: 0.04em;
+    vertical-align: 1px;
+  }
+
+  /* ── Series cards collage ── */
+  .collage { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .polaroid {
+    background: var(--surface);
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+  .polaroid:hover, .polaroid:focus-visible {
+    transform: translate(-2px, -2px) rotate(-1deg);
+    box-shadow: 6px 6px 0 var(--grape);
+    outline: none;
+  }
+  .photo {
+    position: relative;
+    aspect-ratio: 3 / 3.4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 14px 10px;
+    text-align: center;
+    border-bottom: 3px solid var(--ink);
+    overflow: hidden;
+  }
+  .photo::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(rgba(255,255,255,0.28) 2.5px, transparent 2.5px);
+    background-size: 18px 18px;
+    pointer-events: none;
+  }
+  .photo .pt {
+    font-family: var(--font-display);
+    color: rgba(255,255,255,0.97);
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.35;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  .photo .ps {
+    font-family: var(--font-display);
+    color: rgba(255,255,255,0.9);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .ph1 { background: linear-gradient(150deg, var(--pink), var(--pink-dark)); }
+  .ph2 { background: linear-gradient(210deg, var(--sky), #2a7ec2); }
+  .ph3 { background: linear-gradient(160deg, var(--grape), #6d35b8); }
+  .ph4 { background: linear-gradient(200deg, var(--mint), #1aa377); }
+  .status {
+    position: absolute;
+    top: 10px; left: 10px;
+    font-family: var(--font-display);
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 10px;
+    background: rgba(255,255,255,0.95);
+    color: var(--pink-dark);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    transform: rotate(-3deg);
+  }
+  .caption { padding: 11px 14px 13px; font-size: 14px; font-weight: 600; }
+  .caption small { display: block; color: var(--muted); font-size: 11.5px; font-weight: 400; margin-top: 2px; }
+
+  /* ── Halo row ── */
+  .halo-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 36px; align-items: start; }
+  .halo-note {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface);
+    border: 3px solid var(--ink);
+    border-radius: 22px;
+    padding: 20px 22px 16px;
+    box-shadow: 6px 6px 0 var(--mint-soft);
+    position: relative;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+  .halo-note:hover, .halo-note:focus-visible {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--mint);
+    outline: none;
+  }
+  .halo-note::after {
+    content: '♡';
+    position: absolute;
+    right: 18px; top: 12px;
+    color: var(--pink);
+    font-size: 26px;
+    transform: rotate(12deg);
+  }
+  .halo-head { display: flex; align-items: center; gap: 11px; margin-bottom: 8px; }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%; flex: none;
+    background: linear-gradient(135deg, var(--pink), var(--orange));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 800; color: #fff; font-size: 16px;
+    border: 3px solid var(--ink);
+  }
+  .halo-head strong { font-family: var(--font-display); font-size: 14.5px; font-weight: 800; display: block; }
+  .halo-head span { display: block; font-size: 11.5px; color: var(--muted); }
+  .halo-note p { font-size: 14.5px; line-height: 1.75; }
+  .halo-stats { margin-top: 10px; font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--muted); }
+  .halo-stats b { color: var(--pink); }
+  .halo-side {
+    background: var(--surface);
+    border: 3px solid var(--ink);
+    border-radius: 22px;
+    box-shadow: 5px 5px 0 var(--lavender-soft);
+    padding: 18px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .halo-side h3 { font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--ink); margin-bottom: 10px; }
+  .halo-side .tag {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--grape);
+    border: 2.5px solid var(--ink);
+    border-radius: 999px;
+    padding: 3px 12px;
+    margin: 0 6px 8px 0;
+    background: var(--paper);
+    box-shadow: 2.5px 2.5px 0 var(--lavender-soft);
+  }
+
+  /* ── Colophon ── */
+  .colophon {
+    margin-top: 40px;
+    border-top: 3px solid var(--ink);
+    background: var(--paper);
+    padding: 22px max(40px, calc((100% - 1120px) / 2 + 40px)) 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .colophon .links { display: flex; gap: 18px; flex-wrap: wrap; }
+  .colophon a { color: var(--muted); text-decoration: none; font-weight: 500; border-bottom: 2px dotted var(--muted); }
+  .colophon a:hover { color: var(--pink); border-color: var(--pink); }
+
+  /* ── Focus visibility ── */
+  .ctrl:focus-visible, .navrow a:focus-visible, .more:focus-visible,
+  .colophon a:focus-visible, .nav-item:focus-visible {
+    outline: 3px solid var(--grape);
+    outline-offset: 2px;
+  }
+
+  /* ── Mobile bottom nav (desktop hidden) ── */
+  .bottomnav { display: none; }
+
+  /* ── Tablet ── */
+  @media (max-width: 1023px) {
+    section { padding: 24px 28px 4px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 26px; }
+    .countdown-card { max-width: 460px; }
+    .collage { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .halo-grid { grid-template-columns: 1fr; gap: 24px; }
+    .controls { top: 18px; right: 18px; }
+  }
+
+  /* ── Phone: back to the original mobile mockup behaviour ── */
+  @media (max-width: 767px) {
+    body { padding-bottom: 108px; }
+    .topbar { padding: 26px 18px 14px; }
+    section { padding: 20px 18px 4px; }
+    .collage { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .controls { position: static; justify-content: center; margin-top: 14px; }
+    .ctrl { padding: 7px 12px; }
+    .navrow { display: none; }
+    .colophon { flex-direction: column; text-align: center; padding: 18px 18px 22px; }
+    .colophon .links { justify-content: center; }
+    .sched-row { grid-template-columns: 60px 1fr auto; gap: 10px; padding: 10px 12px; font-size: 13px; }
+    .bottomnav {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      position: fixed;
+      left: 12px; right: 12px; bottom: 10px;
+      z-index: 10;
+      background: var(--surface);
+      border: 3px solid var(--ink);
+      border-radius: 999px;
+      box-shadow: 5px 5px 0 var(--sky);
+      padding: 6px;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 8px 0;
+      font-family: var(--font-display); font-size: 10px; font-weight: 700;
+      color: var(--muted); text-decoration: none;
+      border-radius: 999px;
+      min-height: 52px; justify-content: center;
+      position: relative;
+    }
+    .nav-item .icon { font-size: 17px; }
+    .nav-item.active { background: var(--ink); color: #fff; }
+    .nav-item .badge {
+      position: absolute; top: 4px; right: calc(50% - 22px);
+      font-family: var(--font-body); font-size: 9.5px; font-weight: 600;
+      background: var(--pink); color: #fff;
+      border: 2px solid var(--ink); border-radius: 999px; padding: 0 6px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ctrl, .countdown-card, .sched-row, .polaroid, .halo-note { transition: none; }
+    .ctrl:hover, .countdown-card:hover, .sched-row:hover, .polaroid:hover, .halo-note:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+
+    <header class="topbar">
+      <div class="brand"><span class="l1">G</span><span class="l2">L</span><span class="l3">O</span><span class="l4">R</span><span class="l5">B</span><span class="l1">I</span><span class="l2">T</span></div>
+      <p class="tagline">สนุกได้ทุกคืน เลือกรสที่ชอบ!</p>
+      <div class="controls">
+        <button class="ctrl" type="button">ไทย ▾</button>
+        <button class="ctrl" type="button"><span class="dot" aria-hidden="true"></span>ธีม ▾</button>
+        <button class="ctrl" type="button">☺ โปรไฟล์ ▾</button>
+      </div>
+    </header>
+
+    <nav class="navrow" aria-label="เมนูหลัก">
+      <a class="active" href="#" aria-current="page">หน้าแรก</a>
+      <a href="#">ปฏิทิน</a>
+      <a href="#">สำรวจ</a>
+      <a href="#">ฮาโล</a>
+      <a href="#">แจ้งเตือน<span class="badge">3</span></a>
+    </nav>
+
+    <section aria-labelledby="today-head">
+      <div class="hero-grid">
+        <a class="countdown-card" href="#" aria-label="23.5 องศาที่โลกเอียง ตอนที่ 9 ออกอากาศคืนนี้ 4 ทุ่มครึ่ง">
+          <span class="kicker">อีกนิดเดียวจะได้ดูแล้ว!</span>
+          <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+          <div class="bignum"><span id="cd">00:42:17</span> <small>คืนนี้ 22:30 ทาง GMMTV</small></div>
+          <span class="sticker">จิ้นแห่งสัปดาห์</span>
+        </a>
+        <div>
+          <div class="section-head">
+            <h2 id="today-head" style="font-size:inherit"><span class="pill-head">ตารางฉายวันนี้</span></h2>
+            <a class="more" href="#">ดูทั้งสัปดาห์ →</a>
+          </div>
+          <div class="schedule">
+            <a class="sched-row live" href="#"><span class="t">22:30</span><span class="name">23.5 องศาที่โลกเอียง <small>EP.9 · ยังไม่เริ่ม</small></span><span class="ch">GMMTV</span></a>
+            <a class="sched-row" href="#"><span class="t">23:15</span><span class="name">Affair รักเล่นกล <small>EP.4</small></span><span class="ch">CH3</span></a>
+            <a class="sched-row" href="#"><span class="t">23:45</span><span class="name">Blank เติมคำว่ารักลงในช่องว่าง <small>EP.11<span class="uncut">UNCUT</span></small></span><span class="ch">9STAR</span></a>
+            <a class="sched-row" href="#"><span class="t">23:55</span><span class="name">Mate รักเธอเท่าโลก <small>EP.5</small></span><span class="ch">WeTV</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="featured-head">
+      <div class="section-head">
+        <h2 id="featured-head" style="font-size:inherit"><span class="pill-head grape">ซีรีส์ที่ทุกคนกำลังจิ้น</span></h2>
+        <a class="more" href="#">สำรวจ →</a>
+      </div>
+      <div class="collage">
+        <a class="polaroid" href="#">
+          <div class="photo ph1"><span class="status">กำลังฉาย</span><span class="ps">GMMTV · 2025</span><span class="pt">23.5 องศาที่โลกเอียง</span></div>
+          <div class="caption">23.5 องศาที่โลกเอียง <small>EP.9 · พุธ 22:30</small></div>
+        </a>
+        <a class="polaroid" href="#">
+          <div class="photo ph2"><span class="status">กำลังฉาย</span><span class="ps">CHANGE2561 · 2025</span><span class="pt">Affair รักเล่นกล</span></div>
+          <div class="caption">Affair รักเล่นกล <small>EP.4 · พฤหัส 23:15</small></div>
+        </a>
+        <a class="polaroid" href="#">
+          <div class="photo ph3"><span class="status">กำลังฉาย</span><span class="ps">9STAR · 2025</span><span class="pt">Blank เติมคำว่ารักลงในช่องว่าง</span></div>
+          <div class="caption">Blank เติมคำว่ารักลงในช่องว่าง <small>EP.11 · เสาร์ 23:45</small></div>
+        </a>
+        <a class="polaroid" href="#">
+          <div class="photo ph4"><span class="status">เร็วๆ นี้</span><span class="ps">WeTV · 2025</span><span class="pt">Mate รักเธอเท่าโลก</span></div>
+          <div class="caption">Mate รักเธอเท่าโลก <small>EP.5 · ศุกร์ 21:00</small></div>
+        </a>
+      </div>
+    </section>
+
+    <section aria-labelledby="halo-head">
+      <div class="section-head">
+        <h2 id="halo-head" style="font-size:inherit"><span class="pill-head sky">เสียงจาก Orbit Halo</span></h2>
+        <a class="more" href="#">อ่านฟีด →</a>
+      </div>
+      <div class="halo-grid">
+        <a class="halo-note" href="#">
+          <div class="halo-head">
+            <span class="avatar" aria-hidden="true">อ</span>
+            <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+          </div>
+          <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัวกันหมด ดูซ้ำรอบที่สี่ยังน้ำตาไหลเลย ใครยังไม่ดูคือพลาดจริงๆ</p>
+          <div class="halo-stats"><b>1,204</b> ถูกใจ · <b>86</b> ความคิดเห็น</div>
+        </a>
+        <div class="halo-side">
+          <h3>กำลังคุยกันเรื่อง…</h3>
+          <span class="tag">#23point5EP9</span>
+          <span class="tag">#BlankTheSeries</span>
+          <span class="tag">ทฤษฎีตอนจบ</span>
+          <span class="tag">นับถอยหลัง Mate</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="colophon">
+      <span>GL Orbit — ทำด้วย ♡ โดยแฟนซีรีส์ เพื่อแฟนซีรีส์</span>
+      <span class="links">
+        <a href="#">เกี่ยวกับ</a>
+        <a href="#">ซีรีส์ทั้งหมด</a>
+        <a href="#">นักแสดง</a>
+        <a href="#">คู่จิ้น</a>
+      </span>
+    </footer>
+
+  </div>
+
+  <nav class="bottomnav" aria-label="เมนูมือถือ">
+    <a class="nav-item active" href="#" aria-current="page"><span class="icon">⌂</span>หน้าแรก</a>
+    <a class="nav-item" href="#"><span class="icon">✎</span>ปฏิทิน</a>
+    <a class="nav-item" href="#"><span class="icon">✿</span>ฮาโล</a>
+    <a class="nav-item" href="#"><span class="icon">♡</span>แจ้งเตือน<span class="badge">3</span></a>
+    <a class="nav-item" href="#"><span class="icon">☺</span>ฉัน</a>
+  </nav>
+
+<script>
+  // Live countdown to tonight 22:30 (demo realism; falls back to tomorrow if passed).
+  (function () {
+    var el = document.getElementById('cd');
+    if (!el) return;
+    function target() {
+      var t = new Date();
+      t.setHours(22, 30, 0, 0);
+      if (t.getTime() <= Date.now()) t.setDate(t.getDate() + 1);
+      return t.getTime();
+    }
+    var end = target();
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function tick() {
+      var diff = Math.max(0, end - Date.now());
+      var h = Math.floor(diff / 3.6e6), m = Math.floor((diff % 3.6e6) / 6e4), s = Math.floor((diff % 6e4) / 1e3);
+      el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+      if (!reduce) setTimeout(tick, 1000);
+    }
+    tick();
+  })();
+</script>
+</body>
+</html>

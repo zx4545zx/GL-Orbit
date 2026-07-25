@@ -1,6 +1,6 @@
 # GL-Orbit Architecture
 
-> Central hub and broadcast schedule for GL (Girls' Love) series worldwide. GL-Orbit is a SvelteKit full-stack app backed by Neon PostgreSQL, with live schedule data, member features, admin CRUD, SEO/PWA support, notifications, and AI-assisted series Q&A.
+> Central hub and broadcast schedule for GL (Girls' Love) series worldwide. GL-Orbit is a SvelteKit full-stack app backed by provider-selectable PostgreSQL, with live schedule data, member features, admin CRUD, SEO/PWA support, notifications, and AI-assisted series Q&A.
 
 ---
 
@@ -13,9 +13,9 @@
 | Language | TypeScript |
 | Styling | Tailwind CSS 4 |
 | Build Tool | Vite 6 |
-| Database | Neon PostgreSQL |
+| Database | Neon PostgreSQL or Supabase PostgreSQL |
 | ORM | Drizzle ORM |
-| DB Driver | `@neondatabase/serverless` |
+| DB Driver | `postgres` + `drizzle-orm/postgres-js` |
 | Auth | Custom JWT with `jose` + `bcryptjs` |
 | PWA | `@vite-pwa/sveltekit` |
 | Tests | Vitest |
@@ -106,7 +106,7 @@ Core enums:
 
 ## Data Access Pattern
 
-`src/lib/server/db/index.ts` lazily initializes the Neon HTTP driver and wraps it with Drizzle. Server code should prefer `await getDb()`.
+`src/lib/server/db/index.ts` lazily initializes Postgres.js with `prepare: false` and wraps it with Drizzle. `DB_PROVIDER` selects Neon or Supabase while `await getDb()` stays unchanged. Supabase runtime URLs use transaction pooler port `6543`; migration commands require the direct `DATABASE_MIGRATION_URL`. Read-only AI access resolves only the selected provider's read-only URL.
 
 Feature-specific query logic is kept in helper modules instead of being embedded directly in UI components:
 

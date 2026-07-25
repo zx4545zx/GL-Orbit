@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
-import { getDb } from '../src/lib/server/db/index.js';
+import { closeDb, getDb } from '../src/lib/server/db/index.js';
 import * as schema from '../src/lib/server/db/schema.js';
 import { hashPassword } from '../src/lib/server/auth/password.js';
 
@@ -12,7 +12,8 @@ async function seedAdmin() {
 
 	if (!email || !password || !username) {
 		console.error('❌ Usage: npx tsx scripts/seed-admin.ts --email=admin@example.com --password=YOUR_SECRET --username=admin');
-		process.exit(1);
+		process.exitCode = 1;
+		return;
 	}
 
 	const db = await getDb();
@@ -25,7 +26,7 @@ async function seedAdmin() {
 
 	if (existing.length > 0) {
 		console.log(`Admin user with email "${email}" already exists.`);
-		process.exit(0);
+		return;
 	}
 
 	const passwordHash = await hashPassword(password);
@@ -49,7 +50,9 @@ async function seedAdmin() {
 	console.log(`\n   Login at: /admin/login`);
 }
 
-seedAdmin().catch((err) => {
-	console.error('❌ Failed to seed admin:', err);
-	process.exit(1);
-});
+seedAdmin()
+	.catch((err) => {
+		console.error('❌ Failed to seed admin:', err);
+		process.exitCode = 1;
+	})
+	.finally(closeDb);

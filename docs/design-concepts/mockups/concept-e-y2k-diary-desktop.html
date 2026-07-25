@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept E — Y2K Diary · Desktop (Responsive)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #e8e6f5;
+    --bg-deep: #ddd9f0;
+    --win: #fdfcff;
+    --ink: #241a3a;
+    --muted: #6f6390;
+    --chrome1: #ffd6f5;
+    --chrome2: #b8f0ff;
+    --chrome3: #d9c8ff;
+    --hot: #ff3fbf;
+    --hot-dark: #c21e92;
+    --blue: #3f7dff;
+    --line: #b3a8d6;
+    --shadow-card: 5px 5px 0 rgba(36,26,58,0.25);
+    --shadow-chrome: 4px 4px 0 #d9c8ff;
+    --font-pixel: 'Silkscreen', 'Prompt', monospace;
+    --font-body: 'Prompt', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    background-image: linear-gradient(rgba(179,168,214,0.28) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(179,168,214,0.28) 1px, transparent 1px);
+    background-size: 22px 22px;
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── Sheet: full-bleed, no surrounding gutter ── */
+  .sheet {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* ── OS titlebar strip (full width) ── */
+  .titlebar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(90deg, var(--hot), var(--blue));
+    color: #fff;
+    padding: 9px 20px;
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .titlebar .dots { margin-left: auto; display: flex; gap: 6px; }
+  .titlebar .dots span {
+    width: 12px; height: 12px;
+    background: #fff;
+    border: 1.5px solid var(--ink);
+    display: inline-block;
+  }
+
+  /* ── Topbar ── */
+  .topbar {
+    position: relative;
+    text-align: center;
+    padding: 38px 32px 20px;
+    border-bottom: 2px solid var(--ink);
+    background: repeating-linear-gradient(45deg, transparent 0 14px, rgba(255,63,191,0.05) 14px 28px);
+  }
+  .brand {
+    font-family: var(--font-pixel);
+    font-size: clamp(28px, 3.6vw, 40px);
+    font-weight: 700;
+    display: inline-block;
+    color: var(--ink);
+    text-shadow: 3px 3px 0 var(--chrome2), 6px 6px 0 var(--chrome1);
+    letter-spacing: 0.02em;
+  }
+  .tagline { font-size: 14px; color: var(--muted); margin-top: 12px; }
+  .sparkle { color: var(--hot); }
+  .controls {
+    position: absolute;
+    top: 24px; right: 28px;
+    display: flex;
+    gap: 10px;
+  }
+  .ctrl {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--win);
+    border: 2px solid var(--ink);
+    padding: 7px 14px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--chrome3);
+    transition: transform 100ms ease-out, box-shadow 100ms ease-out;
+  }
+  .ctrl:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--hot);
+  }
+  .ctrl:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--hot); }
+  .ctrl .dot {
+    width: 11px; height: 11px;
+    background: conic-gradient(var(--chrome1), var(--chrome2), var(--chrome3), var(--chrome1));
+    border: 1.5px solid var(--ink);
+  }
+
+  /* ── Desktop nav row ── */
+  .navrow {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 32px;
+    border-bottom: 2px solid var(--ink);
+    background: linear-gradient(90deg, var(--chrome1), var(--chrome2) 50%, var(--chrome3));
+  }
+  .navrow a {
+    position: relative;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 12px 20px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .navrow a:hover { background: rgba(255,255,255,0.55); }
+  .navrow a.active {
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--ink);
+    color: #fff;
+    box-shadow: inset 3px 3px 0 var(--hot);
+  }
+  .navrow .badge {
+    font-family: var(--font-pixel);
+    font-size: 9px;
+    background: var(--hot);
+    color: #fff;
+    border: 1.5px solid var(--ink);
+    padding: 2px 6px;
+    margin-left: 6px;
+  }
+
+  /* ── Sections: full-bleed bands, content centered at reading width ── */
+  section { padding: 30px max(40px, calc((100% - 1120px) / 2 + 40px)) 6px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+  .chip {
+    display: inline-block;
+    font-family: var(--font-pixel);
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    background: var(--ink);
+    padding: 6px 14px;
+    box-shadow: 4px 4px 0 var(--chrome3);
+    letter-spacing: 0.02em;
+  }
+  .chip.hot { box-shadow: 4px 4px 0 var(--hot); }
+  .chip.blue { box-shadow: 4px 4px 0 var(--chrome2); }
+  .more {
+    font-family: var(--font-body);
+    font-size: 13px;
+    white-space: nowrap;
+    color: var(--blue);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    padding: 4px 2px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .more:hover { color: var(--hot-dark); }
+
+  /* ── Y2K window component ── */
+  .window {
+    background: var(--win);
+    border: 2px solid var(--ink);
+    box-shadow: var(--shadow-card);
+  }
+  .win-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(90deg, var(--chrome1), var(--chrome2));
+    border-bottom: 2px solid var(--ink);
+    padding: 6px 12px;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    color: var(--ink);
+  }
+  .win-bar .x {
+    margin-left: auto;
+    border: 1.5px solid var(--ink);
+    background: #fff;
+    padding: 1px 6px;
+    font-size: 9px;
+    line-height: 1.3;
+  }
+  .win-body { padding: 20px 22px 18px; }
+
+  /* ── Hero: countdown + schedule ── */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 36px;
+    align-items: start;
+  }
+  .countdown-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 100ms ease-out, box-shadow 100ms ease-out;
+  }
+  .countdown-card:hover, .countdown-card:focus-visible {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--hot);
+    outline: none;
+  }
+  .kicker { font-size: 12px; color: var(--blue); font-weight: 600; letter-spacing: 0.08em; }
+  .countdown-card h2 { font-size: 20px; font-weight: 600; margin: 4px 0 12px; }
+  .ticker {
+    font-family: var(--font-pixel);
+    font-size: clamp(22px, 2.4vw, 28px);
+    color: var(--hot);
+    background: repeating-linear-gradient(0deg, #fff0fb 0 2px, transparent 2px 4px);
+    border: 1.5px dashed var(--hot);
+    text-align: center;
+    padding: 10px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .ticker small {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-top: 7px;
+  }
+  .sticker {
+    display: inline-block;
+    font-family: var(--font-pixel);
+    font-size: 9.5px;
+    font-weight: 700;
+    background: var(--chrome2);
+    color: var(--ink);
+    padding: 5px 12px;
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--hot);
+    margin-top: 16px;
+  }
+
+  .schedule .sched-row {
+    display: grid;
+    grid-template-columns: 76px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 16px;
+    border: 1.5px solid var(--line);
+    margin-top: -1.5px;
+    background: var(--win);
+    font-size: 14.5px;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+  }
+  .schedule .sched-row:first-child { margin-top: 0; }
+  .sched-row:hover, .sched-row:focus-visible {
+    background: #fff0fb;
+    border-color: var(--hot);
+    z-index: 1;
+  }
+  .sched-row .t { font-family: var(--font-pixel); font-weight: 700; font-size: 12px; color: var(--blue); font-variant-numeric: tabular-nums; }
+  .sched-row .name { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sched-row .name small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .sched-row .ch {
+    font-family: var(--font-pixel);
+    font-size: 9.5px;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    background: var(--chrome3);
+    padding: 3px 9px;
+    white-space: nowrap;
+  }
+  .uncut { font-family: var(--font-pixel); font-size: 8.5px; font-weight: 700; color: var(--hot-dark); margin-left: 6px; letter-spacing: 0.04em; }
+
+  /* ── CD collage ── */
+  .collage { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .cd-card {
+    background: var(--win);
+    border: 2px solid var(--ink);
+    box-shadow: var(--shadow-chrome);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 100ms ease-out, box-shadow 100ms ease-out;
+  }
+  .cd-card:hover, .cd-card:focus-visible {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--hot);
+    outline: none;
+  }
+  .photo {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 14px 10px;
+    text-align: center;
+    overflow: hidden;
+    border-bottom: 2px solid var(--ink);
+  }
+  .photo::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(rgba(255,255,255,0.16) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px);
+    background-size: 11px 11px;
+    pointer-events: none;
+  }
+  .photo .disc {
+    position: absolute;
+    top: 14%; left: 50%;
+    width: 52%;
+    aspect-ratio: 1;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: conic-gradient(var(--chrome1), var(--chrome2), var(--chrome3), var(--chrome1));
+    border: 2px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 300ms ease-out;
+  }
+  .cd-card:hover .disc { transform: translateX(-50%) rotate(45deg); }
+  .photo .disc::after {
+    content: '';
+    width: 30%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--win);
+    border: 2px solid var(--ink);
+  }
+  .photo .pt {
+    position: relative;
+    font-family: var(--font-body);
+    color: #fff;
+    font-size: 15.5px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-shadow: 2px 2px 0 var(--ink);
+  }
+  .photo .ps {
+    position: relative;
+    font-family: var(--font-pixel);
+    color: rgba(255,255,255,0.92);
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    text-shadow: 1.5px 1.5px 0 var(--ink);
+  }
+  .ph1 { background: linear-gradient(160deg, #ff8ad8, #c21e92); }
+  .ph2 { background: linear-gradient(200deg, #7db3ff, #2a4fc0); }
+  .ph3 { background: linear-gradient(150deg, #b48aff, #5b2ea6); }
+  .ph4 { background: linear-gradient(210deg, #6fd9ef, #1470a6); }
+  .status {
+    position: absolute;
+    top: 8px; left: 8px;
+    font-family: var(--font-pixel);
+    font-size: 8.5px;
+    font-weight: 700;
+    padding: 3px 8px;
+    background: var(--ink);
+    color: #fff;
+    box-shadow: 2px 2px 0 var(--hot);
+    z-index: 1;
+  }
+  .caption { font-size: 13.5px; font-weight: 600; padding: 10px 12px 12px; }
+  .caption small { display: block; color: var(--muted); font-size: 11.5px; font-weight: 400; margin-top: 3px; }
+
+  /* ── Halo row ── */
+  .halo-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 36px; align-items: start; }
+  .halo-note {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 5px 5px 0 var(--chrome1);
+    transition: transform 100ms ease-out, box-shadow 100ms ease-out;
+  }
+  .halo-note:hover, .halo-note:focus-visible {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--hot);
+    outline: none;
+  }
+  .halo-head { display: flex; align-items: center; gap: 11px; margin-bottom: 10px; }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%; flex: none;
+    background: conic-gradient(var(--hot), var(--blue), var(--chrome2), var(--hot));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; color: #fff; font-size: 16px;
+    border: 2px solid var(--ink);
+    text-shadow: 1px 1px 0 var(--ink);
+  }
+  .halo-head strong { font-size: 14.5px; display: block; }
+  .halo-head span { display: block; font-family: var(--font-pixel); font-size: 9px; color: var(--muted); margin-top: 3px; }
+  .halo-note p { font-size: 14.5px; line-height: 1.75; }
+  .halo-stats { margin-top: 12px; font-family: var(--font-pixel); font-size: 10px; color: var(--blue); }
+  .halo-side { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .halo-side h3 { font-family: var(--font-pixel); font-size: 11px; color: var(--ink); margin-bottom: 10px; }
+  .halo-side .tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    background: var(--chrome2);
+    padding: 4px 10px;
+    margin: 0 6px 8px 0;
+    box-shadow: 2px 2px 0 var(--chrome3);
+  }
+  .halo-side .tag:nth-child(odd) { background: var(--chrome1); }
+
+  /* ── Colophon ── */
+  .colophon {
+    margin-top: 40px;
+    border-top: 2px solid var(--ink);
+    background: linear-gradient(90deg, var(--chrome3), var(--chrome1));
+    padding: 22px max(40px, calc((100% - 1120px) / 2 + 40px)) 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+  .colophon .brandline { font-family: var(--font-pixel); font-size: 11px; }
+  .colophon .links { display: flex; gap: 18px; flex-wrap: wrap; }
+  .colophon a { color: var(--ink); text-decoration: none; border-bottom: 2px solid transparent; padding: 6px 0; }
+  .colophon a:hover { color: var(--hot-dark); border-bottom-color: var(--hot); }
+
+  /* ── Focus visibility ── */
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .cd-card:focus-visible, .countdown-card:focus-visible, .halo-note:focus-visible { outline: 3px solid var(--blue); }
+
+  /* ── Mobile bottom nav (desktop hidden) ── */
+  .bottomnav { display: none; }
+
+  /* ── Tablet ── */
+  @media (max-width: 1023px) {
+    section { padding: 24px 28px 4px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 26px; }
+    .countdown-card { max-width: 480px; }
+    .collage { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .halo-grid { grid-template-columns: 1fr; gap: 24px; }
+    .controls { top: 18px; right: 18px; }
+  }
+
+  /* ── Phone: back to the original mobile mockup behaviour ── */
+  @media (max-width: 767px) {
+    body { padding-bottom: 96px; }
+    .titlebar { padding: 8px 14px; font-size: 11px; }
+    .topbar { padding: 28px 18px 16px; }
+    section { padding: 20px 18px 4px; }
+    .collage { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .controls { position: static; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+    .ctrl { padding: 7px 12px; }
+    .navrow { display: none; }
+    .colophon { flex-direction: column; text-align: center; padding: 18px 18px 22px; }
+    .colophon .links { justify-content: center; }
+    .sched-row { grid-template-columns: 62px 1fr auto; gap: 10px; padding: 11px 12px; font-size: 13.5px; }
+    .bottomnav {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 10;
+      border-top: 2px solid var(--ink);
+      background: var(--win);
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 10px 0 12px;
+      font-family: var(--font-pixel); font-size: 8.5px;
+      color: var(--muted); text-decoration: none;
+      min-height: 56px; justify-content: center;
+      position: relative;
+    }
+    .nav-item .icon { font-size: 17px; }
+    .nav-item.active {
+      color: var(--hot);
+      background: repeating-linear-gradient(45deg, transparent 0 6px, rgba(255,63,191,0.09) 6px 12px);
+    }
+    .nav-item.active .icon { transform: scale(1.15); }
+    .nav-item .badge {
+      position: absolute; top: 6px; right: calc(50% - 22px);
+      font-family: var(--font-pixel); font-size: 8px;
+      background: var(--hot); color: #fff;
+      border: 1.5px solid var(--ink); padding: 1px 5px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cd-card, .countdown-card, .halo-note, .ctrl, .photo .disc, .nav-item .icon { transition: none; }
+    .cd-card:hover, .countdown-card:hover, .halo-note:hover, .ctrl:hover { transform: none; }
+    .cd-card:hover .disc { transform: translateX(-50%); }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+
+    <div class="titlebar">
+      <span>♥ gl-orbit.exe — เชื่อมต่อสำเร็จ!</span>
+      <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+    </div>
+
+    <header class="topbar">
+      <div class="brand">GL*ORBIT</div>
+      <p class="tagline">ไดอารี่ของคนรักซีรีส์ <span class="sparkle">✧</span> since 2024 <span class="sparkle">✧</span></p>
+      <div class="controls">
+        <button class="ctrl" type="button">ไทย ▾</button>
+        <button class="ctrl" type="button"><span class="dot" aria-hidden="true"></span>ธีม ▾</button>
+        <button class="ctrl" type="button">☺ โปรไฟล์ ▾</button>
+      </div>
+    </header>
+
+    <nav class="navrow" aria-label="เมนูหลัก">
+      <a class="active" href="#" aria-current="page">หน้าแรก</a>
+      <a href="#">ปฏิทิน</a>
+      <a href="#">สำรวจ</a>
+      <a href="#">ฮาโล</a>
+      <a href="#">แจ้งเตือน<span class="badge">3</span></a>
+    </nav>
+
+    <section aria-labelledby="today-head">
+      <div class="hero-grid">
+        <a class="countdown-card window" href="#" aria-label="23.5 องศาที่โลกเอียง ตอนที่ 9 ออกอากาศคืนนี้ 4 ทุ่มครึ่ง">
+          <span class="win-bar"><span>now_airing.txt</span><span class="x" aria-hidden="true">×</span></span>
+          <span class="win-body" style="display:block">
+            <span class="kicker">ตอนนี้ทุกคนกำลังรอ!</span>
+            <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+            <span class="ticker" style="display:block"><span id="cd">00:42:17</span><small>คืนนี้ 22:30 ทาง GMMTV</small></span>
+            <span class="sticker">จิ้นแห่งสัปดาห์</span>
+          </span>
+        </a>
+        <div>
+          <div class="section-head">
+            <h2 id="today-head" style="font-size:inherit"><span class="chip">GUESTBOOK · ตารางฉายวันนี้</span></h2>
+            <a class="more" href="#">ดูทั้งสัปดาห์ →</a>
+          </div>
+          <div class="schedule window">
+            <a class="sched-row" href="#"><span class="t">22:30</span><span class="name">23.5 องศาที่โลกเอียง <small>EP.9 · ยังไม่เริ่ม</small></span><span class="ch">GMMTV</span></a>
+            <a class="sched-row" href="#"><span class="t">23:15</span><span class="name">Affair รักเล่นกล <small>EP.4</small></span><span class="ch">CH3</span></a>
+            <a class="sched-row" href="#"><span class="t">23:45</span><span class="name">Blank เติมคำว่ารักลงในช่องว่าง <small>EP.11<span class="uncut">UNCUT</span></small></span><span class="ch">9STAR</span></a>
+            <a class="sched-row" href="#"><span class="t">23:55</span><span class="name">Mate รักเธอเท่าโลก <small>EP.5</small></span><span class="ch">WeTV</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="featured-head">
+      <div class="section-head">
+        <h2 id="featured-head" style="font-size:inherit"><span class="chip hot">CD แนะนำ · ซีรีส์ที่ทุกคนกำลังจิ้น</span></h2>
+        <a class="more" href="#">ชั้นเพลงทั้งหมด →</a>
+      </div>
+      <div class="collage">
+        <a class="cd-card" href="#">
+          <div class="photo ph1"><span class="status">กำลังฉาย</span><span class="disc" aria-hidden="true"></span><span class="ps">GMMTV · 2025</span><span class="pt">23.5 องศาที่โลกเอียง</span></div>
+          <div class="caption">23.5 องศาที่โลกเอียง <small>EP.9 · พุธ 22:30</small></div>
+        </a>
+        <a class="cd-card" href="#">
+          <div class="photo ph2"><span class="status">กำลังฉาย</span><span class="disc" aria-hidden="true"></span><span class="ps">CHANGE2561 · 2025</span><span class="pt">Affair รักเล่นกล</span></div>
+          <div class="caption">Affair รักเล่นกล <small>EP.4 · พฤหัส 23:15</small></div>
+        </a>
+        <a class="cd-card" href="#">
+          <div class="photo ph3"><span class="status">กำลังฉาย</span><span class="disc" aria-hidden="true"></span><span class="ps">9STAR · 2025</span><span class="pt">Blank เติมคำว่ารักลงในช่องว่าง</span></div>
+          <div class="caption">Blank เติมคำว่ารักลงในช่องว่าง <small>EP.11 · เสาร์ 23:45</small></div>
+        </a>
+        <a class="cd-card" href="#">
+          <div class="photo ph4"><span class="status">เร็วๆ นี้</span><span class="disc" aria-hidden="true"></span><span class="ps">WeTV · 2025</span><span class="pt">Mate รักเธอเท่าโลก</span></div>
+          <div class="caption">Mate รักเธอเท่าโลก <small>EP.5 · ศุกร์ 21:00</small></div>
+        </a>
+      </div>
+    </section>
+
+    <section aria-labelledby="halo-head">
+      <div class="section-head">
+        <h2 id="halo-head" style="font-size:inherit"><span class="chip blue">ฝากข้อความ ♥ เสียงจาก Orbit Halo</span></h2>
+        <a class="more" href="#">อ่านฟีด →</a>
+      </div>
+      <div class="halo-grid">
+        <a class="halo-note window" href="#">
+          <span class="win-bar"><span>guestbook_entry.html</span><span class="x" aria-hidden="true">×</span></span>
+          <span class="win-body" style="display:block">
+            <span class="halo-head">
+              <span class="avatar" aria-hidden="true">อ</span>
+              <span><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></span>
+            </span>
+            <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัวกันหมด ดูซ้ำรอบที่สี่ยังน้ำตาไหลเลย ใครยังไม่ดูคือพลาดจริงๆ</p>
+            <span class="halo-stats" style="display:block">♥ 1,204 ถูกใจ · ✉ 86 ความคิดเห็น</span>
+          </span>
+        </a>
+        <div class="halo-side window">
+          <div class="win-bar"><span>trending.txt</span><span class="x" aria-hidden="true">×</span></div>
+          <div class="win-body">
+            <h3>กำลังคุยกันเรื่อง…</h3>
+            <span class="tag">#23point5EP9</span>
+            <span class="tag">#BlankTheSeries</span>
+            <span class="tag">ทฤษฎีตอนจบ</span>
+            <span class="tag">นับถอยหลัง Mate</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="colophon">
+      <span class="brandline">GL*ORBIT — ทำด้วย ♥ โดยแฟนซีรีส์ เพื่อแฟนซีรีส์</span>
+      <span class="links">
+        <a href="#">เกี่ยวกับ</a>
+        <a href="#">ซีรีส์ทั้งหมด</a>
+        <a href="#">นักแสดง</a>
+        <a href="#">คู่จิ้น</a>
+      </span>
+    </footer>
+
+  </div>
+
+  <nav class="bottomnav" aria-label="เมนูมือถือ">
+    <a class="nav-item active" href="#" aria-current="page"><span class="icon">⌂</span>หน้าแรก</a>
+    <a class="nav-item" href="#"><span class="icon">✎</span>ปฏิทิน</a>
+    <a class="nav-item" href="#"><span class="icon">✿</span>ฮาโล</a>
+    <a class="nav-item" href="#"><span class="icon">♡</span>แจ้งเตือน<span class="badge">3</span></a>
+    <a class="nav-item" href="#"><span class="icon">☺</span>ฉัน</a>
+  </nav>
+
+<script>
+  // Live countdown to tonight 22:30 (demo realism; falls back to tomorrow if passed).
+  (function () {
+    var el = document.getElementById('cd');
+    if (!el) return;
+    function target() {
+      var t = new Date();
+      t.setHours(22, 30, 0, 0);
+      if (t.getTime() <= Date.now()) t.setDate(t.getDate() + 1);
+      return t.getTime();
+    }
+    var end = target();
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function tick() {
+      var diff = Math.max(0, end - Date.now());
+      var h = Math.floor(diff / 3.6e6), m = Math.floor((diff % 3.6e6) / 6e4), s = Math.floor((diff % 6e4) / 1e3);
+      el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+      if (!reduce) setTimeout(tick, 1000);
+    }
+    tick();
+  })();
+</script>
+</body>
+</html>

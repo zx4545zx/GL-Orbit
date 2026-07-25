@@ -55,7 +55,7 @@ export type ProfileMoment = {
 	media: MomentApiItem['media'];
 };
 
-function formatMomentTime(value: string | Date, lang: string): string {
+export function formatMomentTime(value: string | Date, lang: string): string {
 	const date = new Date(value);
 	const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
 	if (Number.isNaN(date.getTime())) return '';

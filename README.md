@@ -28,7 +28,7 @@
 | Framework | SvelteKit 2.x + Svelte 5 Runes |
 | Language | TypeScript 5.8 (`strict`, `NodeNext`) |
 | Styling | Tailwind CSS 4 + project design tokens |
-| Database | PostgreSQL บน Neon Serverless |
+| Database | PostgreSQL บน Neon หรือ Supabase (เลือกขณะ runtime) |
 | ORM | Drizzle ORM 0.43 + Drizzle Kit |
 | Auth | Custom JWT (`jose`) + bcrypt |
 | i18n | Paraglide SvelteKit (TH/EN) |
@@ -51,12 +51,14 @@ npm install
 
 | กลุ่ม | ตัวแปร |
 |---|---|
-| จำเป็น | `DATABASE_URL`, `AUTH_SECRET` |
-| AI Chat | `READONLY_DATABASE_URL`, `MINIMAX_API_KEY`, `MINIMAX_API_BASE_URL`, `MINIMAX_MODEL` |
+| จำเป็น | `DB_PROVIDER`, URL ของ provider ที่เลือก, `AUTH_SECRET` |
+| AI Chat | URL read-only ของ provider ที่เลือก, `MINIMAX_API_KEY`, `MINIMAX_API_BASE_URL`, `MINIMAX_MODEL` |
 | Web Push | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `VITE_VAPID_PUBLIC_KEY` |
 | Media upload | `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL` |
 
 อย่า commit `.env` หรือค่าความลับจริงลง repository
+
+ตั้ง `DB_PROVIDER=neon` พร้อม `NEON_DATABASE_URL`/`NEON_READONLY_DATABASE_URL` หรือ `DB_PROVIDER=supabase` พร้อม `SUPABASE_DATABASE_URL`/`SUPABASE_READONLY_DATABASE_URL` เพื่อสลับเฉพาะฐานข้อมูล Supabase runtime ต้องใช้ transaction pooler port `6543` ส่วน Drizzle Kit ต้องใช้ direct connection ใน `DATABASE_MIGRATION_URL` เท่านั้น ค่า legacy `DATABASE_URL` และ `READONLY_DATABASE_URL` ใช้ได้เฉพาะเมื่อไม่ตั้ง `DB_PROVIDER` (default Neon)
 
 ### 3. สร้าง/อัปเดต schema
 

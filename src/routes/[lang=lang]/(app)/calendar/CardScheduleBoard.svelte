@@ -32,22 +32,8 @@
 	const weekDayNames = $derived(Array.from({ length: 7 }, (_, i) => getWeekDayLong(new Date(2024, 0, 1 + i), lang)));
 	const weekDayNamesShort = $derived(Array.from({ length: 7 }, (_, i) => getWeekDayShort(new Date(2024, 0, 1 + i), lang)));
 
-	const dayColorClasses = [
-		'bg-coral/10',
-		'bg-orange-300/10',
-		'bg-lavender/15',
-		'bg-emerald-300/10',
-		'bg-teal-300/10',
-		'bg-blue-300/10',
-		'bg-rose-300/10'
-	];
-
 	function getDayDate(index: number): Date {
 		return new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + index);
-	}
-
-	function formatDayDate(date: Date): string {
-		return `${date.getDate()} ${getMonthShort(date, lang)}`;
 	}
 
 	function isToday(date: Date): boolean {
@@ -117,175 +103,420 @@
 </script>
 
 <!-- Mobile Day Tabs -->
-<div class="md:hidden mb-4">
-	<div class="glass-card rounded-xl grid grid-cols-7 gap-0 p-0" role="tablist" aria-label={m.calendar_card_select_day_aria()}>
+<div class="md:hidden">
+	<div class="board-daytabs" role="tablist" aria-label={m.calendar_card_select_day_aria()}>
 		{#each weekDayNames as day, i}
 			{@const date = getDayDate(i)}
 			{@const active = selectedMobileDay === i}
-			{@const hasEvents = !!scheduleMap[i]?.items.length}
+			{@const today = isToday(date)}
+			{@const count = scheduleMap[i]?.items.length ?? 0}
 			<button
+				type="button"
 				role="tab"
 				aria-selected={active}
 				aria-label="{day} {date.getDate()}"
 				onclick={() => selectMobileDay(i)}
-				class="col-span-1 flex min-w-0 min-h-11 flex-col items-center justify-start py-2 rounded-lg text-xs font-medium transition-colors duration-200 {active ? 'bg-coral text-white' : 'text-plum-light hover:bg-coral-light hover:text-coral-dark'}"
+				class="board-daytab {active ? 'board-daytab--active' : ''} {today ? 'board-daytab--today' : ''}"
 			>
-				<span class="font-bold">{weekDayNamesShort[i]}</span>
-				<span class="text-[10px] opacity-80 mt-0.5 truncate w-full px-1 text-center">{date.getDate()}</span>
-				{#if hasEvents}
-					<span class="mt-1 min-w-4 h-4 px-1 rounded-full text-[9px] leading-4 {active ? 'bg-white text-coral-dark' : 'bg-coral-light text-coral-dark'}">{scheduleMap[i]?.items.length}</span>
-				{:else}
-					<span class="mt-1 w-1 h-1 rounded-full {active ? 'bg-coral' : 'bg-plum-light/20'}"></span>
-				{/if}
+				<span class="board-daytab-wd">{weekDayNamesShort[i]}</span>
+				<span class="board-daytab-n">{date.getDate()}</span>
+				<span class="board-daytab-dots" aria-hidden="true">
+					{#each Array(Math.min(count, 3)) as _}
+						<i class="board-dot orbit-round-data"></i>
+					{/each}
+				</span>
 			</button>
 		{/each}
 	</div>
 </div>
 
 <!-- Desktop Board -->
-<div class="hidden md:grid grid-cols-7 gap-3">
+<div class="board-week hidden md:grid" role="table" aria-label={m.calendar_week_header_current_label()}>
 	{#each weekDayNames as day, i}
 		{@const date = getDayDate(i)}
 		{@const schedule = scheduleMap[i]}
 		{@const events = schedule?.items.slice().sort(sortByTime) ?? []}
 		{@const today = isToday(date)}
-		<div class="flex flex-col min-h-[320px] rounded-xl overflow-hidden glass-card">
-			<div class="px-3 py-3 text-center {dayColorClasses[i]} border-b border-[var(--orbit-line)]">
-				<div class="text-xs font-medium opacity-80 mb-0.5 {today ? 'text-coral-dark' : 'text-plum-light'}">{day}</div>
-				<div class="font-[family-name:var(--font-display)] text-lg font-bold text-plum flex items-center justify-center gap-1.5">
-					{#if today}
-						<span class="w-2 h-2 rounded-full bg-coral"></span>
-					{/if}
-					{date.getDate()}
-				</div>
-				<div class="text-[10px] text-plum-light">{getMonthShort(date, lang)}</div>
-			</div>
-			<div class="flex-1 p-2 space-y-2 {events.length === 0 ? 'flex flex-col items-center justify-center' : ''}">
+		<section class="board-wday {today ? 'board-wday--today' : ''}">
+			<header class="board-wday-head">
+				<div class="board-wday-wd">{day}{#if today} · {m.calendar_card_today_badge()}{/if}</div>
+				<div class="board-wday-dn">{date.getDate()}</div>
+				<div class="board-wday-mn">{getMonthShort(date, lang)}</div>
+			</header>
+			<div class="board-wday-body">
 				{#if events.length > 0}
-					{#each events as event, idx (event.series + event.time + event.episode)}
+					{#each events as event (event.series + event.time + event.episode)}
 						<article
 							aria-label={m.calendar_event_aria({ series: event.series, episode: event.episode, time: event.time })}
-							class="group overflow-hidden glass-card-strong rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer animate-fade-in"
-							style="animation-delay: {idx * 60}ms"
+							class="board-wevent"
 						>
 							<a href="/{page.data.lang}/series/{event.seriesId}" class="block">
-								<div class="relative mb-2">
+								<div class="board-wevent-poster">
 									<Picture
 										src={event.posterUrl}
 										type="posters"
-										sizes="4rem"
+										sizes="10rem"
 										alt={event.series}
-										width={64}
-										height={90}
-										class="w-full aspect-[2/3] rounded-lg object-cover shadow-sm bg-white/50"
+										width={160}
+										height={240}
+										class="block h-full w-full object-cover"
 										loading="lazy"
 									/>
-									{#if event.isUncut}
-										<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-coral text-white text-[9px] font-bold shadow-sm">Uncut</span>
-									{/if}
 								</div>
-								<div class="space-y-1 px-2.5 pb-2.5">
-									<div class="flex flex-col gap-1">
-										<span class="text-sm font-bold text-coral-dark">{event.time}</span>
-										<span class="text-[10px] px-1.5 py-0.5 rounded-md border w-fit {platformClass(event.platforms[0])}">{event.platforms[0]}</span>
-									</div>
-									<h3 class="font-semibold text-plum text-xs leading-snug line-clamp-2 min-h-[2rem]" title={event.series}>{event.series}</h3>
-									<div class="text-[10px] text-plum-light font-medium">{event.episode}</div>
+								<div class="board-wevent-body">
+									{#if event.isUncut}
+										<span class="board-badge-uncut board-wevent-uncut">UNCUT</span>
+									{/if}
+									<span class="board-time-badge">{event.time}</span>
+									<span class="board-wevent-name" title={event.series}>{event.series}</span>
+									<span class="board-wevent-ep">{event.episode}</span>
+									{#if event.platforms[0]}
+										<span class="board-chip border {platformClass(event.platforms[0])}">{event.platforms[0]}</span>
+									{/if}
 								</div>
 							</a>
 						</article>
 					{/each}
 				{:else}
-					<div class="text-center px-2">
-						<div class="w-10 h-10 rounded-xl bg-lavender/10 flex items-center justify-center mx-auto mb-2">
-							<svg class="w-5 h-5 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-							</svg>
-						</div>
-						<p class="text-[11px] text-plum-light">{m.calendar_card_no_events()}</p>
-					</div>
+					<p class="board-wempty">{m.calendar_card_no_events()}</p>
 				{/if}
 			</div>
-		</div>
+		</section>
 	{/each}
 </div>
 
 <!-- Mobile Selected Day Cards -->
-<div class="md:hidden space-y-3" role="tabpanel" aria-label={m.calendar_card_day_items_aria({ day: mobileDay })}>
-	<div class="glass-card rounded-xl p-4">
-		<div class="flex items-center justify-between gap-3 mb-4">
-			<div class="flex items-center gap-3 min-w-0">
-				<div class="w-11 h-11 rounded-xl {dayColorClasses[selectedMobileDay]} flex items-center justify-center flex-shrink-0">
-					<span class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{weekDayNamesShort[selectedMobileDay]}</span>
+<div class="mt-4 md:hidden" role="tabpanel" aria-label={m.calendar_card_day_items_aria({ day: mobileDay })}>
+	<div class="board-mobile-card">
+		<header class="board-mobile-head">
+			<div class="min-w-0">
+				<div class="board-mobile-day">
+					{mobileDay}
+					{#if mobileToday}
+						<span class="board-badge-today">{m.calendar_card_today_badge()}</span>
+					{/if}
 				</div>
-				<div class="min-w-0">
-					<div class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">
-						{mobileDay}
-						{#if mobileToday}
-							<span class="ml-1.5 text-xs px-2 py-0.5 rounded-full bg-coral text-white">{m.calendar_card_today_badge()}</span>
-						{/if}
-					</div>
-					<div class="text-sm text-plum-light truncate">{mobileDate.getDate()} {getMonthLong(mobileDate, lang)} {new Intl.DateTimeFormat(lang, { year: 'numeric' }).format(mobileDate)}</div>
-				</div>
+				<div class="board-mobile-date">{mobileDate.getDate()} {getMonthLong(mobileDate, lang)} {new Intl.DateTimeFormat(lang, { year: 'numeric' }).format(mobileDate)}</div>
 			</div>
-			<div class="rounded-2xl bg-coral/10 px-3 py-2 text-center flex-shrink-0">
-				<div class="font-[family-name:var(--font-display)] text-xl font-bold text-coral-dark">{mobileEvents.length}</div>
-				<div class="text-[10px] text-plum-light">{m.calendar_card_items_label()}</div>
+			<div class="board-mobile-count">
+				<div class="board-mobile-count-num">{mobileEvents.length}</div>
+				<div class="board-mobile-count-label">{m.calendar_card_items_label()}</div>
 			</div>
-		</div>
+		</header>
 
 		{#if mobileEvents.length > 0}
-			<div class="space-y-3">
-				{#each mobileEvents as event, idx (event.series + event.time + event.episode)}
+			<div class="grid gap-3">
+				{#each mobileEvents as event (event.series + event.time + event.episode)}
 					<article
 						aria-label={m.calendar_event_aria({ series: event.series, episode: event.episode, time: event.time })}
-						class="group overflow-hidden glass-card-strong rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 animate-fade-in"
-						style="animation-delay: {idx * 60}ms"
+						class="board-wevent board-wevent--row"
 					>
-						<a href="/{page.data.lang}/series/{event.seriesId}" class="flex gap-3">
-							<div class="relative flex self-stretch flex-shrink-0 overflow-hidden">
+						<a href="/{page.data.lang}/series/{event.seriesId}" class="flex">
+							<div class="board-wevent-poster board-wevent-poster--row">
 								<Picture
 									src={event.posterUrl}
 									type="posters"
-									sizes="4rem"
+									sizes="64px"
 									alt={event.series}
 									width={64}
-									height={90}
-									class="block h-full w-20 sm:w-24 object-cover shadow-sm bg-white/50"
+									height={96}
+									class="block h-full w-full object-cover"
 									loading="lazy"
 								/>
-								{#if event.isUncut}
-									<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-coral text-white text-[9px] font-bold shadow-sm">Uncut</span>
-								{/if}
 							</div>
-							<div class="flex-1 min-w-0 flex flex-col justify-center py-3 pr-3">
-								<div class="flex items-center gap-2 mb-1.5">
-									<span class="text-base font-bold text-coral-dark">{event.time}</span>
-									<span class="text-[10px] px-2 py-0.5 rounded-md border {platformClass(event.platforms[0])}">{event.platforms[0]}</span>
-								</div>
-								<h3 class="font-semibold text-plum text-sm leading-snug line-clamp-2 mb-1" title={event.series}>{event.series}</h3>
-								<div class="text-xs text-plum-light font-medium">{event.episode}</div>
-								<div class="mt-2 flex items-center text-xs text-coral-dark font-medium group-hover:translate-x-1 transition-transform">
-									{m.calendar_card_detail_link()}
-									<svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-									</svg>
-								</div>
+							<div class="board-wevent-body board-wevent-body--row">
+								{#if event.isUncut}
+									<span class="board-badge-uncut board-wevent-uncut">UNCUT</span>
+								{/if}
+								<span class="flex flex-wrap items-center gap-2">
+									<span class="board-time-badge">{event.time}</span>
+									{#if event.platforms[0]}
+										<span class="board-chip border {platformClass(event.platforms[0])}">{event.platforms[0]}</span>
+									{/if}
+								</span>
+								<span class="board-wevent-name" title={event.series}>{event.series}</span>
+								<span class="board-wevent-ep">{event.episode}</span>
+								<span class="board-wevent-more">
+									{m.calendar_card_detail_link()} →
+								</span>
 							</div>
 						</a>
 					</article>
 				{/each}
 			</div>
 		{:else}
-			<div class="text-center py-8">
-				<div class="w-14 h-14 rounded-2xl bg-lavender/10 flex items-center justify-center mx-auto mb-3">
-					<svg class="w-7 h-7 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<div class="py-8 text-center">
+				<div class="board-empty-icon mx-auto mb-3">
+					<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
 					</svg>
 				</div>
-				<p class="font-semibold text-plum text-sm mb-1">{m.calendar_card_mobile_empty_title()}</p>
-				<p class="text-plum-light text-xs leading-relaxed">{m.calendar_card_mobile_empty_hint()}</p>
+				<p class="mb-1 text-sm font-semibold text-plum">{m.calendar_card_mobile_empty_title()}</p>
+				<p class="text-xs leading-relaxed text-plum-light">{m.calendar_card_mobile_empty_hint()}</p>
 			</div>
 		{/if}
 	</div>
 </div>
+
+<style>
+	.board-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 11px;
+		font-weight: 600;
+		padding: 2px 8px;
+		line-height: 1.4;
+		white-space: nowrap;
+		border-radius: var(--orbit-radius-badge);
+	}
+	.board-time-badge {
+		display: inline-block;
+		font-family: var(--orbit-font-display);
+		font-size: 12px;
+		background: var(--orbit-ink);
+		color: var(--orbit-mint);
+		padding: 2px 8px;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-badge);
+		width: fit-content;
+	}
+	.board-badge-uncut {
+		display: inline-block;
+		font-family: var(--orbit-font-display);
+		font-size: 10px;
+		letter-spacing: 0.08em;
+		padding: 2px 7px;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-badge);
+		background: var(--orbit-coral);
+		color: #fff;
+	}
+	.board-badge-today {
+		display: inline-block;
+		font-family: var(--orbit-font-display);
+		font-size: 10px;
+		letter-spacing: 0.06em;
+		padding: 2px 8px;
+		margin-left: 8px;
+		vertical-align: middle;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-badge);
+		background: var(--orbit-coral);
+		color: #fff;
+	}
+	.board-dot {
+		display: inline-block;
+		width: 7px;
+		height: 7px;
+		background: var(--orbit-coral);
+		border: 1px solid var(--orbit-line-strong);
+	}
+
+	/* ===== mobile day tabs ===== */
+	.board-daytabs {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: var(--orbit-border-width);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		background: var(--orbit-line);
+		box-shadow: var(--orbit-shadow);
+		overflow: hidden;
+	}
+	.board-daytab {
+		appearance: none;
+		border: none;
+		background: var(--orbit-surface);
+		cursor: pointer;
+		min-height: 56px;
+		padding: 8px 2px;
+		display: grid;
+		justify-items: center;
+		align-content: start;
+		gap: 2px;
+		font-family: var(--orbit-font-display);
+		font-size: 11px;
+		color: var(--orbit-ink);
+		transition: background-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+	}
+	.board-daytab:hover { background: var(--orbit-coral-soft); }
+	.board-daytab-n { font-size: 15px; }
+	.board-daytab-dots { display: flex; gap: 3px; min-height: 9px; align-items: center; }
+	.board-daytab--active,
+	.board-daytab--active:hover {
+		background: var(--orbit-ink);
+		color: var(--orbit-mint);
+	}
+	.board-daytab--active .board-dot { background: var(--orbit-coral); border-color: var(--orbit-coral); }
+	.board-daytab--today { box-shadow: inset 0 0 0 max(2px, var(--orbit-border-width)) var(--orbit-coral); }
+
+	/* ===== desktop week board ===== */
+	.board-week {
+		grid-template-columns: repeat(7, 1fr);
+		gap: var(--orbit-border-width);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow);
+		background: var(--orbit-line);
+		overflow: hidden;
+	}
+	.board-wday {
+		background: var(--orbit-surface);
+		display: flex;
+		flex-direction: column;
+		min-height: 240px;
+		min-width: 0;
+	}
+	.board-wday-head {
+		padding: 10px 10px 8px;
+		border-bottom: var(--orbit-border-width) solid var(--orbit-line-strong);
+		background: var(--orbit-paper-deep);
+	}
+	.board-wday--today .board-wday-head { background: var(--orbit-coral-soft); }
+	.board-wday-wd {
+		font-family: var(--orbit-font-display);
+		font-size: 11px;
+		letter-spacing: 0.05em;
+		color: var(--orbit-muted);
+		text-transform: uppercase;
+	}
+	.board-wday-dn {
+		font-family: var(--orbit-font-display);
+		font-size: 20px;
+		line-height: 1.2;
+		color: var(--orbit-ink);
+	}
+	.board-wday--today .board-wday-dn { color: var(--orbit-coral-dark); }
+	.board-wday-mn { font-size: 11px; color: var(--orbit-muted); }
+	.board-wday-body {
+		padding: 10px;
+		display: grid;
+		gap: 10px;
+		align-content: start;
+		flex: 1;
+	}
+	.board-wempty {
+		color: var(--orbit-muted);
+		font-family: var(--orbit-font-display);
+		text-align: center;
+		padding: 24px 4px;
+		font-size: 12px;
+		margin: 0;
+	}
+
+	/* ===== event cards ===== */
+	.board-wevent {
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		background: var(--orbit-surface);
+		box-shadow: var(--orbit-shadow);
+		overflow: hidden;
+		transition: transform var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease), box-shadow var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+	}
+	.board-wevent:hover {
+		transform: translate(-1px, -1px);
+		box-shadow: var(--orbit-shadow-raised);
+	}
+	.board-wevent a { color: inherit; text-decoration: none; }
+	.board-wevent-poster {
+		width: 100%;
+		aspect-ratio: 2 / 3;
+		background: var(--orbit-lavender);
+		border-bottom: var(--orbit-border-width) solid var(--orbit-line-strong);
+		overflow: hidden;
+	}
+	.board-wevent-body {
+		padding: 8px;
+		display: grid;
+		gap: 4px;
+		position: relative;
+		justify-items: start;
+	}
+	.board-wevent-uncut { position: absolute; top: -12px; right: 6px; }
+	.board-wevent-name {
+		font-weight: 700;
+		font-size: 13px;
+		line-height: 1.3;
+		color: var(--orbit-ink);
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	.board-wevent-ep { font-size: 12px; color: var(--orbit-muted); }
+	.board-wevent-more {
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--orbit-link);
+	}
+
+	/* mobile horizontal cards */
+	.board-wevent--row .board-wevent-poster--row {
+		width: 64px;
+		flex: none;
+		aspect-ratio: auto;
+		min-height: 96px;
+		border-bottom: none;
+		border-right: var(--orbit-border-width) solid var(--orbit-line-strong);
+	}
+	.board-wevent-body--row { padding: 10px 12px; align-content: center; padding-inline-end: 84px; }
+	.board-wevent--row .board-wevent-uncut { top: 8px; right: 8px; }
+
+	/* ===== mobile selected day panel ===== */
+	.board-mobile-card {
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow);
+		padding: 16px;
+	}
+	.board-mobile-head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 12px;
+		margin-bottom: 16px;
+		padding-bottom: 12px;
+		border-bottom: var(--orbit-border-width) solid var(--orbit-line);
+	}
+	.board-mobile-day {
+		font-family: var(--orbit-font-display);
+		font-size: 18px;
+		color: var(--orbit-ink);
+	}
+	.board-mobile-date { font-size: 13px; color: var(--orbit-muted); }
+	.board-mobile-count {
+		flex: none;
+		text-align: center;
+		padding: 6px 12px;
+		background: var(--orbit-coral-soft);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+	}
+	.board-mobile-count-num {
+		font-family: var(--orbit-font-display);
+		font-size: 20px;
+		color: var(--orbit-coral-dark);
+		line-height: 1.1;
+	}
+	.board-mobile-count-label { font-size: 10px; color: var(--orbit-muted); }
+	.board-empty-icon {
+		width: 48px;
+		height: 48px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--orbit-lavender);
+		color: var(--orbit-ink);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.board-daytab,
+		.board-wevent { transition: none; }
+		.board-wevent:hover { transform: none; }
+	}
+</style>

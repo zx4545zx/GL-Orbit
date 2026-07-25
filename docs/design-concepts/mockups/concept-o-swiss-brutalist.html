@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept O — Swiss Brutalist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f4f0;
+    --ink: #111111;
+    --muted: #6b6b66;
+    --red: #e8290b;
+    --line: #111111;
+    --font-ui: 'IBM Plex Sans Thai', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #d8d8d2;
+    font-family: var(--font-ui);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg);
+    border: 3px solid var(--line);
+    overflow: hidden;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 3px solid var(--line);
+  }
+  .brand {
+    flex: 1;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    padding: 16px 18px;
+  }
+  .brand sup { color: var(--red); font-size: 12px; }
+  .issue {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    border-left: 3px solid var(--line);
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    writing-mode: vertical-rl;
+    letter-spacing: 0.2em;
+  }
+
+  .countdown {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    border-bottom: 3px solid var(--line);
+  }
+  .countdown .big {
+    background: var(--red);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 26px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    padding: 18px 16px;
+  }
+  .countdown .info { padding: 14px 16px; }
+  .countdown .kicker { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.2em; color: var(--red); }
+  .countdown h2 { font-size: 16px; font-weight: 700; line-height: 1.35; margin-top: 4px; }
+  .countdown p { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); margin-top: 4px; }
+
+  .marquee {
+    border-bottom: 3px solid var(--line);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 7px 0;
+    background: var(--ink);
+    color: #fff;
+  }
+  .marquee span {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    animation: scroll 22s linear infinite;
+  }
+  @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 3px solid var(--line);
+    background: #fff;
+  }
+  .section-head h2 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+  }
+  .section-head h2::before { content: '■ '; color: var(--red); }
+  .more { font-family: var(--font-mono); font-size: 10px; color: var(--ink); text-decoration: underline; }
+
+  .sched-row {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1.5px solid var(--line);
+    font-size: 13.5px;
+    background: var(--bg);
+  }
+  .sched-row .t { font-family: var(--font-mono); font-weight: 600; font-size: 14px; }
+  .sched-row .ch {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    border: 1.5px solid var(--line);
+    padding: 2px 6px;
+  }
+  .sched-row.live { background: #fff; box-shadow: inset 4px 0 0 var(--red); }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 3px solid var(--line); }
+  .card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    border-right: 3px solid var(--line);
+    background: #fff;
+  }
+  .card:last-child { border-right: 0; }
+  .card .art { aspect-ratio: 3 / 3.2; border-bottom: 3px solid var(--line); position: relative; }
+  .art.a1 { background: repeating-linear-gradient(45deg, #111 0 12px, #f4f4f0 12px 24px); }
+  .art.a2 { background: repeating-linear-gradient(-45deg, #e8290b 0 12px, #f4f4f0 12px 24px); }
+  .art .tag {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: #fff;
+    border: 2px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+  .card .meta { padding: 12px; }
+  .card h3 { font-size: 13px; font-weight: 700; }
+  .card p { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .card:hover, .card:focus-visible { background: var(--red); color: #fff; outline: none; }
+  .card:hover p, .card:focus-visible p { color: rgba(255,255,255,0.8); }
+
+  .halo {
+    padding: 16px;
+    border-bottom: 3px solid var(--line);
+    background: #fff;
+  }
+  .halo-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .avatar { width: 34px; height: 34px; background: var(--ink); flex: none; }
+  .halo-head strong { font-size: 13px; font-weight: 700; }
+  .halo-head span { display: block; font-family: var(--font-mono); font-size: 9.5px; color: var(--muted); }
+  .halo p { font-size: 13px; line-height: 1.7; }
+  .halo-stats { margin-top: 10px; font-family: var(--font-mono); font-size: 10px; }
+  .halo-stats b { color: var(--red); }
+
+  .bottomnav { display: grid; grid-template-columns: repeat(5, 1fr); background: var(--ink); }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 0 14px;
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.14em;
+    color: #8a8a84;
+    text-decoration: none;
+    min-height: 58px;
+    justify-content: center;
+    border-right: 1px solid #333;
+  }
+  .nav-item:last-child { border-right: 0; }
+  .nav-item .icon { font-size: 15px; }
+  .nav-item.active { color: #fff; background: var(--red); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee span { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <div class="brand">GL ORBIT<sup>®</sup></div>
+      <div class="issue">VOL.24 — FRI</div>
+    </header>
+
+    <div class="countdown">
+      <div class="big">42:17</div>
+      <div class="info">
+        <span class="kicker">NEXT EPISODE</span>
+        <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+        <p>22:30 · GMMTV · TONIGHT</p>
+      </div>
+    </div>
+
+    <div class="marquee" aria-hidden="true">
+      <span>ตารางฉายประจำวัน — 23.5 องศาที่โลกเอียง 22:30 · Affair รักเล่นกล 23:15 · Blank เติมคำว่ารักลงในช่องว่าง 23:45 — ORBIT HALO เปิดตลอด 24 ชม.</span>
+    </div>
+
+    <div class="section-head">
+      <h2>SCHEDULE / วันนี้</h2>
+      <a class="more" href="#">FULL WEEK →</a>
+    </div>
+    <div class="sched-row live"><span class="t">22:30</span><span>23.5 องศาที่โลกเอียง</span><span class="ch">GMMTV</span></div>
+    <div class="sched-row"><span class="t">23:15</span><span>Affair รักเล่นกล</span><span class="ch">CH3</span></div>
+    <div class="sched-row"><span class="t">23:45</span><span>Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR</span></div>
+
+    <div class="section-head">
+      <h2>SERIES / แนะนำ</h2>
+      <a class="more" href="#">EXPLORE →</a>
+    </div>
+    <div class="cards">
+      <a class="card" href="#">
+        <div class="art a1"><span class="tag">NO.01</span></div>
+        <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · FRI 21:00</p></div>
+      </a>
+      <a class="card" href="#">
+        <div class="art a2"><span class="tag">NO.02</span></div>
+        <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · SAT 20:30</p></div>
+      </a>
+    </div>
+
+    <div class="halo">
+      <div class="halo-head">
+        <span class="avatar"></span>
+        <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 MIN AGO</span></div>
+      </div>
+      <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+      <div class="halo-stats">LIKES <b>1204</b> / COMMENTS <b>86</b></div>
+    </div>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">⌂</span>HOME</a>
+      <a class="nav-item" href="#"><span class="icon">▦</span>CAL</a>
+      <a class="nav-item" href="#"><span class="icon">✦</span>HALO</a>
+      <a class="nav-item" href="#"><span class="icon">▼</span>SAVED</a>
+      <a class="nav-item" href="#"><span class="icon">●</span>YOU</a>
+    </nav>
+  </div>
+</body>
+</html>

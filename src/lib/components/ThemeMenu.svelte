@@ -7,11 +7,12 @@
  let options = $state<(HTMLButtonElement | null)[]>([]);
  let status = $state('');
  let activeIndex = $state(0);
- const labels: Record<ThemeName, () => string> = { orbit: m.theme_orbit, space: m.theme_space, sakura: m.theme_sakura, love: m.theme_love };
+ const labels: Record<ThemeName, () => string> = { fanzine: m.theme_fanzine, midnight: m.theme_midnight, y2k: m.theme_y2k, sakura: m.theme_sakura, ocean: m.theme_ocean, candy: m.theme_candy, mission: m.theme_mission };
  $effect(() => { if (open) queueMicrotask(() => options[activeIndex]?.focus()); });
  function toggle() { open = !open; if (open) activeIndex = THEME_NAMES.indexOf(themeState.theme); }
  function close() { open = false; trigger?.focus(); }
- function select(theme: ThemeName) { setTheme(theme); status = m.theme_selected({ theme: labels[theme]() }); close(); }
+  function select(theme: ThemeName) { setTheme(theme); status = m.theme_selected({ theme: labels[theme]() }); close(); }
+  function isCurrentTheme(name: ThemeName) { return Object.is(themeState.theme, name); }
  function keydown(event: KeyboardEvent) {
   if (event.key === 'Escape') { event.preventDefault(); close(); return; }
   if (event.key === 'Tab') { open = false; return; }
@@ -26,14 +27,14 @@
 </script>
 
 <div class="relative {className}">
- <button bind:this={trigger} type="button" aria-haspopup="menu" aria-expanded={open} aria-label={m.theme_trigger()} onclick={toggle} class="flex min-h-11 items-center gap-2 border border-[var(--orbit-line)] bg-[var(--orbit-surface)] px-3 text-[var(--orbit-ink)] transition-colors hover:border-[var(--orbit-coral)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--orbit-focus)]">
+  <button bind:this={trigger} type="button" aria-haspopup="menu" aria-expanded={open} aria-label={m.theme_trigger()} onclick={toggle} class="orbit-control touch-target flex min-h-11 items-center gap-2 px-3">
   <span class="h-4 w-6 border border-[var(--orbit-line-strong)] bg-[var(--orbit-coral-soft)]" aria-hidden="true"></span><span class="hidden sm:inline">{m.theme_trigger()}</span>
  </button>
  {#if open}
-  <div role="menu" tabindex="-1" onkeydown={keydown} class="absolute right-0 top-full z-50 mt-2 w-52 border border-[var(--orbit-line-strong)] bg-[var(--orbit-surface)] p-1 shadow-[var(--orbit-shadow-raised)]">
+    <div role="menu" tabindex="-1" class="orbit-menu absolute right-0 top-full z-50 mt-2 w-52 p-1">
    {#each THEME_NAMES as name, index}
-     <button bind:this={options[index]} type="button" role="menuitemradio" aria-checked={themeState.theme === name} tabindex={activeIndex === index ? 0 : -1} onclick={() => select(name)} class="flex min-h-11 w-full items-center gap-3 border border-transparent px-3 text-left text-sm text-[var(--orbit-ink)] hover:border-[var(--orbit-line)] hover:bg-[var(--orbit-paper-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--orbit-focus)]">
-     <span class="h-5 w-8 border border-[var(--orbit-line-strong)] {name === 'space' ? 'bg-[#cfe0ff]' : name === 'sakura' ? 'bg-[#f8c9d8]' : name === 'love' ? 'bg-[#ffc9b5]' : 'bg-[#f9d8e4]'}" aria-hidden="true"></span><span>{labels[name]()}</span>{#if themeState.theme === name}<span class="ml-auto font-bold" aria-label={m.theme_current()}>✓</span>{/if}
+        <button bind:this={options[index]} type="button" role="menuitemradio" aria-checked={isCurrentTheme(name)} tabindex={activeIndex === index ? 0 : -1} onclick={() => select(name)} onkeydown={keydown} class="orbit-menu-item">
+      <span class="h-5 w-8 border border-[var(--orbit-line-strong)] bg-[var(--orbit-coral-soft)]" aria-hidden="true"></span><span>{labels[name]()}</span>{#if isCurrentTheme(name)}<span class="ml-auto font-bold" aria-label={m.theme_current()}>✓</span>{/if}
     </button>
    {/each}
   </div>

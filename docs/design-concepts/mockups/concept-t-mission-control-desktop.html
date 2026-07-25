@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept T — Mission Control · Desktop (Responsive)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #edeae2;
+    --paper-deep: #e0dccf;
+    --surface: #f7f5ef;
+    --ink: #1c1f26;
+    --muted: #757a6e;
+    --line: #c9c4b6;
+    --line-strong: #1c1f26;
+    --nasa: #0b3d91;
+    --nasa-dark: #082a66;
+    --nasa-soft: #d8e2f5;
+    --red: #c8352b;
+    --amber: #d98e2b;
+    --green: #2e8a4e;
+    --mint: #d4ecdc;
+    --shadow: 0 1px 2px rgba(28,31,38,.12);
+    --shadow-raised: 0 4px 14px rgba(28,31,38,.14);
+    --font-cond: 'Barlow Condensed', 'Sarabun', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-body: 'Sarabun', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--paper);
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── Sheet: full-bleed, no surrounding gutter ── */
+  .sheet { position: relative; min-height: 100vh; }
+
+  /* ── Topbar ── */
+  .topbar {
+    position: relative;
+    text-align: center;
+    padding: 34px 32px 20px;
+    border-bottom: 2px solid var(--ink);
+    background: var(--surface);
+  }
+  .brand-lockup { display: inline-flex; align-items: center; gap: 14px; }
+  .patch {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #4a6ac8, var(--nasa));
+    border: 2px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: var(--font-cond);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+    flex: none;
+  }
+  .brand {
+    font-family: var(--font-cond);
+    font-size: clamp(30px, 3.6vw, 38px);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-align: left;
+    line-height: 1;
+  }
+  .brand small {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 0.22em;
+    margin-top: 4px;
+  }
+  .tagline {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+  .tagline::before { content: '▮ '; color: var(--red); }
+  .controls {
+    position: absolute;
+    top: 24px; right: 28px;
+    display: flex;
+    gap: 8px;
+  }
+  .ctrl {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    background: var(--surface);
+    border: 2px solid var(--ink);
+    padding: 7px 14px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+  .ctrl:hover { background: var(--nasa-soft); }
+  .ctrl .dot { width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #4a6ac8, var(--nasa)); border: 1.5px solid var(--ink); }
+
+  /* ── Desktop nav row ── */
+  .navrow {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 0 32px;
+    border-bottom: 2px solid var(--ink);
+    background: var(--ink);
+  }
+  .navrow a {
+    position: relative;
+    font-family: var(--font-cond);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: #9a9d94;
+    text-decoration: none;
+    padding: 12px 24px;
+    min-height: 44px;
+    border-right: 1px solid #33363e;
+  }
+  .navrow a:first-child { border-left: 1px solid #33363e; }
+  .navrow a:hover { color: #fff; background: #2a2e36; }
+  .navrow a.active { color: #fff; background: var(--nasa); }
+  .navrow a.active::before { content: '▮ '; color: #fff; font-size: 11px; }
+  .navrow .badge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    background: var(--red);
+    color: #fff;
+    padding: 2px 6px;
+    margin-left: 6px;
+    vertical-align: 2px;
+  }
+
+  /* ── Sections: full-bleed bands, content centered at reading width ── */
+  section { padding: 30px max(40px, calc((100% - 1120px) / 2 + 40px)) 6px; }
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 10px;
+  }
+  .sec-label {
+    display: inline-block;
+    font-family: var(--font-cond);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .sec-label::before { content: '▮ '; color: var(--red); }
+  .more {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    color: var(--nasa);
+    text-decoration: none;
+    border: 1.5px solid var(--nasa);
+    padding: 6px 12px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .more:hover, .more:focus-visible { background: var(--nasa); color: #fff; }
+
+  /* ── Hero: countdown + schedule ── */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 36px;
+    align-items: start;
+  }
+  .countdown-card {
+    display: block;
+    text-decoration: none;
+    color: #fff;
+    background: var(--nasa);
+    border: 2px solid var(--ink);
+    padding: 22px 22px 20px;
+    box-shadow: var(--shadow-raised);
+    position: relative;
+  }
+  .countdown-card:hover, .countdown-card:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.8);
+  }
+  .countdown-card h2 {
+    font-family: var(--font-cond);
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin: 5px 0 10px;
+  }
+  .bignum {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: clamp(30px, 3.2vw, 38px);
+    font-weight: 600;
+    background: rgba(0,0,0,0.3);
+    border: 1.5px solid rgba(255,255,255,0.4);
+    padding: 8px 14px;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+  .bignum small {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    margin-top: 4px;
+    font-variant-numeric: normal;
+  }
+  .sticker {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    background: var(--red);
+    color: #fff;
+    border: 1.5px solid var(--ink);
+    padding: 4px 12px;
+    margin-top: 16px;
+  }
+  .telemetry {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 18px;
+    border: 2px solid var(--ink);
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .telemetry div {
+    padding: 9px 12px;
+    border-right: 1px solid var(--line);
+    font-family: var(--font-mono);
+  }
+  .telemetry div:last-child { border-right: 0; }
+  .telemetry dt { font-size: 8px; letter-spacing: 0.18em; color: var(--muted); }
+  .telemetry dd { font-size: 13px; font-weight: 600; margin-top: 2px; }
+  .telemetry .ok { color: var(--green); }
+  .telemetry .warn { color: var(--amber); }
+
+  .schedule { background: var(--surface); border: 2px solid var(--ink); }
+  .sched-row {
+    display: grid;
+    grid-template-columns: 76px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14.5px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .sched-row:last-child { border-bottom: 0; }
+  .sched-row:hover, .sched-row:focus-visible { background: var(--nasa-soft); outline: none; }
+  .sched-row .t { font-family: var(--font-mono); font-weight: 600; font-size: 14px; color: var(--nasa); font-variant-numeric: tabular-nums; }
+  .sched-row .name { font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sched-row .name small { display: block; font-weight: 400; font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .sched-row .ch {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+  .uncut { font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--red); margin-left: 6px; letter-spacing: 0.06em; }
+
+  /* ── Mission collage ── */
+  .collage { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .polaroid {
+    background: var(--surface);
+    border: 2px solid var(--ink);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: background 140ms ease;
+  }
+  .polaroid:hover, .polaroid:focus-visible { background: #fff; outline: 2px solid var(--nasa); outline-offset: -2px; }
+  .photo {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 14px 10px;
+    text-align: center;
+    overflow: hidden;
+    border-bottom: 2px solid var(--ink);
+  }
+  .photo .pt {
+    font-family: var(--font-cond);
+    color: rgba(255,255,255,0.96);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  }
+  .photo .ps {
+    font-family: var(--font-mono);
+    color: rgba(255,255,255,0.85);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .ph1 { background: linear-gradient(160deg, #2c4f9e, #101f42); }
+  .ph2 { background: linear-gradient(210deg, #9e4a2c, #421a10); }
+  .ph3 { background: linear-gradient(160deg, #d98e2b, #6e4210); }
+  .ph4 { background: linear-gradient(200deg, #2e8a4e, #123c22); }
+  .status {
+    position: absolute;
+    top: 8px; left: 8px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+  }
+  .status.soon { background: var(--amber); color: #fff; }
+  .caption { font-family: var(--font-cond); font-size: 16px; font-weight: 600; letter-spacing: 0.03em; padding: 11px 12px 12px; }
+  .caption small { display: block; font-family: var(--font-mono); color: var(--muted); font-size: 9.5px; font-weight: 400; letter-spacing: 0.06em; margin-top: 3px; }
+
+  /* ── Halo row ── */
+  .halo-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 36px; align-items: start; }
+  .halo-note {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface);
+    border: 2px solid var(--ink);
+    padding: 20px 22px 16px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .halo-note:hover, .halo-note:focus-visible { outline: 2px solid var(--nasa); outline-offset: -2px; }
+  .comm {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--red);
+    letter-spacing: 0.2em;
+    margin-bottom: 10px;
+  }
+  .halo-head { display: flex; align-items: center; gap: 11px; margin-bottom: 8px; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%; flex: none;
+    background: radial-gradient(circle at 35% 35%, #4a6ac8, var(--nasa));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-cond); font-weight: 700; color: #fff; font-size: 16px;
+    border: 2px solid var(--ink);
+  }
+  .halo-head strong { font-family: var(--font-cond); font-size: 16px; letter-spacing: 0.03em; display: block; }
+  .halo-head span { display: block; font-family: var(--font-mono); font-size: 9.5px; color: var(--muted); letter-spacing: 0.06em; }
+  .halo-note p {
+    font-size: 14.5px;
+    line-height: 1.75;
+    border-left: 3px solid var(--nasa);
+    padding-left: 12px;
+  }
+  .halo-stats { margin-top: 10px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; color: var(--muted); }
+  .halo-stats b { color: var(--nasa); }
+  .halo-side {
+    background: var(--surface);
+    border: 2px solid var(--ink);
+    padding: 16px 18px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    box-shadow: var(--shadow);
+  }
+  .halo-side h3 {
+    font-family: var(--font-cond);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .halo-side h3::before { content: '▮ '; color: var(--red); }
+  .halo-side .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--nasa);
+    border: 1.5px solid var(--nasa);
+    padding: 3px 10px;
+    margin: 0 4px 6px 0;
+    background: var(--surface);
+  }
+  .halo-side .tag:hover { background: var(--nasa-soft); }
+
+  /* ── Colophon ── */
+  .colophon {
+    margin-top: 40px;
+    border-top: 2px solid var(--ink);
+    background: var(--surface);
+    padding: 22px max(40px, calc((100% - 1120px) / 2 + 40px)) 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .colophon .links { display: flex; gap: 18px; flex-wrap: wrap; }
+  .colophon a { color: var(--nasa); text-decoration: none; padding: 6px 2px; min-height: 32px; display: inline-flex; align-items: center; }
+  .colophon a:hover, .colophon a:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ── Mobile bottom nav (desktop hidden) ── */
+  .bottomnav { display: none; }
+
+  /* ── Focus ── */
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+
+  /* ── Tablet ── */
+  @media (max-width: 1023px) {
+    section { padding: 24px 28px 4px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 26px; }
+    .countdown-card { max-width: 460px; }
+    .collage { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .halo-grid { grid-template-columns: 1fr; gap: 24px; }
+    .controls { top: 18px; right: 18px; }
+  }
+
+  /* ── Phone ── */
+  @media (max-width: 767px) {
+    body { padding-bottom: 96px; }
+    .topbar { padding: 26px 18px 16px; }
+    section { padding: 20px 18px 4px; }
+    .collage { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .controls { position: static; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+    .ctrl { padding: 7px 12px; }
+    .navrow { display: none; }
+    .colophon { flex-direction: column; text-align: center; padding: 18px 18px 22px; }
+    .colophon .links { justify-content: center; }
+    .sched-row { grid-template-columns: 62px 1fr auto; gap: 10px; padding: 11px 12px; font-size: 13.5px; }
+    .bottomnav {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 10;
+      background: var(--ink);
+      border-top: 2px solid var(--ink);
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 10px 0 12px;
+      font-family: var(--font-cond); font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+      color: #9a9d94; text-decoration: none;
+      min-height: 58px; justify-content: center;
+      position: relative;
+      border-right: 1px solid #33363e;
+    }
+    .nav-item:last-child { border-right: 0; }
+    .nav-item .icon { font-size: 17px; }
+    .nav-item.active { color: #fff; background: var(--nasa); }
+    .nav-item .badge {
+      position: absolute; top: 5px; right: calc(50% - 22px);
+      font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+      background: var(--red); color: #fff; padding: 1px 6px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .polaroid { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+
+    <header class="topbar">
+      <div class="brand-lockup">
+        <span class="patch">GL</span>
+        <div class="brand">ORBIT CONTROL<small>SERIES TRACKING STATION — BANGKOK</small></div>
+      </div>
+      <p class="tagline">สถานีติดตามซีรีส์ของคนรัก GL</p>
+      <div class="controls">
+        <button class="ctrl" type="button">ไทย ▾</button>
+        <button class="ctrl" type="button"><span class="dot" aria-hidden="true"></span>ธีม ▾</button>
+        <button class="ctrl" type="button">☺ โปรไฟล์ ▾</button>
+      </div>
+    </header>
+
+    <nav class="navrow" aria-label="เมนูหลัก">
+      <a class="active" href="#" aria-current="page">หน้าแรก</a>
+      <a href="#">ปฏิทิน</a>
+      <a href="#">สำรวจ</a>
+      <a href="#">ฮาโล</a>
+      <a href="#">แจ้งเตือน<span class="badge">3</span></a>
+    </nav>
+
+    <section aria-labelledby="today-head">
+      <div class="hero-grid">
+        <div>
+          <a class="countdown-card" href="#" aria-label="23.5 องศาที่โลกเอียง ตอนที่ 9 ออกอากาศคืนนี้ 4 ทุ่มครึ่ง">
+            <span class="kicker">T-MINUS · เตรียมออกอากาศ</span>
+            <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+            <div class="bignum"><span id="cd">00:42:17</span><small>คืนนี้ 22:30 ทาง GMMTV</small></div>
+            <span class="sticker">จิ้นแห่งสัปดาห์</span>
+          </a>
+          <dl class="telemetry">
+            <div><dt>SIGNAL</dt><dd class="ok">STRONG</dd></div>
+            <div><dt>SUBTITLES</dt><dd class="ok">READY</dd></div>
+            <div><dt>EP REMAIN</dt><dd class="warn">4 / 12</dd></div>
+          </dl>
+        </div>
+        <div>
+          <div class="section-head">
+            <h2 id="today-head" style="font-size:inherit"><span class="sec-label">FLIGHT PLAN · ตารางฉายวันนี้</span></h2>
+            <a class="more" href="#">FULL LOG →</a>
+          </div>
+          <div class="schedule">
+            <a class="sched-row" href="#"><span class="t">22:30</span><span class="name">23.5 องศาที่โลกเอียง <small>EP.9 · ยังไม่เริ่ม</small></span><span class="ch">GMMTV</span></a>
+            <a class="sched-row" href="#"><span class="t">23:15</span><span class="name">Affair รักเล่นกล <small>EP.4</small></span><span class="ch">CH3</span></a>
+            <a class="sched-row" href="#"><span class="t">23:45</span><span class="name">Blank เติมคำว่ารักลงในช่องว่าง <small>EP.11<span class="uncut">UNCUT</span></small></span><span class="ch">9STAR</span></a>
+            <a class="sched-row" href="#"><span class="t">23:55</span><span class="name">Mate รักเธอเท่าโลก <small>EP.5</small></span><span class="ch">WeTV</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="featured-head">
+      <div class="section-head">
+        <h2 id="featured-head" style="font-size:inherit"><span class="sec-label">MISSIONS · ซีรีส์ที่ทุกคนกำลังจิ้น</span></h2>
+        <a class="more" href="#">REGISTRY →</a>
+      </div>
+      <div class="collage">
+        <a class="polaroid" href="#">
+          <div class="photo ph1"><span class="status">กำลังฉาย</span><span class="ps">GMMTV · 2025</span><span class="pt">23.5 องศาที่โลกเอียง</span></div>
+          <div class="caption">23.5 องศาที่โลกเอียง <small>EP.9 · พุธ 22:30</small></div>
+        </a>
+        <a class="polaroid" href="#">
+          <div class="photo ph2"><span class="status">กำลังฉาย</span><span class="ps">CHANGE2561 · 2025</span><span class="pt">Affair รักเล่นกล</span></div>
+          <div class="caption">Affair รักเล่นกล <small>EP.4 · พฤหัส 23:15</small></div>
+        </a>
+        <a class="polaroid" href="#">
+          <div class="photo ph3"><span class="status">กำลังฉาย</span><span class="ps">9STAR · 2025</span><span class="pt">Blank เติมคำว่ารักลงในช่องว่าง</span></div>
+          <div class="caption">Blank เติมคำว่ารักลงในช่องว่าง <small>EP.11 · เสาร์ 23:45</small></div>
+        </a>
+        <a class="polaroid" href="#">
+          <div class="photo ph4"><span class="status soon">เร็วๆ นี้</span><span class="ps">WeTV · 2025</span><span class="pt">Mate รักเธอเท่าโลก</span></div>
+          <div class="caption">Mate รักเธอเท่าโลก <small>EP.5 · ศุกร์ 21:00</small></div>
+        </a>
+      </div>
+    </section>
+
+    <section aria-labelledby="halo-head">
+      <div class="section-head">
+        <h2 id="halo-head" style="font-size:inherit"><span class="sec-label">COMMS · เสียงจาก Orbit Halo</span></h2>
+        <a class="more" href="#">อ่านฟีด →</a>
+      </div>
+      <div class="halo-grid">
+        <a class="halo-note" href="#">
+          <div class="comm">INCOMING TRANSMISSION</div>
+          <div class="halo-head">
+            <span class="avatar" aria-hidden="true">อ</span>
+            <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+          </div>
+          <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัวกันหมด ดูซ้ำรอบที่สี่ยังน้ำตาไหลเลย ใครยังไม่ดูคือพลาดจริงๆ</p>
+          <div class="halo-stats">LIKES <b>1,204</b> · COMMENTS <b>86</b></div>
+        </a>
+        <div class="halo-side">
+          <h3>กำลังคุยกันเรื่อง…</h3>
+          <span class="tag">#23point5EP9</span>
+          <span class="tag">#BlankTheSeries</span>
+          <span class="tag">ทฤษฎีตอนจบ</span>
+          <span class="tag">นับถอยหลัง Mate</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="colophon">
+      <span>GL ORBIT CONTROL — ทำด้วย ♡ โดยแฟนซีรีส์ เพื่อแฟนซีรีส์</span>
+      <span class="links">
+        <a href="#">เกี่ยวกับ</a>
+        <a href="#">ซีรีส์ทั้งหมด</a>
+        <a href="#">นักแสดง</a>
+        <a href="#">คู่จิ้น</a>
+      </span>
+    </footer>
+
+  </div>
+
+  <nav class="bottomnav" aria-label="เมนูมือถือ">
+    <a class="nav-item active" href="#" aria-current="page"><span class="icon">⌂</span>หน้าแรก</a>
+    <a class="nav-item" href="#"><span class="icon">✎</span>ปฏิทิน</a>
+    <a class="nav-item" href="#"><span class="icon">✿</span>ฮาโล</a>
+    <a class="nav-item" href="#"><span class="icon">♡</span>แจ้งเตือน<span class="badge">3</span></a>
+    <a class="nav-item" href="#"><span class="icon">☺</span>ฉัน</a>
+  </nav>
+
+<script>
+  // Live countdown to tonight 22:30 (demo realism; falls back to tomorrow if passed).
+  (function () {
+    var el = document.getElementById('cd');
+    if (!el) return;
+    function target() {
+      var t = new Date();
+      t.setHours(22, 30, 0, 0);
+      if (t.getTime() <= Date.now()) t.setDate(t.getDate() + 1);
+      return t.getTime();
+    }
+    var end = target();
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function tick() {
+      var diff = Math.max(0, end - Date.now());
+      var h = Math.floor(diff / 3.6e6), m = Math.floor((diff % 3.6e6) / 6e4), s = Math.floor((diff % 6e4) / 1e3);
+      el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+      if (!reduce) setTimeout(tick, 1000);
+    }
+    tick();
+  })();
+</script>
+</body>
+</html>

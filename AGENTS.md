@@ -22,7 +22,7 @@ GL-Orbit เป็น SvelteKit web app สำหรับแฟนซีรี�
 | Framework | SvelteKit 2.x, Svelte 5 Runes |
 | Language | TypeScript 5.8, `strict`, `NodeNext` |
 | Styling | Tailwind CSS 4 via `@tailwindcss/vite` |
-| Database | Neon PostgreSQL via `@neondatabase/serverless` |
+| Database | Neon/Supabase PostgreSQL via `postgres` |
 | ORM | Drizzle ORM 0.43 / Drizzle Kit |
 | Auth | Custom JWT HS256 (`jose`) + bcrypt |
 | i18n | Paraglide SvelteKit, Thai + English |
@@ -60,8 +60,10 @@ npx tsx scripts/seed-data.ts
 
 ดูรูปแบบทั้งหมดใน `.env.example`
 
-- Core: `DATABASE_URL`, `AUTH_SECRET`
-- AI Chat: `READONLY_DATABASE_URL`, `MINIMAX_API_KEY`, `MINIMAX_API_BASE_URL`, `MINIMAX_MODEL`
+- Core: `DB_PROVIDER`, `NEON_DATABASE_URL` or `SUPABASE_DATABASE_URL`, `AUTH_SECRET`
+- AI Chat: matching `*_READONLY_DATABASE_URL`, `MINIMAX_API_KEY`, `MINIMAX_API_BASE_URL`, `MINIMAX_MODEL`
+- Migration: `DATABASE_MIGRATION_URL` must be direct; Supabase runtime uses transaction pooler port `6543`
+- Legacy `DATABASE_URL`/`READONLY_DATABASE_URL` work only when `DB_PROVIDER` is absent (default Neon)
 - Web Push: VAPID server keys + `VITE_VAPID_PUBLIC_KEY`
 - Media: Cloudflare R2 endpoint, credentials, bucket และ public URL
 

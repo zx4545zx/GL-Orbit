@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GL-Orbit Theme Switch — 7 Themes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Chivo+Mono:wght@400;500;700&family=Mali:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&family=Silkscreen:wght@400;700&family=Prompt:wght@300;400;500;600&family=Shippori+Mincho:wght@400;500;600;700&family=Comfortaa:wght@400;500;700&family=Baloo+2:wght@500;600;700;800&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ BASE LAYOUT (theme-agnostic) ============ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Sarabun', sans-serif;
+  background: #22201e;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 16px 48px;
+}
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 480px;
+  margin-bottom: 22px;
+}
+.picker button {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 12.5px;
+  padding: 8px 14px;
+  min-height: 40px;
+  border-radius: 999px;
+  border: 1.5px solid #555;
+  background: #2e2c2a;
+  color: #d8d4cc;
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+.picker button:hover { border-color: #999; }
+.picker button[aria-pressed="true"] {
+  background: #f2ede4;
+  color: #1c1a16;
+  border-color: #f2ede4;
+  font-weight: 600;
+}
+.picker-hint { color: #8a857c; font-size: 12px; margin-bottom: 16px; text-align: center; }
+
+.phone {
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  border: var(--phone-border, 1px solid var(--line));
+  border-radius: var(--phone-radius, 0);
+  box-shadow: var(--phone-shadow, none);
+  transition: background 200ms ease;
+}
+.brand { font-family: var(--font-disp); font-size: var(--brand-size, 20px); font-weight: var(--brand-weight, 600); color: var(--brand-color, var(--ink)); letter-spacing: var(--brand-ls, 0.02em); }
+.side-note { font-size: 11px; color: var(--muted); font-family: var(--font-side, var(--font-body)); }
+.topbar {
+  display: flex;
+  align-items: var(--topbar-align, center);
+  justify-content: space-between;
+  gap: 10px;
+  padding: var(--topbar-pad, 18px 20px 10px);
+  text-align: var(--topbar-text, left);
+  border-bottom: var(--topbar-border, none);
+  background: var(--topbar-bg, transparent);
+}
+.topbar.center { flex-direction: column; }
+
+.countdown {
+  margin: var(--cd-margin, 14px 20px 0);
+  padding: var(--cd-pad, 16px 18px);
+  background: var(--cd-bg, var(--panel));
+  border: var(--cd-border, 1px solid var(--line));
+  border-radius: var(--cd-radius, 0);
+  text-align: var(--cd-text, left);
+  box-shadow: var(--cd-shadow, none);
+  position: relative;
+  display: var(--cd-display, block);
+  gap: 14px;
+  align-items: center;
+}
+.cd-kicker { display: block; font-size: 10.5px; letter-spacing: 0.22em; color: var(--accent); font-weight: 500; font-family: var(--font-kicker, var(--font-body)); }
+.countdown h2 { font-family: var(--font-disp); font-size: var(--cd-h2, 17px); font-weight: 600; margin: 5px 0 4px; }
+.cd-time { font-family: var(--font-time, var(--font-disp)); font-size: var(--cd-time-size, 26px); font-weight: 700; color: var(--time-color, var(--accent)); }
+.cd-time small { font-size: 12px; color: var(--muted); font-weight: 400; font-family: var(--font-body); }
+.cd-dot { display: none; width: 9px; height: 9px; background: var(--accent); box-shadow: 0 0 10px var(--accent); flex: none; }
+
+section { padding: var(--section-pad, 18px 20px 0); }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.section-head h2 {
+  font-family: var(--font-disp);
+  font-size: var(--sh-size, 14px);
+  font-weight: var(--sh-weight, 600);
+  color: var(--sh-color, var(--ink));
+  letter-spacing: var(--sh-ls, 0);
+  padding: var(--sh-pad, 0);
+  background: var(--sh-bg, transparent);
+  border: var(--sh-border, none);
+  border-left: var(--sh-left, none);
+  border-radius: var(--sh-radius, 0);
+  box-shadow: var(--sh-shadow, none);
+  white-space: nowrap;
+}
+.more { font-size: 11.5px; color: var(--accent); text-decoration: none; font-family: var(--font-more, var(--font-body)); white-space: nowrap; }
+
+.sched { background: var(--sched-bg, var(--panel)); border: var(--sched-border, 1px solid var(--line)); border-radius: var(--sched-radius, 0); overflow: hidden; box-shadow: var(--sched-shadow, none); }
+.sched-row {
+  display: grid;
+  grid-template-columns: 58px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 14px;
+  font-size: 13px;
+  font-family: var(--font-body);
+}
+.sched-row + .sched-row { border-top: var(--sched-row-border, 1px solid var(--line)); }
+.sched-row .t { font-family: var(--font-time, var(--font-body)); font-weight: 600; color: var(--time-color, var(--accent)); font-size: var(--sched-t-size, 13px); }
+.sched-row .ch {
+  font-size: 10px;
+  color: var(--ch-color, var(--muted));
+  border: var(--ch-border, 1px solid var(--line));
+  border-radius: var(--ch-radius, 0);
+  padding: 2px 7px;
+  background: var(--ch-bg, transparent);
+  font-family: var(--font-ch, var(--font-body));
+}
+.sched-row.live { background: var(--live-bg, transparent); box-shadow: var(--live-shadow, none); border-left: var(--live-left, none); }
+
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card {
+  background: var(--card-bg, var(--panel));
+  border: var(--card-border, 1px solid var(--line));
+  border-radius: var(--card-radius, 0);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  box-shadow: var(--card-shadow, none);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+.card:hover, .card:focus-visible { transform: var(--card-hover, translateY(-3px)); box-shadow: var(--card-hover-shadow, var(--card-shadow)); border-color: var(--card-hover-border, var(--accent)); outline: none; }
+.card .art { aspect-ratio: 3 / 3.4; border-radius: var(--art-radius, 0); border-bottom: var(--art-border, none); position: relative; }
+.art.a1 { background: var(--art1, linear-gradient(160deg, #666, #333)); }
+.art.a2 { background: var(--art2, linear-gradient(210deg, #888, #444)); }
+.card .meta { padding: 11px 13px 13px; text-align: var(--meta-text, left); }
+.card h3 { font-family: var(--font-disp); font-size: var(--card-h3, 13.5px); font-weight: 600; }
+.card p { font-size: 11px; color: var(--muted); margin-top: 3px; font-family: var(--font-card-p, var(--font-body)); }
+
+.halo { background: var(--halo-bg, var(--panel)); border: var(--halo-border, 1px solid var(--line)); border-radius: var(--halo-radius, 0); padding: 15px 17px; box-shadow: var(--halo-shadow, none); position: relative; text-align: var(--halo-text, left); }
+.halo-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; justify-content: var(--halo-head-justify, flex-start); }
+.avatar { width: 34px; height: 34px; border-radius: var(--avatar-radius, 50%); background: var(--avatar-bg, linear-gradient(135deg, var(--accent), var(--accent2, var(--accent)))); border: var(--avatar-border, none); flex: none; }
+.halo-head strong { font-size: 13px; font-weight: 600; font-family: var(--font-disp); }
+.halo-head span { display: block; font-size: 10.5px; color: var(--muted); }
+.halo p { font-size: 13px; line-height: 1.7; font-family: var(--font-halo-p, var(--font-body)); font-style: var(--halo-style, normal); }
+.halo-stats { margin-top: 10px; font-size: 11.5px; color: var(--muted); }
+.halo-stats b { color: var(--accent); }
+
+.bottomnav {
+  margin: var(--nav-margin, 22px 0 0);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-top: var(--nav-border, 1px solid var(--line));
+  background: var(--nav-bg, var(--panel));
+  border-radius: var(--nav-radius, 0);
+  padding: var(--nav-pad, 0);
+  box-shadow: var(--nav-shadow, none);
+  border-left: var(--nav-side-border, none);
+  border-right: var(--nav-side-border, none);
+  border-bottom: var(--nav-bottom-border, none);
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 11px 0 13px;
+  font-size: var(--nav-size, 10px);
+  color: var(--muted);
+  text-decoration: none;
+  min-height: 56px;
+  justify-content: center;
+  font-family: var(--font-nav, var(--font-body));
+  letter-spacing: var(--nav-ls, 0);
+  border-radius: var(--nav-item-radius, 0);
+  position: relative;
+}
+.nav-item .icon { font-size: 15px; font-family: var(--font-body); }
+.nav-item.active { color: var(--nav-active, var(--accent)); background: var(--nav-active-bg, transparent); font-weight: var(--nav-active-weight, 400); }
+.nav-item.active::before { content: var(--nav-indicator, none); }
+
+/* decorations: hidden by default */
+.deco { display: none; }
+
+/* ============ THEME A — Midnight Broadcast ============ */
+.phone[data-theme='a'] {
+  --bg: #0d0a14; --panel: #171224; --ink: #f2ecfa; --muted: #9d8fb8;
+  --accent: #ff4d7e; --accent2: #5ff2e0; --line: #2d2344;
+  --font-body: 'Chakra Petch', sans-serif; --font-disp: 'Chakra Petch', sans-serif;
+  --font-time: 'Chivo Mono', monospace; --font-mono: 'Chivo Mono', monospace;
+  --font-nav: 'Chivo Mono', monospace; --font-ch: 'Chivo Mono', monospace;
+  --brand-ls: 0.14em; --time-color: var(--accent2);
+  --phone-border: 1px solid #4a3670;
+  --phone-shadow: 0 0 60px rgba(95,242,224,0.07);
+  --cd-display: flex; --cd-border: 1px solid #4a3670;
+  --cd-bg: linear-gradient(135deg, rgba(255,77,126,0.09), rgba(95,242,224,0.05));
+  --sh-color: var(--muted); --sh-ls: 0.2em; --sh-size: 12px;
+  --sched-row-border: 1px solid var(--line);
+  --live-bg: rgba(255,77,126,0.07);
+  --nav-active: var(--accent2); --nav-size: 9px; --nav-ls: 0.08em;
+  --card-hover-border: var(--accent2);
+  --card-hover-shadow: 0 0 16px rgba(95,242,224,0.18);
+  --art1: linear-gradient(160deg, #3d2a5c, #1a1030);
+  --art2: linear-gradient(200deg, #5c2a3d, #30101a);
+}
+.phone[data-theme='a'] .cd-dot { display: block; animation: blink 1.6s ease-in-out infinite; }
+.phone[data-theme='a'] .deco-corners { display: block; }
+.phone[data-theme='a'] .deco-corners span { position: absolute; width: 14px; height: 14px; z-index: 5; }
+.phone[data-theme='a'] .deco-corners .tl { top: 6px; left: 6px; border-top: 2px solid var(--accent2); border-left: 2px solid var(--accent2); }
+.phone[data-theme='a'] .deco-corners .tr { top: 6px; right: 6px; border-top: 2px solid var(--accent2); border-right: 2px solid var(--accent2); }
+.phone[data-theme='a'] .deco-corners .bl { bottom: 6px; left: 6px; border-bottom: 2px solid var(--accent2); border-left: 2px solid var(--accent2); }
+.phone[data-theme='a'] .deco-corners .br { bottom: 6px; right: 6px; border-bottom: 2px solid var(--accent2); border-right: 2px solid var(--accent2); }
+.phone[data-theme='a'] .nav-item.active::before {
+  content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 2px;
+  background: var(--accent2); box-shadow: 0 0 8px var(--accent2);
+}
+@keyframes blink { 50% { opacity: 0.35; box-shadow: none; } }
+
+/* ============ THEME B — Fan Zine ============ */
+.phone[data-theme='b'] {
+  --bg: #fbf3e4; --panel: #fff; --ink: #3b2a20; --muted: #8a725f;
+  --accent: #e4572e; --accent2: #f2c14e; --line: #d8c4a8;
+  --font-body: 'Sarabun', sans-serif; --font-disp: 'Mali', cursive;
+  --font-time: 'Mali', cursive; --font-nav: 'Mali', cursive; --font-more: 'Mali', cursive;
+  --brand-size: 28px; --topbar-text: center; --topbar-align: center;
+  --cd-border: 1.5px dashed var(--accent); --cd-bg: #fff; --cd-radius: 2px;
+  --cd-shadow: 4px 4px 0 rgba(228,87,46,0.15); --cd-text: center;
+  --sh-color: var(--ink); --sh-size: 14px;
+  --sh-bg: var(--accent2); --sh-pad: 4px 16px;
+  --sh-shadow: 0 1px 3px rgba(59,42,32,0.18);
+  --sched-row-border: 1px dashed var(--line);
+  --live-bg: #fdf1e3;
+  --card-bg: #fff; --card-radius: 2px; --card-shadow: 3px 3px 8px rgba(59,42,32,0.14);
+  --card-hover: rotate(0) scale(1.02); --card-hover-shadow: 3px 3px 8px rgba(59,42,32,0.14);
+  --card-hover-border: var(--line); --card-h3: 13px; --meta-text: center;
+  --art1: linear-gradient(150deg, #f49bc1, #c05a86);
+  --art2: linear-gradient(210deg, #7fb5d5, #4a7a9e);
+  --halo-bg: #fffbe8; --halo-shadow: 3px 3px 6px rgba(59,42,32,0.1);
+  --nav-border: 2px dashed var(--line); --nav-bg: transparent;
+  --nav-active-weight: 700;
+}
+.phone[data-theme='b'] .topbar { flex-direction: column; }
+.phone[data-theme='b'] .countdown { transform: rotate(-0.8deg); }
+.phone[data-theme='b'] .countdown::before {
+  content: ''; position: absolute; top: -10px; left: 50%; width: 80px; height: 20px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: rgba(242,193,78,0.75); box-shadow: 0 1px 2px rgba(59,42,32,0.15);
+}
+.phone[data-theme='b'] .section-head h2 { transform: rotate(-1.4deg); clip-path: polygon(2% 8%, 98% 0%, 100% 88%, 0% 100%); }
+.phone[data-theme='b'] .card:nth-child(1) { transform: rotate(-1.6deg); }
+.phone[data-theme='b'] .card:nth-child(2) { transform: rotate(1.4deg); }
+.phone[data-theme='b'] .card:hover { transform: rotate(0) scale(1.02); }
+.phone[data-theme='b'] .halo { transform: rotate(0.6deg); }
+.phone[data-theme='b'] .nav-item.active .icon { transform: rotate(-8deg) scale(1.15); display: inline-block; }
+
+/* ============ THEME E — Y2K Diary ============ */
+.phone[data-theme='e'] {
+  --bg: #e8e6f5; --panel: #fdfcff; --ink: #241a3a; --muted: #6f6390;
+  --accent: #ff3fbf; --accent2: #3f7dff; --line: #b3a8d6;
+  --font-body: 'Prompt', sans-serif; --font-disp: 'Silkscreen', monospace;
+  --font-time: 'Silkscreen', monospace; --font-nav: 'Silkscreen', monospace;
+  --font-kicker: 'Prompt', sans-serif; --font-ch: 'Prompt', sans-serif;
+  --brand-size: 23px; --topbar-text: center; --topbar-align: center;
+  --phone-border: 2px solid var(--ink);
+  --phone-shadow: 8px 8px 0 var(--accent);
+  --cd-border: 2px solid var(--ink); --cd-shadow: 5px 5px 0 rgba(36,26,58,0.25);
+  --sh-size: 12px; --sh-color: #fff; --sh-bg: var(--ink); --sh-pad: 4px 10px;
+  --sh-shadow: 3px 3px 0 #d9c8ff;
+  --sched-border: 1.5px solid var(--line); --sched-row-border: 1.5px solid var(--line);
+  --time-color: var(--accent2);
+  --live-bg: #fff0fb;
+  --card-border: 2px solid var(--ink); --card-shadow: 4px 4px 0 #d9c8ff;
+  --card-hover: translate(-2px,-2px); --card-hover-shadow: 6px 6px 0 var(--accent);
+  --card-hover-border: var(--ink); --card-h3: 12px;
+  --art1: conic-gradient(#ffd6f5, #b8f0ff, #d9c8ff, #ffd6f5);
+  --art2: conic-gradient(#b8f0ff, #d9c8ff, #ffd6f5, #b8f0ff);
+  --halo-border: 2px solid var(--ink); --halo-shadow: 5px 5px 0 #ffd6f5;
+  --avatar-border: 2px solid var(--ink);
+  --nav-border: 2px solid var(--ink); --nav-size: 8px;
+  --nav-active-bg: repeating-linear-gradient(45deg, transparent 0 6px, rgba(255,63,191,0.1) 6px 12px);
+}
+.phone[data-theme='e'] .topbar { flex-direction: column; }
+.phone[data-theme='e'] .deco-titlebar { display: flex; }
+.phone[data-theme='e'] .deco-titlebar {
+  align-items: center; gap: 8px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  color: #fff; padding: 7px 12px;
+  font-family: 'Silkscreen', monospace; font-size: 11px;
+}
+.phone[data-theme='e'] .deco-titlebar .dots { margin-left: auto; display: flex; gap: 6px; }
+.phone[data-theme='e'] .deco-titlebar .dots i { width: 11px; height: 11px; background: #fff; border: 1.5px solid var(--ink); }
+.phone[data-theme='e'] .brand { text-shadow: 3px 3px 0 #b8f0ff, 5px 5px 0 #ffd6f5; }
+.phone[data-theme='e'] .cd-time { background: repeating-linear-gradient(0deg, #fff0fb 0 2px, transparent 2px 4px); border: 1.5px dashed var(--accent); padding: 4px 10px; display: inline-block; font-size: 19px; }
+
+/* ============ THEME L — Sakura ============ */
+.phone[data-theme='l'] {
+  --bg: #faf6f0; --panel: #fffdf9; --ink: #2f2a28; --muted: #9c8f88;
+  --accent: #c73e3a; --accent2: #f2b8c6; --line: #e8ddd2;
+  --font-body: 'Sarabun', sans-serif; --font-disp: 'Shippori Mincho', serif;
+  --font-time: 'Shippori Mincho', serif;
+  --brand-size: 25px; --brand-ls: 0.08em; --topbar-text: center; --topbar-align: center;
+  --cd-text: center; --time-color: var(--ink);
+  --sh-size: 14px; --sh-color: var(--ink);
+  --sched-row-border: 1px solid #fce7ec;
+  --live-bg: #fce7ec;
+  --card-hover-border: var(--accent2); --card-hover-shadow: 0 12px 24px rgba(199,62,58,0.1);
+  --card-h3: 14px;
+  --art1: linear-gradient(165deg, #f2b8c6, #d9889e);
+  --art2: linear-gradient(210deg, #e8cdd3, #b08a94);
+  --halo-border: 1px solid var(--line); --halo-shadow: none;
+  --nav-active-weight: 500;
+}
+.phone[data-theme='l'] .topbar { flex-direction: column; }
+.phone[data-theme='l'] .deco-petals { display: block; position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 4; }
+.phone[data-theme='l'] .petal {
+  position: absolute; top: -24px; width: 13px; height: 10px;
+  background: var(--accent2); border-radius: 80% 0 80% 0; opacity: 0.7;
+  animation: fall linear infinite;
+}
+.phone[data-theme='l'] .petal:nth-child(1) { left: 10%; animation-duration: 12s; }
+.phone[data-theme='l'] .petal:nth-child(2) { left: 30%; animation-duration: 15s; animation-delay: 2s; width: 9px; height: 7px; }
+.phone[data-theme='l'] .petal:nth-child(3) { left: 52%; animation-duration: 13s; animation-delay: 5s; }
+.phone[data-theme='l'] .petal:nth-child(4) { left: 70%; animation-duration: 16s; animation-delay: 1s; width: 10px; height: 8px; }
+.phone[data-theme='l'] .petal:nth-child(5) { left: 86%; animation-duration: 14s; animation-delay: 4s; }
+@keyframes fall {
+  0% { transform: translateY(-24px) rotate(0); opacity: 0; }
+  8% { opacity: 0.7; }
+  92% { opacity: 0.7; }
+  100% { transform: translateY(760px) translateX(14px) rotate(380deg); opacity: 0; }
+}
+.phone[data-theme='l'] .brand::after {
+  content: '軌道'; display: inline-block; background: var(--accent); color: #fff;
+  font-family: 'Sarabun', sans-serif; font-size: 10px; font-weight: 500;
+  padding: 2px 5px; margin-left: 8px; vertical-align: 6px;
+}
+.phone[data-theme='l'] .countdown::before {
+  content: ''; position: absolute; inset: 5px; border: 1px solid #fce7ec; pointer-events: none;
+}
+.phone[data-theme='l'] .halo { border-left: 3px solid var(--accent2); }
+.phone[data-theme='l'] .nav-item.active::before {
+  content: '❀'; position: absolute; top: 3px; font-size: 9px; color: var(--accent2);
+}
+
+/* ============ THEME N — Ocean Breeze ============ */
+.phone[data-theme='n'] {
+  --bg: #eef7fa; --panel: #fff; --ink: #14384a; --muted: #6d8ea0;
+  --accent: #1f9ab8; --accent2: #ff8a70; --line: #cde4ec;
+  --font-body: 'Prompt', sans-serif; --font-disp: 'Comfortaa', sans-serif;
+  --font-time: 'Comfortaa', sans-serif;
+  --brand-color: #0d6d8a;
+  --phone-radius: 26px; --phone-border: 1px solid var(--line);
+  --cd-bg: linear-gradient(140deg, #1f9ab8, #0d6d8a); --cd-border: none;
+  --cd-radius: 22px; --cd-shadow: 0 12px 26px rgba(31,154,184,0.28);
+  --cd-display: flex;
+  --time-color: #fff;
+  --sched-radius: 18px; --sched-row-border: 1px solid #d3edf4;
+  --live-bg: #d3edf4;
+  --ch-bg: #d3edf4; --ch-color: var(--accent); --ch-border: none; --ch-radius: 999px;
+  --card-radius: 18px; --card-hover-shadow: 0 12px 26px rgba(31,154,184,0.2);
+  --art1: linear-gradient(165deg, #4fc3d9, #1f7ea0);
+  --art2: linear-gradient(215deg, #ffb49e, #e8725a);
+  --halo-bg: #fdf3e2; --halo-border: 1px solid #f0dfc0; --halo-radius: 20px;
+  --nav-margin: 20px 16px 16px; --nav-radius: 999px; --nav-border: 1px solid var(--line);
+  --nav-side-border: 1px solid var(--line); --nav-bottom-border: 1px solid var(--line);
+  --nav-pad: 6px; --nav-item-radius: 999px;
+  --nav-active-bg: #d3edf4; --nav-active: #0d6d8a; --nav-active-weight: 500;
+}
+.phone[data-theme='n'] .countdown h2, .phone[data-theme='n'] .cd-kicker { color: #fff; }
+.phone[data-theme='n'] .cd-kicker { opacity: 0.8; }
+.phone[data-theme='n'] .cd-time small { color: rgba(255,255,255,0.8); }
+.phone[data-theme='n'] .cd-shell {
+  display: flex; width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.4);
+  align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: 12px; flex: none;
+}
+.phone[data-theme='n'] .deco-wave { display: block; height: 16px; background: radial-gradient(circle at 10px -6px, transparent 14px, #d3edf4 15px); background-size: 20px 16px; }
+.phone[data-theme='n'] .section-head h2::before { content: '〜 '; color: var(--accent2); }
+
+/* ============ THEME P — Candy Pop ============ */
+.phone[data-theme='p'] {
+  --bg: #fff6ec; --panel: #fff; --ink: #37204a; --muted: #9a85ad;
+  --accent: #ff5c9e; --accent2: #9b5de5; --line: #f3ddc4;
+  --font-body: 'Prompt', sans-serif; --font-disp: 'Baloo 2', sans-serif;
+  --font-time: 'Baloo 2', sans-serif; --font-nav: 'Baloo 2', sans-serif;
+  --brand-size: 30px; --brand-weight: 800; --topbar-text: center; --topbar-align: center;
+  --phone-border: 3px solid var(--ink); --phone-radius: 30px;
+  --phone-shadow: 8px 8px 0 var(--accent);
+  --cd-border: 3px solid var(--ink); --cd-radius: 22px;
+  --cd-shadow: 5px 5px 0 #ff9b3d; --cd-display: flex;
+  --sh-bg: #fff; --sh-border: 3px solid var(--ink); --sh-radius: 999px;
+  --sh-pad: 3px 14px; --sh-shadow: 3px 3px 0 #2fd6a3; --sh-size: 15px;
+  --sched-bg: transparent; --sched-border: none; --sched-radius: 0;
+  --time-color: var(--accent2);
+  --live-bg: #ffe9f3; --live-shadow: 4px 4px 0 var(--accent);
+  --ch-bg: #4bb7f0; --ch-color: #fff; --ch-border: 2px solid var(--ink); --ch-radius: 999px;
+  --card-border: 3px solid var(--ink); --card-radius: 20px;
+  --card-hover: translate(-2px,-2px) rotate(-1deg); --card-hover-shadow: 6px 6px 0 var(--accent2);
+  --card-hover-border: var(--ink); --card-h3: 14px;
+  --art-border: 3px solid var(--ink);
+  --art1: linear-gradient(150deg, #2fd6a3, #1aa377);
+  --art2: linear-gradient(220deg, #4bb7f0, #2a7ec2);
+  --halo-border: 3px solid var(--ink); --halo-radius: 22px; --halo-shadow: 5px 5px 0 #2fd6a3;
+  --avatar-border: 3px solid var(--ink);
+  --nav-margin: 20px 16px 16px; --nav-radius: 999px; --nav-pad: 6px;
+  --nav-border: 3px solid var(--ink); --nav-side-border: 3px solid var(--ink);
+  --nav-bottom-border: 3px solid var(--ink); --nav-shadow: 5px 5px 0 #4bb7f0;
+  --nav-item-radius: 999px; --nav-active-bg: var(--ink); --nav-active: #fff; --nav-active-weight: 600;
+}
+.phone[data-theme='p'] .topbar { flex-direction: column; }
+.phone[data-theme='p'] .brand { color: var(--accent); text-shadow: 2px 2px 0 var(--ink); }
+.phone[data-theme='p'] .sched { display: flex; flex-direction: column; gap: 8px; }
+.phone[data-theme='p'] .sched-row { background: #fff; border: 3px solid var(--ink); border-radius: 16px; }
+.phone[data-theme='p'] .cd-badge {
+  display: block; font-family: 'Baloo 2', sans-serif; background: var(--accent); color: #fff;
+  font-size: 14px; font-weight: 700; border: 3px solid var(--ink); border-radius: 16px;
+  padding: 10px 12px; transform: rotate(-4deg); flex: none; text-align: center; line-height: 1.15;
+}
+.phone[data-theme='p'] .cd-time { font-size: 0; }
+.phone[data-theme='p'] .cd-time small { font-size: 12px; }
+
+/* ============ THEME T — Mission Control ============ */
+.phone[data-theme='t'] {
+  --bg: #edeae2; --panel: #f7f5ef; --ink: #1c1f26; --muted: #757a6e;
+  --accent: #0b3d91; --accent2: #c8352b; --line: #c9c4b6;
+  --font-body: 'Sarabun', sans-serif; --font-disp: 'Barlow Condensed', 'Sarabun', sans-serif;
+  --font-time: 'IBM Plex Mono', monospace; --font-nav: 'Barlow Condensed', sans-serif;
+  --font-ch: 'IBM Plex Mono', monospace; --font-more: 'IBM Plex Mono', monospace;
+  --brand-size: 20px; --brand-weight: 700; --brand-ls: 0.06em;
+  --phone-border: 2px solid var(--ink);
+  --topbar-border: 2px solid var(--ink); --topbar-bg: var(--panel); --topbar-pad: 14px 16px;
+  --cd-margin: 0; --cd-radius: 0; --cd-border: none;
+  --cd-bg: var(--accent); --cd-display: flex; --cd-pad: 16px;
+  --cd-h2: 18px; --time-color: #fff;
+  --sh-size: 14px; --sh-ls: 0.18em; --sh-pad: 0;
+  --sched-bg: var(--bg); --sched-border: none; --sched-row-border: 1px solid var(--line);
+  --time-color-sched: var(--accent);
+  --ch-bg: var(--ink); --ch-color: #fff; --ch-border: none;
+  --live-bg: rgba(46,138,78,0.1);
+  --card-border: none; --card-bg: var(--panel); --card-radius: 0;
+  --card-hover: none; --card-hover-shadow: none; --card-hover-border: var(--accent);
+  --card-h3: 15px; --card-p-font: 'IBM Plex Mono', monospace;
+  --art-border: 2px solid var(--ink);
+  --art1: linear-gradient(160deg, #2c4f9e, #101f42);
+  --art2: linear-gradient(210deg, #9e4a2c, #421a10);
+  --halo-bg: transparent; --halo-border: none; --halo-radius: 0;
+  --nav-margin: 22px 0 0; --nav-bg: var(--ink); --nav-border: none;
+  --nav-active: #fff; --nav-active-bg: var(--accent); --nav-active-weight: 600; --nav-ls: 0.14em;
+}
+.phone[data-theme='t'] .countdown h2, .phone[data-theme='t'] .cd-kicker { color: #fff; }
+.phone[data-theme='t'] .cd-kicker { opacity: 0.75; }
+.phone[data-theme='t'] .cd-time { background: rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.4); padding: 6px 10px; font-size: 20px; }
+.phone[data-theme='t'] .cd-time small { font-size: 10px; color: rgba(255,255,255,0.7); }
+.phone[data-theme='t'] .deco-patch {
+  display: flex; width: 42px; height: 42px; border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 35% 35%, #4a6ac8, var(--accent));
+  border: 2px solid var(--ink); align-items: center; justify-content: center;
+  color: #fff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px;
+}
+.phone[data-theme='t'] .deco-telemetry { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 2px solid var(--ink); background: var(--panel); }
+.phone[data-theme='t'] .deco-telemetry div { padding: 9px 12px; border-right: 1px solid var(--line); font-family: 'IBM Plex Mono', monospace; }
+.phone[data-theme='t'] .deco-telemetry div:last-child { border-right: 0; }
+.phone[data-theme='t'] .deco-telemetry dt { font-size: 8px; letter-spacing: 0.16em; color: var(--muted); }
+.phone[data-theme='t'] .deco-telemetry dd { font-size: 13px; font-weight: 600; margin-top: 2px; color: #2e8a4e; }
+.phone[data-theme='t'] .deco-telemetry dd.warn { color: #d98e2b; }
+.phone[data-theme='t'] .section-head h2::before { content: '▮ '; color: var(--accent2); }
+.phone[data-theme='t'] .sched-row .t { color: var(--accent); }
+.phone[data-theme='t'] .sched-row.live .t { color: #2e8a4e; }
+.phone[data-theme='t'] .halo p { border-left: 3px solid var(--accent); padding-left: 12px; }
+.phone[data-theme='t'] .section-head, .phone[data-theme='t'] .sched-row { padding-left: 16px; padding-right: 16px; }
+.phone[data-theme='t'] .section-wrap { border-bottom: 2px solid var(--ink); padding-bottom: 12px; }
+
+/* shared optional elements default hidden */
+.cd-shell, .cd-badge, .deco-patch { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card { transition: none; }
+  .card:hover { transform: none; }
+  .phone[data-theme='a'] .cd-dot { animation: none; }
+  .phone[data-theme='l'] .deco-petals { display: none; }
+}
+</style>
+</head>
+<body>
+  <div class="picker" role="group" aria-label="เลือกธีม">
+    <button data-set-theme="a" aria-pressed="true">A · Midnight Broadcast</button>
+    <button data-set-theme="b" aria-pressed="false">B · Fan Zine</button>
+    <button data-set-theme="e" aria-pressed="false">E · Y2K Diary</button>
+    <button data-set-theme="l" aria-pressed="false">L · Sakura</button>
+    <button data-set-theme="n" aria-pressed="false">N · Ocean Breeze</button>
+    <button data-set-theme="p" aria-pressed="false">P · Candy Pop</button>
+    <button data-set-theme="t" aria-pressed="false">T · Mission Control</button>
+  </div>
+  <p class="picker-hint">กดปุ่มเพื่อสลับธีม · ธีมที่เลือกจะถูกจำไว้ใน browser</p>
+
+  <div class="phone" data-theme="a" id="phone">
+    <div class="deco deco-titlebar" aria-hidden="true"><span>♥ gl-orbit.exe</span><span class="dots"><i></i><i></i><i></i></span></div>
+    <div class="deco deco-corners" aria-hidden="true"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+    <div class="deco deco-petals" aria-hidden="true"><span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span></div>
+
+    <header class="topbar">
+      <span class="deco deco-patch" aria-hidden="true">GL</span>
+      <div class="brand">GL Orbit</div>
+      <div class="side-note">ศุกร์ 24 · 23:41</div>
+    </header>
+
+    <div class="deco deco-wave" aria-hidden="true"></div>
+
+    <div class="countdown">
+      <span class="cd-dot" aria-hidden="true"></span>
+      <span class="cd-shell" aria-hidden="true">42 นาที</span>
+      <span class="cd-badge" aria-hidden="true">42<br>นาที</span>
+      <div>
+        <span class="cd-kicker">ตอนต่อไป · ON AIR SOON</span>
+        <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+        <div class="cd-time">00:42:17 <small>· 22:30 GMMTV</small></div>
+      </div>
+    </div>
+
+    <dl class="deco deco-telemetry" aria-hidden="true">
+      <div><dt>SIGNAL</dt><dd>STRONG</dd></div>
+      <div><dt>SUBTITLES</dt><dd>READY</dd></div>
+      <div><dt>EP REMAIN</dt><dd class="warn">4 / 12</dd></div>
+    </dl>
+
+    <div class="section-wrap">
+      <section>
+        <div class="section-head">
+          <h2>ตารางฉายวันนี้</h2>
+          <a class="more" href="#">ทั้งสัปดาห์ →</a>
+        </div>
+        <div class="sched">
+          <div class="sched-row live"><span class="t">22:30</span><span class="name">23.5 องศาที่โลกเอียง</span><span class="ch">GMMTV</span></div>
+          <div class="sched-row"><span class="t">23:15</span><span class="name">Affair รักเล่นกล</span><span class="ch">CH3</span></div>
+          <div class="sched-row"><span class="t">23:45</span><span class="name">Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="section-wrap">
+      <section>
+        <div class="section-head">
+          <h2>ซีรีส์น่าติดตาม</h2>
+          <a class="more" href="#">สำรวจ →</a>
+        </div>
+        <div class="cards">
+          <a class="card" href="#">
+            <div class="art a1"></div>
+            <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · ศุกร์ 21:00</p></div>
+          </a>
+          <a class="card" href="#">
+            <div class="art a2"></div>
+            <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · เสาร์ 20:30</p></div>
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <div class="section-wrap">
+      <section>
+        <div class="section-head">
+          <h2>จาก Orbit Halo</h2>
+          <a class="more" href="#">อ่านฟีด →</a>
+        </div>
+        <div class="halo">
+          <div class="halo-head">
+            <span class="avatar"></span>
+            <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+          </div>
+          <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+          <div class="halo-stats"><b>1,204</b> ถูกใจ · <b>86</b> ความคิดเห็น</div>
+        </div>
+      </section>
+    </div>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">⌂</span>หน้าแรก</a>
+      <a class="nav-item" href="#"><span class="icon">☷</span>ปฏิทิน</a>
+      <a class="nav-item" href="#"><span class="icon">✧</span>ฮาโล</a>
+      <a class="nav-item" href="#"><span class="icon">♡</span>บันทึก</a>
+      <a class="nav-item" href="#"><span class="icon">☺</span>ฉัน</a>
+    </nav>
+  </div>
+
+<script>
+  const phone = document.getElementById('phone');
+  const buttons = document.querySelectorAll('[data-set-theme]');
+  const valid = ['a', 'b', 'e', 'l', 'n', 'p', 't'];
+
+  function applyTheme(theme) {
+    if (!valid.includes(theme)) theme = 'a';
+    phone.setAttribute('data-theme', theme);
+    buttons.forEach((btn) => {
+      btn.setAttribute('aria-pressed', btn.dataset.setTheme === theme ? 'true' : 'false');
+    });
+    try { localStorage.setItem('gl-orbit-concept-theme', theme); } catch (e) { /* ignore */ }
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => applyTheme(btn.dataset.setTheme));
+  });
+
+  let saved = 'a';
+  try { saved = localStorage.getItem('gl-orbit-concept-theme') || 'a'; } catch (e) { /* ignore */ }
+  applyTheme(saved);
+</script>
+</body>
+</html>

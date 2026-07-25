@@ -58,7 +58,9 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			)
 			SELECT count(*)::int AS revoked_count FROM revoked
 		`);
-		const rawCount = (result.rows[0] as { revoked_count?: unknown } | undefined)?.revoked_count;
+		const compatibleResult = result as unknown as { rows?: unknown[] };
+		const firstRow = (compatibleResult.rows ?? result)[0];
+		const rawCount = (firstRow as { revoked_count?: unknown } | undefined)?.revoked_count;
 		const parsedCount = Number(rawCount);
 		return json({
 			success: true,

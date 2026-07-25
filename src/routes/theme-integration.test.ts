@@ -12,7 +12,8 @@ describe('theme integration', () => {
  });
  it('pre-paint script is light-only allowlisted', () => {
   const init = readFileSync('static/theme-init.js', 'utf8');
-  expect(init).toContain("stored === 'space'");
+  expect(init).toContain("stored === 'fanzine'");
+  expect(init).toContain("stored === 'ocean'");
   expect(init).not.toContain('prefers-color-scheme');
  });
 });

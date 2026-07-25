@@ -34,7 +34,7 @@ const config = {
 			}
 		},
 		adapter: adapter({
-			// Match Neon region (ap-southeast-1 = Singapore) to avoid cross-Pacific latency
+			// Keep compute near the selected PostgreSQL provider's Singapore region
 			regions: ['sin1']
 		})
 	}

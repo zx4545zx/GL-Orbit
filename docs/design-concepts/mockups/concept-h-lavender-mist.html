@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept H — Lavender Mist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Prompt:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #3c3552;
+    --muted: #8d86a8;
+    --lav: #a78bfa;
+    --lav-deep: #7c5ce8;
+    --sky: #93c5fd;
+    --rose: #f0a6c0;
+    --glass: rgba(255, 255, 255, 0.55);
+    --glass-line: rgba(255, 255, 255, 0.7);
+    --font-display: 'Quicksand', 'Prompt', sans-serif;
+    --font-body: 'Prompt', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: linear-gradient(160deg, #e6dcfb, #d3e4fd 55%, #fbdff0);
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 30px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(170deg, #efe8fd, #e2edff 50%, #fbe9f4);
+    border: 1px solid rgba(255,255,255,0.8);
+    box-shadow: 0 20px 60px rgba(124, 92, 232, 0.18);
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(38px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .blob.b1 { width: 190px; height: 190px; background: var(--lav); top: -60px; right: -50px; }
+  .blob.b2 { width: 160px; height: 160px; background: var(--sky); top: 220px; left: -60px; }
+  .blob.b3 { width: 150px; height: 150px; background: var(--rose); bottom: -40px; right: -30px; }
+  .content { position: relative; z-index: 1; }
+
+  .glass {
+    background: var(--glass);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-line);
+    border-radius: 22px;
+    box-shadow: 0 6px 20px rgba(124, 92, 232, 0.1);
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 26px 24px 6px;
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .brand span {
+    background: linear-gradient(90deg, var(--lav-deep), var(--rose));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hello { font-size: 12px; color: var(--muted); font-weight: 300; }
+
+  .countdown {
+    margin: 16px 22px 0;
+    padding: 20px;
+    text-align: center;
+  }
+  .countdown .kicker {
+    font-family: var(--font-display);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    color: var(--lav-deep);
+    text-transform: uppercase;
+  }
+  .countdown h2 { font-size: 17px; font-weight: 500; margin: 6px 0 10px; }
+  .countdown .time {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--lav-deep), var(--rose));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .countdown .time small { font-size: 12px; font-weight: 500; }
+  .bar {
+    margin-top: 12px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.7);
+    overflow: hidden;
+  }
+  .bar i {
+    display: block;
+    width: 78%;
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--lav), var(--rose));
+  }
+
+  section { padding: 18px 22px 0; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .section-head h2 { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
+  .more { font-size: 12px; color: var(--lav-deep); text-decoration: none; }
+
+  .timeline { padding: 6px 16px; }
+  .tl-row {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 12px;
+    padding: 9px 0;
+    font-size: 13px;
+    align-items: baseline;
+  }
+  .tl-row + .tl-row { border-top: 1px solid rgba(255,255,255,0.7); }
+  .tl-row .t { font-family: var(--font-display); font-weight: 700; font-size: 12.5px; color: var(--lav-deep); }
+  .tl-row .ch { font-size: 10.5px; color: var(--muted); display: block; font-weight: 300; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card {
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+  .card:hover, .card:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(124, 92, 232, 0.22);
+    outline: none;
+  }
+  .card .art { aspect-ratio: 3 / 3.4; }
+  .art.a1 { background: linear-gradient(150deg, var(--lav), var(--lav-deep)); }
+  .art.a2 { background: linear-gradient(210deg, var(--sky), #6d8fe8); }
+  .card .meta { padding: 12px 14px 14px; }
+  .card h3 { font-size: 13px; font-weight: 500; }
+  .card p { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 300; }
+
+  .halo { padding: 16px; }
+  .halo-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--lav), var(--rose));
+    border: 2px solid #fff;
+    flex: none;
+  }
+  .halo-head strong { font-size: 13px; font-weight: 500; }
+  .halo-head span { display: block; font-size: 10.5px; color: var(--muted); font-weight: 300; }
+  .halo p { font-size: 13px; line-height: 1.75; font-weight: 300; }
+  .halo-stats { margin-top: 10px; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: var(--lav-deep); }
+
+  .bottomnav {
+    margin: 20px 18px 18px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 6px;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 9px 0;
+    font-size: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 16px;
+    min-height: 52px;
+    justify-content: center;
+    font-weight: 300;
+  }
+  .nav-item .icon { font-size: 16px; }
+  .nav-item.active {
+    background: linear-gradient(135deg, var(--lav), var(--lav-deep));
+    color: #fff;
+    font-weight: 500;
+    box-shadow: 0 6px 16px rgba(124, 92, 232, 0.4);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+    .card:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <span class="blob b1" aria-hidden="true"></span>
+    <span class="blob b2" aria-hidden="true"></span>
+    <span class="blob b3" aria-hidden="true"></span>
+    <div class="content">
+
+      <header class="topbar">
+        <div class="brand">GL <span>Orbit</span></div>
+        <div class="hello">ค่ำคืนสบาย ๆ ✦</div>
+      </header>
+
+      <div class="countdown glass">
+        <span class="kicker">อีกนิดเดียว</span>
+        <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+        <div class="time">00:42:17 <small>· 22:30 GMMTV</small></div>
+        <div class="bar" aria-hidden="true"><i></i></div>
+      </div>
+
+      <section>
+        <div class="section-head">
+          <h2>ตารางฉายวันนี้</h2>
+          <a class="more" href="#">ทั้งสัปดาห์</a>
+        </div>
+        <div class="timeline glass">
+          <div class="tl-row"><span class="t">22:30</span><span>23.5 องศาที่โลกเอียง <span class="ch">GMMTV</span></span></div>
+          <div class="tl-row"><span class="t">23:15</span><span>Affair รักเล่นกล <span class="ch">ช่อง 3</span></span></div>
+          <div class="tl-row"><span class="t">23:45</span><span>Blank เติมคำว่ารักลงในช่องว่าง <span class="ch">9STAR</span></span></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>ซีรีส์น่าติดตาม</h2>
+          <a class="more" href="#">สำรวจ</a>
+        </div>
+        <div class="cards">
+          <a class="card glass" href="#">
+            <div class="art a1"></div>
+            <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · ศุกร์ 21:00</p></div>
+          </a>
+          <a class="card glass" href="#">
+            <div class="art a2"></div>
+            <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · เสาร์ 20:30</p></div>
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>จาก Orbit Halo</h2>
+          <a class="more" href="#">อ่านฟีด</a>
+        </div>
+        <div class="halo glass">
+          <div class="halo-head">
+            <span class="avatar"></span>
+            <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+          </div>
+          <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+          <div class="halo-stats">♡ 1,204 · แสดงความคิดเห็น 86</div>
+        </div>
+      </section>
+
+      <nav class="bottomnav glass">
+        <a class="nav-item active" href="#"><span class="icon">⌂</span>หน้าแรก</a>
+        <a class="nav-item" href="#"><span class="icon">☷</span>ปฏิทิน</a>
+        <a class="nav-item" href="#"><span class="icon">✧</span>ฮาโล</a>
+        <a class="nav-item" href="#"><span class="icon">♡</span>บันทึก</a>
+        <a class="nav-item" href="#"><span class="icon">☺</span>ฉัน</a>
+      </nav>
+
+    </div>
+  </div>
+</body>
+</html>

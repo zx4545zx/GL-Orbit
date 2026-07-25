@@ -1,21 +1,18 @@
 import 'dotenv/config';
-import type { NeonQueryFunction } from '@neondatabase/serverless';
+import postgres, { type Sql } from 'postgres';
+import { resolveReadOnlyDatabaseConfig } from '../db/config.js';
 
-let _readOnlySql: NeonQueryFunction<false, false> | null = null;
+let _readOnlySql: Sql | null = null;
 
-async function getReadOnlySql(): Promise<NeonQueryFunction<false, false>> {
+function getReadOnlySql(): Sql {
 	if (!_readOnlySql) {
-		const url = process.env.READONLY_DATABASE_URL;
-		if (!url) {
-			throw new Error('READONLY_DATABASE_URL is not set');
-		}
-		const { neon } = await import('@neondatabase/serverless');
-		_readOnlySql = neon(url);
+		const { url } = resolveReadOnlyDatabaseConfig();
+		_readOnlySql = postgres(url, { prepare: false });
 	}
 	return _readOnlySql;
 }
 
 export async function runReadOnlyQuery(sqlText: string): Promise<unknown[]> {
 	const sql = await getReadOnlySql();
-	return await sql.query(sqlText);
+	return await sql.unsafe(sqlText);
 }

@@ -1,0 +1,465 @@
+<!-- GL-Orbit /countdown redesign mockup — Y2K theme concept -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>นับถอยหลัง GL — Y2K Concept Mockup | GL-Orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orbit-paper:#e8e6f5; --orbit-paper-deep:#ddd9f0; --orbit-surface:#fdfcff;
+    --orbit-ink:#241a3a; --orbit-muted:#6f6390; --orbit-line:#b3a8d6; --orbit-line-strong:#241a3a;
+    --orbit-coral:#ff3fbf; --orbit-coral-dark:#c21e92; --orbit-coral-soft:#ffd6f5;
+    --orbit-lavender:#d9c8ff; --orbit-mint:#b8f0ff;
+    --orbit-shadow:4px 4px 0 #d9c8ff; --orbit-shadow-raised:5px 5px 0 rgba(36,26,58,.25);
+    --orbit-link:#3f7dff; --orbit-focus:#3f7dff; --orbit-selection:#b8f0ff;
+    --font-display:'Silkscreen', monospace;
+    --font-body:'Prompt', 'Silkscreen', sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;border-radius:0}
+  ::selection{background:var(--orbit-selection);color:var(--orbit-ink)}
+  body{
+    margin:0; font-family:var(--font-body); color:var(--orbit-ink);
+    background-color:var(--orbit-paper);
+    background-image:
+      linear-gradient(var(--orbit-paper-deep) 1px, transparent 1px),
+      linear-gradient(90deg, var(--orbit-paper-deep) 1px, transparent 1px);
+    background-size:24px 24px;
+    line-height:1.55;
+  }
+  h1,h2,h3{margin:0; font-family:var(--font-display); letter-spacing:.02em; line-height:1.2}
+  a{color:var(--orbit-link); text-decoration:none}
+  :focus-visible{outline:3px solid var(--orbit-focus); outline-offset:2px}
+
+  .wrap{max-width:1200px; margin:0 auto; padding:0 20px 64px}
+
+  /* ===== mockup ribbon ===== */
+  .ribbon{
+    position:fixed; right:0; bottom:24px; z-index:50;
+    background:var(--orbit-coral); color:#fff; font-family:var(--font-display); font-size:11px;
+    letter-spacing:.1em; padding:8px 14px; border:2px solid var(--orbit-line-strong);
+    border-right:none; box-shadow:-4px 4px 0 var(--orbit-lavender);
+  }
+
+  /* ===== shared y2k primitives ===== */
+  .card{background:var(--orbit-surface); border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow)}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height:44px; padding:10px 18px; font-family:var(--font-display); font-size:14px;
+    background:var(--orbit-surface); color:var(--orbit-ink);
+    border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow);
+    cursor:pointer; text-decoration:none; user-select:none;
+    transition:transform .08s ease, box-shadow .08s ease;
+  }
+  .btn:hover{text-decoration:none; transform:translate(-1px,-1px); box-shadow:5px 5px 0 var(--orbit-lavender)}
+  .btn:active{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--orbit-lavender)}
+  .btn--primary{background:var(--orbit-coral); color:#fff; box-shadow:4px 4px 0 var(--orbit-coral-dark)}
+  .btn--primary:hover{box-shadow:5px 5px 0 var(--orbit-coral-dark)}
+
+  .badge{
+    display:inline-block; font-family:var(--font-display); font-size:10px; letter-spacing:.08em;
+    padding:3px 8px; border:2px solid var(--orbit-line-strong);
+  }
+  .badge--uncut{background:var(--orbit-coral); color:#fff}
+  .badge--soon{background:var(--orbit-mint); color:var(--orbit-ink)}
+
+  .chip{
+    display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600;
+    padding:2px 8px; border:2px solid var(--orbit-line-strong); line-height:1.4; white-space:nowrap;
+  }
+  .chip--yt{background:#ffe3e3; color:#c0392b}
+  .chip--iq{background:#dcf5e3; color:#127a3e}
+  .chip--viu{background:#ffedd8; color:#b36b00}
+  .chip--nf{background:#ffdfe4; color:#b00020}
+  .chip--wetv{background:#ffe9d6; color:#c2410c}
+
+  .poster{
+    background:var(--orbit-lavender); border:2px solid var(--orbit-line-strong);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); color:var(--orbit-ink); flex:none;
+    position:relative; overflow:hidden;
+  }
+  .poster::after{
+    content:""; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(253,252,255,.35) 1px, transparent 1px);
+    background-size:100% 4px; pointer-events:none;
+  }
+
+  .section-title{font-size:20px; text-transform:uppercase; margin:0 0 16px; display:flex; align-items:center; gap:10px}
+  .section-title .spark{color:var(--orbit-coral)}
+
+  /* ===== hero ===== */
+  .hero{padding:48px 0 32px; display:grid; grid-template-columns:3fr 2fr; gap:32px; align-items:end}
+  .kicker{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-display); font-size:12px; letter-spacing:.1em;
+    background:var(--orbit-mint); border:2px solid var(--orbit-line-strong);
+    padding:6px 12px; box-shadow:var(--orbit-shadow); margin-bottom:16px;
+  }
+  .blink{width:10px; height:10px; border-radius:50%; background:var(--orbit-coral); border:2px solid var(--orbit-line-strong); animation:blink 1.1s steps(2,start) infinite}
+  @keyframes blink{to{visibility:hidden}}
+  .hero h1{font-size:clamp(38px,6vw,64px)}
+  .hero h1 .gl{color:var(--orbit-coral); text-shadow:3px 3px 0 var(--orbit-lavender)}
+  .hero .sub{margin:12px 0 24px; color:var(--orbit-muted); font-size:17px; max-width:46ch}
+  .hero-actions{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
+
+  .stats{display:grid; grid-template-columns:1fr; gap:14px}
+  .stat{background:var(--orbit-surface); border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow); padding:14px 18px}
+  .stat .label{font-size:13px; font-weight:600; color:var(--orbit-muted)}
+  .stat .num{font-family:var(--font-display); font-size:30px; color:var(--orbit-coral-dark); line-height:1.1}
+  .stat .detail{font-size:13px; margin-top:2px}
+  .stat .detail b{color:var(--orbit-ink)}
+
+  /* ===== next-up spotlight (ใกล้สุด 1 เรื่อง) ===== */
+  .spotlight{
+    display:grid; grid-template-columns:200px 1fr; margin-bottom:40px;
+    background:var(--orbit-ink); color:var(--orbit-surface);
+    border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow-raised);
+    overflow:hidden; position:relative;
+  }
+  .spotlight::after{
+    content:"✦ ★ ✦"; position:absolute; right:16px; top:10px; color:var(--orbit-lavender);
+    font-family:var(--font-display); font-size:12px; letter-spacing:4px; opacity:.7;
+  }
+  .spotlight .poster{border:none; border-right:2px solid var(--orbit-line-strong); aspect-ratio:2/3; font-size:56px; width:100%; height:100%}
+  .spotlight .body{padding:24px 28px; display:grid; gap:10px; align-content:center; justify-items:start}
+  .spotlight .tag{
+    font-family:var(--font-display); font-size:11px; letter-spacing:.1em;
+    background:var(--orbit-coral); color:#fff; border:2px solid var(--orbit-coral);
+    padding:4px 10px;
+  }
+  .spotlight h2{font-size:26px; color:var(--orbit-mint)}
+  .spotlight .meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:14px; color:var(--orbit-lavender)}
+  .spotlight .flip{color:var(--orbit-surface)}
+
+  /* ===== flip tiles ===== */
+  .flip{display:flex; align-items:flex-start; gap:6px; font-family:var(--font-display)}
+  .flip .unit{display:grid; justify-items:center; gap:4px}
+  .flip .val{
+    min-width:56px; text-align:center; font-size:32px; font-weight:700; tabular-nums;
+    background:var(--orbit-surface); color:var(--orbit-ink);
+    border:2px solid var(--orbit-line-strong); box-shadow:3px 3px 0 var(--orbit-lavender);
+    padding:8px 6px; position:relative;
+  }
+  .flip .val::after{
+    content:""; position:absolute; left:0; right:0; top:50%; height:2px;
+    background:var(--orbit-line); opacity:.6;
+  }
+  .flip .lab{font-size:10px; letter-spacing:.08em; color:var(--orbit-muted)}
+  .spotlight .flip .lab{color:var(--orbit-lavender)}
+  .flip .sep{font-size:28px; font-weight:700; padding-top:10px; color:var(--orbit-coral); animation:blink 1s steps(2,start) infinite}
+
+  /* ===== countdown card grid ===== */
+  .cd-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px}
+  .cd-card{
+    display:flex; flex-direction:column; text-decoration:none; color:var(--orbit-ink);
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow); overflow:hidden;
+    transition:transform .08s ease, box-shadow .08s ease;
+  }
+  .cd-card:hover{transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--orbit-lavender); text-decoration:none}
+  .cd-card:active{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--orbit-lavender)}
+  .cd-head{display:flex; gap:12px; padding:14px 16px; border-bottom:2px solid var(--orbit-line-strong); align-items:center}
+  .cd-head .poster{width:52px; aspect-ratio:2/3; font-size:20px}
+  .cd-head .info{min-width:0; display:grid; gap:4px; justify-items:start}
+  .cd-head .name{font-weight:700; font-size:15px; line-height:1.3}
+  .cd-head .ep{font-size:12px; color:var(--orbit-muted)}
+  .cd-count{padding:18px 16px 14px; display:grid; gap:14px; justify-items:center; flex:1; align-content:center; background:
+    repeating-linear-gradient(0deg, transparent 0 22px, var(--orbit-paper) 22px 23px);}
+  .cd-days{
+    font-family:var(--font-display); font-size:13px; letter-spacing:.06em;
+    background:var(--orbit-lavender); border:2px solid var(--orbit-line-strong); padding:4px 12px;
+  }
+  .cd-days b{color:var(--orbit-coral-dark); font-size:16px}
+  .cd-card .flip .val{min-width:48px; font-size:26px; padding:6px 4px}
+  .cd-card .flip .sep{font-size:22px; padding-top:8px}
+  .cd-foot{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:10px 16px; border-top:2px dashed var(--orbit-line); font-size:13px; color:var(--orbit-muted);
+  }
+  .cd-foot .go{font-family:var(--font-display); color:var(--orbit-link)}
+
+  /* ===== notes ===== */
+  .notes{
+    margin-top:32px; display:flex; gap:14px; align-items:flex-start;
+    background:var(--orbit-mint); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow); padding:16px 20px;
+  }
+  .notes .i{
+    flex:none; width:32px; height:32px; border:2px solid var(--orbit-line-strong);
+    background:var(--orbit-surface); font-family:var(--font-display);
+    display:flex; align-items:center; justify-content:center; font-size:16px;
+  }
+  .notes h2{font-size:15px; margin-bottom:2px}
+  .notes p{margin:0; font-size:14px}
+
+  footer{margin-top:48px; text-align:center; font-family:var(--font-display); font-size:11px; color:var(--orbit-muted); letter-spacing:.06em}
+
+  /* ===== responsive ===== */
+  @media (max-width:1023px){
+    .hero{grid-template-columns:1fr; gap:24px}
+    .stats{grid-template-columns:repeat(3,1fr)}
+    .cd-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:639px){
+    .hero{padding-top:32px}
+    .hero h1{font-size:38px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .stat:first-child{grid-column:span 2}
+    .spotlight{grid-template-columns:1fr}
+    .spotlight .poster{aspect-ratio:16/9; border-right:none; border-bottom:2px solid var(--orbit-line-strong); font-size:40px}
+    .spotlight .body{padding:20px}
+    .spotlight h2{font-size:20px}
+    .cd-grid{grid-template-columns:1fr}
+    .flip .val{min-width:48px; font-size:26px}
+    .cd-card .flip .val{min-width:44px; font-size:22px}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none !important; transition:none !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="ribbon" aria-hidden="true">MOCKUP — Y2K CONCEPT</div>
+
+<div class="wrap">
+
+  <!-- ============ 1. HERO ============ -->
+  <header class="hero">
+    <div>
+      <span class="kicker"><span class="blink" aria-hidden="true"></span> LIVE COUNTDOWN</span>
+      <h1>นับถอยหลัง <span class="gl">GL</span> ✦</h1>
+      <p class="sub">เหลือเวลาอีกเท่าไหร่ก่อนตอนใหม่จะมา — นับถอยหลังแบบเรียลไทม์ทุกวินาที ตั้งเตือนไว้แล้วมาฟินพร้อมกัน</p>
+      <div class="hero-actions">
+        <a class="btn" href="#">← ดูปฏิทินฉาย</a>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="label">กำลังนับถอยหลัง</div>
+        <div class="num">7</div>
+        <div class="detail">ตอนจาก 7 เรื่อง</div>
+      </div>
+      <div class="stat">
+        <div class="label">ใกล้สุด</div>
+        <div class="num" style="font-size:16px; padding-top:6px">Blank Heart</div>
+        <div class="detail"><b>คืนนี้</b> · 21:30 · EP.5 UNCUT</div>
+      </div>
+      <div class="stat">
+        <div class="label">สัปดาห์นี้</div>
+        <div class="num">8</div>
+        <div class="detail">ตอนใหม่ทั้งหมด</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ 2. NEXT-UP SPOTLIGHT ============ -->
+  <h2 class="section-title"><span class="spark">✦</span> ออนแอร์เร็วสุด</h2>
+  <section class="spotlight" aria-label="ตอนที่ออนแอร์เร็วที่สุด">
+    <div class="poster" aria-hidden="true">B</div>
+    <div class="body">
+      <span class="tag">NEXT UP ★ EP.5</span>
+      <h2>Blank Heart หัวใจว่างเปล่า</h2>
+      <div class="meta">
+        <span class="badge badge--uncut">UNCUT</span>
+        <span class="chip chip--iq">iQIYI</span>
+        <span>จันทร์ 27 ก.ค. · 21:30 น.</span>
+      </div>
+      <div class="flip" data-target="spot" aria-label="เวลานับถอยหลัง">
+        <span class="unit"><span class="val" data-u="d">01</span><span class="lab">DAYS</span></span>
+        <span class="sep" aria-hidden="true">:</span>
+        <span class="unit"><span class="val" data-u="h">04</span><span class="lab">HRS</span></span>
+        <span class="sep" aria-hidden="true">:</span>
+        <span class="unit"><span class="val" data-u="m">12</span><span class="lab">MIN</span></span>
+        <span class="sep" aria-hidden="true">:</span>
+        <span class="unit"><span class="val" data-u="s">33</span><span class="lab">SEC</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. ALL COUNTDOWNS ============ -->
+  <h2 class="section-title"><span class="spark">✧</span> ทุกตอนที่กำลังจะมา</h2>
+  <section class="cd-grid" aria-label="รายการนับถอยหลังทั้งหมด">
+
+    <a class="cd-card" href="#">
+      <div class="cd-head">
+        <div class="poster" aria-hidden="true">ป</div>
+        <div class="info">
+          <span class="name">ปริศนาดาวเคียงเดือน</span>
+          <span class="ep">EP.6 · พุธ 29 ก.ค. 20:30</span>
+          <span class="chip chip--viu">Viu</span>
+        </div>
+      </div>
+      <div class="cd-count">
+        <span class="cd-days"><b>3</b> DAYS LEFT</span>
+        <div class="flip" data-tick>
+          <span class="unit"><span class="val" data-u="h">07</span><span class="lab">HRS</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="m">45</span><span class="lab">MIN</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="s">09</span><span class="lab">SEC</span></span>
+        </div>
+      </div>
+      <div class="cd-foot"><span>พุธ 29 ก.ค. · 20:30 น.</span><span class="go" aria-hidden="true">→</span></div>
+    </a>
+
+    <a class="cd-card" href="#">
+      <div class="cd-head">
+        <div class="poster" aria-hidden="true">M</div>
+        <div class="info">
+          <span class="name">Moonlight Peony พจมานจันทร์</span>
+          <span class="ep">EP.8 · ศุกร์ 31 ก.ค. 22:00</span>
+          <span class="chip chip--wetv">WeTV</span>
+        </div>
+      </div>
+      <div class="cd-count">
+        <span class="cd-days"><b>5</b> DAYS LEFT</span>
+        <div class="flip" data-tick>
+          <span class="unit"><span class="val" data-u="h">18</span><span class="lab">HRS</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="m">02</span><span class="lab">MIN</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="s">51</span><span class="lab">SEC</span></span>
+        </div>
+      </div>
+      <div class="cd-foot"><span>ศุกร์ 31 ก.ค. · 22:00 น.</span><span class="go" aria-hidden="true">→</span></div>
+    </a>
+
+    <a class="cd-card" href="#">
+      <div class="cd-head">
+        <div class="poster" aria-hidden="true">23</div>
+        <div class="info">
+          <span class="name">องศารักพาราเลล</span>
+          <span class="ep">EP.6 · เสาร์ 1 ส.ค. 20:30</span>
+          <span class="chip chip--yt">YouTube</span>
+        </div>
+      </div>
+      <div class="cd-count">
+        <span class="cd-days"><b>6</b> DAYS LEFT</span>
+        <div class="flip" data-tick>
+          <span class="unit"><span class="val" data-u="h">03</span><span class="lab">HRS</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="m">27</span><span class="lab">MIN</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="s">40</span><span class="lab">SEC</span></span>
+        </div>
+      </div>
+      <div class="cd-foot"><span>เสาร์ 1 ส.ค. · 20:30 น.</span><span class="go" aria-hidden="true">→</span></div>
+    </a>
+
+    <a class="cd-card" href="#">
+      <div class="cd-head">
+        <div class="poster" aria-hidden="true">S</div>
+        <div class="info">
+          <span class="name">Secret Soda รสชาติความลับ</span>
+          <span class="ep">EP.4 · เสาร์ 1 ส.ค. 21:00</span>
+          <span class="badge badge--uncut">UNCUT</span>
+        </div>
+      </div>
+      <div class="cd-count">
+        <span class="cd-days"><b>6</b> DAYS LEFT</span>
+        <div class="flip" data-tick>
+          <span class="unit"><span class="val" data-u="h">04</span><span class="lab">HRS</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="m">11</span><span class="lab">MIN</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="s">58</span><span class="lab">SEC</span></span>
+        </div>
+      </div>
+      <div class="cd-foot"><span>เสาร์ 1 ส.ค. · 21:00 น. · Netflix</span><span class="go" aria-hidden="true">→</span></div>
+    </a>
+
+    <a class="cd-card" href="#">
+      <div class="cd-head">
+        <div class="poster" aria-hidden="true">G</div>
+        <div class="info">
+          <span class="name">Galaxy Tutor ติวรักข้ามกาแล็กซี</span>
+          <span class="ep">EP.10 · อาทิตย์ 2 ส.ค. 23:00</span>
+          <span class="chip chip--iq">iQIYI</span>
+        </div>
+      </div>
+      <div class="cd-count">
+        <span class="cd-days"><b>7</b> DAYS LEFT</span>
+        <div class="flip" data-tick>
+          <span class="unit"><span class="val" data-u="h">22</span><span class="lab">HRS</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="m">36</span><span class="lab">MIN</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="s">14</span><span class="lab">SEC</span></span>
+        </div>
+      </div>
+      <div class="cd-foot"><span>อาทิตย์ 2 ส.ค. · 23:00 น.</span><span class="go" aria-hidden="true">→</span></div>
+    </a>
+
+    <a class="cd-card" href="#">
+      <div class="cd-head">
+        <div class="poster" aria-hidden="true">B</div>
+        <div class="info">
+          <span class="name">Blank Heart (รีรัน)</span>
+          <span class="ep">EP.4 ซับไทย · จันทร์ 3 ส.ค. 21:30</span>
+          <span class="chip chip--iq">iQIYI</span>
+        </div>
+      </div>
+      <div class="cd-count">
+        <span class="cd-days"><b>8</b> DAYS LEFT</span>
+        <div class="flip" data-tick>
+          <span class="unit"><span class="val" data-u="h">11</span><span class="lab">HRS</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="m">59</span><span class="lab">MIN</span></span>
+          <span class="sep" aria-hidden="true">:</span>
+          <span class="unit"><span class="val" data-u="s">02</span><span class="lab">SEC</span></span>
+        </div>
+      </div>
+      <div class="cd-foot"><span>จันทร์ 3 ส.ค. · 21:30 น.</span><span class="go" aria-hidden="true">→</span></div>
+    </a>
+
+  </section>
+
+  <!-- ============ 4. NOTES ============ -->
+  <div class="notes">
+    <span class="i" aria-hidden="true">i</span>
+    <div>
+      <h2>หมายเหตุ</h2>
+      <p>เวลานับถอยหลังอ้างอิงเวลาประเทศไทย (GMT+7) — การ์ดจะหายไปเองอัตโนมัติเมื่อถึงเวลาออนแอร์</p>
+    </div>
+  </div>
+
+  <footer>GL-ORBIT ★ COUNTDOWN CONCEPT ★ MADE WITH ✦ Y2K ENERGY ✦</footer>
+</div>
+
+<script>
+(function(){
+  // mock live tick: count down seconds, roll minutes/hours at 0
+  setInterval(function(){
+    document.querySelectorAll('.flip').forEach(function(flip){
+      ['s','m','h','d'].forEach(function(u){
+        var el = flip.querySelector('[data-u="'+u+'"]');
+        if(!el) return;
+        var v = parseInt(el.textContent, 10);
+        if(u === 's'){
+          v = v - 1;
+          if(v < 0){ v = 59; roll(flip, 'm'); }
+          el.textContent = String(v).padStart(2,'0');
+        }
+      });
+    });
+  }, 1000);
+  function roll(flip, unit){
+    var el = flip.querySelector('[data-u="'+unit+'"]');
+    if(!el) return;
+    var v = parseInt(el.textContent, 10) - 1;
+    if(v < 0){
+      v = unit === 'm' ? 59 : 23;
+      roll(flip, unit === 'm' ? 'h' : 'd');
+    }
+    el.textContent = String(v).padStart(2,'0');
+  }
+})();
+</script>
+</body>
+</html>

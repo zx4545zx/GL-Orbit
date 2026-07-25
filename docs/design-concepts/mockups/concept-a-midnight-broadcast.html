@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept A — Midnight Broadcast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Chivo+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a14;
+    --panel: #171224;
+    --panel-deep: #100c1b;
+    --ink: #f2ecfa;
+    --muted: #9d8fb8;
+    --coral: #ff4d7e;
+    --cyan: #5ff2e0;
+    --amber: #ffc24d;
+    --line: #2d2344;
+    --line-glow: #4a3670;
+    --font-ui: 'Chakra Petch', sans-serif;
+    --font-mono: 'Chivo Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0 3px,
+      rgba(255, 255, 255, 0.012) 3px 4px
+    );
+    z-index: 10;
+  }
+
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--panel-deep);
+    border: 1px solid var(--line-glow);
+    box-shadow: 0 0 60px rgba(95, 242, 224, 0.05), 0 0 120px rgba(255, 77, 126, 0.04);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .corner { position: absolute; width: 14px; height: 14px; z-index: 2; }
+  .corner.tl { top: 6px; left: 6px; border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+  .corner.tr { top: 6px; right: 6px; border-top: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+  .corner.bl { bottom: 6px; left: 6px; border-bottom: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+  .corner.br { bottom: 6px; right: 6px; border-bottom: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.14em;
+  }
+  .brand em { font-style: normal; color: var(--coral); }
+
+  .freq {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .onair {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 20px 0;
+    padding: 12px 14px;
+    border: 1px solid var(--line-glow);
+    background: linear-gradient(135deg, rgba(255, 77, 126, 0.09), rgba(95, 242, 224, 0.05));
+  }
+
+  .onair-dot {
+    width: 9px; height: 9px;
+    background: var(--coral);
+    box-shadow: 0 0 10px var(--coral);
+    animation: blink 1.6s ease-in-out infinite;
+    flex: none;
+  }
+  @keyframes blink { 50% { opacity: 0.35; box-shadow: none; } }
+
+  .onair-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--amber);
+    letter-spacing: 0.22em;
+  }
+
+  .onair-title {
+    flex: 1;
+    font-size: 13.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .countdown {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cyan);
+    text-shadow: 0 0 12px rgba(95, 242, 224, 0.5);
+  }
+
+  section { padding: 18px 20px 4px; }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .section-head h2 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+  .section-head .more {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--cyan);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+  }
+
+  .schedule {
+    border: 1px solid var(--line);
+    font-family: var(--font-mono);
+  }
+  .schedule-row {
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+  }
+  .schedule-row:last-child { border-bottom: 0; }
+  .schedule-row .time { color: var(--cyan); font-weight: 500; }
+  .schedule-row .name { font-family: var(--font-ui); font-weight: 500; }
+  .schedule-row .ch {
+    font-size: 10px;
+    color: var(--muted);
+    border: 1px solid var(--line-glow);
+    padding: 2px 6px;
+    letter-spacing: 0.06em;
+  }
+  .schedule-row.live { background: rgba(255, 77, 126, 0.07); }
+  .schedule-row.live .time { color: var(--coral); }
+
+  .featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .series-card {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  .series-card:hover, .series-card:focus-visible {
+    border-color: var(--cyan);
+    box-shadow: 0 0 16px rgba(95, 242, 224, 0.18);
+    outline: none;
+  }
+  .series-poster {
+    aspect-ratio: 3 / 4;
+    display: flex;
+    align-items: flex-end;
+    padding: 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: rgba(242, 236, 250, 0.85);
+  }
+  .p1 { background: linear-gradient(160deg, #3d2a5c, #1a1030 60%), #1a1030; }
+  .p2 { background: linear-gradient(200deg, #5c2a3d, #30101a 60%), #30101a; }
+  .series-meta { padding: 10px 10px 12px; }
+  .series-meta h3 { font-size: 13px; font-weight: 600; }
+  .series-meta p { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+
+  .halo {
+    border: 1px solid var(--line);
+    padding: 14px;
+    background: var(--panel);
+  }
+  .halo-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--coral), var(--cyan));
+    flex: none;
+  }
+  .halo-head strong { font-size: 13px; display: block; }
+  .halo-head span { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+  .halo p { font-size: 13px; line-height: 1.6; color: #ded4ee; }
+  .halo-stats {
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--muted);
+    display: flex;
+    gap: 16px;
+  }
+  .halo-stats b { color: var(--coral); font-weight: 500; }
+
+  .bottomnav {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid var(--line-glow);
+    background: var(--panel);
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 0 14px;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-decoration: none;
+    min-height: 56px;
+    justify-content: center;
+    position: relative;
+  }
+  .nav-item .icon { font-size: 17px; font-family: var(--font-ui); }
+  .nav-item.active { color: var(--cyan); }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 2px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .onair-dot { animation: none; }
+    .series-card { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <span class="corner tl"></span><span class="corner tr"></span>
+    <span class="corner bl"></span><span class="corner br"></span>
+
+    <header class="topbar">
+      <div class="brand">GL<em>·</em>ORBIT</div>
+      <div class="freq">CH.23 · BKK 23:41</div>
+    </header>
+
+    <div class="onair">
+      <span class="onair-dot"></span>
+      <span class="onair-label">ON&nbsp;AIR</span>
+      <span class="onair-title">23.5 องศาที่โลกเอียง — EP.9</span>
+      <span class="countdown">00:42:17</span>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>ตารางฉายคืนนี้</h2>
+        <a class="more" href="#">FULL&nbsp;GRID&nbsp;→</a>
+      </div>
+      <div class="schedule">
+        <div class="schedule-row live">
+          <span class="time">22:30</span><span class="name">23.5 องศาที่โลกเอียง</span><span class="ch">GMMTV</span>
+        </div>
+        <div class="schedule-row">
+          <span class="time">23:15</span><span class="name">Affair รักเล่นกล</span><span class="ch">CH3</span>
+        </div>
+        <div class="schedule-row">
+          <span class="time">23:45</span><span class="name">Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR</span>
+        </div>
+        <div class="schedule-row">
+          <span class="time">00:30</span><span class="name">The Loyal Pin ปิ่นภักดิ์</span><span class="ch">IDF</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>สัญญาณแนะนำ</h2>
+        <a class="more" href="#">EXPLORE&nbsp;→</a>
+      </div>
+      <div class="featured">
+        <a class="series-card" href="#">
+          <div class="series-poster p1">POSTER</div>
+          <div class="series-meta">
+            <h3>Mate รักเธอเท่าโลก</h3>
+            <p>EP.5 · ศุกร์ 21:00</p>
+          </div>
+        </a>
+        <a class="series-card" href="#">
+          <div class="series-poster p2">POSTER</div>
+          <div class="series-meta">
+            <h3>Pluto นิทาน ดวงดาว ความรัก</h3>
+            <p>EP.12 · เสาร์ 20:30</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Orbit Halo</h2>
+        <a class="more" href="#">FEED&nbsp;→</a>
+      </div>
+      <div class="halo">
+        <div class="halo-head">
+          <span class="avatar"></span>
+          <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+        </div>
+        <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัวไปหมด ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+        <div class="halo-stats"><span><b>1,204</b> ถูกใจ</span><span><b>86</b> ความคิดเห็น</span></div>
+      </div>
+    </section>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">⌂</span>HOME</a>
+      <a class="nav-item" href="#"><span class="icon">▦</span>GUIDE</a>
+      <a class="nav-item" href="#"><span class="icon">✦</span>HALO</a>
+      <a class="nav-item" href="#"><span class="icon">♡</span>SAVED</a>
+      <a class="nav-item" href="#"><span class="icon">◉</span>YOU</a>
+    </nav>
+  </div>
+</body>
+</html>

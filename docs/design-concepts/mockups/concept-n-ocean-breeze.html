@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept N — Ocean Breeze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Prompt:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef7fa;
+    --surface: #ffffff;
+    --ink: #14384a;
+    --muted: #6d8ea0;
+    --sea: #1f9ab8;
+    --sea-deep: #0d6d8a;
+    --sea-soft: #d3edf4;
+    --coral: #ff8a70;
+    --sand: #fdf3e2;
+    --line: #cde4ec;
+    --font-display: 'Comfortaa', 'Prompt', sans-serif;
+    --font-body: 'Prompt', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: linear-gradient(170deg, #d3edf4, #eef7fa 60%);
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .phone {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 26px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .wave {
+    display: block;
+    width: 100%;
+    height: 20px;
+    background: radial-gradient(circle at 10px -6px, transparent 14px, var(--sea-soft) 15px);
+    background-size: 20px 20px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 24px 6px;
+  }
+  .brand { font-family: var(--font-display); font-size: 21px; font-weight: 700; color: var(--sea-deep); }
+  .brand span { color: var(--coral); }
+  .hello { font-size: 12px; color: var(--muted); font-weight: 300; }
+
+  .countdown {
+    margin: 14px 22px 0;
+    background: linear-gradient(140deg, var(--sea), var(--sea-deep));
+    border-radius: 22px;
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 12px 26px rgba(31,154,184,0.28);
+  }
+  .countdown .shell {
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex: none;
+    border: 1.5px solid rgba(255,255,255,0.4);
+  }
+  .countdown h2 { font-size: 15.5px; font-weight: 500; }
+  .countdown p { font-size: 12px; opacity: 0.85; margin-top: 3px; font-weight: 300; }
+
+  section { padding: 18px 22px 0; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--sea-deep);
+  }
+  .section-head h2::before { content: '〜 '; color: var(--coral); }
+  .more { font-size: 12px; color: var(--sea); text-decoration: none; }
+
+  .sched { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 4px 16px; }
+  .sched-row {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 11px 0;
+    font-size: 13px;
+  }
+  .sched-row + .sched-row { border-top: 1px solid var(--sea-soft); }
+  .sched-row .t { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: var(--sea-deep); }
+  .sched-row .ch { font-size: 10px; color: var(--sea); background: var(--sea-soft); border-radius: 999px; padding: 3px 9px; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+  .card:hover, .card:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(31,154,184,0.2);
+    outline: none;
+  }
+  .card .art { aspect-ratio: 3 / 3.4; }
+  .art.a1 { background: linear-gradient(165deg, #4fc3d9, #1f7ea0); }
+  .art.a2 { background: linear-gradient(215deg, #ffb49e, #e8725a); }
+  .card .meta { padding: 12px 14px 14px; }
+  .card h3 { font-size: 13px; font-weight: 500; }
+  .card p { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 300; }
+
+  .halo {
+    background: var(--sand);
+    border: 1px solid #f0dfc0;
+    border-radius: 20px;
+    padding: 16px 18px;
+  }
+  .halo-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sea), var(--coral));
+    border: 2px solid #fff;
+    flex: none;
+  }
+  .halo-head strong { font-size: 13px; font-weight: 500; }
+  .halo-head span { display: block; font-size: 10.5px; color: var(--muted); }
+  .halo p { font-size: 13px; line-height: 1.75; font-weight: 300; }
+  .halo-stats { margin-top: 10px; font-size: 11.5px; color: var(--muted); }
+  .halo-stats b { color: var(--sea-deep); }
+
+  .bottomnav {
+    margin: 20px 18px 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 6px;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 9px 0;
+    font-size: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 999px;
+    min-height: 52px;
+    justify-content: center;
+    font-weight: 300;
+  }
+  .nav-item .icon { font-size: 16px; }
+  .nav-item.active { background: var(--sea-soft); color: var(--sea-deep); font-weight: 500; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+    .card:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <div class="brand">GL<span>·</span>Orbit</div>
+      <div class="hello">ลมทะเลยามเย็น ⚓</div>
+    </header>
+    <span class="wave" aria-hidden="true"></span>
+
+    <div class="countdown">
+      <div class="shell">42 นาที</div>
+      <div>
+        <h2>23.5 องศาที่โลกเอียง EP.9</h2>
+        <p>คืนนี้ 22:30 · GMMTV</p>
+      </div>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>ตารางฉายวันนี้</h2>
+        <a class="more" href="#">ทั้งสัปดาห์</a>
+      </div>
+      <div class="sched">
+        <div class="sched-row"><span class="t">22:30</span><span>23.5 องศาที่โลกเอียง</span><span class="ch">GMMTV</span></div>
+        <div class="sched-row"><span class="t">23:15</span><span>Affair รักเล่นกล</span><span class="ch">CH3</span></div>
+        <div class="sched-row"><span class="t">23:45</span><span>Blank เติมคำว่ารักลงในช่องว่าง</span><span class="ch">9STAR</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>ซีรีส์น่าติดตาม</h2>
+        <a class="more" href="#">สำรวจ</a>
+      </div>
+      <div class="cards">
+        <a class="card" href="#">
+          <div class="art a1"></div>
+          <div class="meta"><h3>Mate รักเธอเท่าโลก</h3><p>EP.5 · ศุกร์ 21:00</p></div>
+        </a>
+        <a class="card" href="#">
+          <div class="art a2"></div>
+          <div class="meta"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><p>EP.12 · เสาร์ 20:30</p></div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>จาก Orbit Halo</h2>
+        <a class="more" href="#">อ่านฟีด</a>
+      </div>
+      <div class="halo">
+        <div class="halo-head">
+          <span class="avatar"></span>
+          <div><strong>ออมกรณ์นภัส</strong><span>@omgk · 12 นาทีที่แล้ว</span></div>
+        </div>
+        <p>ซีนห้องสมุดใน EP.9 คือที่สุดของปีนี้แล้ว แสง มุมกล้อง ดนตรี ทุกอย่างลงตัว ดูซ้ำรอบที่สี่ยังน้ำตาไหล</p>
+        <div class="halo-stats"><b>1,204</b> ถูกใจ · <b>86</b> ความคิดเห็น</div>
+      </div>
+    </section>
+
+    <nav class="bottomnav">
+      <a class="nav-item active" href="#"><span class="icon">⌂</span>หน้าแรก</a>
+      <a class="nav-item" href="#"><span class="icon">☷</span>ปฏิทิน</a>
+      <a class="nav-item" href="#"><span class="icon">✧</span>ฮาโล</a>
+      <a class="nav-item" href="#"><span class="icon">♡</span>บันทึก</a>
+      <a class="nav-item" href="#"><span class="icon">☺</span>ฉัน</a>
+    </nav>
+  </div>
+</body>
+</html>

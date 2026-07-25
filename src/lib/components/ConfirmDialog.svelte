@@ -69,14 +69,14 @@
 
 	<!-- Dialog -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center p-4"
+		class="orbit-dialog fixed inset-0 z-50 flex items-center justify-center p-4"
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="confirm-title"
 	>
-		<div class="glass-card-strong relative max-w-sm w-full overflow-hidden rounded-2xl p-6 shadow-xl shadow-plum/15 animate-slide-up sm:p-8">
+		<div class="orbit-dialog-panel relative max-w-sm w-full overflow-hidden p-6 animate-slide-up sm:p-8">
 			<!-- Icon -->
-			<div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl {danger ? 'bg-coral/10' : 'bg-lavender/10'} flex items-center justify-center mx-auto mb-4">
+			<div class="orbit-dialog-icon w-12 h-12 sm:w-14 sm:h-14 {danger ? 'bg-coral/10' : 'bg-lavender/10'} flex items-center justify-center mx-auto mb-4">
 				{#if danger}
 					<svg class="w-6 h-6 sm:w-7 sm:h-7 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -99,15 +99,16 @@
 				<button
 					type="button"
 					data-cancel-button
+					data-testid="confirm-cancel"
 					onclick={handleCancel}
-					class="flex-1 px-4 py-2.5 sm:py-3 rounded-lg orbit-control text-plum font-medium transition-all text-sm sm:text-base touch-target"
+					class="orbit-dialog-action orbit-control"
 				>
 					{cancelLabel}
 				</button>
 				<button
 					type="button"
 					onclick={handleConfirm}
-					class="flex-1 px-4 py-2.5 sm:py-3 rounded-lg text-white font-semibold transition-all text-sm sm:text-base touch-target {danger ? 'bg-coral shadow-sm shadow-coral/25 hover:bg-coral-dark' : 'bg-lavender-dark shadow-sm shadow-lavender/25 hover:bg-plum'}"
+					class="orbit-dialog-action orbit-action {!danger ? 'bg-lavender-dark hover:bg-plum' : ''}"
 				>
 					{confirmLabel}
 				</button>
