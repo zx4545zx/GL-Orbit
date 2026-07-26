@@ -14,8 +14,14 @@
 	function isActive(href: string) {
 		return page.url.pathname === href || page.url.pathname.startsWith(href + '/');
 	}
+
+	// The landing page renders its own cinematic hero instead of the shared header/tabs.
+	const isLanding = $derived(page.url.pathname === `${langPrefix}/explore`);
 </script>
 
+{#if isLanding}
+	{@render children()}
+{:else}
 <div class="py-6 sm:py-8 max-w-6xl mx-auto">
 	<!-- Header + inline tab switcher -->
 	<div class="flex flex-col items-center gap-4 mb-6 sm:mb-8">
@@ -47,3 +53,4 @@
 
 	{@render children()}
 </div>
+{/if}

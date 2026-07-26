@@ -30,7 +30,7 @@ import NotificationBadge from './NotificationBadge.svelte';
 				`
 			},
 			{
-				href: `/${page.data.lang}/explore/series`,
+				href: `/${page.data.lang}/explore`,
 				label: m.nav_explore(),
 				icon: (active: boolean) => `
 					<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-[var(--orbit-coral)]' : 'opacity-70'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">

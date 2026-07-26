@@ -15,7 +15,7 @@ import Picture from './Picture.svelte';
 		const links = [
 			{ href: `/${page.data.lang}/`, label: m.nav_home() },
 			{ href: `/${page.data.lang}/calendar`, label: m.nav_calendar() },
-			{ href: `/${page.data.lang}/explore/series`, label: m.nav_explore() }
+			{ href: `/${page.data.lang}/explore`, label: m.nav_explore() }
 			// Orbit Halo hidden while the feature is closed — restore the /halo entry here.
 		];
 		if (currentUser) {
