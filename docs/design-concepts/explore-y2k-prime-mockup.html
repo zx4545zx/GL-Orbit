@@ -1,0 +1,319 @@
+<!-- GL-Orbit /explore mockup — Prime Video structure × Orbit Y2K skin (tokens locked to explore-midnight-y2k-mockup.html) -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สำรวจ GL — Y2K × Prime Mockup | GL-Orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orbit-paper:#e8e6f5;
+  --orbit-surface:#fdfcff;
+  --orbit-ink:#241a3a;
+  --orbit-muted:#6f6390;
+  --orbit-coral:#ff3fbf;
+  --orbit-coral-dark:#c21e92;
+  --orbit-coral-soft:#ffd6f5;
+  --orbit-lavender:#d9c8ff;
+  --orbit-mint:#b8f0ff;
+  --orbit-link:#3f7dff;
+  --orbit-shadow:4px 4px 0 #d9c8ff;
+  --orbit-shadow-raised:5px 5px 0 rgba(36,26,58,.25);
+  --font-display:'Silkscreen',monospace;
+  --font-body:'Prompt',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;border-radius:0!important}
+body{
+  font-family:var(--font-body);
+  color:var(--orbit-ink);
+  background-color:var(--orbit-paper);
+  background-image:
+    linear-gradient(rgba(36,26,58,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(36,26,58,.05) 1px, transparent 1px);
+  background-size:24px 24px;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+.container{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ===== ticker ===== */
+.ticker{background:var(--orbit-ink);border-bottom:2px solid var(--orbit-ink);overflow:hidden;white-space:nowrap}
+.ticker-track{display:inline-block;padding:7px 0;animation:tick 30s linear infinite}
+.ticker span{font-family:var(--font-display);font-size:10px;letter-spacing:2px;color:var(--orbit-mint);margin:0 26px;text-transform:uppercase}
+.ticker b{color:var(--orbit-coral);font-weight:400}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ===== nav ===== */
+.nav{position:sticky;top:0;z-index:60;background:var(--orbit-surface);border-bottom:2px solid var(--orbit-ink)}
+.nav-in{display:flex;align-items:center;gap:20px;padding:12px 0}
+.logo{font-family:var(--font-display);font-size:18px;letter-spacing:1px;color:var(--orbit-ink)}
+.logo em{font-style:normal;color:var(--orbit-coral)}
+.logo .sub{font-size:9px;color:var(--orbit-muted);display:block;letter-spacing:3px}
+.nav-links{display:flex;gap:2px}
+.nav-links a{font-size:14px;font-weight:500;padding:8px 14px;border:2px solid transparent}
+.nav-links a:hover{border-color:var(--orbit-ink);background:var(--orbit-lavender)}
+.nav-links a.on{background:var(--orbit-ink);color:var(--orbit-mint);border-color:var(--orbit-ink)}
+.nav-search{margin-left:auto;display:flex}
+.nav-search input{font-family:var(--font-body);font-size:14px;padding:8px 12px;border:2px solid var(--orbit-ink);background:#fff;width:190px;outline:none}
+.nav-search input:focus{box-shadow:var(--orbit-shadow)}
+.nav-search button{font-family:var(--font-display);font-size:11px;padding:8px 14px;border:2px solid var(--orbit-ink);border-left:none;background:var(--orbit-coral);color:#fff;cursor:pointer}
+.nav-search button:hover{background:var(--orbit-coral-dark)}
+
+/* ===== hero ===== */
+.hero{padding:28px 0 8px}
+.hero-panel{
+  position:relative;border:2px solid var(--orbit-ink);box-shadow:var(--orbit-shadow-raised);
+  background:linear-gradient(135deg,#3a2456 0%,#241a3a 55%,#150d24 100%);
+  color:#fff;overflow:hidden;
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
+}
+.hero-panel::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 2px,transparent 2px 4px)}
+.hero-info{position:relative;z-index:2;padding:40px 36px 32px;display:flex;flex-direction:column;gap:14px}
+.kicker{font-family:var(--font-display);font-size:10px;letter-spacing:3px;color:var(--orbit-mint);text-transform:uppercase}
+.kicker b{color:var(--orbit-coral);font-weight:400}
+.hero-title{font-family:var(--font-display);font-size:clamp(30px,4.4vw,52px);line-height:1.12;color:#fff;text-shadow:4px 4px 0 rgba(255,63,191,.45)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--font-display);font-size:10px;letter-spacing:1px;padding:6px 10px;border:2px solid var(--orbit-mint);color:var(--orbit-mint);text-transform:uppercase}
+.chip.hot{border-color:var(--orbit-coral);color:var(--orbit-coral)}
+.hero-sub{font-size:15px;line-height:1.75;color:#dcd4f2;max-width:52ch}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
+.btn{font-family:var(--font-display);font-size:12px;letter-spacing:1px;padding:12px 20px;border:2px solid var(--orbit-ink);cursor:pointer;text-transform:uppercase;box-shadow:4px 4px 0 rgba(0,0,0,.4);transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 rgba(0,0,0,.4)}
+.btn-coral{background:var(--orbit-coral);color:#fff}
+.btn-ghost{background:transparent;color:#fff;border-color:var(--orbit-mint);box-shadow:4px 4px 0 rgba(184,240,255,.3)}
+.member-line{font-size:13px;color:var(--orbit-mint)}
+.member-line b{color:#fff}
+.hero-art{position:relative;z-index:1;min-height:340px;
+  background:
+    radial-gradient(circle at 70% 20%, rgba(255,63,191,.5), transparent 55%),
+    radial-gradient(circle at 20% 85%, rgba(184,240,255,.4), transparent 50%),
+    linear-gradient(160deg,#5a3a86,#241a3a);}
+.hero-art::before{content:"SECRET";position:absolute;inset:auto -30px 24px auto;font-family:var(--font-display);font-size:88px;line-height:.8;color:transparent;-webkit-text-stroke:2px rgba(255,214,245,.35);transform:rotate(-90deg);transform-origin:right bottom}
+.hero-art .ghost{position:absolute;top:26px;left:24px;font-family:var(--font-display);font-size:15px;letter-spacing:3px;color:rgba(255,255,255,.55)}
+.hero-progress{position:absolute;left:24px;right:24px;bottom:22px;z-index:2}
+.hero-progress .lbl{font-family:var(--font-display);font-size:9px;letter-spacing:2px;color:var(--orbit-mint);margin-bottom:6px}
+.pbar{height:14px;border:2px solid #fff;background:rgba(0,0,0,.35)}
+.pbar i{display:block;height:100%;width:72%;background:repeating-linear-gradient(90deg,var(--orbit-coral) 0 8px,var(--orbit-coral-dark) 8px 10px)}
+
+/* ===== sections ===== */
+.section{padding:30px 0 6px}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.sec-head::before{content:"";width:14px;height:14px;background:var(--orbit-coral);border:2px solid var(--orbit-ink);box-shadow:3px 3px 0 var(--orbit-lavender)}
+.sec-head h2{font-family:var(--font-display);font-size:17px;letter-spacing:2px;text-transform:uppercase}
+.sec-head .more{margin-left:auto;font-family:var(--font-display);font-size:10px;letter-spacing:1px;color:var(--orbit-link);border-bottom:2px solid var(--orbit-link)}
+.rail{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 4px 14px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail>*{scroll-snap-align:start;flex:0 0 auto}
+
+/* continue watching */
+.cw{width:280px;background:var(--orbit-surface);border:2px solid var(--orbit-ink);box-shadow:var(--orbit-shadow)}
+.cw .thumb{position:relative;aspect-ratio:16/9;border-bottom:2px solid var(--orbit-ink)}
+.cw .thumb .ep{position:absolute;top:8px;left:8px;font-family:var(--font-display);font-size:9px;letter-spacing:1px;padding:5px 8px;background:var(--orbit-ink);color:var(--orbit-mint)}
+.cw .thumb .left{position:absolute;right:8px;bottom:8px;font-family:var(--font-display);font-size:9px;padding:4px 7px;background:#fff;border:2px solid var(--orbit-ink);color:var(--orbit-ink)}
+.cw .body{padding:12px 14px 14px}
+.cw h3{font-size:15px;font-weight:600;margin-bottom:8px}
+.cw .pbar{border-color:var(--orbit-ink);background:#fff;height:12px}
+.cw .meta{font-size:12px;color:var(--orbit-muted);margin-top:8px}
+
+/* ranked wide cards */
+.rank-item{display:flex;align-items:flex-end}
+.rank-num{font-family:var(--font-display);font-size:110px;line-height:.76;color:transparent;-webkit-text-stroke:3px var(--orbit-ink);text-shadow:5px 5px 0 var(--orbit-lavender);margin-right:-20px;user-select:none}
+.rank-card{position:relative;z-index:1;width:250px;background:var(--orbit-surface);border:2px solid var(--orbit-ink);box-shadow:var(--orbit-shadow)}
+.rank-card .thumb{aspect-ratio:16/10;border-bottom:2px solid var(--orbit-ink)}
+.rank-card h3{font-size:14px;font-weight:600;padding:10px 12px 12px}
+
+/* genre strip */
+.genres{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.genre{position:relative;border:2px solid var(--orbit-ink);box-shadow:var(--orbit-shadow);padding:22px 16px 18px;background:var(--orbit-surface);overflow:hidden;cursor:pointer;transition:transform .12s}
+.genre:hover{transform:translate(-2px,-2px)}
+.genre .glyph{font-size:26px;display:block;margin-bottom:10px}
+.genre .name{font-family:var(--font-display);font-size:11px;letter-spacing:2px;text-transform:uppercase}
+.genre .count{font-size:12px;color:var(--orbit-muted);margin-top:4px}
+.genre::after{content:"";position:absolute;top:0;right:0;width:34px;height:34px;background:var(--orbit-lavender);border-left:2px solid var(--orbit-ink);border-bottom:2px solid var(--orbit-ink)}
+.genre:nth-child(2)::after{background:var(--orbit-mint)}
+.genre:nth-child(3)::after{background:var(--orbit-coral-soft)}
+.genre:nth-child(5)::after{background:var(--orbit-coral)}
+
+/* posters */
+.poster{width:172px;background:var(--orbit-surface);border:2px solid var(--orbit-ink);box-shadow:var(--orbit-shadow)}
+.poster .art{position:relative;aspect-ratio:2/3;border-bottom:2px solid var(--orbit-ink)}
+.poster .art .badge{position:absolute;top:8px;left:8px;font-family:var(--font-display);font-size:9px;letter-spacing:1px;padding:5px 8px;background:var(--orbit-coral);color:#fff;border:2px solid var(--orbit-ink)}
+.poster h3{font-size:14px;font-weight:600;padding:10px 12px 4px}
+.poster .meta{font-size:12px;color:var(--orbit-muted);padding:0 12px 12px}
+
+/* artists */
+.artist{width:132px;text-align:center}
+.artist .ava{width:104px;height:104px;margin:0 auto 10px;border-radius:50%!important;border:2px solid var(--orbit-ink);box-shadow:var(--orbit-shadow);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:26px;color:var(--orbit-ink)}
+.artist h3{font-size:14px;font-weight:600}
+.artist .meta{font-size:12px;color:var(--orbit-muted)}
+
+/* ships */
+.ship{width:220px;background:var(--orbit-surface);border:2px solid var(--orbit-ink);box-shadow:var(--orbit-shadow);padding:18px 14px 14px;text-align:center}
+.duo{position:relative;width:120px;height:76px;margin:0 auto 12px}
+.duo .a,.duo .b{position:absolute;width:72px;height:72px;border-radius:50%!important;border:2px solid var(--orbit-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:17px}
+.duo .a{left:0;background:var(--orbit-lavender)}
+.duo .b{right:0;background:var(--orbit-mint)}
+.duo .heart{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;width:34px;height:34px;background:var(--orbit-coral);border:2px solid var(--orbit-ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px}
+.ship h3{font-size:15px;font-weight:600}
+.ship .meta{font-size:12px;color:var(--orbit-muted);margin-top:3px}
+
+/* placeholders */
+.ph--a{background:linear-gradient(135deg,var(--orbit-lavender),var(--orbit-mint))}
+.ph--b{background:linear-gradient(135deg,var(--orbit-coral-soft),var(--orbit-lavender))}
+.ph--c{background:linear-gradient(135deg,var(--orbit-mint),var(--orbit-coral-soft))}
+.ph--d{background:repeating-linear-gradient(45deg,var(--orbit-lavender) 0 14px,var(--orbit-mint) 14px 28px)}
+.ph--e{background:linear-gradient(160deg,#c9b3f5,#8f6fd0)}
+.ph--f{background:linear-gradient(160deg,#ffb3e2,#ff6fd0)}
+
+/* footer + ribbon */
+.footer{margin-top:44px;background:var(--orbit-ink);color:var(--orbit-mint);border-top:2px solid var(--orbit-ink)}
+.footer .container{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;flex-wrap:wrap;gap:10px}
+.footer .flogo{font-family:var(--font-display);font-size:14px}
+.footer .flogo em{font-style:normal;color:var(--orbit-coral)}
+.footer p{font-family:var(--font-display);font-size:9px;letter-spacing:2px;text-transform:uppercase}
+.ribbon{position:fixed;right:0;bottom:24px;z-index:70;font-family:var(--font-display);font-size:10px;letter-spacing:2px;background:var(--orbit-coral);color:#fff;border:2px solid var(--orbit-ink);border-right:none;box-shadow:var(--orbit-shadow);padding:10px 16px;text-transform:uppercase}
+
+/* ===== responsive ===== */
+@media (max-width:960px){
+  .nav-links{display:none}
+  .hero-panel{grid-template-columns:1fr}
+  .hero-art{min-height:230px;order:-1}
+  .genres{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:639px){
+  .container{padding:0 16px}
+  .hero-info{padding:24px 18px}
+  .rank-num{font-size:78px}
+  .genres{grid-template-columns:repeat(2,1fr)}
+  .poster{width:148px}
+  .nav-search input{width:120px}
+}
+</style>
+</head>
+<body>
+
+<div class="ticker"><div class="ticker-track" id="ticker"></div></div>
+
+<nav class="nav"><div class="container nav-in">
+  <a class="logo" href="#">GL<em>-ORBIT</em><span class="sub">video</span></a>
+  <div class="nav-links">
+    <a href="#">หน้าแรก</a><a class="on" href="#">สำรวจ</a><a href="#">ซีรีส์</a><a href="#">นักแสดง</a><a href="#">คู่จิ้น</a><a href="#">หมวดหมู่</a>
+  </div>
+  <div class="nav-search"><input type="text" placeholder="ค้นหาซีรีส์ นักแสดง…"><button>ค้นหา</button></div>
+</div></nav>
+
+<header class="hero"><div class="container">
+  <div class="hero-panel">
+    <div class="hero-info">
+      <span class="kicker">GL-ORBIT <b>ORIGINAL</b> ★ แนะนำประจำสัปดาห์</span>
+      <h1 class="hero-title">ใจซ่อนรัก<br>The Secret of Us</h1>
+      <div class="hero-meta">
+        <span class="chip hot">2024</span><span class="chip">8 ตอน</span><span class="chip">โรแมนซ์</span><span class="chip">ช่อง 3</span>
+      </div>
+      <p class="hero-sub">หมอฟ้าลดากับเอิร์น เพื่อนสมัยเรียนที่จากกันด้วยความเข้าใจผิด ได้กลับมาเจอกันอีกครั้งในฐานะคนไข้และคนรักเก่า ความรู้สึกที่ซ่อนไว้จึงค่อยๆ เปิดเผย</p>
+      <p class="member-line">รวมอยู่ใน<b>สมาชิก GL-Orbit</b> ของคุณแล้ว</p>
+      <div class="hero-cta">
+        <button class="btn btn-coral">▶ ดูรายละเอียด</button>
+        <button class="btn btn-ghost">+ เพิ่มเข้าลิสต์</button>
+      </div>
+    </div>
+    <div class="hero-art">
+      <span class="ghost">EP.08 · FINALE</span>
+      <div class="hero-progress">
+        <div class="lbl">ตอนใหม่ ศุกร์นี้ — เตรียมพบกัน</div>
+        <div class="pbar"><i></i></div>
+      </div>
+    </div>
+  </div>
+</div></header>
+
+<main class="container">
+
+  <section class="section">
+    <div class="sec-head"><h2>ดูต่อจากจุดที่ค้างไว้</h2><a class="more" href="#">ดูทั้งหมด →</a></div>
+    <div class="rail">
+      <article class="cw"><div class="thumb ph--a"><span class="ep">ตอนที่ 7</span><span class="left">เหลือ 12 นาที</span></div><div class="body"><h3>ใจซ่อนรัก The Secret of Us</h3><div class="pbar"><i style="width:82%"></i></div><div class="meta">ดูไปแล้ว 82%</div></div></article>
+      <article class="cw"><div class="thumb ph--b"><span class="ep">ตอนที่ 4</span><span class="left">เหลือ 38 นาที</span></div><div class="body"><h3>Pluto นิทาน ดวงดาว ความรัก</h3><div class="pbar"><i style="width:45%"></i></div><div class="meta">ดูไปแล้ว 45%</div></div></article>
+      <article class="cw"><div class="thumb ph--c"><span class="ep">ตอนที่ 11</span><span class="left">เหลือ 6 นาที</span></div><div class="body"><h3>23.5 องศาที่โลกเอียง</h3><div class="pbar"><i style="width:91%"></i></div><div class="meta">ดูไปแล้ว 91%</div></div></article>
+      <article class="cw"><div class="thumb ph--e"><span class="ep">ตอนที่ 2</span><span class="left">เหลือ 51 นาที</span></div><div class="body"><h3>Blank The Series</h3><div class="pbar"><i style="width:18%"></i></div><div class="meta">ดูไปแล้ว 18%</div></div></article>
+      <article class="cw"><div class="thumb ph--f"><span class="ep">ตอนที่ 6</span><span class="left">เหลือ 25 นาที</span></div><div class="body"><h3>Affair รักเล่นกล</h3><div class="pbar"><i style="width:60%"></i></div><div class="meta">ดูไปแล้ว 60%</div></div></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2>ซีรีส์ที่คนดูมากสุดสัปดาห์นี้</h2></div>
+    <div class="rail">
+      <div class="rank-item"><span class="rank-num">1</span><article class="rank-card"><div class="thumb ph--a"></div><h3>23.5 องศาที่โลกเอียง</h3></article></div>
+      <div class="rank-item"><span class="rank-num">2</span><article class="rank-card"><div class="thumb ph--b"></div><h3>ใจซ่อนรัก The Secret of Us</h3></article></div>
+      <div class="rank-item"><span class="rank-num">3</span><article class="rank-card"><div class="thumb ph--c"></div><h3>GAP The Series</h3></article></div>
+      <div class="rank-item"><span class="rank-num">4</span><article class="rank-card"><div class="thumb ph--d"></div><h3>Pluto นิทาน ดวงดาว ความรัก</h3></article></div>
+      <div class="rank-item"><span class="rank-num">5</span><article class="rank-card"><div class="thumb ph--e"></div><h3>The Loyal Pin ปิ่นภักดิ์</h3></article></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2>สำรวจตามแนว</h2></div>
+    <div class="genres">
+      <a class="genre" href="#"><span class="glyph">♥</span><span class="name">โรแมนซ์</span><div class="count">18 เรื่อง</div></a>
+      <a class="genre" href="#"><span class="glyph">☂</span><span class="name">ดราม่า</span><div class="count">12 เรื่อง</div></a>
+      <a class="genre" href="#"><span class="glyph">✿</span><span class="name">คอมเมดี้</span><div class="count">9 เรื่อง</div></a>
+      <a class="genre" href="#"><span class="glyph">✦</span><span class="name">แฟนตาซี</span><div class="count">6 เรื่อง</div></a>
+      <a class="genre" href="#"><span class="glyph">♛</span><span class="name">ย้อนยุค</span><div class="count">5 เรื่อง</div></a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2>ออกใหม่สัปดาห์นี้</h2><a class="more" href="#">ดูทั้งหมด →</a></div>
+    <div class="rail">
+      <article class="poster"><div class="art ph--b"><span class="badge">NEW</span></div><h3>Pluto นิทาน ดวงดาว ความรัก</h3><div class="meta">GMMTV · 12 ตอน</div></article>
+      <article class="poster"><div class="art ph--a"><span class="badge">NEW</span></div><h3>The Loyal Pin ปิ่นภักดิ์</h3><div class="meta">IdolFactory · 16 ตอน</div></article>
+      <article class="poster"><div class="art ph--c"><span class="badge">NEW</span></div><h3>Affair รักเล่นกล</h3><div class="meta">Change2561 · 8 ตอน</div></article>
+      <article class="poster"><div class="art ph--f"></div><h3>ใจซ่อนรัก The Secret of Us</h3><div class="meta">ช่อง 3 · 8 ตอน</div></article>
+      <article class="poster"><div class="art ph--e"></div><h3>Blank The Series</h3><div class="meta">Workpoint · 10 ตอน</div></article>
+      <article class="poster"><div class="art ph--d"></div><h3>GAP The Series</h3><div class="meta">IdolFactory · 12 ตอน</div></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2>นักแสดงยอดนิยม</h2><a class="more" href="#">ดูทั้งหมด →</a></div>
+    <div class="rail">
+      <div class="artist"><div class="ava ph--a">ฟ</div><h3>ฟรีน สโรชา</h3><div class="meta">6 ผลงาน</div></div>
+      <div class="artist"><div class="ava ph--b">บ</div><h3>เบ็คกี้ อาร์มสตรอง</h3><div class="meta">5 ผลงาน</div></div>
+      <div class="artist"><div class="ava ph--c">ห</div><h3>หลิงหลิง คอง</h3><div class="meta">3 ผลงาน</div></div>
+      <div class="artist"><div class="ava ph--e">อ</div><h3>ออม กรณ์นภัส</h3><div class="meta">3 ผลงาน</div></div>
+      <div class="artist"><div class="ava ph--f">ม</div><h3>มิลค์ พรรษา</h3><div class="meta">4 ผลงาน</div></div>
+      <div class="artist"><div class="ava ph--d">ล</div><h3>เลิฟ ภัทรานิษฐ์</h3><div class="meta">4 ผลงาน</div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2>คู่จิ้นที่แฟนๆ รัก</h2><a class="more" href="#">ดูทั้งหมด →</a></div>
+    <div class="rail">
+      <div class="ship"><div class="duo"><span class="a">ฟ</span><span class="b">บ</span><span class="heart">♥</span></div><h3>ฟรีนเบ็ค</h3><div class="meta">3 ผลงานร่วม</div></div>
+      <div class="ship"><div class="duo"><span class="a">ห</span><span class="b">อ</span><span class="heart">♥</span></div><h3>หลิงออม</h3><div class="meta">2 ผลงานร่วม</div></div>
+      <div class="ship"><div class="duo"><span class="a">ม</span><span class="b">ล</span><span class="heart">♥</span></div><h3>มิลค์เลิฟ</h3><div class="meta">2 ผลงานร่วม</div></div>
+      <div class="ship"><div class="duo"><span class="a">น</span><span class="b">อ</span><span class="heart">♥</span></div><h3>น้ำออน</h3><div class="meta">1 ผลงานร่วม</div></div>
+      <div class="ship"><div class="duo"><span class="a">ว</span><span class="b">จ</span><span class="heart">♥</span></div><h3>วิวจูน</h3><div class="meta">1 ผลงานร่วม</div></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer"><div class="container">
+  <span class="flogo">GL<em>-ORBIT</em> video</span>
+  <p>PRIME STRUCTURE × ORBIT Y2K SKIN — CONCEPT MOCKUP</p>
+</div></footer>
+
+<div class="ribbon">Y2K × PRIME</div>
+
+<script>
+const items='สำรวจจักรวาล GL ★ ตอนใหม่ทุกสัปดาห์ <b>♥</b> ใจซ่อนรัก ศุกร์นี้ <b>★</b> PLUTO นิทาน ดวงดาว ความรัก <b>✦</b> ดูต่อจากจุดที่ค้างไว้ ';
+document.getElementById('ticker').innerHTML=('<span>'+items+'</span>').repeat(2);
+</script>
+</body>
+</html>

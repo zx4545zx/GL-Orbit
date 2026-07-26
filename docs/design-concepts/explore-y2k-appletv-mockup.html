@@ -1,0 +1,231 @@
+<!-- GL-Orbit /explore mockup — Apple TV+ layout × Orbit Y2K tokens -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สำรวจ GL — Y2K × Apple TV+ Concept | GL-Orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orbit-paper:#e8e6f5; --orbit-paper-deep:#ddd9f0; --orbit-surface:#fdfcff;
+    --orbit-ink:#241a3a; --orbit-muted:#6f6390; --orbit-line:#b3a8d6; --orbit-line-strong:#241a3a;
+    --orbit-coral:#ff3fbf; --orbit-coral-dark:#c21e92; --orbit-coral-soft:#ffd6f5;
+    --orbit-lavender:#d9c8ff; --orbit-mint:#b8f0ff;
+    --orbit-shadow:4px 4px 0 #d9c8ff; --orbit-shadow-raised:5px 5px 0 rgba(36,26,58,.25);
+    --orbit-link:#3f7dff; --orbit-selection:#b8f0ff;
+    --font-display:'Silkscreen', monospace; --font-body:'Prompt','Silkscreen',sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;border-radius:0}
+  ::selection{background:var(--orbit-selection);color:var(--orbit-ink)}
+  body{margin:0;font-family:var(--font-body);color:var(--orbit-ink);line-height:1.55;
+    background-color:var(--orbit-paper);
+    background-image:linear-gradient(var(--orbit-paper-deep) 1px,transparent 1px),linear-gradient(90deg,var(--orbit-paper-deep) 1px,transparent 1px);
+    background-size:24px 24px}
+  h1,h2,h3{margin:0;line-height:1.15}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 24px 72px}
+
+  .ticker{background:var(--orbit-ink);color:var(--orbit-mint);font-family:var(--font-display);
+    font-size:12px;letter-spacing:.08em;overflow:hidden;white-space:nowrap;border-bottom:2px solid var(--orbit-line-strong)}
+  .ticker-inner{display:inline-block;padding:7px 0;animation:mq 30s linear infinite}
+  @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .ribbon{position:fixed;right:0;bottom:20px;z-index:50;background:var(--orbit-coral);color:#fff;
+    font-family:var(--font-display);font-size:11px;letter-spacing:.1em;padding:8px 14px;
+    border:2px solid var(--orbit-line-strong);border-right:none;box-shadow:-4px 4px 0 var(--orbit-lavender)}
+
+  /* minimal topbar */
+  .top{display:flex;align-items:center;justify-content:space-between;margin-top:24px}
+  .wordmark{font-family:var(--font-display);font-weight:700;font-size:14px;letter-spacing:.06em}
+  .wordmark b{color:var(--orbit-coral)}
+  .top-links{display:flex;gap:18px}
+  .top-links a{font-family:var(--font-display);font-size:10px;letter-spacing:.18em;color:var(--orbit-muted);text-transform:uppercase}
+  .top-links a.on{color:var(--orbit-ink);border-bottom:2px solid var(--orbit-coral)}
+
+  /* cinematic hero */
+  .hero{position:relative;margin-top:24px;min-height:520px;display:grid;place-items:center;text-align:center;
+    overflow:hidden;border:2px solid var(--orbit-line-strong);box-shadow:var(--orbit-shadow-raised);color:#fff;
+    background:
+      radial-gradient(700px 340px at 50% 110%, rgba(255,63,191,.3), transparent 60%),
+      radial-gradient(500px 300px at 85% 0%, rgba(217,200,255,.25), transparent 65%),
+      linear-gradient(160deg,#3a2456 0%,#241a3a 60%,#150d24 100%)}
+  .hero .scan{position:absolute;inset:0;pointer-events:none;opacity:.3;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.35) 0 2px,transparent 2px 4px)}
+  .hero-in{position:relative;z-index:2;display:grid;gap:18px;justify-items:center;padding:56px 28px}
+  .hero-kicker{font-family:var(--font-display);font-size:10px;letter-spacing:.3em;color:var(--orbit-mint);
+    border:2px solid var(--orbit-mint);padding:6px 14px;background:rgba(36,26,58,.6)}
+  .hero-title{font-weight:300;font-size:clamp(38px,6vw,84px);letter-spacing:.02em}
+  .hero-title b{font-weight:700;color:var(--orbit-coral)}
+  .hero-sub{font-size:15px;color:#cdc3e8;max-width:46ch;margin:0}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 22px;
+    font-family:var(--font-display);font-size:13px;border:2px solid var(--orbit-line-strong);
+    transition:transform .08s ease,box-shadow .08s ease}
+  .btn:hover{transform:translate(-1px,-1px)}
+  .btn:active{transform:translate(2px,2px);box-shadow:none}
+  .btn--primary{background:var(--orbit-coral);color:#fff;box-shadow:4px 4px 0 var(--orbit-coral-dark)}
+  .btn--ghost{background:transparent;color:#fff;border-color:#fff;box-shadow:4px 4px 0 rgba(255,255,255,.25)}
+  .hero-dots{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);z-index:2;display:flex;gap:8px}
+  .hero-dots i{width:11px;height:11px;border:2px solid #fff}
+  .hero-dots i.on{background:var(--orbit-coral);border-color:var(--orbit-coral)}
+
+  /* big cinematic cards */
+  .sec{margin-top:56px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:18px}
+  .sec-title{font-family:var(--font-display);font-size:16px;letter-spacing:.04em;display:flex;align-items:center;gap:10px}
+  .sec-title::before{content:"";width:6px;height:20px;background:var(--orbit-coral);border:2px solid var(--orbit-line-strong)}
+  .sec-more{font-family:var(--font-display);font-size:11px;color:var(--orbit-link)}
+  .cine{display:grid;grid-auto-flow:column;grid-auto-columns:420px;gap:20px;overflow-x:auto;
+    padding:10px 6px 20px;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .cine::-webkit-scrollbar{display:none}
+  .cine>*{scroll-snap-align:start}
+  .cine-card{display:grid;gap:8px}
+  .cine-frame{position:relative;aspect-ratio:16/9;overflow:hidden;border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow);transition:transform .1s ease,box-shadow .1s ease}
+  .cine-card:hover .cine-frame{transform:translateY(-4px);box-shadow:var(--orbit-shadow-raised)}
+  .ph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--font-display);font-size:44px;color:var(--orbit-ink)}
+  .ph--a{background:linear-gradient(160deg,var(--orbit-lavender),var(--orbit-mint))}
+  .ph--b{background:linear-gradient(160deg,var(--orbit-coral-soft),var(--orbit-lavender))}
+  .ph--c{background:linear-gradient(160deg,var(--orbit-mint),var(--orbit-coral-soft))}
+  .ph--d{background:repeating-linear-gradient(45deg,var(--orbit-lavender) 0 12px,var(--orbit-paper-deep) 12px 24px)}
+  .cine-badge{position:absolute;top:12px;left:12px;font-family:var(--font-display);font-size:9px;
+    padding:3px 8px;border:2px solid var(--orbit-line-strong);background:var(--orbit-mint)}
+  .cine-title{font-weight:600;font-size:15px}
+  .cine-sub{font-size:12px;color:var(--orbit-muted)}
+
+  /* schedule list */
+  .sched{border:2px solid var(--orbit-line-strong);background:var(--orbit-surface);box-shadow:var(--orbit-shadow)}
+  .sched-row{display:grid;grid-template-columns:64px 1fr auto auto;gap:14px;align-items:center;
+    padding:14px 18px;border-bottom:2px solid var(--orbit-line-strong)}
+  .sched-row:last-child{border-bottom:none}
+  .sched-day{display:grid;place-items:center;min-height:40px;background:var(--orbit-ink);color:var(--orbit-mint);
+    font-family:var(--font-display);font-size:11px;border:2px solid var(--orbit-line-strong);
+    box-shadow:3px 3px 0 var(--orbit-lavender)}
+  .sched-name{font-weight:600;font-size:14px}
+  .sched-ep{font-family:var(--font-display);font-size:10px;color:var(--orbit-muted)}
+  .sched-time{font-family:var(--font-display);font-size:11px;padding:3px 10px;border:2px solid var(--orbit-line-strong);
+    background:var(--orbit-coral-soft);color:var(--orbit-coral-dark)}
+
+  .astar{display:grid;justify-items:center;gap:10px;width:132px;padding-top:4px}
+  .astar .face{width:112px;aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow);display:grid;place-items:center;font-family:var(--font-display);font-size:30px;
+    color:var(--orbit-ink);transition:transform .1s ease}
+  .astar:hover .face{transform:translateY(-4px)}
+  .astar .name{font-weight:700;font-size:13px;text-align:center}
+  .avatars{display:grid;grid-auto-flow:column;grid-auto-columns:132px;gap:16px;overflow-x:auto;
+    padding:10px 6px 18px;scrollbar-width:none}
+  .avatars::-webkit-scrollbar{display:none}
+
+  .duo-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .duo-card{position:relative;background:var(--orbit-surface);border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow);padding:22px 12px 16px;display:grid;justify-items:center;gap:8px}
+  .duo-pair{position:relative;display:flex;align-items:center;justify-content:center;width:100%}
+  .duo-pair .face{width:42%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid var(--orbit-surface);
+    display:grid;place-items:center;font-family:var(--font-display);font-size:24px;color:var(--orbit-ink)}
+  .duo-pair .face + .face{margin-left:-12%}
+  .duo-pair .heart{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:32px;height:32px;
+    display:grid;place-items:center;background:var(--orbit-surface);border:2px solid var(--orbit-line-strong);
+    border-radius:50%;color:var(--orbit-coral);font-size:13px}
+  .duo-name{font-weight:700;font-size:14px}
+  .duo-sub{font-size:11px;color:var(--orbit-muted)}
+
+  .footer-note{margin-top:64px;text-align:center;font-family:var(--font-display);font-size:11px;
+    letter-spacing:.12em;color:var(--orbit-muted)}
+  .footer-note b{color:var(--orbit-coral-dark)}
+
+  @media (max-width:820px){
+    .top-links{display:none}
+    .hero{min-height:440px}
+    .cine{grid-auto-columns:300px}
+    .duo-row{grid-template-columns:1fr}
+    .sched-row{grid-template-columns:56px 1fr auto;gap:10px}
+    .sched-time{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker" aria-hidden="true"><div class="ticker-inner">
+· GL-ORBIT tv · ORIGINAL STORIES · ความรักมีหลายองศา · GL-ORBIT tv · ORIGINAL STORIES · ความรักมีหลายองศา · GL-ORBIT tv · ORIGINAL STORIES · ความรักมีหลายองศา ·
+</div></div>
+
+<div class="wrap">
+
+  <header class="top">
+    <span class="wordmark">GL·ORBIT <b>tv</b></span>
+    <nav class="top-links">
+      <a href="#" class="on">Explore</a><a href="#">Calendar</a><a href="#">My List</a>
+    </nav>
+  </header>
+
+  <section class="hero" aria-label="เรื่องเด่น">
+    <div class="scan" aria-hidden="true"></div>
+    <div class="hero-in">
+      <span class="hero-kicker">GL-ORBIT ORIGINAL</span>
+      <h1 class="hero-title">The Loyal Pin <b>ปิ่นภักดิ์</b></h1>
+      <p class="hero-sub">คำสัตย์ที่ให้ไว้ใต้แสงจันทร์ ไม่เคยจางหายไปตามกาลเวลา</p>
+      <div class="hero-cta">
+        <a class="btn btn--primary" href="#">ดูรายละเอียด</a>
+        <a class="btn btn--ghost" href="#">+ เพิ่มเข้าลิสต์</a>
+      </div>
+    </div>
+    <div class="hero-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+  </section>
+
+  <section class="sec" aria-label="เพิ่มเติมจาก GL-Orbit">
+    <div class="sec-head"><h2 class="sec-title">เพิ่มเติมจาก GL-Orbit</h2><a class="sec-more" href="#">ดูทั้งหมด →</a></div>
+    <div class="cine">
+      <a class="cine-card" href="#">
+        <div class="cine-frame"><div class="ph ph--a">23.5</div><span class="cine-badge">กำลังฉาย</span></div>
+        <span class="cine-title">23.5 องศาที่โลกเอียง</span><span class="cine-sub">GMMTV · โรแมนซ์/ดราม่า</span></a>
+      <a class="cine-card" href="#">
+        <div class="cine-frame"><div class="ph ph--b">GAP</div><span class="cine-badge">จบแล้ว</span></div>
+        <span class="cine-title">GAP The Series</span><span class="cine-sub">IdolFactory · โรแมนซ์</span></a>
+      <a class="cine-card" href="#">
+        <div class="cine-frame"><div class="ph ph--c">PL</div><span class="cine-badge">กำลังฉาย</span></div>
+        <span class="cine-title">Pluto นิทาน ดวงดาว ความรัก</span><span class="cine-sub">GMMTV · ดราม่า</span></a>
+    </div>
+  </section>
+
+  <section class="sec" aria-label="ตารางฉายสัปดาห์นี้">
+    <div class="sec-head"><h2 class="sec-title">ตารางฉายสัปดาห์นี้</h2><a class="sec-more" href="#">ปฏิทินเต็ม →</a></div>
+    <div class="sched">
+      <div class="sched-row"><span class="sched-day">ศุกร์</span><span class="sched-name">23.5 องศาที่โลกเอียง</span><span class="sched-ep">EP.10</span><span class="sched-time">20:30</span></div>
+      <div class="sched-row"><span class="sched-day">เสาร์</span><span class="sched-name">Pluto นิทาน ดวงดาว ความรัก</span><span class="sched-ep">EP.8</span><span class="sched-time">21:00</span></div>
+      <div class="sched-row"><span class="sched-day">เสาร์</span><span class="sched-name">Affair รักเล่นกล</span><span class="sched-ep">EP.6</span><span class="sched-time">23:00</span></div>
+      <div class="sched-row"><span class="sched-day">อาทิตย์</span><span class="sched-name">ใจซ่อนรัก The Secret of Us</span><span class="sched-ep">EP.2</span><span class="sched-time">20:00</span></div>
+    </div>
+  </section>
+
+  <section class="sec" aria-label="นักแสดง">
+    <div class="sec-head"><h2 class="sec-title">นักแสดง</h2><a class="sec-more" href="#">ดูทั้งหมด →</a></div>
+    <div class="avatars">
+      <a class="astar" href="#"><span class="face ph--a">F</span><span class="name">ฟรีน สโรชา</span></a>
+      <a class="astar" href="#"><span class="face ph--b">B</span><span class="name">เบ็คกี้ อาร์มสตรอง</span></a>
+      <a class="astar" href="#"><span class="face ph--c">L</span><span class="name">หลิงหลิง คอง</span></a>
+      <a class="astar" href="#"><span class="face ph--d">O</span><span class="name">ออม กรณ์นภัส</span></a>
+      <a class="astar" href="#"><span class="face ph--a">M</span><span class="name">มิลค์ พรรษา</span></a>
+      <a class="astar" href="#"><span class="face ph--c">L</span><span class="name">เลิฟ ภัทรานิษฐ์</span></a>
+    </div>
+  </section>
+
+  <section class="sec" aria-label="คู่จิ้น">
+    <div class="sec-head"><h2 class="sec-title">คู่จิ้น</h2><a class="sec-more" href="#">ดูทั้งหมด →</a></div>
+    <div class="duo-row">
+      <a class="duo-card" href="#"><span class="duo-pair"><span class="face ph--a">F</span><span class="face ph--b">B</span><span class="heart">♥</span></span>
+        <span class="duo-name">ฟรีนเบ็ค</span><span class="duo-sub">4 ผลงานร่วม</span></a>
+      <a class="duo-card" href="#"><span class="duo-pair"><span class="face ph--c">L</span><span class="face ph--d">O</span><span class="heart">♥</span></span>
+        <span class="duo-name">หลิงออม</span><span class="duo-sub">3 ผลงานร่วม</span></a>
+      <a class="duo-card" href="#"><span class="duo-pair"><span class="face ph--b">M</span><span class="face ph--c">L</span><span class="heart">♥</span></span>
+        <span class="duo-name">มิลค์เลิฟ</span><span class="duo-sub">5 ผลงานร่วม</span></a>
+    </div>
+  </section>
+
+  <p class="footer-note">GL-ORBIT <b>·</b> EXPLORE CONCEPT · Y2K × APPLE TV+ <b>·</b></p>
+</div>
+
+<div class="ribbon">MOCKUP · Y2K × APPLE TV+</div>
+</body>
+</html>

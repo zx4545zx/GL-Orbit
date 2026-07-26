@@ -1,0 +1,227 @@
+<!-- GL-Orbit /explore mockup — YouTube structure × Orbit Y2K skin (tokens locked to explore-midnight-y2k-mockup.html) -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สำรวจ GL — Y2K × YouTube Mockup | GL-Orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orbit-paper:#e8e6f5;
+  --orbit-surface:#fdfcff;
+  --orbit-ink:#241a3a;
+  --orbit-muted:#6f6390;
+  --orbit-coral:#ff3fbf;
+  --orbit-coral-dark:#c21e92;
+  --orbit-coral-soft:#ffd6f5;
+  --orbit-lavender:#d9c8ff;
+  --orbit-mint:#b8f0ff;
+  --orbit-link:#3f7dff;
+  --orbit-shadow:4px 4px 0 #d9c8ff;
+  --orbit-shadow-raised:5px 5px 0 rgba(36,26,58,.25);
+  --font-display:'Silkscreen',monospace;
+  --font-body:'Prompt',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;border-radius:0!important}
+body{
+  font-family:var(--font-body);
+  color:var(--orbit-ink);
+  background-color:var(--orbit-paper);
+  background-image:
+    linear-gradient(rgba(36,26,58,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(36,26,58,.05) 1px, transparent 1px);
+  background-size:24px 24px;
+  overflow-x:hidden;
+}
+a{text-decoration:none;color:inherit}
+
+/* ===== topbar ===== */
+.topbar{position:sticky;top:0;z-index:60;background:var(--orbit-surface);border-bottom:2px solid var(--orbit-ink);display:flex;align-items:center;gap:14px;padding:10px 20px}
+.burger{font-family:var(--font-display);font-size:14px;width:40px;height:40px;border:2px solid var(--orbit-ink);background:#fff;box-shadow:var(--orbit-shadow);cursor:pointer}
+.burger:hover{background:var(--orbit-lavender)}
+.logo{font-family:var(--font-display);font-size:17px;display:flex;align-items:center;gap:8px}
+.logo .tri{width:0;height:0;border-left:12px solid var(--orbit-coral);border-top:7px solid transparent;border-bottom:7px solid transparent}
+.search{margin:0 auto;display:flex;width:min(520px,46%);min-width:0}
+.search input{flex:1;min-width:0;font-family:var(--font-body);font-size:14px;padding:9px 14px;border:2px solid var(--orbit-ink);background:#fff;outline:none}
+.search input:focus{box-shadow:var(--orbit-shadow)}
+.search button{font-family:var(--font-display);font-size:11px;padding:9px 18px;border:2px solid var(--orbit-ink);border-left:none;background:var(--orbit-coral);color:#fff;cursor:pointer}
+.search button:hover{background:var(--orbit-coral-dark)}
+.top-ava{width:38px;height:38px;flex:0 0 38px;border-radius:50%!important;border:2px solid var(--orbit-ink);background:var(--orbit-lavender);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;box-shadow:var(--orbit-shadow)}
+
+/* ===== layout ===== */
+.shell{display:grid;grid-template-columns:216px minmax(0,1fr);max-width:1440px;margin:0 auto}
+.shell>div{min-width:0}
+.sidebar{position:sticky;top:62px;align-self:start;height:calc(100vh - 62px);overflow-y:auto;background:var(--orbit-surface);border-right:2px solid var(--orbit-ink);padding:14px 12px}
+.snav a{display:flex;align-items:center;gap:12px;padding:9px 12px;font-size:14px;font-weight:500;border:2px solid transparent;margin-bottom:2px}
+.snav a .ic{font-family:var(--font-display);font-size:13px;width:22px;text-align:center}
+.snav a:hover{border-color:var(--orbit-ink);background:var(--orbit-lavender)}
+.snav a.on{background:var(--orbit-ink);color:var(--orbit-mint);border-color:var(--orbit-ink)}
+.snav hr{border:none;border-top:2px solid var(--orbit-ink);margin:12px 4px}
+.snav h4{font-family:var(--font-display);font-size:9px;letter-spacing:2px;color:var(--orbit-muted);padding:4px 12px 8px;text-transform:uppercase}
+.chan{display:flex;align-items:center;gap:10px;padding:6px 12px;font-size:13px}
+.chan .cava{width:26px;height:26px;border-radius:50%!important;border:2px solid var(--orbit-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:9px;flex:0 0 auto}
+.chan .dot{margin-left:auto;width:8px;height:8px;background:var(--orbit-coral);border:2px solid var(--orbit-ink)}
+
+/* ===== chips ===== */
+.chips{position:sticky;top:62px;z-index:50;background:var(--orbit-paper);border-bottom:2px solid var(--orbit-ink);padding:12px 24px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chipx{flex:0 0 auto;font-family:var(--font-display);font-size:10px;letter-spacing:1px;padding:8px 14px;border:2px solid var(--orbit-ink);background:var(--orbit-surface);box-shadow:var(--orbit-shadow);cursor:pointer;text-transform:uppercase}
+.chipx:hover{background:var(--orbit-lavender)}
+.chipx.on{background:var(--orbit-ink);color:var(--orbit-mint)}
+
+/* ===== content ===== */
+.content{padding:22px 24px 40px}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin:26px 0 16px}
+.sec-head:first-child{margin-top:0}
+.sec-head::before{content:"";width:14px;height:14px;background:var(--orbit-coral);border:2px solid var(--orbit-ink);box-shadow:3px 3px 0 var(--orbit-lavender)}
+.sec-head h2{font-family:var(--font-display);font-size:16px;letter-spacing:2px;text-transform:uppercase}
+.sec-head .more{margin-left:auto;font-family:var(--font-display);font-size:10px;letter-spacing:1px;color:var(--orbit-link);border-bottom:2px solid var(--orbit-link)}
+
+.vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.vid .thumb{position:relative;aspect-ratio:16/9;border:2px solid var(--orbit-ink);box-shadow:var(--orbit-shadow)}
+.vid .thumb .dur{position:absolute;right:8px;bottom:8px;font-family:var(--font-display);font-size:9px;padding:4px 7px;background:var(--orbit-ink);color:var(--orbit-mint)}
+.vid .thumb .ep{position:absolute;top:8px;left:8px;font-family:var(--font-display);font-size:9px;letter-spacing:1px;padding:5px 8px;background:var(--orbit-coral);color:#fff;border:2px solid var(--orbit-ink)}
+.vid .vrow{display:flex;gap:12px;margin-top:12px}
+.vid .vava{width:38px;height:38px;flex:0 0 auto;border-radius:50%!important;border:2px solid var(--orbit-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:12px}
+.vid h3{font-size:15px;font-weight:600;line-height:1.45}
+.vid .meta{font-size:12.5px;color:var(--orbit-muted);margin-top:3px}
+
+/* shorts */
+.shorts{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 4px 14px;scrollbar-width:none}
+.shorts::-webkit-scrollbar{display:none}
+.short{flex:0 0 auto;scroll-snap-align:start;width:150px}
+.short .sart{position:relative;aspect-ratio:9/16;border:2px solid var(--orbit-ink);box-shadow:var(--orbit-shadow);display:flex;align-items:flex-end}
+.short .sart .heart{position:absolute;top:8px;right:8px;width:30px;height:30px;background:var(--orbit-coral);border:2px solid var(--orbit-ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+.short .sart .lbl{margin:10px;font-family:var(--font-display);font-size:10px;color:var(--orbit-ink);background:rgba(253,252,255,.85);padding:4px 8px;border:2px solid var(--orbit-ink)}
+.short h3{font-size:13px;font-weight:600;margin-top:10px}
+.short .meta{font-size:12px;color:var(--orbit-muted)}
+
+/* live */
+.lgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.live .thumb{position:relative;aspect-ratio:16/9;border:2px solid var(--orbit-ink);box-shadow:var(--orbit-shadow);
+  background:linear-gradient(135deg,#3a2456,#241a3a)}
+.live .thumb::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 4px)}
+.live .badge{position:absolute;top:8px;left:8px;z-index:2;font-family:var(--font-display);font-size:9px;letter-spacing:1px;padding:5px 9px;background:var(--orbit-coral);color:#fff;border:2px solid var(--orbit-ink);display:flex;align-items:center;gap:6px}
+.live .badge::before{content:"";width:7px;height:7px;background:#fff;animation:blink 1.1s steps(2) infinite}
+@keyframes blink{50%{opacity:.15}}
+.live .views{position:absolute;left:8px;bottom:8px;z-index:2;font-family:var(--font-display);font-size:9px;padding:4px 7px;background:#fff;border:2px solid var(--orbit-ink);color:var(--orbit-ink)}
+.live .lrow{margin-top:12px}
+.live h3{font-size:15px;font-weight:600}
+.live .meta{font-size:12.5px;color:var(--orbit-muted);margin-top:3px}
+
+/* placeholders */
+.ph--a{background:linear-gradient(135deg,var(--orbit-lavender),var(--orbit-mint))}
+.ph--b{background:linear-gradient(135deg,var(--orbit-coral-soft),var(--orbit-lavender))}
+.ph--c{background:linear-gradient(135deg,var(--orbit-mint),var(--orbit-coral-soft))}
+.ph--d{background:repeating-linear-gradient(45deg,var(--orbit-lavender) 0 14px,var(--orbit-mint) 14px 28px)}
+.ph--e{background:linear-gradient(160deg,#c9b3f5,#8f6fd0)}
+.ph--f{background:linear-gradient(160deg,#ffb3e2,#ff6fd0)}
+
+.ribbon{position:fixed;right:0;bottom:24px;z-index:70;font-family:var(--font-display);font-size:10px;letter-spacing:2px;background:var(--orbit-coral);color:#fff;border:2px solid var(--orbit-ink);border-right:none;box-shadow:var(--orbit-shadow);padding:10px 16px;text-transform:uppercase}
+
+/* ===== responsive ===== */
+@media (max-width:1100px){
+  .shell{grid-template-columns:64px minmax(0,1fr)}
+  .snav a span,.snav h4,.chan span.nm,.chan .dot{display:none}
+  .snav a{justify-content:center;padding:10px 4px}
+  .chan{justify-content:center;padding:6px 4px}
+  .vgrid,.lgrid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:639px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .topbar{padding:10px 14px;gap:10px}
+  .search{width:auto;flex:1}
+  .burger{display:none}
+  .content{padding:18px 16px 40px}
+  .chips{padding:12px 16px}
+  .vgrid,.lgrid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="burger">≡</button>
+  <a class="logo" href="#"><span class="tri"></span>GL-ORBIT</a>
+  <div class="search"><input type="text" placeholder="ค้นหาซีรีส์ นักแสดง คู่จิ้น…"><button>ค้นหา</button></div>
+  <div class="top-ava">ฉ</div>
+</header>
+
+<div class="shell">
+  <aside class="sidebar">
+    <nav class="snav">
+      <a href="#"><span class="ic">⌂</span><span>หน้าแรก</span></a>
+      <a class="on" href="#"><span class="ic">✦</span><span>สำรวจ</span></a>
+      <a href="#"><span class="ic">▣</span><span>ซีรีส์</span></a>
+      <a href="#"><span class="ic">☺</span><span>นักแสดง</span></a>
+      <a href="#"><span class="ic">♥</span><span>คู่จิ้น</span></a>
+      <a href="#"><span class="ic">▤</span><span>ปฏิทินฉาย</span></a>
+      <a href="#"><span class="ic">◷</span><span>ดูภายหลัง</span></a>
+      <hr>
+      <h4>ช่องที่ติดตาม</h4>
+      <a class="chan" href="#"><span class="cava ph--a">G</span><span class="nm">GMMTV</span><span class="dot"></span></a>
+      <a class="chan" href="#"><span class="cava ph--b">I</span><span class="nm">IdolFactory</span><span class="dot"></span></a>
+      <a class="chan" href="#"><span class="cava ph--c">3</span><span class="nm">Ch3Thailand</span></a>
+      <a class="chan" href="#"><span class="cava ph--e">W</span><span class="nm">Workpoint</span></a>
+      <a class="chan" href="#"><span class="cava ph--f">C</span><span class="nm">Change2561</span><span class="dot"></span></a>
+    </nav>
+  </aside>
+
+  <div>
+    <div class="chips">
+      <button class="chipx on">ทั้งหมด</button>
+      <button class="chipx">กำลังฉาย</button>
+      <button class="chipx">มาใหม่</button>
+      <button class="chipx">โรแมนซ์</button>
+      <button class="chipx">ดราม่า</button>
+      <button class="chipx">คู่จิ้น</button>
+      <button class="chipx">นักแสดง</button>
+      <button class="chipx">สัมภาษณ์</button>
+      <button class="chipx">เบื้องหลัง</button>
+    </div>
+
+    <main class="content">
+      <section>
+        <div class="sec-head"><h2>ตอนใหม่ประจำสัปดาห์</h2><a class="more" href="#">ดูทั้งหมด →</a></div>
+        <div class="vgrid">
+          <article class="vid"><div class="thumb ph--a"><span class="ep">ตอนที่ 11</span><span class="dur">52:10</span></div><div class="vrow"><span class="vava ph--a">G</span><div><h3>23.5 องศาที่โลกเอียง | ตอนที่ 11 — วงโคจรที่เปลี่ยนไป</h3><div class="meta">GMMTV · ดู 812K ครั้ง · 2 วันที่ผ่านมา</div></div></div></article>
+          <article class="vid"><div class="thumb ph--b"><span class="ep">ตอนที่ 4</span><span class="dur">48:33</span></div><div class="vrow"><span class="vava ph--a">G</span><div><h3>Pluto นิทาน ดวงดาว ความรัก | ตอนที่ 4 — แสงที่หายไป</h3><div class="meta">GMMTV · ดู 654K ครั้ง · 3 วันที่ผ่านมา</div></div></div></article>
+          <article class="vid"><div class="thumb ph--c"><span class="ep">ตอนที่ 7</span><span class="dur">45:02</span></div><div class="vrow"><span class="vava ph--c">3</span><div><h3>ใจซ่อนรัก The Secret of Us | ตอนที่ 7 — ความจริงในห้องตรวจ</h3><div class="meta">Ch3Thailand · ดู 1.2M ครั้ง · 5 วันที่ผ่านมา</div></div></div></article>
+          <article class="vid"><div class="thumb ph--e"><span class="ep">ตอนที่ 2</span><span class="dur">50:47</span></div><div class="vrow"><span class="vava ph--e">W</span><div><h3>Blank The Series | ตอนที่ 2 — ช่องว่างที่เธอทิ้งไว้</h3><div class="meta">Workpoint · ดู 431K ครั้ง · 1 สัปดาห์ที่ผ่านมา</div></div></div></article>
+          <article class="vid"><div class="thumb ph--f"><span class="ep">ตอนที่ 6</span><span class="dur">44:19</span></div><div class="vrow"><span class="vava ph--f">C</span><div><h3>Affair รักเล่นกล | ตอนที่ 6 — เกมที่เริ่มย้อนกลับ</h3><div class="meta">Change2561 · ดู 388K ครั้ง · 1 สัปดาห์ที่ผ่านมา</div></div></div></article>
+          <article class="vid"><div class="thumb ph--d"><span class="ep">ตอนที่ 5</span><span class="dur">49:55</span></div><div class="vrow"><span class="vava ph--b">I</span><div><h3>The Loyal Pin ปิ่นภักดิ์ | ตอนที่ 5 — คำสัญญาใต้แสงเทียน</h3><div class="meta">IdolFactory · ดู 967K ครั้ง · 2 สัปดาห์ที่ผ่านมา</div></div></div></article>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-head"><h2>คู่จิ้น Moments</h2><a class="more" href="#">ดูทั้งหมด →</a></div>
+        <div class="shorts">
+          <div class="short"><div class="sart ph--b"><span class="heart">♥</span><span class="lbl">#ฟรีนเบ็ค</span></div><h3>โมเมนต์หวานเบื้องหลัง GAP</h3><div class="meta">ดู 2.4M ครั้ง</div></div>
+          <div class="short"><div class="sart ph--c"><span class="heart">♥</span><span class="lbl">#หลิงออม</span></div><h3>หลิงออม ซ้อมฉากโรงพยาบาล</h3><div class="meta">ดู 1.8M ครั้ง</div></div>
+          <div class="short"><div class="sart ph--a"><span class="heart">♥</span><span class="lbl">#มิลค์เลิฟ</span></div><h3>มิลค์เลิฟ พูดถึงฉากจบ 23.5</h3><div class="meta">ดู 1.1M ครั้ง</div></div>
+          <div class="short"><div class="sart ph--d"><span class="heart">✦</span><span class="lbl">#Pluto</span></div><h3>เบื้องหลังฉากดวงดาว</h3><div class="meta">ดู 876K ครั้ง</div></div>
+          <div class="short"><div class="sart ph--e"><span class="heart">♥</span><span class="lbl">#วิวจูน</span></div><h3>วิวจูน ชวนกันดูตอนจบ</h3><div class="meta">ดู 654K ครั้ง</div></div>
+          <div class="short"><div class="sart ph--f"><span class="heart">♥</span><span class="lbl">#น้ำออน</span></div><h3>น้ำออน รีแอคตอนจบ</h3><div class="meta">ดู 512K ครั้ง</div></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-head"><h2>LIVE ตอนนี้</h2><a class="more" href="#">ดูทั้งหมด →</a></div>
+        <div class="lgrid">
+          <article class="live"><div class="thumb"><span class="badge">LIVE</span><span class="views">1.2K กำลังดู</span></div><div class="lrow"><h3>นับถอยหลัง ใจซ่อนรัก ตอนจบ กับแฟนๆ</h3><div class="meta">GL-Orbit Official · เริ่ม 20:00 น.</div></div></article>
+          <article class="live"><div class="thumb"><span class="badge">LIVE</span><span class="views">856 กำลังดู</span></div><div class="lrow"><h3>ฟรีนเบ็ค พูดคุยหลังจบ GAP รีรัน</h3><div class="meta">IdolFactory · กำลังถ่ายทอดสด</div></div></article>
+          <article class="live"><div class="thumb"><span class="badge">LIVE</span><span class="views">402 กำลังดู</span></div><div class="lrow"><h3>สปอยด์ Pluto ตอนที่ 4 — วิเคราะห์ทุกฉาก</h3><div class="meta">GL-Orbit Fan · กำลังถ่ายทอดสด</div></div></article>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="ribbon">Y2K × YOUTUBE</div>
+
+</body>
+</html>

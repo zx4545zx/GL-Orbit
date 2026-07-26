@@ -1,0 +1,408 @@
+<!-- GL-Orbit /explore redesign mockup — Family Pastel Streaming concept (Disney+ layout × bright Y2K skin) -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สำรวจ GL — Family Pastel Streaming Mockup | GL-Orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orbit-paper:#e8e6f5; --orbit-paper-deep:#ddd9f0; --orbit-surface:#fdfcff;
+    --orbit-ink:#241a3a; --orbit-muted:#6f6390; --orbit-line:#b3a8d6; --orbit-line-strong:#241a3a;
+    --orbit-coral:#ff3fbf; --orbit-coral-dark:#c21e92; --orbit-coral-soft:#ffd6f5;
+    --orbit-lavender:#d9c8ff; --orbit-mint:#b8f0ff;
+    --orbit-shadow:4px 4px 0 #d9c8ff; --orbit-shadow-raised:5px 5px 0 rgba(36,26,58,.25);
+    --orbit-link:#3f7dff; --orbit-focus:#3f7dff; --orbit-selection:#b8f0ff;
+    --font-display:'Silkscreen', monospace;
+    --font-body:'Prompt', 'Silkscreen', sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;border-radius:0}
+  ::selection{background:var(--orbit-selection);color:var(--orbit-ink)}
+  body{
+    margin:0; font-family:var(--font-body); color:var(--orbit-ink);
+    background-color:var(--orbit-paper);
+    background-image:
+      linear-gradient(var(--orbit-paper-deep) 1px, transparent 1px),
+      linear-gradient(90deg, var(--orbit-paper-deep) 1px, transparent 1px);
+    background-size:24px 24px;
+    line-height:1.55;
+  }
+  h1,h2,h3{margin:0; font-family:var(--font-display); letter-spacing:.02em; line-height:1.2}
+  a{color:inherit; text-decoration:none}
+  :focus-visible{outline:3px solid var(--orbit-focus); outline-offset:2px}
+  button{font-family:inherit; cursor:pointer}
+
+  .wrap{max-width:1200px; margin:0 auto; padding:0 24px 72px}
+  .ribbon{
+    position:fixed; right:0; bottom:20px; z-index:50;
+    background:var(--orbit-coral); color:#fff; font-family:var(--font-display); font-size:11px;
+    letter-spacing:.1em; padding:8px 14px; border:2px solid var(--orbit-line-strong);
+    border-right:none; box-shadow:-4px 4px 0 var(--orbit-lavender);
+  }
+
+  /* ===== top brand bar ===== */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 0 0;
+  }
+  .logo{
+    display:inline-flex; align-items:center; gap:10px; min-height:44px;
+    font-family:var(--font-display); font-weight:700; font-size:16px;
+  }
+  .logo .mark{
+    width:34px; height:34px; display:grid; place-items:center;
+    background:var(--orbit-coral); color:#fff; border:2px solid var(--orbit-line-strong);
+    box-shadow:3px 3px 0 var(--orbit-lavender); font-size:15px;
+  }
+  .topbar .hi{
+    font-family:var(--font-display); font-size:10px; letter-spacing:.08em; color:var(--orbit-muted);
+  }
+
+  /* ===== hero: clean centered welcome panel ===== */
+  .hero{
+    margin-top:18px; position:relative; text-align:center;
+    border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow-raised);
+    background:var(--orbit-surface);
+    padding:44px 24px 40px;
+    display:grid; justify-items:center; gap:14px; overflow:hidden;
+  }
+  /* soft pastel sunburst corners, no blur */
+  .hero::before{
+    content:""; position:absolute; left:-60px; top:-60px; width:180px; height:180px;
+    background:repeating-conic-gradient(var(--orbit-mint) 0 12deg, transparent 12deg 24deg);
+    opacity:.5; pointer-events:none;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-60px; bottom:-60px; width:180px; height:180px;
+    background:repeating-conic-gradient(var(--orbit-coral-soft) 0 12deg, transparent 12deg 24deg);
+    opacity:.6; pointer-events:none;
+  }
+  .hero > *{position:relative; z-index:1}
+  .hero-kicker{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-display); font-size:10px; letter-spacing:.14em;
+    background:var(--orbit-mint); padding:5px 14px; border:2px solid var(--orbit-line-strong);
+  }
+  .hero-title{
+    font-size:clamp(28px,4.6vw,50px); line-height:1.1;
+  }
+  .hero-title .accent{color:var(--orbit-coral); text-shadow:3px 3px 0 var(--orbit-lavender)}
+  .hero-sub{margin:0; font-size:14px; color:var(--orbit-muted); max-width:52ch}
+  .hero-actions{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:4px}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:10px 20px;
+    font-family:var(--font-display); font-size:13px;
+    border:2px solid var(--orbit-line-strong);
+    transition:transform .08s ease, box-shadow .08s ease;
+  }
+  .btn:hover{transform:translate(-1px,-1px)}
+  .btn:active{transform:translate(2px,2px); box-shadow:none}
+  .btn--primary{background:var(--orbit-coral); color:#fff; box-shadow:4px 4px 0 var(--orbit-coral-dark)}
+  .btn--soft{background:var(--orbit-surface); color:var(--orbit-ink); box-shadow:var(--orbit-shadow)}
+
+  /* ===== tabs + search + filters ===== */
+  .bar{
+    display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between;
+    margin:30px 0 10px;
+  }
+  .tabs{
+    display:inline-flex; border:2px solid var(--orbit-line-strong);
+    background:var(--orbit-surface); box-shadow:var(--orbit-shadow); overflow:hidden;
+  }
+  .tab{
+    display:inline-flex; align-items:center; gap:8px; min-height:44px;
+    padding:10px 16px; font-family:var(--font-display); font-size:12px; font-weight:700;
+    background:transparent; border:none; border-right:2px solid var(--orbit-line-strong);
+    color:var(--orbit-ink); white-space:nowrap;
+  }
+  .tab:last-child{border-right:none}
+  .tab:hover{background:var(--orbit-coral-soft)}
+  .tab[aria-current="page"]{background:var(--orbit-ink); color:var(--orbit-mint)}
+  .tab .n{font-size:10px; padding:1px 6px; border:2px solid currentColor; line-height:1.3}
+  .search{
+    display:flex; align-items:center; gap:8px; flex:1; min-width:220px; max-width:380px;
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow); padding:0 12px; min-height:44px;
+  }
+  .search input{
+    flex:1; min-width:0; border:none; background:transparent; outline:none;
+    font-family:var(--font-body); font-size:14px; color:var(--orbit-ink); min-height:40px;
+  }
+  .search input::placeholder{color:var(--orbit-muted)}
+  .filters{display:flex; gap:8px; overflow-x:auto; padding:4px 0 8px; scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .chip{
+    flex:none; min-height:40px; padding:8px 14px;
+    font-family:var(--font-display); font-size:10px;
+    background:var(--orbit-surface); color:var(--orbit-ink);
+    border:2px solid var(--orbit-line-strong); box-shadow:3px 3px 0 var(--orbit-lavender);
+  }
+  .chip:hover{transform:translate(-1px,-1px)}
+  .chip[aria-pressed="true"]{background:var(--orbit-coral); color:#fff; box-shadow:3px 3px 0 var(--orbit-coral-dark)}
+
+  /* ===== section headers ===== */
+  .section{margin-top:40px}
+  .section-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px}
+  .section-title{font-size:16px; display:flex; align-items:center; gap:10px}
+  .section-title::before{content:""; width:6px; height:20px; background:var(--orbit-coral); border:2px solid var(--orbit-line-strong)}
+  .section-more{font-family:var(--font-display); font-size:11px; color:var(--orbit-link)}
+  .section-more:hover{text-decoration:underline}
+
+  /* ===== brand tiles (studio channels, Disney+ style) ===== */
+  .brands{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:14px;
+  }
+  .brand{
+    position:relative; aspect-ratio:16/9; overflow:hidden;
+    border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow);
+    display:grid; place-items:center; text-align:center;
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .brand:hover{transform:translateY(-4px); box-shadow:var(--orbit-shadow-raised)}
+  .brand:active{transform:translate(2px,2px); box-shadow:none}
+  .brand .word{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(12px,1.5vw,17px);
+    color:var(--orbit-ink); line-height:1.15; padding:0 6px;
+  }
+  .brand .word small{display:block; font-size:8px; letter-spacing:.12em; font-weight:400; margin-top:4px; color:var(--orbit-coral-dark)}
+  .b--a{background:linear-gradient(150deg,var(--orbit-coral-soft),var(--orbit-lavender))}
+  .b--b{background:linear-gradient(150deg,var(--orbit-lavender),var(--orbit-mint))}
+  .b--c{background:linear-gradient(150deg,var(--orbit-mint),var(--orbit-coral-soft))}
+  .b--d{background:linear-gradient(150deg,var(--orbit-lavender),var(--orbit-paper-deep))}
+  .b--e{background:linear-gradient(150deg,var(--orbit-coral-soft),var(--orbit-mint))}
+  .brand::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(36,26,58,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(36,26,58,.06) 1px, transparent 1px);
+    background-size:12px 12px;
+  }
+  @media (max-width:900px){.brands{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:560px){
+    .brands{display:flex; overflow-x:auto; gap:12px; scroll-snap-type:x mandatory; scrollbar-width:none; padding-bottom:6px}
+    .brands::-webkit-scrollbar{display:none}
+    .brand{flex:none; width:44vw; min-width:170px; scroll-snap-align:start}
+  }
+
+  /* ===== rails ===== */
+  .rail-scroll{
+    display:grid; grid-auto-flow:column; grid-auto-columns:186px; gap:16px;
+    overflow-x:auto; padding:10px 6px 18px; scroll-snap-type:x mandatory; scrollbar-width:none;
+  }
+  .rail-scroll::-webkit-scrollbar{display:none}
+  .rail-scroll > *{scroll-snap-align:start}
+  @media (max-width:639px){.rail-scroll{grid-auto-columns:150px}}
+
+  .card{
+    position:relative; background:var(--orbit-surface); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow); overflow:hidden; display:flex; flex-direction:column;
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .card:hover{transform:translateY(-4px) scale(1.02); box-shadow:var(--orbit-shadow-raised); z-index:1}
+  .poster{position:relative; aspect-ratio:2/3; overflow:hidden; border-bottom:2px solid var(--orbit-line-strong)}
+  .ph{position:absolute; inset:0; display:grid; place-items:center; font-family:var(--font-display); font-size:40px; color:var(--orbit-ink)}
+  .ph--a{background:linear-gradient(160deg,var(--orbit-lavender),var(--orbit-mint))}
+  .ph--b{background:linear-gradient(160deg,var(--orbit-coral-soft),var(--orbit-lavender))}
+  .ph--c{background:linear-gradient(160deg,var(--orbit-mint),var(--orbit-coral-soft))}
+  .ph--d{background:repeating-linear-gradient(45deg,var(--orbit-lavender) 0 12px,var(--orbit-paper-deep) 12px 24px)}
+  .status{
+    position:absolute; top:10px; left:10px; z-index:1;
+    font-family:var(--font-display); font-size:9px; letter-spacing:.06em;
+    padding:3px 8px; border:2px solid var(--orbit-line-strong); background:var(--orbit-mint);
+  }
+  .status--soon{background:var(--orbit-lavender)}
+  .status--end{background:var(--orbit-coral-soft); color:var(--orbit-coral-dark)}
+  .ep{
+    position:absolute; right:10px; bottom:10px; z-index:1;
+    font-family:var(--font-display); font-size:9px; padding:2px 7px;
+    background:var(--orbit-ink); color:var(--orbit-mint); border:2px solid var(--orbit-line-strong);
+  }
+  .badge-new{
+    position:absolute; top:10px; left:10px; z-index:1;
+    font-family:var(--font-display); font-size:9px; padding:3px 8px;
+    background:var(--orbit-coral); color:#fff; border:2px solid var(--orbit-line-strong);
+  }
+  .card-body{padding:10px 12px 12px; display:grid; gap:2px}
+  .card-title{font-weight:700; font-size:13px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .card-sub{font-size:11px; color:var(--orbit-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+  /* artist avatar cards */
+  .astar{display:grid; justify-items:center; gap:10px; width:132px; padding-top:4px}
+  .astar .face{
+    width:112px; aspect-ratio:1; border-radius:50%; overflow:hidden;
+    border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow);
+    display:grid; place-items:center;
+    font-family:var(--font-display); font-size:30px; color:var(--orbit-ink);
+    transition:transform .1s ease;
+  }
+  .astar:hover .face{transform:translateY(-4px)}
+  .astar .name{font-weight:700; font-size:13px; text-align:center}
+  .astar .role{font-size:10px; color:var(--orbit-muted); text-align:center}
+
+  /* ship duo cards */
+  .duo{display:flex; align-items:center; justify-content:center; aspect-ratio:auto; padding:18px 8px}
+  .duo .face{
+    width:58%; aspect-ratio:1; overflow:hidden; border:2px solid var(--orbit-surface);
+    border-radius:50%; display:grid; place-items:center;
+    font-family:var(--font-display); font-size:24px; color:var(--orbit-ink);
+  }
+  .duo .face + .face{margin-left:-18%; margin-top:24%}
+  .duo .heart{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:1;
+    width:34px; height:34px; display:grid; place-items:center;
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong); border-radius:50%;
+    color:var(--orbit-coral); font-size:14px;
+  }
+
+  .footer-note{
+    margin-top:60px; text-align:center; font-family:var(--font-display);
+    font-size:11px; letter-spacing:.12em; color:var(--orbit-muted);
+  }
+  .footer-note b{color:var(--orbit-coral-dark)}
+
+  @media (max-width:820px){
+    .hero{padding:32px 18px 30px}
+    .bar{margin-top:24px}
+    .search{max-width:none; order:2; flex-basis:100%}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar">
+    <a class="logo" href="#" aria-label="GL-Orbit หน้าหลัก"><span class="mark">G</span> GL-ORBIT</a>
+    <span class="hi">ยินดีต้อนรับ ★ เย็นวันอาทิตย์</span>
+  </header>
+
+  <!-- ===== HERO: clean welcome panel ===== -->
+  <section class="hero" aria-label="ยินดีต้อนรับสู่การสำรวจ">
+    <span class="hero-kicker">✦ GL-ORBIT STREAMING ✦</span>
+    <h1 class="hero-title">วันนี้อยากฟินเรื่องไหนดี? <span class="accent">เลือกเลย!</span></h1>
+    <p class="hero-sub">รวมซีรีส์ GL ไว้ครบทุกค่ายในที่เดียว — เลือกสตูดิโอที่ชอบ หรือเลื่อนดูคอลเลกชันแนะนำประจำสัปดาห์ได้เลย</p>
+    <div class="hero-actions">
+      <a class="btn btn--primary" href="#">▶ เริ่มสำรวจ</a>
+      <a class="btn btn--soft" href="#">★ ลิสต์ของฉัน</a>
+    </div>
+  </section>
+
+  <!-- ===== BRAND TILES ===== -->
+  <section class="section" aria-label="สตูดิโอและช่องทาง">
+    <div class="section-head">
+      <h2 class="section-title">เลือกตามสตูดิโอ</h2>
+      <a class="section-more" href="#">ดูทุกค่าย →</a>
+    </div>
+    <div class="brands">
+      <a class="brand b--a" href="#" aria-label="ดูผลงานของ GMMTV"><span class="word">GMMTV<small>24 เรื่อง</small></span></a>
+      <a class="brand b--b" href="#" aria-label="ดูผลงานของ Me Mind Y"><span class="word">ME MIND Y<small>9 เรื่อง</small></span></a>
+      <a class="brand b--c" href="#" aria-label="ดูผลงานของ North Star"><span class="word">NORTH STAR<small>7 เรื่อง</small></span></a>
+      <a class="brand b--d" href="#" aria-label="ดูผลงานของ BEC"><span class="word">BEC<small>12 เรื่อง</small></span></a>
+      <a class="brand b--e" href="#" aria-label="ดูผลงานของ iQIYI Originals"><span class="word">iQIYI<small>ORIGINALS · 15 เรื่อง</small></span></a>
+    </div>
+  </section>
+
+  <!-- ===== TABS + SEARCH ===== -->
+  <div class="bar">
+    <nav class="tabs" aria-label="หมวดสำรวจ">
+      <a class="tab" href="#" aria-current="page">ซีรีส์ <span class="n">128</span></a>
+      <a class="tab" href="#">นักแสดง <span class="n">46</span></a>
+      <a class="tab" href="#">คู่จิ้น <span class="n">32</span></a>
+    </nav>
+    <form class="search" role="search" onsubmit="return false">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.2-5.2m0 0A7.5 7.5 0 1 0 5.2 5.2a7.5 7.5 0 0 0 10.6 10.6Z"/></svg>
+      <input type="text" placeholder="ค้นหาชื่อเรื่อง นักแสดง คู่จิ้น…" aria-label="ค้นหา">
+    </form>
+  </div>
+  <div class="filters" role="group" aria-label="กรองสถานะ">
+    <button class="chip" aria-pressed="true">ทั้งหมด</button>
+    <button class="chip" aria-pressed="false">กำลังฉาย</button>
+    <button class="chip" aria-pressed="false">เร็วๆ นี้</button>
+    <button class="chip" aria-pressed="false">จบแล้ว</button>
+  </div>
+
+  <!-- ===== RAIL: recommended ===== -->
+  <section class="section" aria-label="แนะนำสำหรับคุณ">
+    <div class="section-head">
+      <h2 class="section-title">แนะนำสำหรับคุณ</h2>
+      <a class="section-more" href="#">ดูทั้งหมด →</a>
+    </div>
+    <div class="rail-scroll">
+      <a class="card" href="#"><div class="poster"><div class="ph ph--a" style="font-size:34px">AI</div><span class="status">กำลังฉาย</span><span class="ep">EP.5</span></div>
+        <div class="card-body"><span class="card-title">AI Girl</span><span class="card-sub">Me Mind Y · YouTube</span></div></a>
+      <a class="card" href="#"><div class="poster"><div class="ph ph--b" style="font-size:34px">4E</div><span class="status">กำลังฉาย</span><span class="ep">EP.4</span></div>
+        <div class="card-body"><span class="card-title">4 Elements: The Fire</span><span class="card-sub">North Star · iQIYI</span></div></a>
+      <a class="card" href="#"><div class="poster"><div class="ph ph--c" style="font-size:34px">M</div><span class="status">กำลังฉาย</span><span class="ep">EP.6</span></div>
+        <div class="card-body"><span class="card-title">My Lady's Bodyguard</span><span class="card-sub">GMMTV · YouTube</span></div></a>
+      <a class="card" href="#"><div class="poster"><div class="ph ph--d" style="font-size:34px">IL</div><span class="status status--soon">เร็วๆ นี้</span><span class="ep">EP.1</span></div>
+        <div class="card-body"><span class="card-title">In Love Forever</span><span class="card-sub">BEC · CH3Plus</span></div></a>
+      <a class="card" href="#"><div class="poster"><div class="ph ph--a" style="font-size:34px">S</div><span class="status status--end">จบแล้ว</span><span class="ep">ครบ</span></div>
+        <div class="card-body"><span class="card-title">Shades</span><span class="card-sub">GMMTV · WeTV</span></div></a>
+      <a class="card" href="#"><div class="poster"><div class="ph ph--b" style="font-size:34px">CL</div><span class="status status--end">จบแล้ว</span><span class="ep">ครบ</span></div>
+        <div class="card-body"><span class="card-title">Chasing Love</span><span class="card-sub">BEC · Netflix</span></div></a>
+    </div>
+  </section>
+
+  <!-- ===== RAIL: fresh this week ===== -->
+  <section class="section" aria-label="มาใหม่สัปดาห์นี้">
+    <div class="section-head">
+      <h2 class="section-title">มาใหม่สัปดาห์นี้</h2>
+      <a class="section-more" href="#">ดูตารางฉาย →</a>
+    </div>
+    <div class="rail-scroll">
+      <a class="card" href="#"><div class="poster"><div class="ph ph--c" style="font-size:34px">AI</div><span class="badge-new">NEW ★</span><span class="ep">พุธ 20:00</span></div>
+        <div class="card-body"><span class="card-title">AI Girl EP.5</span><span class="card-sub">ซับไทย · YouTube</span></div></a>
+      <a class="card" href="#"><div class="poster"><div class="ph ph--d" style="font-size:34px">4E</div><span class="badge-new">NEW ★</span><span class="ep">พุธ 21:00</span></div>
+        <div class="card-body"><span class="card-title">4 Elements EP.4</span><span class="card-sub">UNCUT · iQIYI</span></div></a>
+      <a class="card" href="#"><div class="poster"><div class="ph ph--a" style="font-size:34px">IL</div><span class="badge-new">NEW ★</span><span class="ep">ศุกร์ 20:30</span></div>
+        <div class="card-body"><span class="card-title">In Love Forever EP.6</span><span class="card-sub">CH3Plus</span></div></a>
+      <a class="card" href="#"><div class="poster"><div class="ph ph--b" style="font-size:34px">M</div><span class="badge-new">NEW ★</span><span class="ep">เสาร์ 23:30</span></div>
+        <div class="card-body"><span class="card-title">Bodyguard EP.6</span><span class="card-sub">YouTube</span></div></a>
+    </div>
+  </section>
+
+  <!-- ===== ARTISTS ===== -->
+  <section class="section" aria-label="นักแสดงที่กำลังมาแรง">
+    <div class="section-head">
+      <h2 class="section-title">นักแสดงที่กำลังมาแรง</h2>
+      <a class="section-more" href="#">ดูทั้งหมด →</a>
+    </div>
+    <div class="rail-scroll" style="grid-auto-columns:132px">
+      <a class="astar" href="#"><span class="face ph--c">A</span><span class="name">Alexis</span><span class="role">3 ผลงาน</span></a>
+      <a class="astar" href="#"><span class="face ph--a">N</span><span class="name">Nook</span><span class="role">3 ผลงาน</span></a>
+      <a class="astar" href="#"><span class="face ph--b">V</span><span class="name">View</span><span class="role">5 ผลงาน</span></a>
+      <a class="astar" href="#"><span class="face ph--d">J</span><span class="name">June</span><span class="role">5 ผลงาน</span></a>
+      <a class="astar" href="#"><span class="face ph--c">M</span><span class="name">Mewnich</span><span class="role">2 ผลงาน</span></a>
+      <a class="astar" href="#"><span class="face ph--a">J</span><span class="name">Jaoying</span><span class="role">2 ผลงาน</span></a>
+    </div>
+  </section>
+
+  <!-- ===== SHIPS ===== -->
+  <section class="section" aria-label="คู่จิ้นครอบครัว GL-Orbit">
+    <div class="section-head">
+      <h2 class="section-title">คู่จิ้นยอดนิยม</h2>
+      <a class="section-more" href="#">ดูทั้งหมด →</a>
+    </div>
+    <div class="rail-scroll">
+      <a class="card" href="#"><div class="poster duo"><div class="face ph--a">A</div><div class="face ph--c">N</div><span class="heart">♥</span></div>
+        <div class="card-body"><span class="card-title">NookAlexis</span><span class="card-sub">3 ผลงานร่วม</span></div></a>
+      <a class="card" href="#"><div class="poster duo"><div class="face ph--b">V</div><div class="face ph--d">J</div><span class="heart">♥</span></div>
+        <div class="card-body"><span class="card-title">ViewJune</span><span class="card-sub">1 ผลงานร่วม</span></div></a>
+      <a class="card" href="#"><div class="poster duo"><div class="face ph--c">M</div><div class="face ph--a">F</div><span class="heart">♥</span></div>
+        <div class="card-body"><span class="card-title">MilkFah</span><span class="card-sub">2 ผลงานร่วม</span></div></a>
+      <a class="card" href="#"><div class="poster duo"><div class="face ph--d">P</div><div class="face ph--b">K</div><span class="heart">♥</span></div>
+        <div class="card-body"><span class="card-title">PraeKwan</span><span class="card-sub">4 ผลงานร่วม</span></div></a>
+    </div>
+  </section>
+
+  <p class="footer-note">GL-ORBIT <b>★</b> EXPLORE CONCEPT · FAMILY PASTEL STREAMING <b>★</b> ฟินได้ทั้งบ้าน ทุกวัย</p>
+</div>
+
+<div class="ribbon">MOCKUP · PASTEL STREAMING</div>
+
+</body>
+</html>

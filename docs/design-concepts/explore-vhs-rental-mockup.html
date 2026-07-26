@@ -1,0 +1,540 @@
+<!-- GL-Orbit /explore redesign mockup — Y2K × VHS RENTAL STORE concept -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สำรวจ GL — VHS Rental Store Concept Mockup | GL-Orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orbit-paper:#e8e6f5; --orbit-paper-deep:#ddd9f0; --orbit-surface:#fdfcff;
+    --orbit-ink:#241a3a; --orbit-muted:#6f6390; --orbit-line-strong:#241a3a;
+    --orbit-coral:#ff3fbf; --orbit-coral-dark:#c21e92; --orbit-coral-soft:#ffd6f5;
+    --orbit-lavender:#d9c8ff; --orbit-mint:#b8f0ff;
+    --orbit-shadow:4px 4px 0 #d9c8ff; --orbit-shadow-raised:5px 5px 0 rgba(36,26,58,.25);
+    --orbit-link:#3f7dff; --orbit-focus:#3f7dff; --orbit-selection:#b8f0ff;
+    --font-display:'Silkscreen', monospace;
+    --font-body:'Prompt', 'Silkscreen', sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;border-radius:0}
+  ::selection{background:var(--orbit-selection);color:var(--orbit-ink)}
+  body{
+    margin:0; font-family:var(--font-body); color:var(--orbit-ink);
+    background-color:var(--orbit-paper);
+    background-image:
+      linear-gradient(var(--orbit-paper-deep) 1px, transparent 1px),
+      linear-gradient(90deg, var(--orbit-paper-deep) 1px, transparent 1px);
+    background-size:24px 24px;
+    line-height:1.55;
+  }
+  h1,h2,h3{margin:0; font-family:var(--font-display); letter-spacing:.02em; line-height:1.2}
+  a{color:inherit; text-decoration:none}
+  :focus-visible{outline:3px solid var(--orbit-focus); outline-offset:2px}
+  button{font-family:inherit; cursor:pointer}
+
+  .wrap{max-width:1152px; margin:0 auto; padding:0 20px 64px}
+
+  /* ===== marquee sign above store ===== */
+  .open-sign{
+    background:var(--orbit-ink); color:var(--orbit-mint);
+    font-family:var(--font-display); font-size:12px; letter-spacing:.08em;
+    overflow:hidden; white-space:nowrap; border-bottom:2px solid var(--orbit-line-strong);
+  }
+  .open-sign-inner{display:inline-block; padding:6px 0; animation:marquee 24s linear infinite}
+  @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ===== shop sign (masthead) ===== */
+  .shopfront{margin-top:24px; display:grid; gap:0}
+  .signboard{
+    position:relative; text-align:center; padding:26px 16px 20px;
+    background:var(--orbit-ink); color:#fff;
+    border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow-raised);
+    background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 2px, transparent 2px 6px);
+  }
+  .sign-title{
+    font-family:var(--font-display); font-size:clamp(24px,4.6vw,44px); line-height:1.1;
+    color:var(--orbit-mint);
+  }
+  .sign-title .neon{color:var(--orbit-coral)}
+  .sign-tag{
+    margin-top:8px; font-family:var(--font-display); font-size:clamp(10px,1.6vw,14px);
+    letter-spacing:.18em; color:var(--orbit-lavender);
+  }
+  .sign-bulbs{display:flex; justify-content:center; gap:10px; margin-top:14px}
+  .sign-bulbs i{
+    width:12px; height:12px; border:2px solid var(--orbit-line-strong);
+    background:var(--orbit-coral);
+  }
+  .sign-bulbs i:nth-child(2n){background:var(--orbit-mint)}
+  .sign-bulbs i:nth-child(3n){background:var(--orbit-lavender)}
+  .awning{
+    display:flex; border:2px solid var(--orbit-line-strong); border-top:none;
+    box-shadow:var(--orbit-shadow); height:26px; overflow:hidden;
+  }
+  .awning i{flex:1}
+  .awning i:nth-child(odd){background:var(--orbit-coral)}
+  .awning i:nth-child(even){background:var(--orbit-surface)}
+
+  .hero-info{
+    margin-top:16px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
+  }
+  .hero-blurb{margin:0; font-size:14px; color:var(--orbit-muted); max-width:56ch}
+  .hero-blurb strong{color:var(--orbit-ink)}
+  .member-card{
+    display:flex; align-items:center; gap:10px; padding:10px 14px;
+    background:var(--orbit-mint); border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow);
+    font-family:var(--font-display); font-size:11px;
+  }
+  .member-card .bc{
+    width:64px; height:20px;
+    background:repeating-linear-gradient(90deg, var(--orbit-ink) 0 2px, transparent 2px 5px, var(--orbit-ink) 5px 6px, transparent 6px 10px);
+  }
+
+  /* ===== tabs + toolbar ===== */
+  .bar{
+    display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
+    margin:28px 0 8px;
+  }
+  .tabs{
+    display:inline-flex; border:2px solid var(--orbit-line-strong);
+    background:var(--orbit-surface); box-shadow:var(--orbit-shadow); overflow:hidden;
+  }
+  .tab{
+    display:inline-flex; align-items:center; gap:8px; min-height:44px;
+    padding:10px 16px; font-family:var(--font-display); font-size:12px; font-weight:700;
+    background:transparent; border:none; border-right:2px solid var(--orbit-line-strong);
+    color:var(--orbit-ink); white-space:nowrap;
+  }
+  .tab:last-child{border-right:none}
+  .tab:hover{background:var(--orbit-coral-soft)}
+  .tab[aria-current="page"]{background:var(--orbit-ink); color:var(--orbit-mint)}
+  .tab .n{font-size:10px; padding:1px 6px; border:2px solid currentColor; line-height:1.3}
+  .search{
+    display:flex; align-items:center; gap:8px; flex:1; min-width:220px; max-width:360px;
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow); padding:0 12px; min-height:44px;
+  }
+  .search input{
+    flex:1; min-width:0; border:none; background:transparent; outline:none;
+    font-family:var(--font-body); font-size:14px; color:var(--orbit-ink); min-height:40px;
+  }
+  .search input::placeholder{color:var(--orbit-muted)}
+
+  .filters{display:flex; gap:8px; overflow-x:auto; padding:6px 0 2px; scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .chip{
+    flex:none; min-height:36px; padding:6px 14px;
+    font-family:var(--font-display); font-size:10px;
+    background:var(--orbit-surface); color:var(--orbit-ink);
+    border:2px solid var(--orbit-line-strong); box-shadow:3px 3px 0 var(--orbit-lavender);
+  }
+  .chip:hover{transform:translate(-1px,-1px)}
+  .chip[aria-pressed="true"]{background:var(--orbit-coral); color:#fff; box-shadow:3px 3px 0 var(--orbit-coral-dark)}
+
+  /* ===== shelf sections ===== */
+  .shelf{margin-top:40px}
+  .shelf-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    margin-bottom:0; padding:8px 12px;
+    background:var(--orbit-ink); color:var(--orbit-mint);
+    border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow);
+  }
+  .shelf-title{display:flex; align-items:center; gap:10px; font-size:15px}
+  .shelf-title .placard{
+    background:var(--orbit-coral); color:#fff; font-size:9px; letter-spacing:.1em;
+    padding:2px 8px; border:2px solid var(--orbit-line-strong);
+  }
+  .shelf-more{font-family:var(--font-display); font-size:11px; color:var(--orbit-mint)}
+  .shelf-more:hover{text-decoration:underline}
+  .shelf-body{
+    border:2px solid var(--orbit-line-strong); border-top:none;
+    background:var(--orbit-surface); box-shadow:var(--orbit-shadow);
+    padding:18px 14px 20px;
+  }
+  .shelf-rail{
+    display:grid; grid-auto-flow:column; grid-auto-columns:172px; gap:14px;
+    overflow-x:auto; padding:4px 4px 12px; scroll-snap-type:x mandatory; scrollbar-width:none;
+  }
+  .shelf-rail::-webkit-scrollbar{display:none}
+  .shelf-rail > *{scroll-snap-align:start}
+  .shelf-base{
+    height:14px; margin-top:6px; border:2px solid var(--orbit-line-strong);
+    background:repeating-linear-gradient(45deg, var(--orbit-lavender) 0 14px, var(--orbit-paper-deep) 14px 28px);
+  }
+  @media (max-width:639px){.shelf-rail{grid-auto-columns:148px}}
+
+  /* ===== VHS spine (series) ===== */
+  .vhs{
+    position:relative; display:flex; flex-direction:row; align-items:stretch;
+    background:var(--orbit-ink); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow); overflow:hidden;
+    min-height:230px; transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .vhs:hover{transform:translateY(-4px); box-shadow:var(--orbit-shadow-raised); z-index:1}
+  .vhs-spine{
+    width:44px; flex:none; display:flex; align-items:center; justify-content:center;
+    border-right:2px solid var(--orbit-line-strong); position:relative;
+  }
+  .vhs-spine span{
+    writing-mode:vertical-rl; transform:rotate(180deg);
+    font-family:var(--font-display); font-size:11px; letter-spacing:.06em; color:var(--orbit-ink);
+    white-space:nowrap; overflow:hidden; max-height:200px;
+  }
+  .sp--a{background:linear-gradient(180deg,var(--orbit-lavender),var(--orbit-mint))}
+  .sp--b{background:linear-gradient(180deg,var(--orbit-coral-soft),var(--orbit-lavender))}
+  .sp--c{background:linear-gradient(180deg,var(--orbit-mint),var(--orbit-coral-soft))}
+  .sp--d{background:repeating-linear-gradient(0deg,var(--orbit-lavender) 0 10px,var(--orbit-paper-deep) 10px 20px)}
+  .vhs-front{
+    flex:1; min-width:0; display:flex; flex-direction:column;
+    background:var(--orbit-surface);
+  }
+  .vhs-cover{
+    position:relative; aspect-ratio:16/9; border-bottom:2px solid var(--orbit-line-strong);
+    display:grid; place-items:center; font-family:var(--font-display); font-size:30px; color:var(--orbit-ink);
+  }
+  .cov--a{background:linear-gradient(150deg,var(--orbit-lavender),var(--orbit-mint))}
+  .cov--b{background:linear-gradient(150deg,var(--orbit-coral-soft),var(--orbit-lavender))}
+  .cov--c{background:linear-gradient(150deg,var(--orbit-mint),var(--orbit-coral-soft))}
+  .cov--d{background:repeating-linear-gradient(45deg,var(--orbit-lavender) 0 12px,var(--orbit-paper-deep) 12px 24px)}
+  .stamp{
+    position:absolute; top:6px; right:6px;
+    font-family:var(--font-display); font-size:8px; letter-spacing:.08em;
+    padding:3px 6px; border:2px solid var(--orbit-line-strong);
+    background:var(--orbit-coral); color:#fff; transform:rotate(6deg);
+  }
+  .stamp--pick{background:var(--orbit-mint); color:var(--orbit-ink); transform:rotate(-5deg)}
+  .vhs-meta{padding:8px 10px 10px; display:grid; gap:3px}
+  .vhs-name{font-weight:700; font-size:12px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .vhs-sub{font-size:10px; color:var(--orbit-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .vhs-foot{display:flex; align-items:center; justify-content:space-between; margin-top:4px}
+  .price{font-family:var(--font-display); font-size:10px; color:var(--orbit-coral-dark)}
+  .status-dot{font-family:var(--font-display); font-size:8px; padding:2px 6px; border:2px solid var(--orbit-line-strong)}
+  .st--on{background:var(--orbit-mint)}
+  .st--soon{background:var(--orbit-lavender)}
+  .st--end{background:var(--orbit-coral-soft); color:var(--orbit-coral-dark)}
+
+  /* ===== STAR OF THE MONTH wall (artists) ===== */
+  .star-wall{display:grid; grid-template-columns:repeat(6,1fr); gap:14px}
+  @media (max-width:900px){.star-wall{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:639px){
+    .star-wall{grid-auto-flow:column; grid-auto-columns:140px; grid-template-columns:none;
+      overflow-x:auto; padding-bottom:10px; scroll-snap-type:x mandatory; scrollbar-width:none}
+    .star-wall::-webkit-scrollbar{display:none}
+    .star-wall > *{scroll-snap-align:start}
+  }
+  .polaroid{
+    display:grid; justify-items:center; gap:6px; padding:10px 8px 12px;
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow); position:relative;
+    transition:transform .1s ease;
+  }
+  .polaroid:hover{transform:translateY(-4px) rotate(-1deg)}
+  .polaroid .tape{
+    position:absolute; top:-8px; left:50%; transform:translateX(-50%) rotate(-3deg);
+    width:56px; height:16px; background:var(--orbit-mint); border:2px solid var(--orbit-line-strong);
+    opacity:.9;
+  }
+  .polaroid .frame{
+    width:100%; aspect-ratio:4/5; border:2px solid var(--orbit-line-strong);
+    display:grid; place-items:center; font-family:var(--font-display); font-size:34px; color:var(--orbit-ink);
+  }
+  .polaroid .name{font-weight:700; font-size:12px; text-align:center}
+  .polaroid .role{font-size:10px; color:var(--orbit-muted)}
+  .polaroid .month-badge{
+    font-family:var(--font-display); font-size:8px; letter-spacing:.08em;
+    background:var(--orbit-coral); color:#fff; padding:2px 8px;
+    border:2px solid var(--orbit-line-strong);
+  }
+
+  /* ===== COUPLES RENT 2 GET 1 (ships) ===== */
+  .promo-banner{
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+    margin-bottom:14px; padding:10px 14px;
+    background:var(--orbit-coral-soft); border:2px solid var(--orbit-line-strong);
+  }
+  .promo-banner .deal{
+    font-family:var(--font-display); font-size:13px; color:var(--orbit-coral-dark);
+  }
+  .promo-banner .fine{font-size:11px; color:var(--orbit-muted)}
+  .ship-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+  @media (max-width:900px){.ship-grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:639px){.ship-grid{grid-template-columns:1fr 1fr; gap:10px}}
+  .rental-card{
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow); overflow:hidden; position:relative;
+    transition:transform .1s ease;
+  }
+  .rental-card:hover{transform:translateY(-4px)}
+  .duo{
+    display:flex; align-items:center; justify-content:center; padding:16px 8px 12px; position:relative;
+    border-bottom:2px solid var(--orbit-line-strong);
+    background:linear-gradient(160deg,var(--orbit-paper) 0%,var(--orbit-surface) 100%);
+  }
+  .duo .face{
+    width:56%; aspect-ratio:1; overflow:hidden; border:2px solid var(--orbit-line-strong);
+    border-radius:50%; display:grid; place-items:center; font-family:var(--font-display); font-size:22px;
+  }
+  .duo .face + .face{margin-left:-16%; margin-top:22%}
+  .duo .heart{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:32px; height:32px; display:grid; place-items:center;
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong); border-radius:50%;
+    color:var(--orbit-coral); font-size:13px;
+  }
+  .rental-body{padding:8px 10px 10px; display:grid; gap:2px}
+  .rental-title{font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .rental-sub{font-size:11px; color:var(--orbit-muted)}
+  .rental-foot{
+    display:flex; align-items:center; justify-content:space-between; margin-top:6px;
+  }
+  .barcode{
+    width:56px; height:16px;
+    background:repeating-linear-gradient(90deg, var(--orbit-ink) 0 2px, transparent 2px 5px, var(--orbit-ink) 5px 6px, transparent 6px 9px);
+  }
+  .due{font-family:var(--font-display); font-size:9px; color:var(--orbit-coral-dark)}
+
+  .footer-note{
+    margin-top:56px; text-align:center; font-family:var(--font-display);
+    font-size:11px; letter-spacing:.12em; color:var(--orbit-muted);
+  }
+  .ribbon{
+    position:fixed; right:0; bottom:24px; z-index:50;
+    background:var(--orbit-coral); color:#fff; font-family:var(--font-display); font-size:11px;
+    letter-spacing:.1em; padding:8px 14px; border:2px solid var(--orbit-line-strong);
+    border-right:none; box-shadow:-4px 4px 0 var(--orbit-lavender);
+  }
+</style>
+</head>
+<body>
+
+<div class="open-sign" aria-hidden="true">
+  <div class="open-sign-inner">
+    ★ OPEN 24 HRS ★ GL-ORBIT VIDEO ★ BE KIND — REWIND ★ เช่า 3 วัน คืนก่อนเที่ยงคืน ★ สมาชิกใหม่รับส่วนลด 20% ★ OPEN 24 HRS ★ GL-ORBIT VIDEO ★ BE KIND — REWIND ★ เช่า 3 วัน คืนก่อนเที่ยงคืน ★ สมาชิกใหม่รับส่วนลด 20% ★
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ===== MASTHEAD: shop sign ===== -->
+  <header class="shopfront">
+    <div class="signboard">
+      <h1 class="sign-title">GL-ORBIT <span class="neon">VIDEO</span></h1>
+      <p class="sign-tag">— BE KIND · REWIND —</p>
+      <div class="sign-bulbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="awning" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="hero-info">
+      <p class="hero-blurb"><strong>ยินดีต้อนรับสู่ร้านเช่าเทป GL ที่ใหญ่ที่สุดในจักรวาล</strong> — เดินดูชั้นเทปได้ตามสบาย ซีรีส์ใหม่เข้าทุกสัปดาห์ อย่าลืมกรอกบัตรสมาชิกก่อนคืนเทปนะ</p>
+      <div class="member-card">
+        <span class="bc" aria-hidden="true"></span>
+        <span>MEMBER&nbsp;NO.&nbsp;GL-1994</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== TABS + SEARCH ===== -->
+  <div class="bar">
+    <nav class="tabs" aria-label="หมวดสำรวจ">
+      <a class="tab" href="#" aria-current="page">ซีรีส์ <span class="n">128</span></a>
+      <a class="tab" href="#">นักแสดง <span class="n">46</span></a>
+      <a class="tab" href="#">คู่จิ้น <span class="n">32</span></a>
+    </nav>
+    <form class="search" role="search" onsubmit="return false">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.2-5.2m0 0A7.5 7.5 0 1 0 5.2 5.2a7.5 7.5 0 0 0 10.6 10.6Z"/></svg>
+      <input type="text" placeholder="ค้นหาเทปในสต็อก…" aria-label="ค้นหา">
+    </form>
+  </div>
+  <div class="filters" role="group" aria-label="กรองสถานะ">
+    <button class="chip" aria-pressed="true">ทั้งหมด</button>
+    <button class="chip" aria-pressed="false">กำลังฉาย</button>
+    <button class="chip" aria-pressed="false">เร็วๆ นี้</button>
+    <button class="chip" aria-pressed="false">จบแล้ว</button>
+  </div>
+
+  <!-- ===== SHELF 1: VHS tapes (series) ===== -->
+  <section class="shelf" aria-label="ชั้นเทปซีรีส์มาใหม่">
+    <div class="shelf-head">
+      <h2 class="shelf-title"><span class="placard">SHELF A1</span> ชั้นเทปซีรีส์ — มาใหม่สัปดาห์นี้</h2>
+      <a class="shelf-more" href="#">ดูทั้งชั้น →</a>
+    </div>
+    <div class="shelf-body">
+      <div class="shelf-rail">
+        <a class="vhs" href="#">
+          <div class="vhs-spine sp--a"><span>AI GIRL</span></div>
+          <div class="vhs-front">
+            <div class="vhs-cover cov--a">AI<span class="stamp">NEW RELEASE</span></div>
+            <div class="vhs-meta">
+              <span class="vhs-name">AI Girl</span>
+              <span class="vhs-sub">EP.5 · YouTube · Me Mind Y</span>
+              <div class="vhs-foot"><span class="price">เช่า ฿20/3วัน</span><span class="status-dot st--on">กำลังฉาย</span></div>
+            </div>
+          </div>
+        </a>
+        <a class="vhs" href="#">
+          <div class="vhs-spine sp--b"><span>4 ELEMENTS: THE FIRE</span></div>
+          <div class="vhs-front">
+            <div class="vhs-cover cov--b">4E<span class="stamp stamp--pick">STAFF PICK</span></div>
+            <div class="vhs-meta">
+              <span class="vhs-name">4 Elements: The Fire</span>
+              <span class="vhs-sub">EP.4 · iQIYI</span>
+              <div class="vhs-foot"><span class="price">เช่า ฿25/3วัน</span><span class="status-dot st--on">กำลังฉาย</span></div>
+            </div>
+          </div>
+        </a>
+        <a class="vhs" href="#">
+          <div class="vhs-spine sp--c"><span>MY LADY'S BODYGUARD</span></div>
+          <div class="vhs-front">
+            <div class="vhs-cover cov--c">M</div>
+            <div class="vhs-meta">
+              <span class="vhs-name">My Lady's Bodyguard</span>
+              <span class="vhs-sub">EP.6 · YouTube</span>
+              <div class="vhs-foot"><span class="price">เช่า ฿20/3วัน</span><span class="status-dot st--on">กำลังฉาย</span></div>
+            </div>
+          </div>
+        </a>
+        <a class="vhs" href="#">
+          <div class="vhs-spine sp--d"><span>IN LOVE FOREVER</span></div>
+          <div class="vhs-front">
+            <div class="vhs-cover cov--d">IL<span class="stamp">NEW RELEASE</span></div>
+            <div class="vhs-meta">
+              <span class="vhs-name">In Love Forever</span>
+              <span class="vhs-sub">EP.1 · CH3Plus</span>
+              <div class="vhs-foot"><span class="price">เช่า ฿30/3วัน</span><span class="status-dot st--soon">เร็วๆ นี้</span></div>
+            </div>
+          </div>
+        </a>
+        <a class="vhs" href="#">
+          <div class="vhs-spine sp--a"><span>SHADES</span></div>
+          <div class="vhs-front">
+            <div class="vhs-cover cov--a">S</div>
+            <div class="vhs-meta">
+              <span class="vhs-name">Shades</span>
+              <span class="vhs-sub">ครบทุกตอน · WeTV</span>
+              <div class="vhs-foot"><span class="price">เช่า ฿15/3วัน</span><span class="status-dot st--end">จบแล้ว</span></div>
+            </div>
+          </div>
+        </a>
+        <a class="vhs" href="#">
+          <div class="vhs-spine sp--b"><span>CHASING LOVE</span></div>
+          <div class="vhs-front">
+            <div class="vhs-cover cov--c">CL<span class="stamp stamp--pick">STAFF PICK</span></div>
+            <div class="vhs-meta">
+              <span class="vhs-name">Chasing Love</span>
+              <span class="vhs-sub">EP.8 · Netflix</span>
+              <div class="vhs-foot"><span class="price">เช่า ฿25/3วัน</span><span class="status-dot st--on">กำลังฉาย</span></div>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="shelf-base" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- ===== SHELF 2: STAR OF THE MONTH wall (artists) ===== -->
+  <section class="shelf" aria-label="กรอบดาราประจำเดือน">
+    <div class="shelf-head">
+      <h2 class="shelf-title"><span class="placard">WALL B2</span> STAR OF THE MONTH — กรอบติดผนัง</h2>
+      <a class="shelf-more" href="#">ดูดาราทั้งหมด →</a>
+    </div>
+    <div class="shelf-body">
+      <div class="star-wall">
+        <a class="polaroid" href="#">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="frame cov--a">A</span>
+          <span class="name">Alexis</span>
+          <span class="role">3 ผลงาน</span>
+          <span class="month-badge">★ เดือนนี้</span>
+        </a>
+        <a class="polaroid" href="#">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="frame cov--b">N</span>
+          <span class="name">Nook</span>
+          <span class="role">3 ผลงาน</span>
+        </a>
+        <a class="polaroid" href="#">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="frame cov--c">V</span>
+          <span class="name">View</span>
+          <span class="role">5 ผลงาน</span>
+        </a>
+        <a class="polaroid" href="#">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="frame cov--d">J</span>
+          <span class="name">June</span>
+          <span class="role">5 ผลงาน</span>
+        </a>
+        <a class="polaroid" href="#">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="frame cov--a">M</span>
+          <span class="name">Mewnich</span>
+          <span class="role">2 ผลงาน</span>
+        </a>
+        <a class="polaroid" href="#">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="frame cov--b">J</span>
+          <span class="name">Jaoying</span>
+          <span class="role">2 ผลงาน</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SHELF 3: COUPLES RENT 2 GET 1 (ships) ===== -->
+  <section class="shelf" aria-label="ชั้นคู่จิ้นโปรโมชัน">
+    <div class="shelf-head">
+      <h2 class="shelf-title"><span class="placard">SHELF C3</span> ชั้นคู่จิ้น — COUPLES CORNER</h2>
+      <a class="shelf-more" href="#">ดูทุกคู่ →</a>
+    </div>
+    <div class="shelf-body">
+      <div class="promo-banner">
+        <span class="deal">★ โปรคู่จิ้น: เช่า 2 แถม 1 ★</span>
+        <span class="fine">เช่าเทปคู่จิ้นเดียวกัน 2 เรื่อง รับเบื้องหลังฟรี 1 ม้วน (เฉพาะสมาชิก)</span>
+      </div>
+      <div class="ship-grid">
+        <a class="rental-card" href="#">
+          <div class="duo"><div class="face cov--a">A</div><div class="face cov--c">N</div><span class="heart">♥</span></div>
+          <div class="rental-body">
+            <span class="rental-title">NookAlexis</span>
+            <span class="rental-sub">3 ผลงานร่วม</span>
+            <div class="rental-foot"><span class="barcode" aria-hidden="true"></span><span class="due">คืนภายใน 3 วัน</span></div>
+          </div>
+        </a>
+        <a class="rental-card" href="#">
+          <div class="duo"><div class="face cov--b">V</div><div class="face cov--d">J</div><span class="heart">♥</span></div>
+          <div class="rental-body">
+            <span class="rental-title">ViewJune</span>
+            <span class="rental-sub">1 ผลงานร่วม</span>
+            <div class="rental-foot"><span class="barcode" aria-hidden="true"></span><span class="due">คืนภายใน 3 วัน</span></div>
+          </div>
+        </a>
+        <a class="rental-card" href="#">
+          <div class="duo"><div class="face cov--c">M</div><div class="face cov--a">F</div><span class="heart">♥</span></div>
+          <div class="rental-body">
+            <span class="rental-title">MilkFah</span>
+            <span class="rental-sub">2 ผลงานร่วม</span>
+            <div class="rental-foot"><span class="barcode" aria-hidden="true"></span><span class="due">คืนภายใน 3 วัน</span></div>
+          </div>
+        </a>
+        <a class="rental-card" href="#">
+          <div class="duo"><div class="face cov--d">P</div><div class="face cov--b">K</div><span class="heart">♥</span></div>
+          <div class="rental-body">
+            <span class="rental-title">PraeKwan</span>
+            <span class="rental-sub">4 ผลงานร่วม</span>
+            <div class="rental-foot"><span class="barcode" aria-hidden="true"></span><span class="due">คืนภายใน 3 วัน</span></div>
+          </div>
+        </a>
+      </div>
+      <div class="shelf-base" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <p class="footer-note">GL-ORBIT VIDEO ★ BE KIND REWIND ★ ฝากเทปไว้ในใจ อย่าลืมเอาไปคืน ✦</p>
+</div>
+
+<div class="ribbon">MOCKUP · VHS RENTAL</div>
+
+</body>
+</html>

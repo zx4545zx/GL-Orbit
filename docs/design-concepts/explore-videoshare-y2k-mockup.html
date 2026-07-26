@@ -1,0 +1,599 @@
+<!-- GL-Orbit /explore redesign mockup — VideoShare Y2K concept (YouTube-style video feed × Y2K visuals) -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สำรวจ GL — VideoShare Y2K Concept Mockup | GL-Orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orbit-paper:#e8e6f5; --orbit-paper-deep:#ddd9f0; --orbit-surface:#fdfcff;
+    --orbit-ink:#241a3a; --orbit-muted:#6f6390; --orbit-line:#b3a8d6; --orbit-line-strong:#241a3a;
+    --orbit-coral:#ff3fbf; --orbit-coral-dark:#c21e92; --orbit-coral-soft:#ffd6f5;
+    --orbit-lavender:#d9c8ff; --orbit-mint:#b8f0ff;
+    --orbit-shadow:4px 4px 0 #d9c8ff; --orbit-shadow-raised:5px 5px 0 rgba(36,26,58,.25);
+    --orbit-link:#3f7dff; --orbit-focus:#3f7dff; --orbit-selection:#b8f0ff;
+    --font-display:'Silkscreen', monospace;
+    --font-body:'Prompt', 'Silkscreen', sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;border-radius:0}
+  ::selection{background:var(--orbit-selection);color:var(--orbit-ink)}
+  body{
+    margin:0; font-family:var(--font-body); color:var(--orbit-ink);
+    background-color:var(--orbit-paper);
+    background-image:
+      linear-gradient(var(--orbit-paper-deep) 1px, transparent 1px),
+      linear-gradient(90deg, var(--orbit-paper-deep) 1px, transparent 1px);
+    background-size:24px 24px;
+    line-height:1.55;
+  }
+  h1,h2,h3{margin:0; line-height:1.2}
+  a{color:inherit; text-decoration:none}
+  :focus-visible{outline:3px solid var(--orbit-focus); outline-offset:2px}
+  button{font-family:inherit; cursor:pointer}
+  ul{margin:0; padding:0; list-style:none}
+
+  .wrap{max-width:1280px; margin:0 auto; padding:0 24px 72px}
+
+  /* ===== top nav (video site masthead) ===== */
+  .masthead{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:14px 0; border-bottom:2px solid var(--orbit-line-strong);
+  }
+  .logo{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-display); font-weight:700; font-size:16px;
+  }
+  .logo .play-mark{
+    width:34px; height:24px; display:grid; place-items:center;
+    background:var(--orbit-coral); color:#fff; font-size:11px;
+    border:2px solid var(--orbit-line-strong); box-shadow:3px 3px 0 var(--orbit-coral-dark);
+  }
+  .search{
+    display:flex; align-items:stretch; flex:1; min-width:200px; max-width:520px;
+    margin-inline:auto; border:2px solid var(--orbit-line-strong);
+    background:var(--orbit-surface); box-shadow:var(--orbit-shadow);
+  }
+  .search input{
+    flex:1; min-width:0; border:none; background:transparent; outline:none;
+    font-family:var(--font-body); font-size:14px; color:var(--orbit-ink);
+    padding:0 12px; min-height:42px;
+  }
+  .search input::placeholder{color:var(--orbit-muted)}
+  .search .go{
+    min-width:56px; min-height:44px; display:grid; place-items:center;
+    background:var(--orbit-ink); color:var(--orbit-mint); border:none;
+    border-left:2px solid var(--orbit-line-strong);
+  }
+  .search .go:hover{background:var(--orbit-coral-dark); color:#fff}
+  .mast-actions{display:flex; gap:10px; align-items:center}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height:44px; padding:10px 18px;
+    font-family:var(--font-display); font-size:12px;
+    background:var(--orbit-surface); color:var(--orbit-ink);
+    border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow);
+    transition:transform .08s ease, box-shadow .08s ease;
+  }
+  .btn:hover{transform:translate(-1px,-1px)}
+  .btn:active{transform:translate(2px,2px); box-shadow:none}
+  .btn--primary{background:var(--orbit-coral); color:#fff; box-shadow:4px 4px 0 var(--orbit-coral-dark)}
+  .btn--mint{background:var(--orbit-mint)}
+
+  /* ===== tabs + filter chips (topic bar) ===== */
+  .bar{
+    display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
+    margin:22px 0 10px;
+  }
+  .tabs{
+    display:inline-flex; border:2px solid var(--orbit-line-strong);
+    background:var(--orbit-surface); box-shadow:var(--orbit-shadow); overflow:hidden;
+  }
+  .tab{
+    display:inline-flex; align-items:center; gap:8px; min-height:44px;
+    padding:10px 16px; font-family:var(--font-display); font-size:12px; font-weight:700;
+    background:transparent; border:none; border-right:2px solid var(--orbit-line-strong);
+    color:var(--orbit-ink); white-space:nowrap;
+  }
+  .tab:last-child{border-right:none}
+  .tab:hover{background:var(--orbit-coral-soft)}
+  .tab[aria-current="page"]{background:var(--orbit-ink); color:var(--orbit-mint)}
+  .tab .n{font-size:10px; padding:1px 6px; border:2px solid currentColor; line-height:1.3}
+  .sort-note{font-family:var(--font-display); font-size:10px; color:var(--orbit-muted); letter-spacing:.06em}
+
+  .filters{display:flex; gap:8px; overflow-x:auto; padding:4px 0 8px; scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .chip{
+    flex:none; min-height:40px; padding:8px 14px;
+    font-family:var(--font-display); font-size:10px;
+    background:var(--orbit-surface); color:var(--orbit-ink);
+    border:2px solid var(--orbit-line-strong); box-shadow:3px 3px 0 var(--orbit-lavender);
+  }
+  .chip:hover{transform:translate(-1px,-1px)}
+  .chip[aria-pressed="true"]{background:var(--orbit-coral); color:#fff; box-shadow:3px 3px 0 var(--orbit-coral-dark)}
+
+  /* ===== featured player + up next ===== */
+  .watch{
+    display:grid; grid-template-columns:minmax(0,2.1fr) minmax(0,1fr); gap:20px;
+    margin-top:20px; align-items:start;
+  }
+  .player{
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow-raised);
+  }
+  .screen{
+    position:relative; aspect-ratio:16/9; overflow:hidden;
+    border-bottom:2px solid var(--orbit-line-strong);
+    background:linear-gradient(150deg,var(--orbit-lavender),var(--orbit-mint) 55%,var(--orbit-coral-soft));
+    display:grid; place-items:center;
+  }
+  .screen .big{
+    font-family:var(--font-display); font-weight:700;
+    font-size:clamp(56px,8vw,110px); color:var(--orbit-ink); opacity:.9;
+  }
+  .play-btn{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:84px; height:60px; display:grid; place-items:center;
+    background:var(--orbit-coral); color:#fff; font-size:24px;
+    border:2px solid var(--orbit-line-strong); box-shadow:5px 5px 0 var(--orbit-coral-dark);
+  }
+  .play-btn:hover{background:var(--orbit-coral-dark)}
+  .live{
+    position:absolute; top:12px; left:12px; display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--font-display); font-size:10px; letter-spacing:.08em;
+    background:var(--orbit-ink); color:#fff; padding:4px 10px;
+    border:2px solid var(--orbit-line-strong);
+  }
+  .live .dot{width:8px; height:8px; border-radius:50%; background:var(--orbit-coral)}
+  .dur{
+    position:absolute; right:10px; bottom:10px;
+    font-family:var(--font-display); font-size:10px;
+    background:var(--orbit-ink); color:var(--orbit-mint);
+    padding:3px 8px; border:2px solid var(--orbit-line-strong);
+  }
+  .progress{
+    position:absolute; left:0; right:0; bottom:0; height:8px;
+    background:rgba(36,26,58,.25); border-top:2px solid var(--orbit-line-strong);
+  }
+  .progress i{display:block; height:100%; width:34%; background:var(--orbit-coral)}
+  .player-info{padding:14px 18px 16px; display:grid; gap:10px}
+  .player-title{font-family:var(--font-display); font-size:17px; font-weight:700}
+  .player-title .accent{color:var(--orbit-coral-dark)}
+  .player-stats{display:flex; flex-wrap:wrap; gap:6px 14px; font-size:12px; color:var(--orbit-muted)}
+  .player-stats .tag{
+    font-family:var(--font-display); font-size:9px; color:var(--orbit-ink);
+    padding:2px 8px; border:2px solid var(--orbit-line-strong); background:var(--orbit-mint);
+  }
+  .channel-row{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    padding-top:10px; border-top:2px solid var(--orbit-line-strong);
+  }
+  .avatar{
+    width:44px; height:44px; flex:none; border-radius:50%;
+    border:2px solid var(--orbit-line-strong); box-shadow:3px 3px 0 var(--orbit-lavender);
+    display:grid; place-items:center; font-family:var(--font-display); font-size:15px;
+  }
+  .channel-row .who{display:grid; line-height:1.35}
+  .channel-row .who b{font-size:14px}
+  .channel-row .who small{font-size:11px; color:var(--orbit-muted)}
+  .sub-btn{
+    margin-left:auto; min-height:44px; padding:10px 16px;
+    font-family:var(--font-display); font-size:11px;
+    background:var(--orbit-ink); color:var(--orbit-mint);
+    border:2px solid var(--orbit-line-strong); box-shadow:3px 3px 0 var(--orbit-coral);
+  }
+  .sub-btn:hover{background:var(--orbit-coral-dark); color:#fff}
+  .react{display:flex; gap:8px; flex-wrap:wrap}
+  .react button{
+    min-height:44px; padding:8px 14px; font-family:var(--font-display); font-size:11px;
+    background:var(--orbit-surface); color:var(--orbit-ink);
+    border:2px solid var(--orbit-line-strong); box-shadow:3px 3px 0 var(--orbit-lavender);
+  }
+  .react button:hover{transform:translate(-1px,-1px)}
+  .react button[aria-pressed="true"]{background:var(--orbit-coral-soft); box-shadow:3px 3px 0 var(--orbit-coral)}
+
+  /* up next column */
+  .upnext{
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow);
+  }
+  .upnext-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 14px; border-bottom:2px solid var(--orbit-line-strong);
+    font-family:var(--font-display); font-size:12px; font-weight:700;
+    background:var(--orbit-lavender);
+  }
+  .upnext-head small{font-size:9px; color:var(--orbit-muted); font-weight:400}
+  .upnext li + li{border-top:2px solid var(--orbit-line-strong)}
+  .next-item{
+    display:grid; grid-template-columns:120px minmax(0,1fr); gap:10px;
+    padding:10px 12px; align-items:center;
+  }
+  .next-item:hover{background:var(--orbit-coral-soft)}
+  .thumb-mini{
+    position:relative; aspect-ratio:16/9; overflow:hidden;
+    border:2px solid var(--orbit-line-strong);
+    display:grid; place-items:center;
+    font-family:var(--font-display); font-size:16px; color:var(--orbit-ink);
+  }
+  .thumb-mini .dur{right:3px; bottom:3px; font-size:8px; padding:1px 5px; border-width:1px}
+  .next-item .t{font-weight:700; font-size:12px; line-height:1.3;
+    display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+  .next-item .s{font-size:10px; color:var(--orbit-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+  .ph--a{background:linear-gradient(160deg,var(--orbit-lavender),var(--orbit-mint))}
+  .ph--b{background:linear-gradient(160deg,var(--orbit-coral-soft),var(--orbit-lavender))}
+  .ph--c{background:linear-gradient(160deg,var(--orbit-mint),var(--orbit-coral-soft))}
+  .ph--d{background:repeating-linear-gradient(45deg,var(--orbit-lavender) 0 12px,var(--orbit-paper-deep) 12px 24px)}
+
+  /* ===== video grid (series as videos) ===== */
+  .section{margin-top:40px}
+  .section-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px}
+  .section-title{
+    font-family:var(--font-display); font-size:16px; letter-spacing:.04em;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-title::before{content:""; width:6px; height:20px; background:var(--orbit-coral); border:2px solid var(--orbit-line-strong)}
+  .section-more{font-family:var(--font-display); font-size:11px; color:var(--orbit-link)}
+  .section-more:hover{text-decoration:underline}
+
+  .vid-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:18px;
+  }
+  .vid{
+    display:flex; flex-direction:column; background:var(--orbit-surface);
+    border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow);
+    overflow:hidden; transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .vid:hover{transform:translateY(-4px); box-shadow:var(--orbit-shadow-raised); z-index:1}
+  .thumb{
+    position:relative; aspect-ratio:16/9; overflow:hidden;
+    border-bottom:2px solid var(--orbit-line-strong);
+    display:grid; place-items:center;
+    font-family:var(--font-display); font-size:36px; color:var(--orbit-ink);
+  }
+  .status{
+    position:absolute; top:8px; left:8px;
+    font-family:var(--font-display); font-size:9px; letter-spacing:.06em;
+    padding:3px 8px; border:2px solid var(--orbit-line-strong); background:var(--orbit-mint);
+  }
+  .status--soon{background:var(--orbit-lavender)}
+  .status--end{background:var(--orbit-coral-soft); color:var(--orbit-coral-dark)}
+  .vid-body{display:flex; gap:10px; padding:10px 12px 12px}
+  .vid-body .avatar{width:36px; height:36px; font-size:12px; box-shadow:2px 2px 0 var(--orbit-lavender)}
+  .vid-body .t{font-weight:700; font-size:13px; line-height:1.3;
+    display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+  .vid-body .s{font-size:11px; color:var(--orbit-muted); line-height:1.4}
+
+  /* ===== channels (artists) ===== */
+  .chan-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px}
+  .chan{
+    display:grid; justify-items:center; gap:6px; text-align:center;
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong);
+    box-shadow:var(--orbit-shadow); padding:18px 12px 14px;
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .chan:hover{transform:translateY(-4px); box-shadow:var(--orbit-shadow-raised)}
+  .chan .avatar{width:76px; height:76px; font-size:24px}
+  .chan .name{font-weight:700; font-size:13px; display:flex; align-items:center; gap:4px}
+  .chan .name .check{
+    width:16px; height:16px; display:inline-grid; place-items:center; flex:none;
+    background:var(--orbit-link); color:#fff; font-size:9px; border:2px solid var(--orbit-line-strong);
+  }
+  .chan .subs{font-size:10px; color:var(--orbit-muted)}
+  .chan .sub-btn{margin:6px 0 0; min-height:44px; width:100%}
+
+  /* ===== playlists (ships) ===== */
+  .pl-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:18px}
+  .pl{
+    position:relative; display:block; background:var(--orbit-surface);
+    border:2px solid var(--orbit-line-strong); box-shadow:var(--orbit-shadow);
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .pl:hover{transform:translateY(-4px); box-shadow:var(--orbit-shadow-raised)}
+  /* stacked playlist backs */
+  .pl::before,.pl::after{
+    content:""; position:absolute; left:10px; right:10px; height:8px;
+    background:var(--orbit-paper-deep); border:2px solid var(--orbit-line-strong);
+  }
+  .pl::before{top:-8px}
+  .pl::after{top:-14px; left:18px; right:18px}
+  .pl-thumb{
+    position:relative; aspect-ratio:16/9; overflow:hidden;
+    border-bottom:2px solid var(--orbit-line-strong);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pl-thumb .face{
+    width:30%; aspect-ratio:1; border-radius:50%; overflow:hidden;
+    border:2px solid var(--orbit-surface);
+    display:grid; place-items:center;
+    font-family:var(--font-display); font-size:18px; color:var(--orbit-ink);
+  }
+  .pl-thumb .face + .face{margin-left:-8%}
+  .pl-thumb .heart{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:30px; height:30px; display:grid; place-items:center;
+    background:var(--orbit-surface); border:2px solid var(--orbit-line-strong); border-radius:50%;
+    color:var(--orbit-coral); font-size:12px;
+  }
+  .pl-count{
+    position:absolute; right:0; top:0; bottom:0; width:34%;
+    display:grid; place-items:center; gap:2px; text-align:center;
+    background:rgba(36,26,58,.85); color:var(--orbit-mint);
+    font-family:var(--font-display); font-size:11px;
+    border-left:2px solid var(--orbit-line-strong);
+  }
+  .pl-count b{font-size:16px}
+  .pl-body{padding:10px 12px 12px; display:grid; gap:2px}
+  .pl-body .t{font-weight:700; font-size:13px}
+  .pl-body .s{font-size:11px; color:var(--orbit-muted)}
+
+  .footer-note{
+    margin-top:56px; text-align:center; font-family:var(--font-display);
+    font-size:11px; letter-spacing:.12em; color:var(--orbit-muted);
+  }
+  .footer-note b{color:var(--orbit-coral-dark)}
+  .ribbon{
+    position:fixed; right:0; bottom:20px; z-index:50;
+    background:var(--orbit-coral); color:#fff; font-family:var(--font-display); font-size:11px;
+    letter-spacing:.1em; padding:8px 14px; border:2px solid var(--orbit-line-strong);
+    border-right:none; box-shadow:-4px 4px 0 var(--orbit-lavender);
+  }
+
+  @media (max-width:900px){
+    .watch{grid-template-columns:1fr}
+    .upnext{order:2}
+  }
+  @media (max-width:639px){
+    .wrap{padding:0 14px 56px}
+    .masthead .search{order:3; flex-basis:100%; max-width:none}
+    .mast-actions .btn--mint{display:none}
+    .vid-grid,.pl-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px}
+    .chan-grid{grid-template-columns:repeat(2,1fr); gap:12px}
+    .next-item{grid-template-columns:104px minmax(0,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ===== MASTHEAD ===== -->
+  <header class="masthead">
+    <a class="logo" href="#" aria-label="GL-Orbit หน้าแรก">
+      <span class="play-mark">▶</span> GL-ORBIT<span style="color:var(--orbit-coral-dark)">TV</span>
+    </a>
+    <form class="search" role="search" onsubmit="return false">
+      <input type="text" placeholder="ค้นหาชื่อเรื่อง นักแสดง คู่จิ้น…" aria-label="ค้นหา">
+      <button class="go" type="submit" aria-label="ค้นหา">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.2-5.2m0 0A7.5 7.5 0 1 0 5.2 5.2a7.5 7.5 0 0 0 10.6 10.6Z"/></svg>
+      </button>
+    </form>
+    <div class="mast-actions">
+      <a class="btn btn--mint" href="#">+ อัปโหลด Moment</a>
+      <a class="btn btn--primary" href="#">เข้าสู่ระบบ</a>
+    </div>
+  </header>
+
+  <!-- ===== TABS + FILTER CHIPS ===== -->
+  <div class="bar">
+    <nav class="tabs" aria-label="หมวดสำรวจ">
+      <a class="tab" href="#" aria-current="page">ซีรีส์ <span class="n">128</span></a>
+      <a class="tab" href="#">นักแสดง <span class="n">46</span></a>
+      <a class="tab" href="#">คู่จิ้น <span class="n">32</span></a>
+    </nav>
+    <span class="sort-note">เรียงตาม: ยอดวิวสูงสุด ▾</span>
+  </div>
+  <div class="filters" role="group" aria-label="กรองสถานะ">
+    <button class="chip" aria-pressed="true">ทั้งหมด</button>
+    <button class="chip" aria-pressed="false">กำลังฉาย</button>
+    <button class="chip" aria-pressed="false">เร็วๆ นี้</button>
+    <button class="chip" aria-pressed="false">จบแล้ว</button>
+    <button class="chip" aria-pressed="false">โรแมนซ์</button>
+    <button class="chip" aria-pressed="false">คอมเมดี้</button>
+    <button class="chip" aria-pressed="false">UNCUT ★</button>
+  </div>
+
+  <!-- ===== FEATURED PLAYER + UP NEXT ===== -->
+  <div class="watch">
+    <section class="player" aria-label="วิดีโอเด่นประจำสัปดาห์">
+      <div class="screen">
+        <span class="big">AI</span>
+        <span class="live"><span class="dot"></span> กำลังฉาย</span>
+        <button class="play-btn" aria-label="เล่นตัวอย่าง AI Girl">▶</button>
+        <span class="dur">1:12:08</span>
+        <div class="progress" aria-hidden="true"><i></i></div>
+      </div>
+      <div class="player-info">
+        <h1 class="player-title">AI GIRL <span class="accent">EP.5</span> — หัวใจที่เธอไม่ได้ตั้งโปรแกรมไว้</h1>
+        <div class="player-stats">
+          <span><b style="color:var(--orbit-ink)">1.2M</b> วิว</span>
+          <span>อัปโหลด 2 วันที่แล้ว</span>
+          <span class="tag">ซับไทย</span>
+          <span class="tag" style="background:var(--orbit-lavender)">2026 · 7 ตอน</span>
+          <span class="tag" style="background:var(--orbit-coral-soft)">Sci-Fi · Romance</span>
+        </div>
+        <p style="margin:0; font-size:13px; color:var(--orbit-muted); max-width:64ch">
+          เมื่อ AI สาวจำลองหลุดออกจากห้องทดลอง เธอต้องมาเรียนรู้คำว่า "หัวใจ" กับวิศวกรสาวผู้สร้างเธอขึ้นมา — ตอนใหม่ทุกวันพุธ 20:00 ทาง YouTube
+        </p>
+        <div class="react" role="group" aria-label="ปฏิกิริยา">
+          <button aria-pressed="true">♥ 48K</button>
+          <button aria-pressed="false">คอมเมนต์ 3.2K</button>
+          <button aria-pressed="false">↗ แชร์</button>
+          <button aria-pressed="false">+ ดูภายหลัง</button>
+        </div>
+        <div class="channel-row">
+          <span class="avatar ph--c" aria-hidden="true">MMY</span>
+          <span class="who"><b>Me Mind Y Official</b><small>ผู้ติดตาม 890K · YouTube</small></span>
+          <button class="sub-btn">ติดตาม</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="upnext" aria-label="ต่อไป">
+      <div class="upnext-head">ต่อไป (Up Next) <small>เล่นอัตโนมัติ ●</small></div>
+      <ul>
+        <li><a class="next-item" href="#">
+          <span class="thumb-mini ph--b">4E<span class="dur">58:12</span></span>
+          <span><span class="t">4 Elements: The Fire EP.4 — ไฟที่ไม่เคยดับ</span><br><span class="s">iQIYI · 856K วิว · 4 วันที่แล้ว</span></span>
+        </a></li>
+        <li><a class="next-item" href="#">
+          <span class="thumb-mini ph--c">M<span class="dur">1:02:40</span></span>
+          <span><span class="t">My Lady's Bodyguard EP.6 — บอดี้การ์ดประจำใจ</span><br><span class="s">YouTube · 640K วิว · 5 วันที่แล้ว</span></span>
+        </a></li>
+        <li><a class="next-item" href="#">
+          <span class="thumb-mini ph--d">IL<span class="dur">TEASER</span></span>
+          <span><span class="t">In Love Forever — Official Teaser (เร็วๆ นี้)</span><br><span class="s">CH3Plus · 312K วิว · 1 สัปดาห์ที่แล้ว</span></span>
+        </a></li>
+        <li><a class="next-item" href="#">
+          <span class="thumb-mini ph--a">CL<span class="dur">49:55</span></span>
+          <span><span class="t">Chasing Love EP.8 — วิ่งตามหัวใจ</span><br><span class="s">Netflix · 2.1M วิว · 2 สัปดาห์ที่แล้ว</span></span>
+        </a></li>
+        <li><a class="next-item" href="#">
+          <span class="thumb-mini ph--b">S<span class="dur">FIN</span></span>
+          <span><span class="t">Shades ตอนจบ — เงาที่เป็นของเรา</span><br><span class="s">WeTV · 1.5M วิว · 1 เดือนที่แล้ว</span></span>
+        </a></li>
+      </ul>
+    </aside>
+  </div>
+
+  <!-- ===== SERIES VIDEO GRID ===== -->
+  <section class="section" aria-label="วิดีโอซีรีส์ทั้งหมด">
+    <div class="section-head">
+      <h2 class="section-title">วิดีโอซีรีส์ทั้งหมด</h2>
+      <a class="section-more" href="#">ดูทั้งหมด →</a>
+    </div>
+    <div class="vid-grid">
+      <a class="vid" href="#">
+        <div class="thumb ph--a">AI<span class="status">กำลังฉาย</span><span class="dur">58:44</span></div>
+        <div class="vid-body"><span class="avatar ph--c">MMY</span>
+          <span><span class="t">AI Girl EP.5 — หัวใจที่เธอไม่ได้ตั้งโปรแกรมไว้</span><br><span class="s">Me Mind Y · 1.2M วิว · 2 วันที่แล้ว</span></span>
+        </div>
+      </a>
+      <a class="vid" href="#">
+        <div class="thumb ph--b">4E<span class="status">กำลังฉาย</span><span class="dur">58:12</span></div>
+        <div class="vid-body"><span class="avatar ph--b">iQ</span>
+          <span><span class="t">4 Elements: The Fire EP.4 — ไฟที่ไม่เคยดับ</span><br><span class="s">iQIYI · 856K วิว · 4 วันที่แล้ว</span></span>
+        </div>
+      </a>
+      <a class="vid" href="#">
+        <div class="thumb ph--c">M<span class="status">กำลังฉาย</span><span class="dur">1:02:40</span></div>
+        <div class="vid-body"><span class="avatar ph--a">CH3</span>
+          <span><span class="t">My Lady's Bodyguard EP.6 — บอดี้การ์ดประจำใจ</span><br><span class="s">YouTube · 640K วิว · 5 วันที่แล้ว</span></span>
+        </div>
+      </a>
+      <a class="vid" href="#">
+        <div class="thumb ph--d">IL<span class="status status--soon">เร็วๆ นี้</span><span class="dur">TEASER</span></div>
+        <div class="vid-body"><span class="avatar ph--d">C3</span>
+          <span><span class="t">In Love Forever — Official Teaser</span><br><span class="s">CH3Plus · 312K วิว · 1 สัปดาห์ที่แล้ว</span></span>
+        </div>
+      </a>
+      <a class="vid" href="#">
+        <div class="thumb ph--a">CL<span class="status status--end">จบแล้ว</span><span class="dur">49:55</span></div>
+        <div class="vid-body"><span class="avatar ph--c">N</span>
+          <span><span class="t">Chasing Love EP.8 — วิ่งตามหัวใจ</span><br><span class="s">Netflix · 2.1M วิว · 2 สัปดาห์ที่แล้ว</span></span>
+        </div>
+      </a>
+      <a class="vid" href="#">
+        <div class="thumb ph--c">S<span class="status status--end">จบแล้ว</span><span class="dur">FIN</span></div>
+        <div class="vid-body"><span class="avatar ph--b">W</span>
+          <span><span class="t">Shades ตอนจบ — เงาที่เป็นของเรา</span><br><span class="s">WeTV · 1.5M วิว · 1 เดือนที่แล้ว</span></span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== CHANNELS (ARTISTS) ===== -->
+  <section class="section" aria-label="ช่องนักแสดงแนะนำ">
+    <div class="section-head">
+      <h2 class="section-title">ช่องนักแสดงแนะนำ</h2>
+      <a class="section-more" href="#">ดูทั้งหมด →</a>
+    </div>
+    <div class="chan-grid">
+      <div class="chan">
+        <span class="avatar ph--c">A</span>
+        <span class="name">Alexis <span class="check" aria-label="ยืนยันแล้ว">✓</span></span>
+        <span class="subs">ผู้ติดตาม 412K · 3 ผลงาน</span>
+        <button class="sub-btn" aria-label="ติดตาม Alexis">ติดตาม</button>
+      </div>
+      <div class="chan">
+        <span class="avatar ph--a">N</span>
+        <span class="name">Nook <span class="check" aria-label="ยืนยันแล้ว">✓</span></span>
+        <span class="subs">ผู้ติดตาม 388K · 3 ผลงาน</span>
+        <button class="sub-btn" aria-label="ติดตาม Nook">ติดตาม</button>
+      </div>
+      <div class="chan">
+        <span class="avatar ph--b">V</span>
+        <span class="name">View <span class="check" aria-label="ยืนยันแล้ว">✓</span></span>
+        <span class="subs">ผู้ติดตาม 520K · 5 ผลงาน</span>
+        <button class="sub-btn" aria-label="ติดตาม View">ติดตาม</button>
+      </div>
+      <div class="chan">
+        <span class="avatar ph--d">J</span>
+        <span class="name">June <span class="check" aria-label="ยืนยันแล้ว">✓</span></span>
+        <span class="subs">ผู้ติดตาม 497K · 5 ผลงาน</span>
+        <button class="sub-btn" aria-label="ติดตาม June">ติดตาม</button>
+      </div>
+      <div class="chan">
+        <span class="avatar ph--c">M</span>
+        <span class="name">Mewnich</span>
+        <span class="subs">ผู้ติดตาม 203K · 2 ผลงาน</span>
+        <button class="sub-btn" aria-label="ติดตาม Mewnich">ติดตาม</button>
+      </div>
+      <div class="chan">
+        <span class="avatar ph--a">J</span>
+        <span class="name">Jaoying</span>
+        <span class="subs">ผู้ติดตาม 178K · 2 ผลงาน</span>
+        <button class="sub-btn" aria-label="ติดตาม Jaoying">ติดตาม</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PLAYLISTS (SHIPS) ===== -->
+  <section class="section" aria-label="เพลย์ลิสต์คู่จิ้น">
+    <div class="section-head">
+      <h2 class="section-title">เพลย์ลิสต์คู่จิ้น</h2>
+      <a class="section-more" href="#">ดูทั้งหมด →</a>
+    </div>
+    <div class="pl-grid" style="margin-top:20px">
+      <a class="pl" href="#">
+        <div class="pl-thumb ph--a">
+          <span class="face ph--c">A</span><span class="face ph--b">N</span><span class="heart">♥</span>
+          <span class="pl-count"><b>24</b>วิดีโอ</span>
+        </div>
+        <div class="pl-body"><span class="t">NookAlexis — รวมโมเมนต์</span><span class="s">3 ผลงานร่วม · อัปเดตล่าสุดเมื่อวาน</span></div>
+      </a>
+      <a class="pl" href="#">
+        <div class="pl-thumb ph--b">
+          <span class="face ph--a">V</span><span class="face ph--d">J</span><span class="heart">♥</span>
+          <span class="pl-count"><b>12</b>วิดีโอ</span>
+        </div>
+        <div class="pl-body"><span class="t">ViewJune — เคมีเกินต้าน</span><span class="s">1 ผลงานร่วม · อัปเดต 3 วันที่แล้ว</span></div>
+      </a>
+      <a class="pl" href="#">
+        <div class="pl-thumb ph--c">
+          <span class="face ph--b">M</span><span class="face ph--a">F</span><span class="heart">♥</span>
+          <span class="pl-count"><b>18</b>วิดีโอ</span>
+        </div>
+        <div class="pl-body"><span class="t">MilkFah — หวานไม่พัก</span><span class="s">2 ผลงานร่วม · อัปเดต 1 สัปดาห์ที่แล้ว</span></div>
+      </a>
+      <a class="pl" href="#">
+        <div class="pl-thumb ph--d">
+          <span class="face ph--c">P</span><span class="face ph--b">K</span><span class="heart">♥</span>
+          <span class="pl-count"><b>31</b>วิดีโอ</span>
+        </div>
+        <div class="pl-body"><span class="t">PraeKwan — คู่จิ้นตำนาน</span><span class="s">4 ผลงานร่วม · อัปเดต 2 สัปดาห์ที่แล้ว</span></div>
+      </a>
+    </div>
+  </section>
+
+  <p class="footer-note">GL-ORBIT <b>TV</b> ★ EXPLORE CONCEPT · VIDEOSHARE Y2K ★ กดติดตามแล้วไปฟินต่อ</p>
+</div>
+
+<div class="ribbon">MOCKUP · VIDEOSHARE Y2K</div>
+
+</body>
+</html>
