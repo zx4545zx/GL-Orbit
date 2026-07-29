@@ -6,12 +6,13 @@
 	import SeriesCastSection from '$lib/components/admin/SeriesCastSection.svelte';
 	import SeriesEpisodesSection from '$lib/components/admin/SeriesEpisodesSection.svelte';
 	import SeriesScheduleSection from '$lib/components/admin/SeriesScheduleSection.svelte';
+	import SeriesVideosSection from '$lib/components/admin/SeriesVideosSection.svelte';
 	import StatusBadge from '$lib/components/admin/StatusBadge.svelte';
 	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
 
-	type TabId = 'main' | 'cast' | 'episodes' | 'schedule';
+	type TabId = 'main' | 'cast' | 'episodes' | 'schedule' | 'videos';
 	let activeTab = $state<TabId>('main');
 	let metadataDirty = $state(false);
 
@@ -19,13 +20,15 @@
 		{ id: 'main', label: 'ข้อมูลหลัก', subtitle: 'Poster, titles, studio', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
 		{ id: 'cast', label: 'นักแสดง', subtitle: 'Cast & role names', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
 		{ id: 'episodes', label: 'ตอน', subtitle: 'Episodes & streaming links', icon: 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-		{ id: 'schedule', label: 'ตารางฉาย', subtitle: 'Weekly broadcast rules', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' }
+		{ id: 'schedule', label: 'ตารางฉาย', subtitle: 'Weekly broadcast rules', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+		{ id: 'videos', label: page.data.lang === 'en' ? 'Videos' : 'วิดีโอ', subtitle: 'Trailers & pilots', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' }
 	];
 
 	function tabCount(id: TabId) {
 		if (id === 'cast') return data.full.artists.length;
 		if (id === 'episodes') return data.full.episodes.length;
 		if (id === 'schedule') return data.full.schedules.length;
+		if (id === 'videos') return data.full.videos.length;
 		return null;
 	}
 	const heroPoster = $derived(data.full.series.posterUrl);
@@ -180,6 +183,8 @@
 						<SeriesEpisodesSection seriesId={data.full.series.id} episodes={data.full.episodes} reference={data.reference} onrefresh={refresh} />
 					{:else if activeTab === 'schedule'}
 						<SeriesScheduleSection seriesId={data.full.series.id} schedules={data.full.schedules} reference={data.reference} onrefresh={refresh} />
+					{:else if activeTab === 'videos'}
+						<SeriesVideosSection seriesId={data.full.series.id} videos={data.full.videos} lang={page.data.lang === 'en' ? 'en' : 'th'} onrefresh={refresh} />
 					{/if}
 				{/key}
 			</div>

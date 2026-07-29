@@ -1,5 +1,6 @@
 import { adminFetch } from './action-feedback.js';
-import type { ApiResult } from './editor-types.js';
+import type { ApiResult, SeriesVideo } from './editor-types.js';
+import type { SeriesVideoType } from '$lib/series-videos/registry.js';
 
 async function req<T = unknown>(url: string, options?: RequestInit): Promise<ApiResult<T>> {
 	try {
@@ -10,7 +11,8 @@ async function req<T = unknown>(url: string, options?: RequestInit): Promise<Api
 		});
 		const json = await res.json().catch(() => ({}));
 		if (!res.ok) {
-			return { ok: false, error: (json as { error?: string }).error ?? `HTTP ${res.status}` };
+			const failure = json as { error?: string; code?: ApiResult['code'] };
+			return { ok: false, error: failure.error ?? `HTTP ${res.status}`, code: failure.code };
 		}
 		return { ok: true, data: json as T };
 	} catch {
@@ -32,6 +34,17 @@ export const editorApi = {
 		req(`/api/admin/series/${seriesId}/gallery`, { method: 'PUT', body: JSON.stringify({ imageIds }) }),
 	removeGalleryImage: (seriesId: string, imageId: string) =>
 		req(`/api/admin/series/${seriesId}/gallery/${imageId}`, { method: 'DELETE' }),
+	addSeriesVideo: (seriesId: string, body: {
+		type: SeriesVideoType; titleTh: string; titleEn: string; youtubeUrl: string;
+	}) => req<{ success: true; data: SeriesVideo }>(`/api/admin/series/${seriesId}/videos`, {
+		method: 'POST', body: JSON.stringify(body)
+	}),
+	reorderSeriesVideos: (seriesId: string, type: SeriesVideoType, videoIds: string[]) =>
+		req<{ success: true }>(`/api/admin/series/${seriesId}/videos`, {
+			method: 'PUT', body: JSON.stringify({ type, videoIds })
+		}),
+	removeSeriesVideo: (seriesId: string, seriesVideoId: string) =>
+		req<{ success: true }>(`/api/admin/series/${seriesId}/videos/${seriesVideoId}`, { method: 'DELETE' }),
 
 	// ── นักแสดง (cast) ──────────────────────────────────
 	addArtist: (seriesId: string, artistId: string, roleName: string | null) =>

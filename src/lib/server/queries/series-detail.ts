@@ -1,9 +1,11 @@
 import { eq, and, isNull, asc, inArray } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { getDb } from '$lib/server/db/index.js';
-import { series, studios, artists, seriesArtists, episodes, episodeSchedules, platforms, genres, seriesGenres, seriesGalleryImages, ships, shipSeries, studioSocials } from '$lib/server/db/schema.js';
+import { series, studios, artists, seriesArtists, episodes, episodeSchedules, platforms, genres, seriesGenres, seriesGalleryImages, seriesVideos, ships, shipSeries, studioSocials } from '$lib/server/db/schema.js';
 import { getCached, setCached } from '$lib/server/cache.js';
 import { formatThailandDate } from '$lib/server/timezone.js';
+import { isSeriesVideoType, sortSeriesVideosByRegistry } from '$lib/series-videos/registry.js';
+import type { SeriesVideoType } from '$lib/series-videos/registry.js';
 
 const CACHE_TTL = 30_000;
 
@@ -26,6 +28,7 @@ export type SeriesDetail = {
 	platforms: { name: string; logo: string | null }[];
 	artists: { id: string; name: string; role: string; image: string }[];
 	gallery: { id: string; imageUrl: string; caption: string | null }[];
+	videos: PublicSeriesVideo[];
 	ships: { id: string; slug: string; name: string; imageUrl: string; artist1Name: string; artist1Image: string; artist2Name: string; artist2Image: string }[];
 	schedule: {
 		episode: number;
@@ -35,6 +38,16 @@ export type SeriesDetail = {
 		schedules: { title: string | null; airDate: string; platform: string; platformLogo: string | null; streamLink: string | null; isUncut: boolean }[];
 	}[];
 	nextEpisode: { episode: number; title: string; airDateIso: string } | null;
+};
+
+export type PublicSeriesVideo = {
+	id: string;
+	type: SeriesVideoType;
+	youtubeUrl: string;
+	youtubeVideoId: string;
+	titleTh: string;
+	titleEn: string;
+	sortOrder: number;
 };
 
 type ScheduleRow = {
@@ -111,6 +124,21 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		.from(seriesGalleryImages)
 		.where(eq(seriesGalleryImages.seriesId, id))
 		.orderBy(asc(seriesGalleryImages.sortOrder), asc(seriesGalleryImages.createdAt));
+
+	const videosPromise = db
+		.select({
+			id: seriesVideos.id,
+			type: seriesVideos.type,
+			youtubeUrl: seriesVideos.youtubeUrl,
+			youtubeVideoId: seriesVideos.youtubeVideoId,
+			titleTh: seriesVideos.titleTh,
+			titleEn: seriesVideos.titleEn,
+			sortOrder: seriesVideos.sortOrder,
+			createdAt: seriesVideos.createdAt
+		})
+		.from(seriesVideos)
+		.where(eq(seriesVideos.seriesId, id))
+		.orderBy(asc(seriesVideos.sortOrder), asc(seriesVideos.createdAt), asc(seriesVideos.id));
 
 	const episodesWithSchedulePromise = (async () => {
 		const episodesResult = await db
@@ -193,11 +221,12 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 			.where(eq(studioSocials.studioId, seriesRow.studioId));
 	})();
 
-	const [seriesResult, artistsResult, genresResult, galleryResult, episodesWithSchedule, shipsResult, studioSocialsResult] = await Promise.all([
+	const [seriesResult, artistsResult, genresResult, galleryResult, videosResult, episodesWithSchedule, shipsResult, studioSocialsResult] = await Promise.all([
 		seriesPromise,
 		artistsPromise,
 		genresPromise,
 		galleryPromise,
+		videosPromise,
 		episodesWithSchedulePromise,
 		shipsPromise,
 		studioSocialsPromise
@@ -209,6 +238,9 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 
 	const episodesResult = episodesWithSchedule.episodes;
 	const scheduleResult = episodesWithSchedule.schedule;
+	const videos = sortSeriesVideosByRegistry(
+		videosResult.filter((video): video is typeof video & { type: SeriesVideoType } => isSeriesVideoType(video.type))
+	).map(({ createdAt: _createdAt, ...video }) => video);
 
 	// --- group-by instead of first-wins ---
 	const scheduleMap = new Map<string, ScheduleRow[]>();
@@ -280,6 +312,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 			image: a.profileImageUrl ?? '/placeholders/avatar.svg'
 		})),
 		gallery: galleryResult,
+		videos,
 		ships: shipsResult.map((ship) => ({
 			id: ship.id,
 			slug: ship.slug,

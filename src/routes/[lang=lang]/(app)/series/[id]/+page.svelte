@@ -6,6 +6,7 @@
 	import Picture from '$lib/components/Picture.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import WatchedButton from '$lib/components/WatchedButton.svelte';
+	import SeriesVideoPlayer from '$lib/components/series/SeriesVideoPlayer.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import { latestMomentsHref } from '$lib/moments/latest-moments.js';
@@ -68,6 +69,7 @@
 
 	const officialGalleryCandidates = $derived(
 		series.gallery.map((image, index) => ({
+			key: `gallery:${image.id}`,
 			src: image.imageUrl,
 			alt: image.caption ?? `${series.titleEn} gallery ${index + 1}`,
 			caption: image.caption ?? ''
@@ -77,6 +79,7 @@
 		series.schedule
 			.filter((item) => Boolean(item.coverUrl))
 			.map((item) => ({
+				key: `episode:${item.episode}:cover`,
 				src: item.coverUrl as string,
 				alt: m.series_episode_cover_alt({ episode: item.episode }),
 				caption: `EP ${item.episode} · ${item.title}`
@@ -104,7 +107,6 @@
 	let activatedTrailers = $state(new Set<number>());
 	let initializedSeriesId = $state<string | null>(null);
 	let descriptionExpanded = $state(false);
-	let activeVideoTab = $state<'trailer' | 'pilot'>('trailer');
 
 	const episodeHasContent = $derived(
 		new Set(
@@ -128,7 +130,6 @@
 			expandedEpisodes = new Set<number>();
 			activatedTrailers = new Set<number>();
 			descriptionExpanded = false;
-			activeVideoTab = 'trailer';
 			initializedSeriesId = series.id;
 		}
 	});
@@ -442,31 +443,7 @@
 			</section>
 		{/if}
 
-		<!-- VIDEOS: TRAILER + PILOT (mock placeholders; no DB fields yet) -->
-		<section aria-labelledby="sd-video-heading">
-			<div class="sd-sec-head">
-				<span class="sd-tag">VID</span>
-				<h2 id="sd-video-heading">{m.series_detail_trailer()} &amp; {m.series_detail_pilot()}</h2>
-				<span class="sd-line"></span>
-				<span class="sd-soon">{m.series_detail_video_placeholder()}</span>
-			</div>
-			<div class="sd-vid-tabs" role="tablist" aria-label={m.series_detail_trailer()}>
-				<button class="sd-vid-tab" role="tab" aria-selected={activeVideoTab === 'trailer'} onclick={() => (activeVideoTab = 'trailer')}>▶ {m.series_detail_trailer()}</button>
-				<button class="sd-vid-tab" role="tab" aria-selected={activeVideoTab === 'pilot'} onclick={() => (activeVideoTab = 'pilot')}>▶ {m.series_detail_pilot()}</button>
-			</div>
-			<div class="sd-video-row">
-				<div class="sd-video-card" role="tabpanel" hidden={activeVideoTab !== 'trailer'}>
-					<span class="sd-empty">{m.series_detail_video_placeholder()}</span>
-					<div class="sd-screen"><div class="sd-play orbit-round-data" aria-hidden="true">▶</div></div>
-					<div class="sd-bar"><span>OFFICIAL_TRAILER.MP4</span><span>--:--</span></div>
-				</div>
-				<div class="sd-video-card" role="tabpanel" hidden={activeVideoTab !== 'pilot'}>
-					<span class="sd-empty">{m.series_detail_video_placeholder()}</span>
-					<div class="sd-screen"><div class="sd-play orbit-round-data" aria-hidden="true">▶</div></div>
-					<div class="sd-bar"><span>PILOT_EP0.MP4</span><span>--:--</span></div>
-				</div>
-			</div>
-		</section>
+		<SeriesVideoPlayer videos={series.videos} lang={currentLang} />
 
 		<!-- GALLERY (Splide) -->
 		{#if galleryCandidates.length > 0}
@@ -479,7 +456,7 @@
 				<div class="sd-splide splide" bind:this={gallerySplideEl} aria-roledescription="carousel">
 					<div class="splide__track">
 						<div class="splide__list">
-							{#each galleryCandidates as image, index (image.src)}
+							{#each galleryCandidates as image, index (image.key)}
 								<div class="splide__slide">
 									<figure class="sd-g-item">
 										<span class="sd-g-num orbit-round-data" aria-hidden="true">{index + 1}</span>
@@ -888,17 +865,6 @@
 		height: var(--orbit-border-width);
 		background: linear-gradient(90deg, var(--orbit-line-strong), var(--orbit-line), transparent);
 	}
-	.sd-soon {
-		font-size: 9.5px;
-		font-weight: var(--orbit-font-label-weight);
-		color: var(--orbit-warning);
-		background: var(--orbit-surface);
-		border: var(--orbit-border-width) dashed var(--orbit-warning);
-		border-radius: var(--orbit-radius-badge);
-		padding: 2px 7px;
-		white-space: nowrap;
-	}
-
 	/* ============ COUNTDOWN (LED cells) ============ */
 	.sd-countdown {
 		display: flex;
@@ -1073,54 +1039,6 @@
 		overflow: hidden;
 		position: relative;
 	}
-	.sd-screen {
-		aspect-ratio: 16 / 9;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background:
-			repeating-linear-gradient(0deg, color-mix(in srgb, var(--orbit-paper) 6%, transparent) 0 2px, transparent 2px 5px),
-			radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--orbit-lavender) 35%, var(--orbit-rail)) 0%, var(--orbit-rail) 78%);
-	}
-	.sd-play {
-		width: 62px;
-		height: 62px;
-		border-radius: 50%;
-		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-focus);
-		background: var(--orbit-coral);
-		color: #fff;
-		font-size: 20px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: var(--orbit-shadow-accent);
-	}
-	.sd-bar {
-		background: var(--orbit-surface);
-		border-top: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
-		font-size: 10.5px;
-		font-weight: var(--orbit-font-label-weight);
-		letter-spacing: var(--orbit-font-letter-spacing);
-		padding: 7px 10px;
-		display: flex;
-		justify-content: space-between;
-		text-transform: uppercase;
-		color: var(--orbit-muted);
-	}
-	.sd-empty {
-		position: absolute;
-		top: 8px;
-		left: 8px;
-		z-index: 2;
-		font-size: 9.5px;
-		font-weight: var(--orbit-font-label-weight);
-		color: var(--orbit-warning);
-		background: var(--orbit-surface);
-		border: var(--orbit-border-width) dashed var(--orbit-warning);
-		border-radius: var(--orbit-radius-badge);
-		padding: 2px 7px;
-	}
-
 	/* ============ SPLIDE SCROLLERS ============ */
 	.sd-splide { overflow-x: clip; }
 	/* splide core hides uninitialized sliders; SSR markup should stay visible */

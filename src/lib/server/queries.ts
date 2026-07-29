@@ -10,10 +10,13 @@ import {
 	episodeSchedules,
 	seriesSchedules,
 	seriesGalleryImages,
+	seriesVideos,
 	platforms
 } from './db/schema.js';
 import type { Db } from './db/index.js';
 import { formatThailandDateTime } from './timezone.js';
+import { isSeriesVideoType, sortSeriesVideosByRegistry } from '$lib/series-videos/registry.js';
+import type { SeriesVideo } from '$lib/admin/editor-types.js';
 
 /**
  * ดึงข้อมูลซีรีส์ทั้งหมดในครั้งเดียว พร้อมความสัมพันธ์ทุกอย่าง
@@ -128,6 +131,25 @@ export async function getSeriesFull(db: Db, id: string) {
 		.where(eq(seriesGalleryImages.seriesId, id))
 		.orderBy(asc(seriesGalleryImages.sortOrder), asc(seriesGalleryImages.createdAt));
 
+	const rawVideoRows = await db
+		.select({
+			id: seriesVideos.id,
+			seriesId: seriesVideos.seriesId,
+			type: seriesVideos.type,
+			youtubeUrl: seriesVideos.youtubeUrl,
+			youtubeVideoId: seriesVideos.youtubeVideoId,
+			titleTh: seriesVideos.titleTh,
+			titleEn: seriesVideos.titleEn,
+			sortOrder: seriesVideos.sortOrder,
+			createdAt: seriesVideos.createdAt
+		})
+		.from(seriesVideos)
+		.where(eq(seriesVideos.seriesId, id))
+		.orderBy(asc(seriesVideos.sortOrder), asc(seriesVideos.createdAt), asc(seriesVideos.id));
+	const videoRows = sortSeriesVideosByRegistry(
+		rawVideoRows.filter((video): video is SeriesVideo => isSeriesVideoType(video.type))
+	);
+
 	// weekly schedules (recurring)
 	const schedRows = await db
 		.select({
@@ -159,6 +181,7 @@ export async function getSeriesFull(db: Db, id: string) {
 		genres: genreRows,
 		artists: artistRows,
 		gallery: galleryRows,
+		videos: videoRows,
 		episodes: episodesOut,
 		schedules: schedRows
 	};

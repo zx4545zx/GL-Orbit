@@ -59,6 +59,7 @@
 - `src/lib/server/queries/series-detail.ts` — add one independent ordered video query and `SeriesDetail.videos`.
 - `src/lib/admin/editor-types.ts` — add shared editor-facing video types and API error code.
 - `src/lib/admin/editor-api.ts` — add typed video mutation methods and preserve stable error codes.
+- `src/lib/components/ConfirmDialog.svelte` — consume the existing shared accessible destructive-confirmation dialog unchanged.
 - `src/routes/[lang=lang]/admin/series/[id]/+page.svelte` — add top-level Videos tab/count and manager component.
 - `src/routes/[lang=lang]/(app)/series/[id]/+page.svelte` — replace mock video section/state with `SeriesVideoPlayer` and retain episode trailer logic.
 - `messages/th.json` — Thai video manager/player copy.
@@ -437,7 +438,7 @@ Expected: PASS; every method has an independent ADMIN assertion and stable safe 
 **Interfaces:**
 - Produces editor methods `addSeriesVideo(seriesId, body)`, `reorderSeriesVideos(seriesId, type, videoIds)`, and `removeSeriesVideo(seriesId, seriesVideoId)`.
 - Produces component props `{ seriesId: string; videos: SeriesVideo[]; lang: 'th' | 'en'; onrefresh: () => void | Promise<void> }`.
-- Consumes `SERIES_VIDEO_TYPES`, `seriesVideoTypeLabel`, `SeriesVideo`, `editorApi`, `ConfirmDialog`, and Paraglide `m`.
+- Consumes `SERIES_VIDEO_TYPES`, `seriesVideoTypeLabel`, `SeriesVideo`, `editorApi`, the existing `$lib/components/ConfirmDialog.svelte`, and Paraglide `m`.
 
 - [ ] **Step 1: Extend API result parsing and write component tests**
 
@@ -479,7 +480,7 @@ Add identical keys in both message files for: videos heading/description/count, 
 
 - [ ] **Step 4: Implement Svelte 5 manager state**
 
-Use `$props`, `$state`, and `$derived`; do not use `export let`. Keep four add-form states unchanged until successful POST. Track `addPending`, `pendingType`, and `pendingDeleteId` separately so only affected controls disable. Derive registry-ordered groups from props; construct reorder IDs from the current type group only. Use `ConfirmDialog` instead of a raw browser confirm so confirmation/focus behavior is testable and localized.
+Use `$props`, `$state`, and `$derived`; do not use `export let`. Keep four add-form states unchanged until successful POST. Track `addPending`, `pendingType`, and `pendingDeleteId` separately so only affected controls disable. Derive registry-ordered groups from props; construct reorder IDs from the current type group only. Reuse the existing `$lib/components/ConfirmDialog.svelte` instead of creating another dialog or using a raw browser confirm, so confirmation/focus behavior remains consistent, testable, and localized.
 
 - [ ] **Step 5: Implement rectangular accessible markup**
 

@@ -1,3 +1,5 @@
+import type { SeriesVideoType } from '$lib/series-videos/registry.js';
+
 export type SeriesStatus = 'UPCOMING' | 'ONGOING' | 'ENDED';
 
 export interface StudioRef {
@@ -83,12 +85,34 @@ export interface SeriesGalleryImage {
 	createdAt: Date;
 }
 
+export interface SeriesVideo {
+	id: string;
+	seriesId: string;
+	type: SeriesVideoType;
+	youtubeUrl: string;
+	youtubeVideoId: string;
+	titleTh: string;
+	titleEn: string;
+	sortOrder: number;
+	createdAt: Date;
+}
+
+export type SeriesVideoErrorCode =
+	| 'INVALID_TYPE'
+	| 'INVALID_TITLE'
+	| 'INVALID_YOUTUBE_URL'
+	| 'DUPLICATE_VIDEO'
+	| 'INVALID_REORDER'
+	| 'SERIES_NOT_FOUND'
+	| 'VIDEO_NOT_FOUND';
+
 export interface SeriesFull {
 	series: SeriesCore;
 	studio: StudioRef | null;
 	genres: GenreRef[];
 	artists: CastMember[];
 	gallery: SeriesGalleryImage[];
+	videos: SeriesVideo[];
 	episodes: Episode[];
 	schedules: WeeklySchedule[];
 }
@@ -97,4 +121,5 @@ export interface ApiResult<T = unknown> {
 	ok: boolean;
 	data?: T;
 	error?: string;
+	code?: SeriesVideoErrorCode;
 }

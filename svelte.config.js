@@ -4,6 +4,11 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: vitePreprocess(),
+	vitePlugin: {
+		experimental: {
+			disableSvelteResolveWarnings: true
+		}
+	},
 	kit: {
 		// Inline the global CSS bundle to remove the render-blocking stylesheet
 		// request flagged by Lighthouse on the initial document. The bundle is

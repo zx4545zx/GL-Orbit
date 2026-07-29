@@ -1,12 +1,16 @@
 import { readFileSync } from 'node:fs';
 import { getTableConfig } from 'drizzle-orm/pg-core';
 import { describe, expect, it } from 'vitest';
-import { currencies, subscriptionBudgets, subscriptionPayments, userSubscriptions } from './schema.js';
+import { currencies, series, seriesVideos, subscriptionBudgets, subscriptionPayments, userSubscriptions } from './schema.js';
 
 const schema = readFileSync(new URL('./schema.ts', import.meta.url), 'utf8');
 const migration = readFileSync(new URL('../../../../drizzle/0019_free_captain_america.sql', import.meta.url), 'utf8');
 const currencyMigration = readFileSync(
 	new URL('../../../../drizzle/0025_subscription_currency_catalog.sql', import.meta.url),
+	'utf8'
+);
+const seriesVideosMigration = readFileSync(
+	new URL('../../../../drizzle/0027_series_videos.sql', import.meta.url),
 	'utf8'
 );
 
@@ -69,5 +73,38 @@ describe('subscription schema', () => {
 		expect(currencyMigration.indexOf('WITH "legacy_codes" AS')).toBeLessThan(
 			currencyMigration.indexOf('ADD CONSTRAINT "subscription_budgets_currency_currencies_code_fk"')
 		);
+	});
+});
+
+describe('series videos schema', () => {
+	it('defines the additive child table contract', () => {
+		const config = getTableConfig(seriesVideos);
+		expect(config.columns.map(({ name }) => name)).toEqual([
+			'id', 'series_id', 'type', 'youtube_url', 'youtube_video_id', 'title_th',
+			'title_en', 'sort_order', 'created_at'
+		]);
+		const column = (name: string) => config.columns.find((item) => item.name === name)!;
+		expect(column('id')).toMatchObject({ primary: true, notNull: true, hasDefault: true });
+		for (const name of config.columns.map(({ name }) => name)) expect(column(name).notNull).toBe(true);
+		expect(column('type').getSQLType()).toBe('varchar(32)');
+		expect(column('youtube_video_id').getSQLType()).toBe('varchar(32)');
+		expect(column('title_th').getSQLType()).toBe('varchar(255)');
+		expect(column('title_en').getSQLType()).toBe('varchar(255)');
+		expect(column('sort_order').hasDefault).toBe(true);
+		expect(column('created_at').getSQLType()).toBe('timestamp with time zone');
+		expect(config.foreignKeys.some((key) => key.reference().foreignTable === series && key.onDelete === 'cascade')).toBe(true);
+		expect(config.uniqueConstraints.some((item) => item.name === 'series_videos_series_video_unique')).toBe(true);
+		expect(config.indexes.some((item) => item.config.name === 'series_videos_order_idx')).toBe(true);
+		expect(config.checks).toHaveLength(0);
+	});
+
+	it('keeps migration additive and scoped to series videos', () => {
+		expect(seriesVideosMigration).toContain('CREATE TABLE "series_videos"');
+		expect(seriesVideosMigration).toContain('ON DELETE cascade');
+		expect(seriesVideosMigration).toContain('series_videos_series_video_unique');
+		expect(seriesVideosMigration).toContain('series_videos_order_idx');
+		for (const forbidden of ['ALTER TABLE "series"', 'ALTER TABLE "episodes"', '\nUPDATE ', 'DELETE FROM', 'INSERT INTO', 'trailer_url', 'DROP']) {
+			expect(seriesVideosMigration).not.toContain(forbidden);
+		}
 	});
 });

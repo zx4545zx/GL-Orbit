@@ -257,6 +257,21 @@ export const seriesGalleryImages = pgTable('series_gallery_images', {
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });
 
+export const seriesVideos = pgTable('series_videos', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
+	type: varchar('type', { length: 32 }).notNull(),
+	youtubeUrl: text('youtube_url').notNull(),
+	youtubeVideoId: varchar('youtube_video_id', { length: 32 }).notNull(),
+	titleTh: varchar('title_th', { length: 255 }).notNull(),
+	titleEn: varchar('title_en', { length: 255 }).notNull(),
+	sortOrder: integer('sort_order').notNull().default(0),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({
+	seriesVideoUnique: unique('series_videos_series_video_unique').on(table.seriesId, table.youtubeVideoId),
+	orderedReadIndex: index('series_videos_order_idx').on(table.seriesId, table.type, table.sortOrder, table.createdAt)
+}));
+
 export const seriesArtists = pgTable('series_artists', {
 	seriesId: uuid('series_id').notNull().references(() => series.id, { onDelete: 'cascade' }),
 	artistId: uuid('artist_id').notNull().references(() => artists.id, { onDelete: 'cascade' }),

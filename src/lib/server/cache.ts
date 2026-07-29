@@ -22,6 +22,10 @@ export function setCached<T>(key: string, value: T, ttlMs: number = 30000): void
 	});
 }
 
+export function deleteCached(key: string): boolean {
+	return cache.delete(key);
+}
+
 export function clearCache(): void {
 	cache.clear();
 }
