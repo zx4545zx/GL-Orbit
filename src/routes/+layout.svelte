@@ -29,6 +29,8 @@
 </script>
 
 <svelte:head>
+	<link rel="preconnect" href="https://cdn.gl-orbit.com" crossorigin="anonymous" />
+	<link rel="dns-prefetch" href="https://cdn.gl-orbit.com" />
 	<meta name="application-name" content={SITE_NAME} />
 	<meta name="apple-mobile-web-app-title" content={SITE_NAME} />
 	<meta property="og:site_name" content={SITE_NAME} />

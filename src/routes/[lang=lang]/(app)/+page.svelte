@@ -137,7 +137,7 @@
 			<a href="/{page.data.lang}/series/{nextOnAir.seriesId}" class="zine-card zine-countdown">
 				<div class="zine-countdown-main">
 					<span class="zine-countdown-poster">
-						<Picture src={nextOnAir.poster} type="posters" sizes="(max-width: 639px) 15rem, 9.5rem" alt={nextOnAir.title} width={384} height={512} loading="eager" class="zine-countdown-img" />
+						<Picture src={nextOnAir.poster} type="posters" sizes="(max-width: 639px) 15rem, 9.5rem" alt={nextOnAir.title} width={384} height={512} loading="eager" fetchpriority="high" class="zine-countdown-img" />
 					</span>
 					<div class="zine-countdown-body">
 						<div class="zine-countdown-top">
@@ -198,7 +198,7 @@
 			{#each featuredSeries as series, i (series.id)}
 				<a href="/{page.data.lang}/series/{series.id}" class="zine-polaroid group">
 					<div class="relative aspect-[3/4] overflow-hidden bg-[var(--orbit-ink)]">
-						<Picture src={series.poster} type="posters" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" alt={series.title} width={400} height={533} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} class="h-full w-full object-cover transition duration-500 group-hover:opacity-90" />
+						<Picture src={series.poster} type="posters" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" alt={series.title} width={400} height={533} loading={i < 2 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} class="h-full w-full object-cover transition duration-500 group-hover:opacity-90" />
 						<div class="absolute left-2 top-2">
 							<span class="orbit-badge px-2 py-1 text-[10px] font-bold {statusConfig[series.status].class}">{statusConfig[series.status].text}</span>
 						</div>
