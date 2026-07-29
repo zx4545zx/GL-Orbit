@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import sharp from 'sharp';
-import { generateVariants, getOrientedImageDimensions } from './sharp.js';
+import { generateVariants } from './sharp.js';
 
 // synthetic 2000x2000 jpeg — no fixture file needed
 async function synthInput(): Promise<Buffer> {
@@ -19,6 +19,38 @@ describe('generateVariants', () => {
 		expect(variants.filter((v) => v.ext === 'avif')).toHaveLength(3);
 		expect(variants.filter((v) => v.ext === 'webp')).toHaveLength(3);
 		expect(variants.filter((v) => v.ext === 'jpg')).toHaveLength(3);
+	});
+
+	it('produces exactly six new cover outputs without 1800 variants', async () => {
+		const variants = await generateVariants(await synthInput(), 'covers');
+		expect(variants).toHaveLength(6);
+		expect([...new Set(variants.map((v) => v.width))]).toEqual([960, 1440]);
+		expect(variants.some((v) => v.width === 1800)).toBe(false);
+	});
+
+	it.each([
+		['portrait JPEG', 60, 180, 'jpeg'],
+		['portrait PNG', 60, 180, 'png'],
+		['portrait WebP', 60, 180, 'webp'],
+		['square JPEG', 80, 80, 'jpeg'],
+		['square PNG', 80, 80, 'png'],
+		['square WebP', 80, 80, 'webp'],
+		['ultra-wide JPEG', 300, 30, 'jpeg'],
+		['ultra-wide PNG', 300, 30, 'png'],
+		['ultra-wide WebP', 300, 30, 'webp'],
+		['very small JPEG', 8, 12, 'jpeg'],
+		['very small PNG', 8, 12, 'png'],
+		['very small WebP', 8, 12, 'webp']
+	] as const)('processes %s covers regardless of source geometry', async (_label, width, height, format) => {
+		const input = await sharp({ create: { width, height, channels: 3, background: '#c4b5fd' } })
+			.toFormat(format)
+			.toBuffer();
+		const variants = await generateVariants(input, 'covers');
+		expect(variants.map((variant) => variant.width)).toEqual([960, 960, 960, 1440, 1440, 1440]);
+	});
+
+	it('rejects bytes that Sharp cannot decode', async () => {
+		await expect(generateVariants(Buffer.from('not an image'), 'covers')).rejects.toThrow();
 	});
 
 	it('generates exactly the configured widths regardless of source size', async () => {
@@ -40,10 +72,4 @@ describe('generateVariants', () => {
 		}
 	});
 
-	it('reads source dimensions for cover validation', async () => {
-		const landscape = await sharp({ create: { width: 2560, height: 1440, channels: 3, background: '#c4b5fd' } })
-			.jpeg()
-			.toBuffer();
-		expect(await getOrientedImageDimensions(landscape)).toEqual({ width: 2560, height: 1440 });
-	});
 });

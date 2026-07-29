@@ -23,7 +23,16 @@ describe('Moment R2 cleanup', () => {
 });
 
 describe('Cover R2 cleanup', () => {
-	it('deletes all nine cover variants', async () => {
+	it('deletes six variants for a new 1440 cover', async () => {
+		const remove = vi.fn().mockResolvedValue(undefined);
+		await deleteImageVariants(`images/covers/${id}/1440.jpg`, remove);
+		expect(remove).toHaveBeenCalledTimes(6);
+		expect(remove).toHaveBeenCalledWith(`images/covers/${id}/960.avif`);
+		expect(remove).toHaveBeenCalledWith(`images/covers/${id}/1440.jpg`);
+		expect(remove).not.toHaveBeenCalledWith(`images/covers/${id}/1800.jpg`);
+	});
+
+	it('deletes all nine variants for a legacy 1800 cover', async () => {
 		const remove = vi.fn().mockResolvedValue(undefined);
 		await deleteImageVariants(`images/covers/${id}/1800.jpg`, remove);
 		expect(remove).toHaveBeenCalledTimes(9);

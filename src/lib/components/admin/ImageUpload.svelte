@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Picture from '$lib/components/Picture.svelte';
-	import { COVER_IMAGE_REQUIREMENTS, getCoverDimensionError } from '$lib/images/config.js';
+	import { IMAGE_VARIANTS } from '$lib/images/config.js';
 	import { getMediaDisplay, type MediaPurpose } from '$lib/images/display.js';
 
 	let {
@@ -29,7 +29,7 @@
 	const ACCEPT_ATTRIBUTE = 'image/jpeg,image/png,image/webp';
 	const MAX_FILE_SIZE = 5 * 1024 * 1024;
 	const MAX_UPLOAD_SIZE = 4 * 1024 * 1024;
-	const effectiveMaxWidth = $derived(maxWidth ?? (purpose === 'cover' ? COVER_IMAGE_REQUIREMENTS.minWidth : 1200));
+	const effectiveMaxWidth = $derived(maxWidth ?? (purpose === 'cover' ? IMAGE_VARIANTS.covers.fallback : 1200));
 	const effectiveQuality = $derived(quality ?? (purpose === 'cover' ? 0.9 : 0.85));
 
 	function clearError() {
@@ -48,16 +48,6 @@
 
 			img.onload = () => {
 				URL.revokeObjectURL(objectUrl);
-				const sourceWidth = img.naturalWidth || img.width;
-				const sourceHeight = img.naturalHeight || img.height;
-				if (purpose === 'cover') {
-					const dimensionError = getCoverDimensionError(sourceWidth, sourceHeight);
-					if (dimensionError) {
-						reject(new Error(dimensionError));
-						return;
-					}
-				}
-
 				const canvas = document.createElement('canvas');
 				const ctx = canvas.getContext('2d');
 				if (!ctx) {
@@ -242,7 +232,7 @@
 	{/if}
 
 	{#if purpose === 'cover'}
-		<p class="text-[10px] leading-relaxed text-plum-light">ภาพแนวนอน 16:9–21:9 · กว้างอย่างน้อย {COVER_IMAGE_REQUIREMENTS.minWidth} px · JPEG, PNG, WebP สูงสุด 5 MB</p>
+		<p class="text-[10px] leading-relaxed text-plum-light">รองรับ JPEG, PNG, WebP · ไฟล์ต้นฉบับสูงสุด 5 MB · บีบอัดอัตโนมัติ</p>
 	{:else}
 		<p class="text-[10px] text-plum-light">รองรับ JPEG, PNG, WebP · ไฟล์ต้นฉบับสูงสุด 5 MB · บีบอัดอัตโนมัติ</p>
 	{/if}

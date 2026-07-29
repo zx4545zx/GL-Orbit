@@ -20,16 +20,6 @@ export async function generateVariants(input: Buffer, type: ImageType): Promise<
 	return variants;
 }
 
-export async function getOrientedImageDimensions(input: Buffer): Promise<{ width: number; height: number }> {
-	const metadata = await sharp(input).metadata();
-	if (!metadata.width || !metadata.height) return { width: 0, height: 0 };
-
-	const swapsAxes = metadata.orientation !== undefined && metadata.orientation >= 5 && metadata.orientation <= 8;
-	return swapsAxes
-		? { width: metadata.height, height: metadata.width }
-		: { width: metadata.width, height: metadata.height };
-}
-
 async function encode(img: ReturnType<typeof sharp>, ext: ImageExt, type: ImageType): Promise<Buffer> {
 	const cover = type === 'covers';
 	if (ext === 'avif') return img.avif({ quality: cover ? 62 : 50, effort: 4 }).toBuffer();

@@ -1,11 +1,11 @@
 import 'dotenv/config';
 import { AwsClient } from 'aws4fetch';
-import { generateVariants, getOrientedImageDimensions, type Variant } from './images/sharp.js';
+import { generateVariants, type Variant } from './images/sharp.js';
 import {
 	IMAGE_VARIANTS,
+	LEGACY_COVER_WIDTHS,
 	buildVariantKey,
 	buildVariantUrl,
-	getCoverDimensionError,
 	mimeForExt,
 	type ImageExt,
 	type ImageType
@@ -107,11 +107,13 @@ async function deleteObject(key: string): Promise<void> {
 
 /** Best-effort cleanup for an image whose database persistence failed after R2 upload. */
 export async function deleteImageVariants(canonicalKey: string, remove: (key: string) => Promise<void> = deleteObject): Promise<void> {
-	const match = /^images\/(posters|covers|profiles|moments)\/([0-9a-f-]{36})\/\d+\.jpg$/.exec(canonicalKey);
+	const match = /^images\/(posters|covers|profiles|moments)\/([0-9a-f-]{36})\/(\d+)\.jpg$/.exec(canonicalKey);
 	if (!match) return;
-	const [, rawType, id] = match;
+	const [, rawType, id, sourceWidth] = match;
 	const type = rawType as ImageType;
-	const keys = IMAGE_VARIANTS[type].widths.flatMap((width) =>
+	const configuredWidths = type === 'covers' ? LEGACY_COVER_WIDTHS : IMAGE_VARIANTS[type].widths;
+	const widths = configuredWidths.filter((width) => width <= Number(sourceWidth));
+	const keys = widths.flatMap((width) =>
 		IMAGE_VARIANTS[type].formats.map((ext) => buildVariantKey(type, id, width, ext))
 	);
 	await Promise.allSettled(keys.map((key) => remove(key)));
@@ -165,11 +167,6 @@ export async function uploadImage(
 	}
 
 	const input = Buffer.from(await file.arrayBuffer());
-	if (type === 'covers') {
-		const { width, height } = await getOrientedImageDimensions(input);
-		const dimensionError = getCoverDimensionError(width, height);
-		if (dimensionError) throw new ImageUploadValidationError(dimensionError);
-	}
 	const variants = await generateVariants(input, type);
 	const id = crypto.randomUUID();
 
