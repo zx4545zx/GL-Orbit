@@ -45,6 +45,15 @@ describe('shared responsive navigation boundary', () => {
 		expect(navigation).not.toContain('fixed top-');
 	});
 
+	it('keeps the homepage topbar and hides it only on non-home mobile routes', () => {
+		expect(navigation).toContain('page.url.pathname === `/${page.data.lang}`');
+		expect(navigation).toContain('page.url.pathname === `/${page.data.lang}/`');
+		expect(navigation).toContain('class:shell-topbar-mobile-hidden={!isHomepage}');
+		expect(css).toMatch(
+			/@media \(max-width: 767px\)[\s\S]*\.shell-topbar-mobile-hidden\s*\{\s*display: none;/
+		);
+	});
+
 	it('keeps both nav bars token-driven without legacy palette classes', () => {
 		for (const source of [bottomNav, navigation]) {
 			expect(source).toContain('var(--orbit-');

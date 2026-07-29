@@ -10,6 +10,9 @@ import Picture from './Picture.svelte';
 
 	const currentUser = $derived(page.data.user);
 	const unreadNotifications = useUnreadNotifications();
+	const isHomepage = $derived(
+		page.url.pathname === `/${page.data.lang}` || page.url.pathname === `/${page.data.lang}/`
+	);
 
 	const navLinks = $derived.by(() => {
 		const links = [
@@ -59,7 +62,7 @@ import Picture from './Picture.svelte';
 
 <svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
 
-<header class="shell-topbar">
+<header class="shell-topbar" class:shell-topbar-mobile-hidden={!isHomepage}>
 	<!-- Centered zine brand topbar -->
 	<div>
 		<a href="/{page.data.lang}/" class="zine-brand touch-target text-2xl sm:text-3xl" data-sveltekit-preload-data="hover">GL Orbit</a>

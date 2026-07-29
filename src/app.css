@@ -1301,6 +1301,10 @@ h1, h2, h3 {
 }
 
 @media (max-width: 767px) {
+  .shell-topbar-mobile-hidden {
+    display: none;
+  }
+
   .shell-controls {
     display: none;
   }
