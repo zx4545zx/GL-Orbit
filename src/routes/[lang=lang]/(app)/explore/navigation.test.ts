@@ -54,6 +54,10 @@ describe('Explore in-place query navigation', () => {
 		expect(source.match(/class="xp-rail-more" href="\{langPrefix\}\/explore\?view=(series|artists|ships)" onclick=\{\(event\) => navigateQuery\(event, `\$\{langPrefix\}\/explore\?view=\1`\)\}/g)).toHaveLength(3);
 	});
 
+	it('keys upcoming schedule cards by the unique schedule record', () => {
+		expect(source).toContain('{#each data.upcoming as item (item.id)}');
+	});
+
 	it('normalizes absolute form targets before skipping an unchanged search', () => {
 		expect(source).toContain('const normalizedTarget = new URL(target, page.url);');
 		expect(source).toContain('const destination = normalizedTarget.pathname + normalizedTarget.search;');

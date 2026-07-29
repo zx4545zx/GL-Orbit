@@ -8,6 +8,7 @@ export interface FeaturedSeriesItem {
 }
 
 export interface UpcomingScheduleItem {
+	id: string;
 	day: string;
 	time: string;
 	series: string;

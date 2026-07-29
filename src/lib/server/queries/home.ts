@@ -8,6 +8,24 @@ import type { HomeApiResponse } from '$lib/types/home.js';
 
 const CACHE_TTL = 30_000;
 
+interface UpcomingScheduleIdentity {
+	seriesId: string;
+	episodeNumber: number;
+	platformId: string;
+	airDate: Date;
+	isUncut: boolean;
+}
+
+export function dedupeUpcomingScheduleRows<T extends UpcomingScheduleIdentity>(rows: T[]): T[] {
+	const seen = new Set<string>();
+	return rows.filter((row) => {
+		const key = `${row.seriesId}::${row.episodeNumber}::${row.airDate.getTime()}::${row.platformId}::${row.isUncut}`;
+		if (seen.has(key)) return false;
+		seen.add(key);
+		return true;
+	});
+}
+
 export async function getHomeData(lang: 'th' | 'en' = 'th'): Promise<HomeApiResponse> {
 	const CACHE_KEY = `query:home:${lang}`;
 	const cached = getCached<HomeApiResponse>(CACHE_KEY, CACHE_TTL);
@@ -36,6 +54,8 @@ export async function getHomeData(lang: 'th' | 'en' = 'th'): Promise<HomeApiResp
 			.limit(8),
 		db
 			.select({
+				id: episodeSchedules.id,
+				platformId: episodeSchedules.platformId,
 				airDate: episodeSchedules.airDate,
 				isUncut: episodeSchedules.isUncut,
 				episodeNumber: episodes.episodeNumber,
@@ -56,7 +76,7 @@ export async function getHomeData(lang: 'th' | 'en' = 'th'): Promise<HomeApiResp
 				isNull(series.deletedAt)
 			))
 			.orderBy(asc(episodeSchedules.airDate))
-			.limit(4),
+			.limit(100),
 		db
 			.select({
 				id: episodeSchedules.id,
@@ -101,12 +121,13 @@ export async function getHomeData(lang: 'th' | 'en' = 'th'): Promise<HomeApiResp
 			status: s.status,
 			studio: s.studioName ?? 'ไม่ระบุสตูดิโอ'
 		})),
-		upcomingSchedule: upcomingSchedules.map((s) => {
+		upcomingSchedule: dedupeUpcomingScheduleRows(upcomingSchedules).slice(0, 4).map((s) => {
 			const d = toThailandTime(s.airDate);
 			const hours = String(d.getUTCHours()).padStart(2, '0');
 			const minutes = String(d.getUTCMinutes()).padStart(2, '0');
 			const timeStr = `${hours}:${minutes}`;
 			return {
+				id: s.id,
 				day: dayFormatter.format(d).replace(/\.$/, ''),
 				time: timeStr,
 				series: s.seriesTitleEn,
