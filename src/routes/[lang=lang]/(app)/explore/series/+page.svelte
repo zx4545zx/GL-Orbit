@@ -19,7 +19,7 @@
 	import type { SeriesListItem, SeriesStatusFilter } from '$lib/server/series/listing.js';
 	import SeriesPosterCard from '$lib/components/SeriesPosterCard.svelte';
 
-	let { data }: { data: PageData } = $props();
+	let { data, embedded = false, basePath, view }: { data: Pick<PageData, 'series' | 'filters'>; embedded?: boolean; basePath?: string; view?: string } = $props();
 
 	const statusConfig: Record<string, { text: string; class: string }> = {
 		ONGOING: { text: m.status_ongoing(), class: 'bg-mint/20 text-mint-dark' },
@@ -73,10 +73,11 @@
 
 	function buildUrl(search: string, status: SeriesStatusFilter): string {
 		const params = new URLSearchParams();
+		if (view) params.set('view', view);
 		if (search.trim()) params.set('search', search.trim());
 		if (status !== 'ALL') params.set('status', status.toLowerCase());
 		const query = params.toString();
-		const base = `/${page.data.lang}/explore/series`;
+		const base = basePath ?? `/${page.data.lang}/explore/series`;
 		return query ? `${base}?${query}` : base;
 	}
 
@@ -158,6 +159,7 @@
 </script>
 
 <svelte:head>
+	{#if !embedded}
 	<title>{SEO_TITLE}</title>
 	<meta name="description" content={SEO_DESCRIPTION} />
 	<meta name="robots" content="index, follow" />
@@ -173,10 +175,11 @@
 	<meta name="twitter:title" content={SEO_TITLE} />
 	<meta name="twitter:description" content={SEO_DESCRIPTION} />
 	{@html jsonLdScript(jsonLd)}
+	{/if}
 </svelte:head>
 
 <!-- Search + Filter -->
-<div class="flex flex-col gap-3 max-w-xl mx-auto mb-6 sm:mb-8">
+{#if !embedded}<div class="flex flex-col gap-3 max-w-xl mx-auto mb-6 sm:mb-8">
 	<div class="orbit-surface rounded-xl flex items-center px-4 py-3 gap-3 transition-all duration-200">
 		<svg class="w-5 h-5 text-plum-light flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
 		<input type="text" bind:value={searchQuery} oninput={scheduleSearchUpdate} placeholder={m.series_search_placeholder()} aria-label={m.series_search_label()} class="flex-1 bg-transparent text-plum placeholder:text-plum-light/50 focus:outline-none text-sm sm:text-base" />
@@ -199,7 +202,7 @@
 			{/each}
 		</div>
 	</div>
-</div>
+</div>{/if}
 
 <!-- Grid -->
 <div class="grid grid-cols-2 min-[440px]:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5" aria-busy={loading}>

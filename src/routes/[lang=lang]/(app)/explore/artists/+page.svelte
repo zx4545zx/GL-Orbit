@@ -20,7 +20,7 @@
 	import type { PageData } from './$types.js';
 	import type { ArtistListItem } from '$lib/server/queries/artist-list.js';
 
-	let { data }: { data: PageData } = $props();
+	let { data, embedded = false, basePath, view }: { data: Pick<PageData, 'artists' | 'filters'>; embedded?: boolean; basePath?: string; view?: string } = $props();
 
 	let extraArtists = $state<ArtistListItem[]>([]);
 	let searchQuery = $state('');
@@ -55,9 +55,10 @@
 
 	function buildUrl(search: string): string {
 		const params = new URLSearchParams();
+		if (view) params.set('view', view);
 		if (search.trim()) params.set('search', search.trim());
 		const query = params.toString();
-		const base = `/${page.data.lang}/explore/artists`;
+		const base = basePath ?? `/${page.data.lang}/explore/artists`;
 		return query ? `${base}?${query}` : base;
 	}
 
@@ -113,6 +114,7 @@
 </script>
 
 <svelte:head>
+	{#if !embedded}
 	<title>{SEO_TITLE}</title>
 	<meta name="description" content={SEO_DESCRIPTION} />
 	<meta name="robots" content="index, follow" />
@@ -128,12 +130,13 @@
 	<meta name="twitter:title" content={SEO_TITLE} />
 	<meta name="twitter:description" content={SEO_DESCRIPTION} />
 	{@html jsonLdScript(jsonLd)}
+	{/if}
 </svelte:head>
 
 <!-- Search -->
-<div class="mb-6 sm:mb-8">
+{#if !embedded}<div class="mb-6 sm:mb-8">
 	<ListingSearch bind:value={searchQuery} placeholder={m.artist_search_placeholder()} ariaLabel={m.artist_search_label()} oninput={scheduleSearchUpdate} onclear={clearSearch} />
-</div>
+</div>{/if}
 
 <!-- Artist Grid -->
 <div class="grid grid-cols-2 min-[440px]:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5" aria-busy={loading}>

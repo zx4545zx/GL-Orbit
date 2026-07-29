@@ -1,9 +1,13 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
 	import Picture from '$lib/components/Picture.svelte';
+	import SeriesResults from './series/+page.svelte';
+	import ArtistResults from './artists/+page.svelte';
+	import ShipResults from './ships/+page.svelte';
 	import '@splidejs/splide/css/core';
 
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import {
 		DEFAULT_OG_IMAGE,
@@ -38,6 +42,82 @@
 	]));
 
 	const heroes = $derived(data.heroes);
+	const mode = $derived(data.mode);
+	const activeSearchMode = $derived(mode === 'artists' || mode === 'ships' ? mode : 'series');
+	let searchQuery = $state('');
+	let loadingToast = $state(false);
+	let navigationRevision = 0;
+	let searchTimer: ReturnType<typeof setTimeout> | undefined;
+	let loadingToastTimer: ReturnType<typeof setTimeout> | undefined;
+	const LOADING_TOAST_MIN_DURATION = 500;
+
+	async function navigateTo(target: string, replaceState = false) {
+		const normalizedTarget = new URL(target, page.url);
+		const destination = normalizedTarget.pathname + normalizedTarget.search;
+		if (destination === page.url.pathname + page.url.search) return;
+		const revision = ++navigationRevision;
+		const startedAt = Date.now();
+		clearTimeout(loadingToastTimer);
+		loadingToast = true;
+		try {
+			if (replaceState) {
+				await goto(destination, { replaceState: true, noScroll: true, keepFocus: true });
+			} else {
+				await goto(destination, { noScroll: true, keepFocus: true });
+			}
+		} finally {
+			if (revision !== navigationRevision) return;
+			const remaining = LOADING_TOAST_MIN_DURATION - (Date.now() - startedAt);
+			if (remaining > 0) loadingToastTimer = setTimeout(() => loadingToast = false, remaining);
+			else loadingToast = false;
+		}
+	}
+
+	function clearSearchTimer() {
+		clearTimeout(searchTimer);
+		searchTimer = undefined;
+	}
+
+	function buildSearchUrl(search: string): string {
+		const params = new URLSearchParams();
+		params.set('view', activeSearchMode);
+		if (search.trim()) params.set('search', search.trim());
+		if (activeSearchMode === 'series' && data.seriesFilters.status !== 'ALL') {
+			params.set('status', data.seriesFilters.status.toLowerCase());
+		}
+		return `${langPrefix}/explore?${params.toString()}`;
+	}
+
+	function updateSearchUrl(search: string) {
+		void navigateTo(buildSearchUrl(search), true);
+	}
+
+	function scheduleSearchUpdate() {
+		clearSearchTimer();
+		searchTimer = setTimeout(() => {
+			searchTimer = undefined;
+			updateSearchUrl(searchQuery);
+		}, 500);
+	}
+
+	$effect(() => {
+		searchQuery = activeSearchMode === 'artists' ? data.artistFilters.search
+			: activeSearchMode === 'ships' ? data.shipFilters.search
+			: data.seriesFilters.search;
+	});
+
+	function navigateQuery(event: MouseEvent, target: string) {
+		if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+		event.preventDefault();
+		clearSearchTimer();
+		void navigateTo(target);
+	}
+
+	function submitSearch(event: SubmitEvent) {
+		event.preventDefault();
+		clearSearchTimer();
+		updateSearchUrl(searchQuery);
+	}
 
 	function heroDescriptionOf(detail: (typeof data.heroes)[number]['detail']): string {
 		return (currentLang === 'th' ? detail.descriptionTh : detail.descriptionEn) || detail.descriptionEn || detail.descriptionTh;
@@ -103,10 +183,11 @@
 			const canLoop = (count: number, perPage: number) => count >= perPage * 2;
 
 			if (heroSplideEl) {
-				heroSplide = new Splide(heroSplideEl, {
-					type: canLoop(heroes.length, 1) ? 'loop' : 'slide',
-					rewind: true,
-					perPage: 1,
+					heroSplide = new Splide(heroSplideEl, {
+						type: canLoop(heroes.length, 1) ? 'loop' : 'slide',
+						rewind: true,
+						autoplay: true,
+						perPage: 1,
 					arrows: false,
 					pagination: false,
 					speed: 600,
@@ -143,8 +224,21 @@
 		})();
 		return () => {
 			disposed = true;
+			clearSearchTimer();
+			clearTimeout(loadingToastTimer);
 			for (const s of mounted) s.destroy();
 		};
+	});
+
+	$effect(() => {
+		if (mode !== 'overview') return;
+		queueMicrotask(() => {
+			heroSplide?.go(0);
+			for (const splide of railSplides) {
+				splide?.refresh();
+				splide?.go(0);
+			}
+		});
 	});
 
 	const statusLabel: Record<string, () => string> = {
@@ -154,16 +248,17 @@
 	};
 
 	const tabs = $derived([
-		{ id: 'series', href: `${langPrefix}/explore/series`, label: m.nav_series() },
-		{ id: 'artists', href: `${langPrefix}/explore/artists`, label: m.nav_artists() },
-		{ id: 'ships', href: `${langPrefix}/explore/ships`, label: m.nav_ships() }
+		{ id: 'series', href: mode === 'series' ? `${langPrefix}/explore` : `${langPrefix}/explore?view=series`, label: m.nav_series() },
+		{ id: 'artists', href: mode === 'artists' ? `${langPrefix}/explore` : `${langPrefix}/explore?view=artists`, label: m.nav_artists() },
+		{ id: 'ships', href: mode === 'ships' ? `${langPrefix}/explore` : `${langPrefix}/explore?view=ships`, label: m.nav_ships() }
 	]);
 
+	const statusSearchParam = $derived(searchQuery.trim() ? `&search=${encodeURIComponent(searchQuery.trim())}` : '');
 	const statusChips = $derived([
-		{ key: 'ALL', label: m.filter_all(), href: `${langPrefix}/explore/series` },
-		{ key: 'ONGOING', label: currentLang === 'en' ? 'Airing' : m.status_ongoing(), href: `${langPrefix}/explore/series?status=ongoing` },
-		{ key: 'UPCOMING', label: currentLang === 'en' ? 'Soon' : m.status_upcoming(), href: `${langPrefix}/explore/series?status=upcoming` },
-		{ key: 'ENDED', label: m.status_ended(), href: `${langPrefix}/explore/series?status=ended` }
+		{ key: 'ALL', label: m.filter_all(), href: `${langPrefix}/explore?view=series${statusSearchParam}` },
+		{ key: 'ONGOING', label: currentLang === 'en' ? 'Airing' : m.status_ongoing(), href: `${langPrefix}/explore?view=series&status=ongoing${statusSearchParam}` },
+		{ key: 'UPCOMING', label: currentLang === 'en' ? 'Soon' : m.status_upcoming(), href: `${langPrefix}/explore?view=series&status=upcoming${statusSearchParam}` },
+		{ key: 'ENDED', label: m.status_ended(), href: `${langPrefix}/explore?view=series&status=ended${statusSearchParam}` }
 	]);
 
 	// Posters for the upcoming rail: reuse countdown/featured posters by series id.
@@ -285,12 +380,6 @@
 			</div>
 			{#if heroes.length > 1}
 			<div class="xp-hero-nav">
-				<button
-					type="button"
-					class="xp-hero-arrow"
-					aria-label={m.explore_hero_prev_slide()}
-					onclick={() => goToSlide(activeSlide - 1)}
-				>←</button>
 				<div class="xp-hero-dots" role="group" aria-label={m.explore_hero_badge()}>
 					{#each heroes as slide, i (slide.detail.id)}
 						<button
@@ -303,12 +392,6 @@
 						></button>
 					{/each}
 				</div>
-				<button
-					type="button"
-					class="xp-hero-arrow"
-					aria-label={m.explore_hero_next_slide()}
-					onclick={() => goToSlide(activeSlide + 1)}
-				>→</button>
 			</div>
 		{/if}
 	</section>
@@ -316,25 +399,49 @@
 
 	<!-- ===== tabs + search + filters ===== -->
 	<div class="xp-bar">
-		<nav class="xp-tabs" aria-label={m.nav_explore()}>
-			{#each tabs as tab (tab.id)}
-				<a class="xp-tab" href={tab.href} data-sveltekit-preload-data="hover">
-					{tab.label}
-				</a>
-			{/each}
-		</nav>
-		<form class="xp-search" role="search" action="{langPrefix}/explore/series" method="get">
+		<div class="xp-nav-controls">
+			<a class="xp-overview" class:xp-overview--active={mode === 'overview'} href={`${langPrefix}/explore`} aria-current={mode === 'overview' ? 'page' : undefined} data-sveltekit-preload-data="hover" onclick={(event) => navigateQuery(event, `${langPrefix}/explore`)}>
+				{currentLang === 'en' ? 'Overview' : 'ภาพรวม'}
+			</a>
+			<nav class="xp-tabs" aria-label={m.nav_explore()}>
+				{#each tabs as tab (tab.id)}
+					<a class="xp-tab" class:xp-tab--active={mode === tab.id} href={tab.href} aria-current={mode === tab.id ? 'page' : undefined} data-sveltekit-preload-data="hover" onclick={(event) => navigateQuery(event, tab.href)}>
+						{tab.label}
+					</a>
+				{/each}
+			</nav>
+		</div>
+		<form class="xp-search" role="search" action="{langPrefix}/explore" method="get" onsubmit={submitSearch}>
+			<input type="hidden" name="view" value={mode === 'artists' || mode === 'ships' ? mode : 'series'} />
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.2-5.2m0 0A7.5 7.5 0 1 0 5.2 5.2a7.5 7.5 0 0 0 10.6 10.6Z"/></svg>
-			<input type="text" name="search" placeholder={m.explore_search_placeholder()} aria-label={m.explore_search_submit()} />
+			<input type="text" name="search" bind:value={searchQuery} oninput={scheduleSearchUpdate} placeholder={m.explore_search_placeholder()} aria-label={m.explore_search_submit()} />
 		</form>
 	</div>
+	{#if mode === 'series'}
 	<div class="xp-filters" role="group" aria-label={m.filter_all()}>
 		{#each statusChips as chip (chip.key)}
-			<a class="xp-chip" href={chip.href} data-sveltekit-preload-data="hover">{chip.label}</a>
+			<a class="xp-chip" href={chip.href} aria-current={data.seriesFilters.status === chip.key ? 'true' : undefined} data-sveltekit-preload-data="hover" onclick={(event) => navigateQuery(event, chip.href)}>{chip.label}</a>
 		{/each}
 	</div>
+	{/if}
+
+	{#if mode === 'series' && data.seriesResults}
+		<SeriesResults data={{ series: data.seriesResults, filters: data.seriesFilters }} embedded basePath={`${langPrefix}/explore`} view="series" />
+	{:else if mode === 'artists' && data.artistResults}
+		<ArtistResults data={{ artists: data.artistResults, filters: data.artistFilters }} embedded basePath={`${langPrefix}/explore`} view="artists" />
+	{:else if mode === 'ships' && data.shipResults}
+		<ShipResults data={{ ships: data.shipResults, filters: data.shipFilters }} embedded basePath={`${langPrefix}/explore`} view="ships" />
+	{/if}
+
+	{#if loadingToast}
+		<div role="status" aria-live="polite" class="fixed inset-x-4 bottom-20 z-[60] mx-auto flex w-fit items-center gap-2 rounded-full bg-plum px-4 py-3 text-sm font-medium text-white shadow-lg shadow-plum/25 md:bottom-6">
+			<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+			{m.common_loading()}
+		</div>
+	{/if}
 
 	<!-- ===== rail: airing soon ===== -->
+	<div hidden={mode !== 'overview'}>
 	{#if data.upcoming.length > 0}
 		<section class="xp-rail" aria-label={m.explore_rail_upcoming()}>
 			<div class="xp-rail-head">
@@ -376,7 +483,7 @@
 				<h2 class="xp-rail-title">{m.explore_rail_top10()}</h2>
 				<div class="xp-rail-tools">
 					{@render railArrows(1, data.top10.length, 3, 4)}
-					<a class="xp-rail-more" href="{langPrefix}/explore/series">{m.explore_view_all()} →</a>
+					<a class="xp-rail-more" href="{langPrefix}/explore?view=series" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=series`)}>{m.explore_view_all()} →</a>
 				</div>
 			</div>
 			<div class="xp-rail-scroll xp-rail-scroll--top10 splide" bind:this={railSplideEls[1]}>
@@ -413,7 +520,7 @@
 				<h2 class="xp-rail-title">{m.explore_rail_artists()}</h2>
 				<div class="xp-rail-tools">
 					{@render railArrows(2, data.artists.length, 4, 6)}
-					<a class="xp-rail-more" href="{langPrefix}/explore/artists">{m.explore_view_all()} →</a>
+					<a class="xp-rail-more" href="{langPrefix}/explore?view=artists" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=artists`)}>{m.explore_view_all()} →</a>
 				</div>
 			</div>
 			<div class="xp-rail-scroll xp-rail-scroll--avatars splide" bind:this={railSplideEls[2]}>
@@ -444,7 +551,7 @@
 				<h2 class="xp-rail-title">{m.explore_rail_ships()}</h2>
 				<div class="xp-rail-tools">
 					{@render railArrows(3, data.ships.length, 3, 4)}
-					<a class="xp-rail-more" href="{langPrefix}/explore/ships">{m.explore_view_all()} →</a>
+					<a class="xp-rail-more" href="{langPrefix}/explore?view=ships" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=ships`)}>{m.explore_view_all()} →</a>
 				</div>
 			</div>
 			<div class="xp-rail-scroll splide" bind:this={railSplideEls[3]}>
@@ -485,13 +592,14 @@
 			{/each}
 		</div>
 	{/if}
+	</div>
 </div>
 
 <style>
 	.xp {
 		max-width: 72rem;
 		margin: 0 auto;
-		padding: 16px 0 64px;
+		padding: 0 0 64px;
 	}
 
 	/* ===== hero (full-bleed carousel) ===== */
@@ -575,6 +683,7 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		object-position: center top;
 		display: block;
 	}
 	/* framed poster on the side (desktop only) */
@@ -730,25 +839,6 @@
 		gap: 14px;
 		max-width: calc(100% - 24px);
 	}
-	.xp-hero-arrow {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-width: 44px;
-		min-height: 44px;
-		font-family: var(--orbit-font-display);
-		font-size: 16px;
-		background: var(--orbit-surface);
-		color: var(--orbit-ink);
-		border: var(--orbit-border-width) solid var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-control);
-		box-shadow: var(--orbit-shadow);
-		cursor: pointer;
-		transition: transform 0.08s ease, box-shadow 0.08s ease;
-	}
-	.xp-hero-arrow:hover:not(:disabled) { transform: translate(-1px, -1px); box-shadow: var(--orbit-shadow-raised); }
-	.xp-hero-arrow:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: none; }
-	.xp-hero-arrow:disabled { opacity: 0.45; cursor: not-allowed; }
 	.xp-hero-dots {
 		display: flex;
 		align-items: center;
@@ -780,7 +870,6 @@
 		background: var(--orbit-coral);
 		border-color: var(--orbit-coral);
 	}
-	.xp-hero-arrow:focus-visible,
 	.xp-hero-dot:focus-visible,
 	.xp-rail-arrow:focus-visible {
 		outline: 3px solid var(--orbit-coral);
@@ -796,7 +885,40 @@
 		justify-content: space-between;
 		margin: 32px 0 10px;
 	}
+	.xp-nav-controls {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+		max-width: 100%;
+	}
+	.xp-overview {
+		display: inline-flex;
+		flex: 0 0 auto;
+		align-items: center;
+		justify-content: center;
+		min-height: 44px;
+		padding: 10px 14px;
+		font-family: var(--orbit-font-display);
+		font-size: 12px;
+		font-weight: 700;
+		line-height: normal;
+		color: var(--orbit-ink);
+		text-decoration: none;
+		white-space: nowrap;
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: 0;
+		box-shadow: var(--orbit-shadow);
+	}
+	.xp-overview:hover { color: var(--orbit-coral); text-decoration: none; }
+	.xp-overview--active { background: var(--orbit-coral-soft); color: var(--orbit-ink); }
+	.xp-overview:focus-visible {
+		outline: 2px solid var(--orbit-coral);
+		outline-offset: 2px;
+	}
 	.xp-tabs {
+		min-width: 0;
 		display: inline-flex;
 		max-width: 100%;
 		overflow-x: auto;
@@ -828,6 +950,7 @@
 	}
 	.xp-tab:last-child { border-right: none; }
 	.xp-tab:hover { color: var(--orbit-coral); text-decoration: none; }
+	.xp-tab--active { background: var(--orbit-coral-soft); color: var(--orbit-ink); }
 	.xp-search {
 		display: flex;
 		align-items: center;
@@ -856,11 +979,15 @@
 	}
 	.xp-search input::placeholder { color: var(--orbit-muted); }
 	.xp-filters {
-		display: flex;
-		gap: 8px;
+		display: inline-flex;
+		max-width: 100%;
 		overflow-x: auto;
-		padding: 4px 0 10px;
+		margin: 4px 0 10px;
 		scrollbar-width: none;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: 0;
+		background: var(--orbit-surface);
+		box-shadow: var(--orbit-shadow);
 	}
 	.xp-filters::-webkit-scrollbar { display: none; }
 	.xp-chip {
@@ -868,24 +995,26 @@
 		display: inline-flex;
 		align-items: center;
 		min-height: 44px;
-		padding: 8px 16px;
+		padding: 10px 16px;
 		text-decoration: none;
-		background: var(--orbit-surface);
 		color: var(--orbit-ink);
-		border: var(--orbit-border-width) solid var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-badge);
-		box-shadow: var(--orbit-shadow);
-		transition: transform 0.08s ease;
+		border-right: var(--orbit-border-width) solid var(--orbit-line);
+		white-space: nowrap;
 	}
-	.xp-chip:hover { transform: translate(-1px, -1px); color: var(--orbit-coral); text-decoration: none; }
+	.xp-chip:last-child { border-right: none; }
+	.xp-chip:hover { color: var(--orbit-coral); text-decoration: none; }
 	.xp-chip:focus-visible {
 		outline: 2px solid var(--orbit-coral);
-		outline-offset: 2px;
+		outline-offset: -2px;
 	}
 	.xp-chip:active {
 		background: var(--orbit-coral-soft);
 		color: var(--orbit-coral-dark);
-		transform: none;
+	}
+	.xp-chip[aria-current='true'] { background: var(--orbit-coral-soft); color: var(--orbit-ink); }
+	@media (max-width: 420px) {
+		.xp-filters { display: flex; }
+		.xp-chip { flex: 1 1 0; justify-content: center; padding-inline: 6px; }
 	}
 
 	/* ===== rails ===== */
@@ -933,8 +1062,11 @@
 	/* track padding lives inside the clip box so hover shadows stay visible;
 	   negative margins cancel the extra box size */
 	.xp-rail-scroll :global(.splide__track) {
-		padding: 14px 14px 24px;
-		margin: -14px -14px -24px;
+		/* The track is the viewport. A 4px internal shadow reserve keeps card
+		   decoration intact while overflow clipping rejects adjacent slides/clones. */
+		padding: 14px 4px 24px !important;
+		margin: -14px 12px -24px;
+		overflow-x: hidden;
 	}
 	/* Responsive pre-init widths mirror Splide to limit hydration movement. */
 	.xp-rail-scroll :global(.splide__slide) { flex: 0 0 auto; width: calc((100% - 54px) / 4); }
@@ -954,6 +1086,21 @@
 		gap: 6px;
 	}
 	@media (min-width: 1024px) {
+		.xp-hero-splide,
+		.xp-hero-splide :global(.splide__track),
+		.xp-hero-splide :global(.splide__list),
+		.xp-hero-slide,
+		.xp-hero-cover,
+		.xp-hero-cover :global(picture),
+		.xp-hero-cover :global(img) { height: min(calc(100vw / 3), 480px); }
+		/* Keep desktop cards 8px inside the content shell. The outer viewport reserves
+		   14px for intact borders/shadows, but clips before the 18px slide gap ends. */
+		.xp-rail { margin-inline: 8px; }
+		.xp-rail-scroll { margin-inline: -14px; }
+		.xp-rail-scroll :global(.splide__track) {
+			padding-inline: 4px !important;
+			margin-inline: 10px;
+		}
 		.xp-rail-arrows--desktop { display: inline-flex; }
 	}
 	@media (min-width: 640px) and (max-width: 1023px) {
@@ -962,9 +1109,8 @@
 		.xp-rail { margin-inline: 8px; }
 		.xp-rail-scroll { margin-inline: -24px; }
 		.xp-rail-scroll :global(.splide__track) {
-			padding-inline: 0;
-			margin-inline: 24px;
-			overflow: visible;
+			padding-inline: 4px !important;
+			margin-inline: 20px;
 		}
 		.xp-rail-arrows--tablet { display: inline-flex; }
 		.xp-rail-scroll :global(.splide__slide) { width: calc((100% - 36px) / 3); }
@@ -1242,19 +1388,17 @@
 
 	/* ===== responsive ===== */
 	@media (max-width: 639px) {
-		.xp { padding-top: 12px; }
-		/* Let moving slides use the gutter without changing the 16px resting edge. */
+		/* Keep cards on the 16px mobile edge with the same clipped shadow reserve. */
 		.xp-rail-scroll { margin-inline: -16px; }
 		.xp-rail-scroll :global(.splide__track) {
-			padding-inline: 0;
-			margin-inline: 16px;
-			overflow: visible;
+			padding-inline: 4px !important;
+			margin-inline: 12px;
+			overflow-x: hidden;
 		}
 		.xp-hero-slide { min-height: 440px; }
 		.xp-hero-frame { padding: 64px 18px 84px; }
 		.xp-hero-title { overflow-wrap: anywhere; }
 		.xp-hero-nav { width: calc(100% - 24px); justify-content: center; gap: 0; }
-		.xp-hero-arrow { display: none; }
 		.xp-hero-dots { justify-content: flex-start; }
 		.xp-hero-ghost { font-size: clamp(130px, 44vw, 220px); top: 34%; right: -4%; }
 		.xp-hero-side { right: 18px; bottom: auto; top: 16px; }
@@ -1300,6 +1444,6 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.xp-btn, .xp-chip, .xp-card, .xp-face, .xp-hero-arrow, .xp-rail-arrow { transition: none; }
+		.xp-btn, .xp-chip, .xp-card, .xp-face, .xp-rail-arrow { transition: none; }
 	}
 </style>

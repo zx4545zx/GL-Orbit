@@ -9,7 +9,7 @@
 	import type { ShipListItem } from '$lib/server/ships/listing.js';
 	import type { PageData } from './$types.js';
 
-	let { data }: { data: PageData } = $props();
+	let { data, embedded = false, basePath, view }: { data: Pick<PageData, 'ships' | 'filters'>; embedded?: boolean; basePath?: string; view?: string } = $props();
 	let extraShips = $state<ShipListItem[]>([]);
 	let searchQuery = $state('');
 	let loading = $state(false);
@@ -44,9 +44,10 @@
 
 	function buildUrl(search: string): string {
 		const params = new URLSearchParams();
+		if (view) params.set('view', view);
 		if (search.trim()) params.set('search', search.trim());
 		const query = params.toString();
-		const base = `/${page.data.lang}/explore/ships`;
+		const base = basePath ?? `/${page.data.lang}/explore/ships`;
 		return query ? `${base}?${query}` : base;
 	}
 
@@ -86,14 +87,16 @@
 </script>
 
 <svelte:head>
+	{#if !embedded}
 	<title>{SEO_TITLE}</title>
 	<meta name="description" content={SEO_DESCRIPTION} />
 	<link rel="canonical" href={canonicalUrl} />
 	{@html jsonLdScript(jsonLd)}
+	{/if}
 </svelte:head>
 
 <section class="space-y-6">
-	<ListingSearch bind:value={searchQuery} placeholder="ค้นหา Ships หรือศิลปิน..." ariaLabel="ค้นหา Ships" oninput={scheduleSearchUpdate} onclear={clearSearch} />
+	{#if !embedded}<ListingSearch bind:value={searchQuery} placeholder="ค้นหา Ships หรือศิลปิน..." ariaLabel="ค้นหา Ships" oninput={scheduleSearchUpdate} onclear={clearSearch} />{/if}
 
 	<div class="grid grid-cols-2 min-[440px]:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5" aria-busy={loading}>
 		{#if loading}

@@ -4,9 +4,9 @@ import { platforms } from '$lib/server/db/schema.js';
 import { getCached, setCached } from '$lib/server/cache.js';
 import { getHomeData } from '$lib/server/queries/home.js';
 import { getSeriesDetail } from '$lib/server/queries/series-detail.js';
-import { getSeriesList } from '$lib/server/series/listing.js';
-import { getArtistList } from '$lib/server/queries/artist-list.js';
-import { getShipList } from '$lib/server/ships/listing.js';
+import { getSeriesList, parseSeriesFilters, parseSeriesPage } from '$lib/server/series/listing.js';
+import { getArtistList, parseArtistFilters, parseArtistPage } from '$lib/server/queries/artist-list.js';
+import { getShipList, parseShipFilters, parseShipPage } from '$lib/server/ships/listing.js';
 import type { PageServerLoad } from './$types.js';
 
 const CACHE_TTL = 30_000;
@@ -29,8 +29,20 @@ async function getPlatformNames(): Promise<ExplorePlatform[]> {
 	return rows;
 }
 
-export const load: PageServerLoad = async ({ params, setHeaders }) => {
+export type ExploreMode = 'overview' | 'series' | 'artists' | 'ships';
+
+export function _parseExploreMode(searchParams: URLSearchParams): ExploreMode {
+	const requested = searchParams.get('view');
+	if (requested === 'series' || requested === 'artists' || requested === 'ships') return requested;
+	return searchParams.has('search') || searchParams.has('status') ? 'series' : 'overview';
+}
+
+export const load: PageServerLoad = async ({ params, url, setHeaders }) => {
 	const lang = params.lang === 'en' ? 'en' : 'th';
+	const mode = _parseExploreMode(url.searchParams);
+	const seriesFilters = parseSeriesFilters(url.searchParams);
+	const artistFilters = parseArtistFilters(url.searchParams);
+	const shipFilters = parseShipFilters(url.searchParams);
 
 	const [home, seriesList, artistList, shipList, platformNames] = await Promise.all([
 		getHomeData(lang),
@@ -38,6 +50,11 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 		getArtistList({ search: '' }, 1),
 		getShipList({ search: '' }, 1),
 		getPlatformNames()
+	]);
+	const [seriesResults, artistResults, shipResults] = await Promise.all([
+		mode === 'series' ? getSeriesList(seriesFilters, parseSeriesPage(url.searchParams)) : null,
+		mode === 'artists' ? getArtistList(artistFilters, parseArtistPage(url.searchParams)) : null,
+		mode === 'ships' ? getShipList(shipFilters, parseShipPage(url.searchParams)) : null
 	]);
 
 	// Hero slides (max 5): countdown series first (they have a real next episode),
@@ -66,6 +83,13 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 
 	return {
 		lang,
+		mode,
+		seriesResults,
+		artistResults,
+		shipResults,
+		seriesFilters,
+		artistFilters,
+		shipFilters,
 		heroes,
 		top10: home.featuredSeries.slice(0, 10),
 		upcoming: home.upcomingSchedule,
