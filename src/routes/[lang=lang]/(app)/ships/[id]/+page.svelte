@@ -5,29 +5,36 @@
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import Picture from '$lib/components/Picture.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
-	import { buildBreadcrumbJsonLd, buildCanonicalUrl, jsonLdScript, localizedPath, safeJsonLd } from '$lib/seo.js';
+	import {
+		buildBreadcrumbJsonLd,
+		buildCanonicalUrl,
+		jsonLdScript,
+		localizedPath,
+		safeJsonLd,
+		truncateSeo
+	} from '$lib/seo.js';
 	import { latestMomentsHref } from '$lib/moments/latest-moments.js';
 	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
 	const ship = $derived(data.ship);
 	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
-	const statusConfig: Record<string, { text: string; dot: string; color: string }> = {
-		ONGOING: { text: m.status_ongoing(), dot: 'bg-mint', color: 'text-mint-dark' },
-		UPCOMING: { text: m.status_upcoming(), dot: 'bg-lavender', color: 'text-lavender-dark' },
-		ENDED: { text: m.status_ended(), dot: 'bg-coral', color: 'text-coral-dark' }
-	};
+
 	const seoTitle = $derived(`${ship.name} | ${m.nav_ships()} GL-Orbit`);
+	const seoDescription = $derived(truncateSeo(ship.description || seoTitle));
 	const canonicalPath = $derived(`/ships/${ship.slug}`);
 	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
+
 	const shareTitle = $derived(currentLang === 'th' ? `ฝากรู้จัก 「${ship.name}」 บน GL-Orbit 💕` : `Meet 「${ship.name}」 on GL-Orbit 💕`);
-	const shareText = $derived(currentLang === 'th' ? `มาทำคาวรู้จักคู่จิ้น「${ship.name}」บน GL-Orbit` : `Meet ship 「${ship.name}」 on GL-Orbit`);
+	const shareText = $derived(currentLang === 'th' ? `มาทำความรู้จักคู่จิ้น「${ship.name}」บน GL-Orbit` : `Meet ship 「${ship.name}」 on GL-Orbit`);
 	const shareAriaLabel = $derived(currentLang === 'th' ? 'แชร์คู่จิ้นนี้' : 'Share this ship');
+
 	const primaryMeta = $derived([
 		{ label: m.ships_shared_works(), value: ship.series.length },
 		{ label: m.common_people(), value: 2 },
-		{ label: currentLang === 'th' ? 'แฮชแท็ก' : 'Hashtags', value: ship.hashtags.length }
+		{ label: m.ship_meta_hashtags(), value: ship.hashtags.length }
 	]);
+
 	const momentsHref = $derived(latestMomentsHref(page.data.lang, 'ship', ship.id));
 	const artistPath = (id: string) => localizedPath(currentLang, `/artists/${id}`);
 	const seriesPath = (id: string) => localizedPath(currentLang, `/series/${id}`);
@@ -36,20 +43,50 @@
 		if (typeof history !== 'undefined' && history.length > 1) history.back();
 		else goto(localizedPath(currentLang, '/ships'));
 	};
-	const jsonLd = $derived(safeJsonLd([
-		{ '@context': 'https://schema.org', '@type': 'ProfilePage', name: ship.name, description: ship.description, image: ship.imageUrl, url: canonicalUrl, about: [{ '@type': 'Person', name: ship.artist1.name }, { '@type': 'Person', name: ship.artist2.name }] },
-		buildBreadcrumbJsonLd(page.url.origin, [{ name: m.nav_home(), path: localizedPath(currentLang, '') }, { name: m.nav_ships(), path: localizedPath(currentLang, '/ships') }, { name: ship.name, path: localizedPath(currentLang, canonicalPath) }])
-	]));
+
+	const shipSince = $derived(
+		ship.startedAt
+			? m.artist_ship_since({
+					date: new Intl.DateTimeFormat(currentLang === 'th' ? 'th-TH' : 'en-GB', {
+						day: 'numeric',
+						month: 'short',
+						year: 'numeric'
+					}).format(new Date(ship.startedAt))
+				})
+			: null
+	);
+
+	const jsonLd = $derived(
+		safeJsonLd([
+			{
+				'@context': 'https://schema.org',
+				'@type': 'ProfilePage',
+				name: ship.name,
+				description: ship.description,
+				image: ship.imageUrl,
+				url: canonicalUrl,
+				about: [
+					{ '@type': 'Person', name: ship.artist1.name },
+					{ '@type': 'Person', name: ship.artist2.name }
+				]
+			},
+			buildBreadcrumbJsonLd(page.url.origin, [
+				{ name: m.nav_home(), path: localizedPath(currentLang, '') },
+				{ name: m.nav_ships(), path: localizedPath(currentLang, '/ships') },
+				{ name: ship.name, path: localizedPath(currentLang, canonicalPath) }
+			])
+		])
+	);
 </script>
 
 <svelte:head>
 	<title>{seoTitle}</title>
-	<meta name="description" content={ship.description || seoTitle} />
+	<meta name="description" content={seoDescription} />
 	<meta name="robots" content="index, follow" />
 	<link rel="canonical" href={canonicalUrl} />
 	<meta property="og:type" content="profile" />
 	<meta property="og:title" content={seoTitle} />
-	<meta property="og:description" content={ship.description || seoTitle} />
+	<meta property="og:description" content={seoDescription} />
 	<meta property="og:url" content={canonicalUrl} />
 	<meta property="og:image" content={ship.imageUrl} />
 	<meta property="og:image:width" content="400" />
@@ -57,64 +94,805 @@
 	<meta property="og:image:type" content="image/jpeg" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={seoTitle} />
-	<meta name="twitter:description" content={ship.description || seoTitle} />
+	<meta name="twitter:description" content={seoDescription} />
 	<meta name="twitter:image" content={ship.imageUrl} />
 	{@html jsonLdScript(jsonLd)}
 </svelte:head>
 
-<div class="-mx-4 -mb-[var(--bottom-nav-reserved-space)] bg-[var(--orbit-paper)] pb-[calc(3rem+var(--bottom-nav-reserved-space))] md:-mt-24 md:mb-0 md:pb-20 md:pt-24">
-	<main class="mx-auto max-w-[90rem] px-4 pt-4 sm:px-6 sm:pt-6 md:px-8">
-		<section class="overflow-hidden bg-plum text-white sm:rounded-xl" aria-labelledby="ship-title">
-			<header class="flex !rounded-none items-center justify-between gap-3 border-b border-white/15 px-4 py-4 sm:px-7">
-				<button type="button" onclick={goBack} class="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/20 bg-white/5 px-4 text-sm font-bold text-white transition hover:border-mint hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>{m.common_back()}</button>
-				<p class="text-[10px] font-black uppercase tracking-[0.3em] text-coral-light sm:text-xs">GL-ORBIT / {m.nav_ships()}</p>
-			</header>
-			<div class="grid lg:grid-cols-[minmax(20rem,0.9fr)_minmax(0,1.1fr)]">
-				<figure class="relative !rounded-none min-h-[25rem] overflow-hidden bg-plum-dark sm:min-h-[32rem] lg:min-h-[39rem]">
+<div class="sh-page -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[var(--orbit-paper)] pb-[calc(1rem+var(--bottom-nav-reserved-space))] md:mb-0 md:pb-10">
+	<main class="sh-wrap" aria-label={ship.name}>
+
+		<!-- HERO: rail panel with merged meta row -->
+		<header class="sh-hero">
+			<div class="sh-hero-bar">
+				<button type="button" onclick={goBack} class="sh-back">
+					<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+					<span>{m.common_back()}</span>
+				</button>
+				<span class="sh-hero-chip">{m.nav_ships()}</span>
+			</div>
+			<div class="sh-hero-grid">
+				<figure class="sh-photo">
 					{#if ship.hasImage}
-						<Picture src={ship.imageUrl} type="posters" sizes="(max-width: 1023px) 100vw, 42vw" alt={ship.name} width={720} height={1080} loading="eager" class="absolute inset-0 h-full w-full object-cover" />
+						<Picture
+							src={ship.imageUrl}
+							type="posters"
+							sizes="(max-width: 859px) 100vw, 300px"
+							alt={ship.name}
+							width={600}
+							height={800}
+							loading="eager"
+							fetchpriority="high"
+							class="sh-photo-img"
+						/>
 					{:else}
-						<div class="absolute inset-0 grid grid-cols-2 gap-px bg-white/20"><Picture src={ship.artist1.imageUrl} type="profiles" sizes="(max-width: 1023px) 50vw, 21vw" alt={ship.artist1.name} width={480} height={600} loading="eager" class="h-full w-full object-cover object-top" /><Picture src={ship.artist2.imageUrl} type="profiles" sizes="(max-width: 1023px) 50vw, 21vw" alt={ship.artist2.name} width={480} height={600} loading="eager" class="h-full w-full object-cover object-top" /></div>
+						<span class="sh-photo-split">
+							<Picture src={ship.artist1.imageUrl} type="profiles" sizes="(max-width: 859px) 50vw, 150px" alt={ship.artist1.name} width={450} height={600} loading="eager" class="sh-photo-img" />
+							<Picture src={ship.artist2.imageUrl} type="profiles" sizes="(max-width: 859px) 50vw, 150px" alt={ship.artist2.name} width={450} height={600} loading="eager" class="sh-photo-img" />
+						</span>
 					{/if}
-					<div aria-hidden="true" class="absolute inset-0 bg-gradient-to-t from-plum/85 via-plum/5 to-transparent"></div>
-					<figcaption class="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 sm:inset-x-8 sm:bottom-8"><span class="text-[10px] font-black uppercase tracking-[0.32em] text-white/75">Pair portrait</span><span class="font-[family-name:var(--font-display)] text-4xl font-bold leading-none text-coral-light sm:text-6xl">{String(ship.series.length).padStart(2, '0')}</span></figcaption>
+					<figcaption class="sh-photo-cap">GL-ORBIT / SHIP FILE</figcaption>
 				</figure>
-				<div class="flex min-w-0 flex-col px-5 py-9 sm:px-10 sm:py-12 lg:justify-between lg:px-14 lg:py-16">
-					<div><p class="text-[10px] font-black uppercase tracking-[0.38em] text-mint sm:text-xs">Pairing record</p><h1 id="ship-title" class="mt-5 break-words font-[family-name:var(--font-display)] text-[clamp(3rem,8vw,6.5rem)] font-bold leading-[0.82] tracking-[-0.075em] text-white [overflow-wrap:anywhere]">{ship.name}</h1><div class="mt-8 grid grid-cols-[1fr_auto_1fr] items-start gap-3 !rounded-none border-y border-white/15 py-5 font-[family-name:var(--font-thai)] text-base font-semibold leading-snug sm:text-xl"><span class="min-w-0 break-words text-coral-light [overflow-wrap:anywhere]">{ship.artist1.name}</span><span aria-hidden="true" class="grid h-6 w-6 place-items-center text-mint"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.51L12 21.35Z"/></svg></span><span class="min-w-0 break-words text-right text-lavender-light [overflow-wrap:anywhere]">{ship.artist2.name}</span></div></div>
-					<div class="mt-10 grid !rounded-none grid-cols-2 border-l border-t border-white/15 sm:grid-cols-4">
-						{#each primaryMeta as item}<div class="min-w-0 !rounded-none border-b border-r border-white/15 px-3 py-4 sm:px-4"><p class="font-[family-name:var(--font-display)] text-2xl font-bold leading-none text-white sm:text-3xl">{item.value}</p><p class="mt-2 truncate text-[9px] font-black uppercase tracking-[0.14em] text-white/60 sm:text-[10px]">{item.label}</p></div>{/each}
-						<ShareButton title={shareTitle} text={shareText} url={canonicalUrl} ariaLabel={shareAriaLabel} variant="orbit" ordinal={null} className="min-h-[5.5rem] !rounded-none border-b border-r border-white/15" />
+				<div class="sh-hero-id">
+					<p class="sh-kicker">{m.ship_detail_kicker()}</p>
+					<h1 id="ship-name" class="sh-nick">{ship.name}</h1>
+					<span class="sh-rule" aria-hidden="true"></span>
+					<div class="sh-pair">
+						<span class="sh-pair-name">{ship.artist1.name}</span>
+						<svg class="sh-pair-heart" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.51L12 21.35Z"/></svg>
+						<span class="sh-pair-name">{ship.artist2.name}</span>
 					</div>
+					{#if shipSince}
+						<p class="sh-since">{shipSince}</p>
+					{/if}
+					{#if ship.hashtags.length > 0}
+						<div class="sh-tags">
+							{#each ship.hashtags as tag (tag)}
+								<span class="sh-tag">#{tag}</span>
+							{/each}
+						</div>
+					{/if}
+					{#if ship.isFeatured}
+						<span class="sh-feat">{m.artist_ship_featured()}</span>
+					{/if}
 				</div>
 			</div>
-		</section>
+			<div class="sh-meta" aria-label="Ship stats">
+				{#each primaryMeta as item, index}
+					<div class="sh-meta-cell">
+						<span class="sh-meta-no">0{index + 1}</span>
+						<span class="sh-meta-n">{item.value}</span>
+						<span class="sh-meta-k">{item.label}</span>
+					</div>
+				{/each}
+				<ShareButton
+					title={shareTitle}
+					text={shareText}
+					url={canonicalUrl}
+					ariaLabel={shareAriaLabel}
+					variant="orbit"
+					ordinal={null}
+					className="h-full min-h-16 w-full !rounded-none !border-0"
+				/>
+			</div>
+		</header>
 
-		<section class="grid !rounded-none border-b border-[var(--orbit-line-strong)] py-8 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8 sm:py-10" aria-label="Ship facts"><p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">Ship notes</p><div>{#if ship.hashtags.length > 0}<div class="flex flex-wrap gap-x-4 gap-y-2">{#each ship.hashtags as tag}<span class="text-sm font-bold text-plum sm:text-base">#{tag}</span>{/each}</div>{/if}<p class="mt-3 text-sm leading-6 text-plum-light">{ship.artist1.fullNameTh || ship.artist1.fullNameEn} และ {ship.artist2.fullNameTh || ship.artist2.fullNameEn}</p></div></section>
-
-		{#if ship.description}<section class="grid !rounded-none border-b border-[var(--orbit-line-strong)] py-12 sm:grid-cols-[10rem_minmax(0,42rem)] sm:gap-8 sm:py-16"><div><p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">00 / Story</p><h2 class="mt-3 text-2xl font-bold text-plum sm:text-3xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{currentLang === 'th' ? 'เรื่องราวคู่นี้' : 'Their story'}</h2></div><p class="mt-5 font-[family-name:var(--font-thai)] text-base leading-8 text-plum-light sm:mt-0 sm:text-lg sm:leading-9">{ship.description}</p></section>{/if}
-
-		<section class="!rounded-none border-b border-[var(--orbit-line-strong)] py-12 sm:py-16" aria-labelledby="artists-heading">
-			<header class="grid sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8"><p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">01 / Pair</p><h2 id="artists-heading" class="mt-3 text-3xl font-bold text-plum sm:mt-0 sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{currentLang === 'th' ? 'ศิลปินที่โคจรรอบกัน' : 'Orbiting artists'}</h2></header>
-			<div class="mt-8 grid gap-4 sm:mt-12 sm:grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)] sm:items-stretch">
-				<a href={artistPath(ship.artist1.id)} class="group grid min-w-0 grid-cols-[5rem_minmax(0,1fr)] gap-4 border border-[var(--orbit-line-strong)] p-3 transition hover:border-coral hover:bg-coral/5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:p-4"><Picture src={ship.artist1.imageUrl} type="profiles" sizes="120px" alt={ship.artist1.name} width={160} height={200} loading="lazy" class="aspect-[4/5] h-full w-full object-cover object-top" /><span class="flex min-w-0 flex-col justify-between py-1"><span class="text-[9px] font-black uppercase tracking-[0.22em] text-coral-dark">Artist 01</span><span><span class="block break-words font-[family-name:var(--font-display)] text-xl font-bold leading-none text-plum [overflow-wrap:anywhere] sm:text-2xl">{ship.artist1.name}</span><span class="mt-2 block text-sm text-plum-light">{ship.artist1.fullNameTh || ship.artist1.fullNameEn}</span></span></span></a>
-				<div aria-hidden="true" class="grid place-items-center py-1 sm:py-0"><span class="grid h-11 w-11 place-items-center text-coral-dark"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.51L12 21.35Z"/></svg></span></div>
-				<a href={artistPath(ship.artist2.id)} class="group grid min-w-0 grid-cols-[minmax(0,1fr)_5rem] gap-4 border border-[var(--orbit-line-strong)] p-3 transition hover:border-lavender hover:bg-lavender/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:grid-cols-[minmax(0,1fr)_7.5rem] sm:p-4"><span class="flex min-w-0 flex-col justify-between py-1 text-right"><span class="text-[9px] font-black uppercase tracking-[0.22em] text-lavender-dark">Artist 02</span><span><span class="block break-words font-[family-name:var(--font-display)] text-xl font-bold leading-none text-plum [overflow-wrap:anywhere] sm:text-2xl">{ship.artist2.name}</span><span class="mt-2 block text-sm text-plum-light">{ship.artist2.fullNameTh || ship.artist2.fullNameEn}</span></span></span><Picture src={ship.artist2.imageUrl} type="profiles" sizes="120px" alt={ship.artist2.name} width={160} height={200} loading="lazy" class="aspect-[4/5] h-full w-full object-cover object-top" /></a>
+		<!-- 01 / PAIR -->
+		<section aria-labelledby="sh-pair-heading">
+			<div class="sh-sec-head">
+				<span class="sh-sec-k">01 / Pair</span>
+				<h2 id="sh-pair-heading">{m.ship_detail_pair_heading()}</h2>
+				<span class="sh-sec-count">2</span>
+			</div>
+			<div class="sh-pair-grid">
+				<a href={artistPath(ship.artist1.id)} class="sh-artist-card">
+					<span class="sh-artist-idx">ARTIST 01</span>
+					<span class="sh-artist-body">
+						<span class="sh-artist-thumb">
+							<Picture src={ship.artist1.imageUrl} type="profiles" sizes="72px" alt={ship.artist1.name} width={108} height={144} loading="lazy" class="sh-artist-img" />
+						</span>
+						<span class="sh-artist-meta">
+							<span class="sh-artist-name">{ship.artist1.name}</span>
+							<span class="sh-artist-full">{ship.artist1.fullNameTh || ship.artist1.fullNameEn}</span>
+						</span>
+					</span>
+					<svg class="sh-artist-arr h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6" /></svg>
+				</a>
+				<span class="sh-pair-divider" aria-hidden="true">
+					<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.51L12 21.35Z"/></svg>
+				</span>
+				<a href={artistPath(ship.artist2.id)} class="sh-artist-card">
+					<span class="sh-artist-idx">ARTIST 02</span>
+					<span class="sh-artist-body">
+						<span class="sh-artist-thumb">
+							<Picture src={ship.artist2.imageUrl} type="profiles" sizes="72px" alt={ship.artist2.name} width={108} height={144} loading="lazy" class="sh-artist-img" />
+						</span>
+						<span class="sh-artist-meta">
+							<span class="sh-artist-name">{ship.artist2.name}</span>
+							<span class="sh-artist-full">{ship.artist2.fullNameTh || ship.artist2.fullNameEn}</span>
+						</span>
+					</span>
+					<svg class="sh-artist-arr h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6" /></svg>
+				</a>
 			</div>
 		</section>
 
+		<!-- 02 / SHARED WORKS -->
 		{#if ship.series.length > 0}
-			<section class="py-12 sm:py-16" aria-labelledby="reel-heading"><header class="flex !rounded-none flex-wrap items-end justify-between gap-5 border-b border-[var(--orbit-line-strong)] pb-7 sm:pb-10"><div><p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">02 / Shared reel</p><h2 id="reel-heading" class="mt-3 text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.ships_shared_works()}</h2></div><p class="font-[family-name:var(--font-display)] text-4xl font-bold leading-none text-plum sm:text-6xl">{String(ship.series.length).padStart(2, '0')}</p></header>
-				<div class="grid grid-cols-2 gap-x-4 gap-y-8 pt-8 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-12 sm:pt-10 md:grid-cols-4 lg:grid-cols-6">
+			<section aria-labelledby="sh-works-heading">
+				<div class="sh-sec-head">
+					<span class="sh-sec-k">02 / Shared reel</span>
+					<h2 id="sh-works-heading">{m.ships_shared_works()}</h2>
+					<span class="sh-sec-count">{ship.series.length}</span>
+				</div>
+				<div class="sh-works">
 					{#each ship.series as s, index (s.id)}
-						{@const st = statusConfig[s.status] ?? null}
-						<a href={seriesPath(s.id)} class="group min-w-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral"><div class="relative overflow-hidden bg-lavender/20"><span class="absolute left-0 top-0 z-10 bg-plum px-2 py-1 font-[family-name:var(--font-display)] text-xs font-bold text-white">{String(index + 1).padStart(2, '0')}</span><Picture src={s.posterUrl} type="posters" sizes="(max-width: 639px) 44vw, (max-width: 1024px) 24vw, 220px" alt={s.title} width={320} height={480} loading="lazy" class="aspect-[2/3] w-full object-cover transition duration-500 group-hover:scale-[1.03]" /></div>{#if st}<p class="mt-3 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.12em] {st.color}"><span class="h-1.5 w-1.5 rounded-full {st.dot}"></span>{st.text}</p>{/if}<h3 class="mt-2 break-words font-[family-name:var(--font-display)] text-base font-bold leading-[1.2] text-plum transition group-hover:text-coral-dark [overflow-wrap:anywhere] sm:text-lg">{s.title}</h3>{#if s.titleTh}<p class="mt-1 break-words font-[family-name:var(--font-thai)] text-xs leading-5 text-plum-light [overflow-wrap:anywhere]">{s.titleTh}</p>{/if}</a>
+						<a href={seriesPath(s.id)} class="sh-work">
+							<span class="sh-work-idx" aria-hidden="true">{String(index + 1).padStart(2, '0')} / WORK</span>
+							<span class="sh-work-poster">
+								<Picture
+									src={s.posterUrl}
+									type="posters"
+									sizes="(max-width: 859px) 44vw, 220px"
+									alt={s.title}
+									width={450}
+									height={600}
+									loading="lazy"
+									class="sh-work-img"
+								/>
+							</span>
+							<span class="sh-work-t">{currentLang === 'th' && s.titleTh ? s.titleTh : s.title}</span>
+							{#if s.titleTh && currentLang !== 'th'}
+								<span class="sh-work-r">{s.titleTh}</span>
+							{/if}
+						</a>
 					{/each}
 				</div>
 			</section>
 		{:else}
-			<section class="py-12 sm:py-16" aria-labelledby="reel-heading"><p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">02 / Shared reel</p><h2 id="reel-heading" class="mt-3 text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.ships_shared_works()}</h2><div class="mt-8 border border-[var(--orbit-line-strong)] bg-white p-8 sm:mt-10 sm:p-12"><p class="font-[family-name:var(--font-display)] text-xl font-bold text-plum sm:text-2xl">{m.ships_detail_empty_series()}</p><a href={backHref} class="mt-5 inline-flex min-h-11 items-center gap-2 bg-plum px-5 text-sm font-bold text-white transition hover:bg-[#24151f] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>{m.artist_detail_empty_back_home()}</a></div></section>
+			<section aria-labelledby="sh-works-heading">
+				<div class="sh-sec-head">
+					<span class="sh-sec-k">02 / Shared reel</span>
+					<h2 id="sh-works-heading">{m.ships_shared_works()}</h2>
+					<span class="sh-sec-count">0</span>
+				</div>
+				<div class="sh-empty">
+					<p class="sh-empty-title">{m.ships_detail_empty_series()}</p>
+					<a href={backHref} class="sh-empty-back">
+						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+						<span>{m.artist_detail_empty_back_home()}</span>
+					</a>
+				</div>
+			</section>
 		{/if}
 
-		<section class="flex flex-wrap items-end justify-between gap-6 bg-plum px-6 py-8 text-white sm:px-10 sm:py-10"><div><p class="text-[10px] font-black uppercase tracking-[0.32em] text-mint">Orbit Halo</p><h2 class="mt-3 font-[family-name:var(--font-display)] text-3xl font-bold leading-none tracking-[-0.05em] sm:text-5xl">Latest Moments</h2></div><a href={momentsHref} class="inline-flex min-h-11 items-center gap-3 bg-mint px-5 text-sm font-bold text-plum transition hover:bg-mint-light focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"><span>{currentLang === 'th' ? 'ดู Moment ทั้งหมด' : 'View all moments'}</span><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6" /></svg></a></section>
+		<!-- 03 / STORY -->
+		{#if ship.description}
+			<section aria-labelledby="sh-story-heading">
+				<div class="sh-sec-head">
+					<span class="sh-sec-k">03 / Story</span>
+					<h2 id="sh-story-heading">{m.ship_detail_story()}</h2>
+				</div>
+				<div class="sh-story">
+					<p>{ship.description}</p>
+				</div>
+			</section>
+		{/if}
+
+		<!-- HALO BANNER -->
+		<section class="sh-halo" aria-labelledby="sh-halo-heading">
+			<div>
+				<p class="sh-halo-kicker">Orbit Halo</p>
+				<h2 id="sh-halo-heading" class="sh-halo-title">Latest Moments</h2>
+			</div>
+			<a href={momentsHref} class="sh-halo-link">
+				<span>{currentLang === 'th' ? 'ดู Moment ทั้งหมด' : 'View all moments'}</span>
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6" /></svg>
+			</a>
+		</section>
+
 	</main>
 </div>
+
+<style>
+	.sh-page {
+		font-family: var(--orbit-font-body, inherit);
+		color: var(--orbit-ink);
+	}
+	.sh-wrap {
+		max-width: 72rem;
+		margin-inline: auto;
+	}
+
+	/* ============ HERO (rail panel, photo 3:4 + merged meta) ============ */
+	.sh-hero {
+		margin: 16px 14px 0;
+		background: var(--orbit-rail);
+		color: var(--orbit-paper);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: var(--orbit-radius-menu-dialog);
+		box-shadow: var(--orbit-shadow-overlay);
+		overflow: hidden;
+	}
+	.sh-hero-bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 10px 14px;
+		border-bottom: 1px solid color-mix(in srgb, var(--orbit-paper) 18%, transparent);
+	}
+	.sh-back {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		min-height: 40px;
+		padding: 4px 12px;
+		font-family: var(--orbit-font-display);
+		font-size: 11px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		text-transform: uppercase;
+		color: var(--orbit-paper);
+		background: transparent;
+		border: 1px solid color-mix(in srgb, var(--orbit-paper) 30%, transparent);
+		border-radius: var(--orbit-radius-control);
+		cursor: pointer;
+	}
+	.sh-back:hover {
+		border-color: var(--orbit-coral);
+	}
+	.sh-back:focus-visible {
+		outline: 2px solid var(--orbit-border-focus);
+		outline-offset: 2px;
+	}
+	.sh-hero-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-family: var(--orbit-font-display);
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		text-transform: uppercase;
+		color: var(--orbit-mint);
+	}
+	.sh-hero-chip::before {
+		content: '';
+		width: 8px;
+		height: 8px;
+		background: var(--orbit-coral);
+	}
+	.sh-hero-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+	}
+	.sh-photo {
+		position: relative;
+	}
+	/* inner HUD ticks, token coral */
+	.sh-photo::before,
+	.sh-photo::after {
+		content: '';
+		position: absolute;
+		width: 14px;
+		height: 14px;
+		z-index: 2;
+		pointer-events: none;
+		border: calc(var(--orbit-border-width) + 1px) var(--orbit-border-style) var(--orbit-coral);
+	}
+	.sh-photo::before {
+		top: 10px;
+		right: 10px;
+		border-left: 0;
+		border-bottom: 0;
+	}
+	.sh-photo::after {
+		bottom: 10px;
+		left: 10px;
+		border-right: 0;
+		border-top: 0;
+	}
+	.sh-photo :global(picture) {
+		display: block;
+		width: 100%;
+	}
+	.sh-photo :global(.sh-photo-img) {
+		display: block;
+		width: 100%;
+		aspect-ratio: 3 / 4;
+		object-fit: cover;
+	}
+	.sh-photo-split {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1px;
+		background: color-mix(in srgb, var(--orbit-paper) 18%, transparent);
+	}
+	.sh-photo-cap {
+		position: absolute;
+		left: 12px;
+		top: 12px;
+		font-size: 9px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		text-transform: uppercase;
+		color: var(--orbit-paper);
+		background: color-mix(in srgb, var(--orbit-rail) 75%, transparent);
+		padding: 3px 8px;
+	}
+	.sh-hero-id {
+		padding: 20px 18px 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.sh-kicker {
+		font-family: var(--orbit-font-display);
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: 0.3em;
+		text-transform: uppercase;
+		color: var(--orbit-mint);
+	}
+	.sh-nick {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: clamp(26px, 6vw, 42px);
+		line-height: 1.1;
+		letter-spacing: -0.015em;
+		overflow-wrap: anywhere;
+	}
+	.sh-rule {
+		height: 3px;
+		width: 64px;
+		margin-top: -2px;
+		background: linear-gradient(90deg, var(--orbit-coral), var(--orbit-lavender), var(--orbit-mint));
+	}
+	.sh-pair {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 10px;
+		border-left: 2px solid var(--orbit-coral);
+		padding-left: 12px;
+	}
+	.sh-pair-name {
+		font-weight: 700;
+		font-size: clamp(14px, 2.4vw, 16px);
+	}
+	.sh-pair-heart {
+		width: 14px;
+		height: 14px;
+		color: var(--orbit-coral);
+		flex: 0 0 auto;
+	}
+	.sh-since {
+		font-size: 11px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		opacity: 0.75;
+	}
+	.sh-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.sh-tag {
+		font-family: var(--orbit-font-display);
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		color: var(--orbit-paper);
+		border: 1px solid color-mix(in srgb, var(--orbit-paper) 30%, transparent);
+		border-radius: var(--orbit-radius-badge);
+		padding: 3px 9px;
+	}
+	.sh-feat {
+		align-self: flex-start;
+		font-family: var(--orbit-font-display);
+		font-size: 9px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		background: var(--orbit-mint);
+		color: var(--orbit-ink);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: var(--orbit-radius-badge);
+		padding: 3px 9px;
+		box-shadow: var(--orbit-shadow-interactive);
+	}
+
+	/* ============ META ROW (merged into hero bottom) ============ */
+	.sh-meta {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		border-top: 1px solid color-mix(in srgb, var(--orbit-paper) 18%, transparent);
+		background: color-mix(in srgb, var(--orbit-rail) 88%, var(--orbit-ink));
+	}
+	.sh-meta-cell {
+		padding: 10px;
+		border-left: 1px solid color-mix(in srgb, var(--orbit-paper) 14%, transparent);
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: 6px;
+		min-height: 68px;
+	}
+	.sh-meta-cell:first-child {
+		border-left: 0;
+	}
+	.sh-meta-no {
+		font-family: var(--orbit-font-display);
+		font-size: 9px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: 0.16em;
+		color: var(--orbit-mint);
+	}
+	.sh-meta-n {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: 22px;
+		line-height: 1;
+		color: var(--orbit-paper);
+	}
+	.sh-meta-k {
+		font-size: 9px;
+		font-weight: 600;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--orbit-paper) 60%, transparent);
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	/* ============ SECTION HEADS ============ */
+	.sh-page section {
+		margin-top: 28px;
+	}
+	.sh-sec-head {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-bottom: 12px;
+		padding: 10px 16px 0;
+		border-top: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+	}
+	.sh-sec-k {
+		font-family: var(--orbit-font-display);
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: 0.3em;
+		text-transform: uppercase;
+		color: var(--orbit-coral-dark);
+		white-space: nowrap;
+	}
+	.sh-sec-head h2 {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: 17px;
+		text-transform: uppercase;
+	}
+	.sh-sec-count {
+		margin-left: auto;
+		font-size: 11px;
+		font-weight: var(--orbit-font-label-weight);
+		color: var(--orbit-muted);
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-badge);
+		padding: 4px 10px;
+	}
+
+	/* ============ ARTIST PAIR CARDS ============ */
+	.sh-pair-grid {
+		display: grid;
+		gap: 10px;
+		padding: 0 16px;
+	}
+	.sh-artist-card {
+		display: grid;
+		grid-template-rows: auto 1fr auto;
+		gap: 10px;
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow-surface);
+		padding: 12px;
+		text-decoration: none;
+		color: var(--orbit-ink);
+		transition: border-color var(--orbit-motion-fast) var(--orbit-motion-ease);
+	}
+	.sh-artist-card:hover {
+		border-color: var(--orbit-border-interactive);
+	}
+	.sh-artist-card:focus-visible {
+		outline: 2px solid var(--orbit-border-focus);
+		outline-offset: 2px;
+	}
+	.sh-artist-idx {
+		font-family: var(--orbit-font-display);
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: 0.16em;
+		color: var(--orbit-coral-dark);
+	}
+	.sh-artist-body {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		min-width: 0;
+	}
+	.sh-artist-thumb {
+		flex: 0 0 56px;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-surface);
+		overflow: hidden;
+		background: var(--orbit-paper-deep);
+	}
+	.sh-artist-thumb :global(picture) {
+		display: block;
+		width: 100%;
+	}
+	.sh-artist-thumb :global(.sh-artist-img) {
+		display: block;
+		width: 100%;
+		aspect-ratio: 3 / 4;
+		object-fit: cover;
+	}
+	.sh-artist-meta {
+		min-width: 0;
+	}
+	.sh-artist-name {
+		display: block;
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: 17px;
+		overflow-wrap: anywhere;
+	}
+	.sh-artist-full {
+		display: block;
+		font-size: 11px;
+		font-weight: var(--orbit-font-label-weight);
+		color: var(--orbit-muted);
+		margin-top: 2px;
+		overflow-wrap: anywhere;
+	}
+	.sh-artist-arr {
+		justify-self: end;
+		color: var(--orbit-muted);
+	}
+	.sh-artist-card:hover .sh-artist-arr {
+		color: var(--orbit-coral);
+	}
+	.sh-pair-divider {
+		display: none;
+		align-items: center;
+		justify-content: center;
+	}
+	.sh-pair-divider svg {
+		width: 22px;
+		height: 22px;
+		color: var(--orbit-coral);
+	}
+
+	/* ============ WORKS (poster grid 3:4) ============ */
+	.sh-works {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 14px 10px;
+		padding: 0 16px;
+	}
+	.sh-work {
+		display: block;
+		min-width: 0;
+		text-decoration: none;
+		color: var(--orbit-ink);
+	}
+	.sh-work:focus-visible {
+		outline: 2px solid var(--orbit-border-focus);
+		outline-offset: 2px;
+	}
+	.sh-work-idx {
+		display: block;
+		font-family: var(--orbit-font-display);
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: 0.16em;
+		color: var(--orbit-coral-dark);
+		margin-bottom: 6px;
+	}
+	.sh-work-poster {
+		display: block;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow-surface);
+		overflow: hidden;
+		background: var(--orbit-paper-deep);
+		transition:
+			border-color var(--orbit-motion-fast) var(--orbit-motion-ease),
+			box-shadow var(--orbit-motion-fast) var(--orbit-motion-ease);
+	}
+	.sh-work-poster :global(picture) {
+		display: block;
+		width: 100%;
+	}
+	.sh-work-poster :global(.sh-work-img) {
+		display: block;
+		width: 100%;
+		aspect-ratio: 3 / 4;
+		object-fit: cover;
+	}
+	.sh-work:hover .sh-work-poster {
+		border-color: var(--orbit-coral);
+		box-shadow: var(--orbit-shadow-accent);
+	}
+	.sh-work-t {
+		display: block;
+		font-weight: 700;
+		font-size: 14px;
+		margin-top: 8px;
+		overflow-wrap: anywhere;
+	}
+	.sh-work-r {
+		display: block;
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: 0.08em;
+		color: var(--orbit-muted);
+		margin-top: 2px;
+		overflow-wrap: anywhere;
+	}
+
+	/* ============ EMPTY WORKS ============ */
+	.sh-empty {
+		margin: 0 16px;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: var(--orbit-radius-surface);
+		background: var(--orbit-surface);
+		box-shadow: var(--orbit-shadow-surface);
+		padding: 28px 20px;
+		text-align: center;
+	}
+	.sh-empty-title {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: 20px;
+	}
+	.sh-empty-back {
+		margin-top: 16px;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		min-height: 44px;
+		padding: 10px 18px;
+		background: var(--orbit-rail);
+		color: var(--orbit-paper);
+		border-radius: var(--orbit-radius-control);
+		font-size: 13px;
+		font-weight: 700;
+		text-decoration: none;
+	}
+	.sh-empty-back:hover {
+		background: var(--orbit-coral);
+	}
+	.sh-empty-back:focus-visible {
+		outline: 2px solid var(--orbit-border-focus);
+		outline-offset: 2px;
+	}
+
+	/* ============ STORY ============ */
+	.sh-story {
+		margin: 0 16px;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-left: calc(var(--orbit-border-width) + 2px) var(--orbit-border-style) var(--orbit-coral);
+		border-radius: var(--orbit-radius-surface);
+		background: var(--orbit-surface);
+		box-shadow: var(--orbit-shadow-surface);
+		padding: 14px 16px;
+		font-size: 14.5px;
+		line-height: 1.9;
+		white-space: pre-line;
+	}
+
+	/* ============ HALO BANNER ============ */
+	.sh-halo {
+		margin: 44px 16px 0;
+		background: var(--orbit-rail);
+		color: var(--orbit-paper);
+		border-radius: var(--orbit-radius-menu-dialog);
+		box-shadow: var(--orbit-shadow-overlay);
+		padding: 28px 24px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+	}
+	.sh-halo-kicker {
+		font-family: var(--orbit-font-display);
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: 0.28em;
+		text-transform: uppercase;
+		color: var(--orbit-mint);
+	}
+	.sh-halo-title {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: clamp(24px, 5vw, 42px);
+		line-height: 1;
+		letter-spacing: -0.02em;
+		margin-top: 8px;
+	}
+	.sh-halo-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 12px;
+		min-height: 44px;
+		background: var(--orbit-surface);
+		color: var(--orbit-ink);
+		padding: 10px 20px;
+		font-size: 13px;
+		font-weight: var(--orbit-font-label-weight);
+		border-radius: var(--orbit-radius-control);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		text-decoration: none;
+	}
+	.sh-halo-link:hover {
+		background: var(--orbit-coral-soft);
+	}
+	.sh-halo-link:focus-visible {
+		outline: 2px solid var(--orbit-paper);
+		outline-offset: 3px;
+	}
+
+	/* ============ DESKTOP ============ */
+	@media (min-width: 860px) {
+		.sh-hero {
+			margin: 24px 24px 0;
+		}
+		.sh-hero-grid {
+			grid-template-columns: minmax(240px, 300px) 1fr;
+		}
+		.sh-hero-id {
+			padding: 28px 32px;
+			gap: 14px;
+		}
+		.sh-meta-n {
+			font-size: 26px;
+		}
+		.sh-sec-head {
+			padding-inline: 24px;
+		}
+		.sh-pair-grid,
+		.sh-works,
+		.sh-story,
+		.sh-empty {
+			margin-inline: 24px;
+			padding-inline: 0;
+		}
+		.sh-pair-grid {
+			grid-template-columns: 1fr auto 1fr;
+			align-items: stretch;
+		}
+		.sh-pair-divider {
+			display: flex;
+		}
+		.sh-works {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 20px 16px;
+		}
+		.sh-halo {
+			margin-inline: 24px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.sh-artist-card,
+		.sh-work-poster {
+			transition: none;
+		}
+	}
+</style>

@@ -454,7 +454,7 @@
 			<div class="xp-rail-scroll splide" bind:this={railSplideEls[0]}>
 			<div class="splide__track">
 				<div class="splide__list">
-				{#each data.upcoming as item (item.seriesId + item.episode + item.platform)}
+				{#each data.upcoming as item (item.id)}
 					<div class="splide__slide">
 						<a class="xp-card" href="{langPrefix}/series/{item.seriesId}">
 						<div class="xp-poster">

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>มิ้ลค์ — Orbit Mockup L (Full-bleed Photo)</title>
+<style>
+  /* ============ ORBIT TOKENS ============ */
+  :root {
+    --orbit-paper: #fbf3e4; --orbit-paper-deep: #f3e7cf; --orbit-surface: #ffffff;
+    --orbit-ink: #3b2a20; --orbit-muted: #8a725f; --orbit-line: #d8c4a8; --orbit-line-strong: #b8a288;
+    --orbit-coral: #e4572e; --orbit-coral-dark: #b23f1d; --orbit-coral-soft: #fde4d6;
+    --orbit-lavender: #f6c9d8; --orbit-mint: #cfe7f5; --orbit-rail: #3b2a20; --orbit-success: #2f7a4f;
+    --orbit-shadow: 3px 3px 0 rgba(59,42,32,.12); --orbit-shadow-raised: 4px 4px 0 rgba(59,42,32,.16);
+    --orbit-shadow-interactive: 3px 3px 0 rgba(59,42,32,.16); --orbit-shadow-accent: 3px 3px 0 rgba(228,87,46,.25);
+    --orbit-shadow-overlay: 5px 5px 0 rgba(59,42,32,.18);
+    --orbit-border: 1px solid var(--orbit-line); --orbit-border-strong: 1px solid var(--orbit-line-strong);
+    --orbit-border-interactive: 1px solid var(--orbit-coral);
+    --font-display: 'Mali','Sarabun','Segoe UI',sans-serif;
+    --font-body: 'Sarabun','Mali','Segoe UI',sans-serif;
+    --font-pixel: 'Courier New',ui-monospace,monospace;
+  }
+  [data-theme="midnight"] {
+    --orbit-paper: #0d0a14; --orbit-paper-deep: #100c1b; --orbit-surface: #171224;
+    --orbit-ink: #f2ecfa; --orbit-muted: #9d8fb8; --orbit-line: #2d2344; --orbit-line-strong: #4a3670;
+    --orbit-coral: #ff4d7e; --orbit-coral-dark: #d12f60; --orbit-coral-soft: #3a1e33;
+    --orbit-lavender: #241a3f; --orbit-mint: #123c38; --orbit-rail: #100c1b; --orbit-success: #52e0a8;
+    --orbit-shadow: 0 0 24px rgba(95,242,224,.08); --orbit-shadow-raised: 0 0 32px rgba(95,242,224,.12);
+    --orbit-shadow-interactive: 0 0 12px rgba(255,77,126,.2); --orbit-shadow-accent: 0 0 18px rgba(95,242,224,.22);
+    --orbit-shadow-overlay: 0 0 40px rgba(95,242,224,.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; border-radius: 0; }
+  body {
+    font-family: var(--font-body); color: var(--orbit-ink);
+    background: var(--orbit-paper); line-height: 1.55; min-height: 100dvh;
+  }
+  .orbit-round-data { border-radius: 9999px !important; }
+  a, button { transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease, transform 140ms ease; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--orbit-coral-dark); outline-offset: 2px; }
+
+  .marquee {
+    background: var(--orbit-rail); color: var(--orbit-paper);
+    font-size: 12px; font-weight: 600; overflow: hidden; white-space: nowrap;
+    padding: 6px 0; border-bottom: var(--orbit-border-strong);
+    position: relative; z-index: 20;
+  }
+  .marquee span { display: inline-block; padding-left: 100%; animation: mq 24s linear infinite; }
+  @keyframes mq { to { transform: translateX(-100%); } }
+
+  .theme-toggle {
+    position: fixed; top: 40px; right: 10px; z-index: 60;
+    font-family: var(--font-pixel); font-size: 10px; font-weight: bold;
+    background: var(--orbit-surface); color: var(--orbit-ink);
+    border: var(--orbit-border-strong); box-shadow: var(--orbit-shadow-interactive);
+    padding: 8px 12px; cursor: pointer; min-height: 40px; text-transform: uppercase;
+  }
+  .theme-toggle:hover { border-color: var(--orbit-coral); }
+
+  .hud { position: relative; }
+  .hud::before, .hud::after {
+    content: ""; position: absolute; width: 10px; height: 10px; pointer-events: none; z-index: 5;
+    border: 1px solid var(--orbit-coral);
+  }
+  .hud::before { top: -4px; left: -4px; border-right: 0; border-bottom: 0; }
+  .hud::after { bottom: -4px; right: -4px; border-left: 0; border-top: 0; }
+
+  /* ============ FULL-BLEED HERO ============ */
+  .hero {
+    position: relative; min-height: 100svh;
+    display: flex; align-items: flex-end;
+    /* mock photo backdrop */
+    background:
+      radial-gradient(circle at 30% 18%, #ffd6f5 0%, transparent 42%),
+      linear-gradient(160deg, #8f7bff 0%, #ff7ad9 50%, #4dd8ff 100%);
+    overflow: hidden;
+  }
+  .hero::before { /* scanlines */
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.09) 0 2px, transparent 2px 5px);
+  }
+  .hero::after { /* bottom fade into paper */
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--orbit-rail) 55%, transparent) 88%, color-mix(in srgb, var(--orbit-rail) 80%, transparent) 100%);
+  }
+  .hero .stars { position: absolute; inset: 0; z-index: 1; }
+  .hero .stars i {
+    position: absolute; color: #fff; font-style: normal; text-shadow: 0 0 6px #fff;
+    animation: tw 2.4s ease-in-out infinite;
+  }
+  @keyframes tw { 50% { opacity: .25; transform: scale(.7); } }
+  .hero .ph-tag {
+    position: absolute; top: 76px; left: 16px; z-index: 2;
+    font-family: var(--font-pixel); font-size: 10px; color: #fff;
+    border: 2px dashed #fff; padding: 8px 12px; text-shadow: 1px 1px 0 var(--orbit-rail);
+  }
+  .hero .kind {
+    position: absolute; top: 76px; right: 16px; z-index: 2;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    background: var(--orbit-mint); color: var(--orbit-ink);
+    border: var(--orbit-border-strong); box-shadow: var(--orbit-shadow-interactive);
+    padding: 3px 12px;
+  }
+  .hero .kind::before { content: "●"; color: var(--orbit-success); }
+
+  .hero-id {
+    position: relative; z-index: 2; width: 100%;
+    padding: 0 18px 34px; color: #fff;
+    max-width: 72rem; margin-inline: auto;
+  }
+  .hero-id h1.nick {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(58px, 17vw, 140px); line-height: .92; letter-spacing: -0.03em;
+    text-shadow: 4px 4px 0 rgba(59,42,32,.45);
+  }
+  .hero-id .fname { font-weight: 700; font-size: clamp(17px, 4vw, 24px); margin-top: 12px; text-shadow: 2px 2px 0 rgba(59,42,32,.4); }
+  .hero-id .ename {
+    font-family: var(--font-pixel); font-size: clamp(11px, 2vw, 13px);
+    text-transform: uppercase; letter-spacing: 0.18em; margin-top: 4px; opacity: .92;
+  }
+  .hero-id .row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; align-items: center; }
+  .btn {
+    font-family: var(--font-body); font-weight: 600; font-size: 13px;
+    background: var(--orbit-surface); color: var(--orbit-ink);
+    border: var(--orbit-border-interactive); box-shadow: var(--orbit-shadow-interactive);
+    padding: 10px 16px; cursor: pointer; text-transform: uppercase;
+    min-height: 44px; display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+  }
+  .btn:hover { border-color: var(--orbit-coral-dark); box-shadow: var(--orbit-shadow-accent); }
+  .btn.primary { background: var(--orbit-coral); color: #fff; }
+  .btn.primary:hover { background: var(--orbit-coral-dark); }
+  .soc {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    padding: 9px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    color: #fff; text-decoration: none;
+    border: 1px solid rgba(255,255,255,.6); background: rgba(59,42,32,.35);
+  }
+  .soc:hover { background: rgba(59,42,32,.55); border-color: #fff; }
+  .scroll-cue {
+    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 2;
+    font-family: var(--font-pixel); font-size: 10px; letter-spacing: 0.3em; color: #fff; opacity: .8;
+    animation: cue 1.8s ease-in-out infinite;
+  }
+  @keyframes cue { 50% { transform: translate(-50%, 6px); } }
+
+  /* ============ FLOATING PANELS ============ */
+  .panels {
+    max-width: 72rem; margin-inline: auto; padding: 0 16px;
+    position: relative; z-index: 3;
+  }
+  .panel {
+    background: var(--orbit-surface); border: var(--orbit-border-strong);
+    box-shadow: var(--orbit-shadow-overlay); margin-top: -34px; position: relative;
+  }
+  .panel + .panel { margin-top: 36px; }
+  .panel-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-bottom: var(--orbit-border);
+    background: var(--orbit-paper-deep);
+  }
+  .panel-head .tag {
+    font-family: var(--font-pixel); font-size: 10px; font-weight: bold;
+    background: var(--orbit-rail); color: var(--orbit-paper); padding: 3px 8px; text-transform: uppercase;
+  }
+  .panel-head h2 { font-family: var(--font-display); font-weight: 700; font-size: 15px; text-transform: uppercase; }
+  .panel-head .line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--orbit-line-strong), transparent); }
+  .panel-body { padding: 18px 16px; }
+
+  /* ship panel — coral accent */
+  .panel.ship { border-color: var(--orbit-coral); box-shadow: var(--orbit-shadow-accent); }
+  .ship-flex { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .ship-faces { display: flex; align-items: center; flex: 0 0 auto; }
+  .ship-face {
+    width: 68px; height: 68px; overflow: hidden; border: var(--orbit-border-strong);
+    box-shadow: var(--orbit-shadow); background: var(--orbit-surface);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700;
+  }
+  .ship-face.f1 { background: linear-gradient(135deg,#ff7ad9,#ffd6f5); }
+  .ship-face.f2 { background: linear-gradient(135deg,#8f7bff,#c8b6ff); }
+  .ship-face + .ship-face { margin-left: -16px; }
+  .ship-meta { min-width: 0; flex: 1 1 260px; }
+  .ship-names { font-family: var(--font-display); font-size: 22px; font-weight: 700; }
+  .ship-since { font-family: var(--font-pixel); font-size: 10px; color: var(--orbit-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+  .ship-desc { font-size: 13.5px; margin-top: 8px; }
+  .ship-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .ship-tags span { font-family: var(--font-pixel); font-size: 10px; border: var(--orbit-border-strong); background: var(--orbit-paper); padding: 2px 8px; }
+  .ship-feat {
+    display: inline-block; margin-top: 10px; font-family: var(--font-pixel); font-size: 9.5px; font-weight: bold;
+    background: var(--orbit-mint); border: var(--orbit-border-strong); padding: 2px 8px;
+  }
+
+  /* works panel — compact rows */
+  .wrow {
+    display: grid; grid-template-columns: 40px 48px 1fr auto; gap: 12px; align-items: center;
+    padding: 10px 4px; text-decoration: none; color: var(--orbit-ink);
+  }
+  .wrow + .wrow { border-top: var(--orbit-border); }
+  .wrow:hover { background: var(--orbit-paper-deep); }
+  .wrow .no { font-family: var(--font-pixel); font-size: 11px; font-weight: bold; color: var(--orbit-coral-dark); }
+  .wrow .thumb { width: 40px; aspect-ratio: 2/3; border: var(--orbit-border); }
+  .t1 { background: linear-gradient(160deg,#8f7bff,#ff7ad9); }
+  .t2 { background: linear-gradient(160deg,#4dd8ff,#5df2b8); }
+  .t3 { background: linear-gradient(160deg,#ff7ad9,#ffe86b); }
+  .wrow .t { font-weight: 700; font-size: 14px; }
+  .wrow .r { font-family: var(--font-pixel); font-size: 9.5px; color: var(--orbit-muted); text-transform: uppercase; margin-top: 2px; }
+  .wrow .go { font-family: var(--font-pixel); font-size: 11px; color: var(--orbit-coral); }
+
+  /* halo panel — rail inversion */
+  .panel.halo { background: var(--orbit-rail); color: var(--orbit-paper); border-color: var(--orbit-line-strong); }
+  .panel.halo .panel-head { background: transparent; border-bottom: 1px solid color-mix(in srgb, var(--orbit-paper) 20%, transparent); }
+  .panel.halo .tag { background: var(--orbit-mint); color: var(--orbit-ink); }
+  .panel.halo .line { background: linear-gradient(90deg, var(--orbit-mint), transparent); }
+  .moment { border: 1px solid color-mix(in srgb, var(--orbit-paper) 20%, transparent); padding: 12px 14px; }
+  .moment + .moment { margin-top: 10px; }
+  .moment .who { font-family: var(--font-pixel); font-size: 10px; color: var(--orbit-mint); }
+  .moment .txt { font-size: 13.5px; margin-top: 4px; }
+  .moment .react { font-family: var(--font-pixel); font-size: 9.5px; opacity: .6; margin-top: 5px; }
+  .halo-link {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 14px;
+    background: var(--orbit-surface); color: var(--orbit-ink); padding: 10px 20px;
+    font-size: 13px; font-weight: 600; text-decoration: none; border: var(--orbit-border-strong);
+  }
+  .halo-link:hover { background: var(--orbit-coral-soft); }
+
+  footer {
+    margin-top: 48px; padding: 14px 16px 32px; text-align: center;
+    font-family: var(--font-pixel); font-size: 10px; letter-spacing: 1px; color: var(--orbit-muted);
+  }
+
+  /* ============ DESKTOP ============ */
+  @media (min-width: 900px) {
+    .hero-id { padding: 0 40px 56px; }
+    .panels { padding: 0 40px; }
+    .panel { margin-top: -56px; }
+    .panel + .panel { margin-top: 44px; }
+    .panel-body { padding: 24px 26px; }
+    .panel.works .panel-body { display: grid; grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee span, .hero .stars i, .scroll-cue { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme==='midnight'?'light':'midnight'">◐ THEME</button>
+
+<div class="marquee"><span>✦ มิ้ลค์ พรรษา ✦ MILK PANSA ✦ MILKLOVE ✦ 23.5 องศาที่โลกเอียง ✦ GL-ORBIT ARTIST FILE ✦&#160;</span></div>
+
+<!-- FULL-BLEED PHOTO HERO -->
+<header class="hero" role="img" aria-label="Artist profile photo (mock)">
+  <div class="stars">
+    <i style="top:14%;left:10%">✦</i><i style="top:26%;left:82%;animation-delay:.4s">✧</i>
+    <i style="top:48%;left:24%;animation-delay:.9s">✦</i><i style="top:20%;left:55%;animation-delay:1.3s">✧</i>
+    <i style="top:38%;left:68%;animation-delay:.7s">✦</i>
+  </div>
+  <span class="ph-tag">PHOTO<br>800×1000</span>
+  <span class="kind">ARTIST</span>
+  <div class="hero-id">
+    <h1 class="nick">มิ้ลค์</h1>
+    <div class="fname">พรรษา วอสเบียน</div>
+    <div class="ename">PANSA VOSBEIN · MILK PANSA</div>
+    <div class="row">
+      <button class="btn primary">♥ Favorite</button>
+      <button class="btn">↗ Share</button>
+      <a class="soc" href="#">📸 IG</a>
+      <a class="soc" href="#">𝕏 X</a>
+      <a class="soc" href="#">♪ TIKTOK</a>
+    </div>
+  </div>
+  <span class="scroll-cue">▼ SCROLL</span>
+</header>
+
+<!-- FLOATING PANELS -->
+<main class="panels">
+
+  <!-- SHIP PANEL -->
+  <section class="panel ship hud">
+    <div class="panel-head"><span class="tag">OTP</span><h2>คู่จิ้น</h2><span class="line"></span></div>
+    <div class="panel-body">
+      <div class="ship-flex">
+        <span class="ship-faces">
+          <span class="ship-face f1 orbit-round-data">ม</span>
+          <span class="ship-face f2 orbit-round-data">ล</span>
+        </span>
+        <div class="ship-meta">
+          <div class="ship-names">มิ้ลค์เลิฟ · MilkLove</div>
+          <div class="ship-since">SHIP SINCE: 15 MAR 2024</div>
+          <p class="desc">คู่จิ้นจาก 23.5 องศาที่โลกเอียง เคมีดีต่อใจจนแฟน ๆ ตั้งเรือลำนี้กันทั้งโลก (mock desc)</p>
+          <div class="ship-tags"><span>#มิ้ลค์เลิฟ</span><span>#MilkLove</span><span>#23point5</span></div>
+          <span class="ship-feat">★ FEATURED SHIP</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKS PANEL -->
+  <section class="panel works">
+    <div class="panel-head"><span class="tag">FILM</span><h2>ซีรีส์ที่เล่น</h2><span class="line"></span></div>
+    <div class="panel-body" style="padding-top:8px;padding-bottom:8px">
+      <a class="wrow" href="#"><span class="no">01</span><span class="thumb t1"></span><span><span class="t">23.5 องศาที่โลกเอียง</span><span class="r" style="display:block">ROLE: องศา</span></span><span class="go">→</span></a>
+      <a class="wrow" href="#"><span class="no">02</span><span class="thumb t2"></span><span><span class="t">Whale Store xoxo</span><span class="r" style="display:block">ROLE: หมูหวาน</span></span><span class="go">→</span></a>
+      <a class="wrow" href="#"><span class="no">03</span><span class="thumb t3"></span><span><span class="t">Vice Versa รักสลับโลก</span><span class="r" style="display:block">ROLE: GUEST</span></span><span class="go">→</span></a>
+    </div>
+  </section>
+
+  <!-- HALO PANEL -->
+  <section class="panel halo">
+    <div class="panel-head"><span class="tag">☆</span><h2>โพสต์ที่เกี่ยวข้อง</h2><span class="line"></span></div>
+    <div class="panel-body">
+      <div class="moment"><div class="who">@orbitfan_th · 3H AGO</div><div class="txt">มิ้ลค์ในงานแฟนมีตวันนี้คือที่สุด 🥹✦</div><div class="react">♥ 1.2K</div></div>
+      <div class="moment"><div class="who">@milklovess · 1D AGO</div><div class="txt">รวมโมเมนต์ มิ้ลค์เลิฟ ช่วง press tour ไว้ให้แล้วในเธรดนี้ ↓</div><div class="react">♥ 856</div></div>
+      <a class="halo-link" href="#">ดู Moment ทั้งหมด →</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>GL-ORBIT ✦ ARTIST MOCKUP L — FULL-BLEED PHOTO — DATA: artists + socials + ships + seriesArtists + momentArtists</footer>
+
+</body>
+</html>

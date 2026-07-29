@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>มิ้ลค์ — Orbit Mockup I (Sticky Sidebar Split)</title>
+<style>
+  /* ============ ORBIT TOKENS (from app.css) ============ */
+  :root {
+    --orbit-paper: #fbf3e4;
+    --orbit-paper-deep: #f3e7cf;
+    --orbit-surface: #ffffff;
+    --orbit-ink: #3b2a20;
+    --orbit-muted: #8a725f;
+    --orbit-line: #d8c4a8;
+    --orbit-line-strong: #b8a288;
+    --orbit-coral: #e4572e;
+    --orbit-coral-dark: #b23f1d;
+    --orbit-coral-soft: #fde4d6;
+    --orbit-lavender: #f6c9d8;
+    --orbit-mint: #cfe7f5;
+    --orbit-rail: #3b2a20;
+    --orbit-success: #2f7a4f;
+    --orbit-shadow: 3px 3px 0 rgba(59, 42, 32, 0.12);
+    --orbit-shadow-raised: 4px 4px 0 rgba(59, 42, 32, 0.16);
+    --orbit-shadow-interactive: 3px 3px 0 rgba(59, 42, 32, 0.16);
+    --orbit-shadow-accent: 3px 3px 0 rgba(228, 87, 46, 0.25);
+    --orbit-shadow-overlay: 5px 5px 0 rgba(59, 42, 32, 0.18);
+    --orbit-border: 1px solid var(--orbit-line);
+    --orbit-border-strong: 1px solid var(--orbit-line-strong);
+    --orbit-border-interactive: 1px solid var(--orbit-coral);
+    --font-display: 'Mali', 'Sarabun', 'Segoe UI', sans-serif;
+    --font-body: 'Sarabun', 'Mali', 'Segoe UI', sans-serif;
+    --font-pixel: 'Courier New', ui-monospace, monospace;
+  }
+  [data-theme="midnight"] {
+    --orbit-paper: #0d0a14; --orbit-paper-deep: #100c1b; --orbit-surface: #171224;
+    --orbit-ink: #f2ecfa; --orbit-muted: #9d8fb8; --orbit-line: #2d2344; --orbit-line-strong: #4a3670;
+    --orbit-coral: #ff4d7e; --orbit-coral-dark: #d12f60; --orbit-coral-soft: #3a1e33;
+    --orbit-lavender: #241a3f; --orbit-mint: #123c38; --orbit-rail: #100c1b; --orbit-success: #52e0a8;
+    --orbit-shadow: 0 0 24px rgba(95,242,224,.08); --orbit-shadow-raised: 0 0 32px rgba(95,242,224,.12);
+    --orbit-shadow-interactive: 0 0 12px rgba(255,77,126,.2); --orbit-shadow-accent: 0 0 18px rgba(95,242,224,.22);
+    --orbit-shadow-overlay: 0 0 40px rgba(95,242,224,.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; border-radius: 0; }
+  body {
+    font-family: var(--font-body); color: var(--orbit-ink);
+    background: var(--orbit-paper);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Ccircle cx='2' cy='2' r='1' fill='%233b2a20' fill-opacity='.05'/%3E%3C/svg%3E");
+    line-height: 1.55; min-height: 100dvh;
+  }
+  .orbit-round-data { border-radius: 9999px !important; }
+  a, button { transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease, transform 140ms ease; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--orbit-coral-dark); outline-offset: 2px; }
+
+  /* marquee */
+  .marquee {
+    background: var(--orbit-rail); color: var(--orbit-paper);
+    font-size: 12px; font-weight: 600; overflow: hidden; white-space: nowrap;
+    padding: 6px 0; border-bottom: var(--orbit-border-strong);
+  }
+  .marquee span { display: inline-block; padding-left: 100%; animation: mq 24s linear infinite; }
+  @keyframes mq { to { transform: translateX(-100%); } }
+
+  .theme-toggle {
+    position: fixed; top: 34px; right: 10px; z-index: 60;
+    font-family: var(--font-pixel); font-size: 10px; font-weight: bold;
+    background: var(--orbit-surface); color: var(--orbit-ink);
+    border: var(--orbit-border-strong); box-shadow: var(--orbit-shadow-interactive);
+    padding: 8px 12px; cursor: pointer; min-height: 40px; text-transform: uppercase;
+  }
+  .theme-toggle:hover { border-color: var(--orbit-coral); }
+
+  .hud { position: relative; }
+  .hud::before, .hud::after {
+    content: ""; position: absolute; width: 10px; height: 10px; pointer-events: none; z-index: 3;
+    border: 1px solid var(--orbit-coral);
+  }
+  .hud::before { top: -4px; left: -4px; border-right: 0; border-bottom: 0; }
+  .hud::after { bottom: -4px; right: -4px; border-left: 0; border-top: 0; }
+
+  /* ============ SPLIT LAYOUT ============ */
+  .split {
+    max-width: 72rem; margin-inline: auto;
+    display: grid; grid-template-columns: 1fr; gap: 0;
+  }
+
+  /* ---- left: identity rail ---- */
+  .rail {
+    background: var(--orbit-rail); color: var(--orbit-paper);
+    border-bottom: var(--orbit-border-strong);
+    padding: 28px 20px 32px; position: relative; overflow: hidden;
+  }
+  .rail::after { /* scanlines */
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 2px, transparent 2px 5px);
+  }
+  .rail .stars i {
+    position: absolute; color: var(--orbit-mint); font-style: normal;
+    animation: tw 2.4s ease-in-out infinite; pointer-events: none;
+  }
+  @keyframes tw { 50% { opacity: .25; transform: scale(.7); } }
+  .rail-inner { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 16px; }
+  .rail .back {
+    align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
+    padding: 4px 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; text-decoration: none;
+    color: var(--orbit-paper); border: 1px solid color-mix(in srgb, var(--orbit-paper) 30%, transparent);
+  }
+  .rail .back:hover { border-color: var(--orbit-coral); }
+  .rail .photo-frame {
+    background: var(--orbit-surface); border: 2px solid var(--orbit-coral);
+    box-shadow: 6px 6px 0 rgba(0,0,0,.35); padding: 6px; width: min(260px, 70vw);
+  }
+  .rail .photo {
+    aspect-ratio: 4/5; display: flex; align-items: flex-end; padding: 10px;
+    font-family: var(--font-pixel); font-size: 11px; font-weight: bold; color: #fff;
+    text-shadow: 1px 1px 0 var(--orbit-rail);
+    background: linear-gradient(160deg, #8f7bff 0%, #ff7ad9 55%, #4dd8ff 100%);
+  }
+  .rail .kicker {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase;
+    color: var(--orbit-mint);
+  }
+  .rail h1.nick {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(46px, 12vw, 76px); line-height: .95; letter-spacing: -0.03em;
+  }
+  .rail .fname { font-weight: 700; font-size: clamp(15px, 3vw, 19px); }
+  .rail .ename {
+    font-family: var(--font-pixel); font-size: clamp(10px, 2vw, 12px);
+    color: var(--orbit-lavender); text-transform: uppercase; letter-spacing: 0.14em; margin-top: 3px;
+  }
+  [data-theme="light"] .rail .ename { color: #f6c9d8; }
+
+  .rail .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .btn {
+    font-family: var(--font-body); font-weight: 600; font-size: 13px;
+    background: var(--orbit-surface); color: var(--orbit-ink);
+    border: var(--orbit-border-interactive); box-shadow: var(--orbit-shadow-interactive);
+    padding: 10px 16px; cursor: pointer; text-transform: uppercase;
+    min-height: 44px; display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+  }
+  .btn:hover { border-color: var(--orbit-coral-dark); box-shadow: var(--orbit-shadow-accent); }
+  .btn.primary { background: var(--orbit-coral); color: #fff; }
+  .btn.primary:hover { background: var(--orbit-coral-dark); }
+
+  .rail .soc-list { display: grid; gap: 8px; margin-top: 6px; }
+  .rail .soc {
+    display: flex; align-items: center; gap: 10px; min-height: 44px;
+    padding: 9px 12px; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    color: var(--orbit-paper); text-decoration: none;
+    border: 1px solid color-mix(in srgb, var(--orbit-paper) 22%, transparent);
+  }
+  .rail .soc:hover { border-color: var(--orbit-coral); background: rgba(255,255,255,.05); }
+  .rail .soc .dot { width: 12px; height: 12px; flex: 0 0 12px; }
+  .rail .soc .arr { margin-left: auto; color: var(--orbit-mint); }
+  .d-ig { background: #e1306c; } .d-x { background: #000; } .d-tt { background: #010101; }
+
+  /* ---- right: content column ---- */
+  .content { padding: 4px 0 0; }
+  section { margin-top: 28px; }
+  .sec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 0 16px; }
+  .sec-head .tag {
+    font-family: var(--font-pixel); font-size: 10px; font-weight: bold;
+    background: var(--orbit-rail); color: var(--orbit-paper); padding: 3px 8px; text-transform: uppercase;
+  }
+  .sec-head h2 { font-family: var(--font-display); font-weight: 700; font-size: 17px; text-transform: uppercase; }
+  .sec-head .line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--orbit-line-strong), var(--orbit-line), transparent); }
+
+  /* ship — wide banner */
+  .ship-banner {
+    margin: 0 16px; border: var(--orbit-border-strong); box-shadow: var(--orbit-shadow-accent);
+    background: linear-gradient(90deg, var(--orbit-coral-soft), var(--orbit-lavender));
+    display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 16px;
+    text-decoration: none; color: var(--orbit-ink); align-items: start;
+  }
+  .ship-banner:hover { box-shadow: var(--orbit-shadow-raised); }
+  .ship-banner .faces { display: flex; align-items: center; padding-top: 4px; }
+  .ship-banner .face {
+    width: 60px; height: 60px; overflow: hidden; border: var(--orbit-border-strong);
+    box-shadow: var(--orbit-shadow); background: var(--orbit-surface);
+    display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700;
+  }
+  .ship-banner .face.f1 { background: linear-gradient(135deg,#ff7ad9,#ffd6f5); }
+  .ship-banner .face.f2 { background: linear-gradient(135deg,#8f7bff,#c8b6ff); }
+  .ship-banner .face + .face { margin-left: -14px; }
+  .ship-banner .names { font-family: var(--font-display); font-size: 20px; font-weight: 700; }
+  .ship-banner .since { font-family: var(--font-pixel); font-size: 10px; color: var(--orbit-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+  .ship-banner .desc { font-size: 13.5px; margin-top: 8px; }
+  .ship-banner .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .ship-banner .tags span { font-family: var(--font-pixel); font-size: 10px; border: var(--orbit-border-strong); background: var(--orbit-surface); padding: 2px 8px; }
+  .ship-banner .feat {
+    display: inline-block; margin-top: 10px; font-family: var(--font-pixel); font-size: 9.5px; font-weight: bold;
+    background: var(--orbit-mint); border: var(--orbit-border-strong); padding: 2px 8px;
+  }
+
+  /* series — poster grid */
+  .series-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 4px 16px 6px;
+  }
+  .s-card { text-decoration: none; color: var(--orbit-ink); display: block; min-width: 0; }
+  .s-card .idx {
+    display: block; font-family: var(--font-pixel); font-size: 10px; font-weight: bold;
+    letter-spacing: 0.18em; color: var(--orbit-coral-dark); margin-bottom: 6px;
+  }
+  .s-card .poster {
+    aspect-ratio: 2/3; border: var(--orbit-border); box-shadow: var(--orbit-shadow);
+    display: flex; align-items: flex-end; padding: 8px;
+    font-family: var(--font-pixel); font-size: 10px; font-weight: bold; color: #fff;
+    text-shadow: 1px 1px 0 var(--orbit-ink); background: var(--orbit-paper-deep);
+  }
+  .p1 { background: linear-gradient(160deg,#8f7bff,#ff7ad9); }
+  .p2 { background: linear-gradient(160deg,#4dd8ff,#5df2b8); }
+  .p3 { background: linear-gradient(160deg,#ff7ad9,#ffe86b); }
+  .s-card:hover .poster { border-color: var(--orbit-coral); box-shadow: var(--orbit-shadow-accent); }
+  .s-card .t { font-weight: 700; font-size: 13.5px; margin-top: 8px; }
+  .s-card .r { font-family: var(--font-pixel); font-size: 9.5px; color: var(--orbit-muted); text-transform: uppercase; margin-top: 2px; }
+
+  /* halo moments — compact feed */
+  .moments { margin: 0 16px; display: grid; gap: 10px; }
+  .moment {
+    border: var(--orbit-border); background: var(--orbit-surface);
+    box-shadow: var(--orbit-shadow); padding: 12px 14px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .moment .av { flex: 0 0 36px; width: 36px; height: 36px; border: var(--orbit-border-strong); overflow: hidden; }
+  .a1 { background: linear-gradient(135deg,#ff7ad9,#ffd6f5); }
+  .a2 { background: linear-gradient(135deg,#4dd8ff,#a8e6ff); }
+  .moment .mm { min-width: 0; flex: 1; }
+  .moment .who { font-family: var(--font-pixel); font-size: 10px; color: var(--orbit-muted); }
+  .moment .txt { font-size: 13.5px; margin-top: 4px; }
+  .moment .react { font-family: var(--font-pixel); font-size: 9.5px; color: var(--orbit-coral-dark); margin-top: 5px; }
+  .halo-cta {
+    margin: 14px 16px 0; background: var(--orbit-rail); color: var(--orbit-paper);
+    padding: 16px 18px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .halo-cta .k { font-size: 10px; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: var(--orbit-mint); }
+  .halo-cta a {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    background: var(--orbit-surface); color: var(--orbit-ink); padding: 8px 18px;
+    font-size: 13px; font-weight: 600; text-decoration: none; border: var(--orbit-border-strong);
+  }
+  .halo-cta a:hover { background: var(--orbit-coral-soft); }
+
+  footer {
+    margin-top: 40px; padding: 14px 16px 32px; text-align: center;
+    font-family: var(--font-pixel); font-size: 10px; letter-spacing: 1px; color: var(--orbit-muted);
+  }
+
+  /* ============ DESKTOP: sticky rail ============ */
+  @media (min-width: 900px) {
+    .split { grid-template-columns: 380px minmax(0, 1fr); align-items: start; }
+    .rail {
+      border-bottom: 0; border-right: var(--orbit-border-strong);
+      position: sticky; top: 0; min-height: 100vh;
+      padding: 32px 26px 36px;
+    }
+    .content { padding-top: 8px; }
+    .sec-head { padding-left: 26px; padding-right: 26px; }
+    .ship-banner, .moments, .halo-cta { margin-inline: 26px; }
+    .series-grid { grid-template-columns: repeat(3, 1fr); padding-left: 26px; padding-right: 26px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee span, .rail .stars i { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme==='midnight'?'light':'midnight'">◐ THEME</button>
+
+<div class="marquee"><span>✦ มิ้ลค์ พรรษา ✦ MILK PANSA ✦ MILKLOVE ✦ 23.5 องศาที่โลกเอียง ✦ GL-ORBIT ARTIST FILE ✦&#160;</span></div>
+
+<div class="split">
+
+  <!-- IDENTITY RAIL (sticky on desktop) -->
+  <aside class="rail">
+    <div class="stars">
+      <i style="top:6%;left:82%">✦</i><i style="top:40%;left:8%;animation-delay:.6s">✧</i>
+      <i style="top:78%;left:88%;animation-delay:1.2s">✦</i>
+    </div>
+    <div class="rail-inner">
+      <a class="back" href="#">← BACK</a>
+      <div class="photo-frame hud">
+        <div class="photo">PHOTO<br>800×1000</div>
+      </div>
+      <div>
+        <p class="kicker">Artist Profile</p>
+        <h1 class="nick">มิ้ลค์</h1>
+        <div class="fname">พรรษา วอสเบียน</div>
+        <div class="ename">PANSA VOSBEIN · MILK PANSA</div>
+      </div>
+      <div class="actions">
+        <button class="btn primary">♥ Favorite</button>
+        <button class="btn">↗ Share</button>
+      </div>
+      <div class="soc-list">
+        <a class="soc" href="#"><span class="dot d-ig"></span>INSTAGRAM<span class="arr">↗</span></a>
+        <a class="soc" href="#"><span class="dot d-x"></span>X (TWITTER)<span class="arr">↗</span></a>
+        <a class="soc" href="#"><span class="dot d-tt"></span>TIKTOK<span class="arr">↗</span></a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENT COLUMN -->
+  <main class="content">
+
+    <!-- SHIP -->
+    <section>
+      <div class="sec-head"><span class="tag">OTP</span><h2>คู่จิ้น</h2><span class="line"></span></div>
+      <a class="ship-banner hud" href="#">
+        <span class="faces">
+          <span class="face f1 orbit-round-data">ม</span>
+          <span class="face f2 orbit-round-data">ล</span>
+        </span>
+        <span>
+          <span class="names">มิ้ลค์เลิฟ · MilkLove</span>
+          <span class="since" style="display:block">SHIP SINCE: 15 MAR 2024</span>
+          <p class="desc">คู่จิ้นจาก 23.5 องศาที่โลกเอียง เคมีดีต่อใจจนแฟน ๆ ตั้งเรือลำนี้กันทั้งโลก (mock desc)</p>
+          <span class="tags"><span>#มิ้ลค์เลิฟ</span><span>#MilkLove</span><span>#23point5</span></span>
+          <span class="feat">★ FEATURED SHIP</span>
+        </span>
+      </a>
+    </section>
+
+    <!-- SERIES -->
+    <section>
+      <div class="sec-head"><span class="tag">FILM</span><h2>ซีรีส์ที่เล่น</h2><span class="line"></span></div>
+      <div class="series-grid">
+        <a class="s-card" href="#"><span class="idx">01 / WORK</span><div class="poster p1">POSTER 600×900</div><div class="t">23.5 องศาที่โลกเอียง</div><div class="r">ROLE: องศา</div></a>
+        <a class="s-card" href="#"><span class="idx">02 / WORK</span><div class="poster p2">POSTER 600×900</div><div class="t">Whale Store xoxo</div><div class="r">ROLE: หมูหวาน</div></a>
+        <a class="s-card" href="#"><span class="idx">03 / WORK</span><div class="poster p3">POSTER 600×900</div><div class="t">Vice Versa รักสลับโลก</div><div class="r">ROLE: GUEST</div></a>
+      </div>
+    </section>
+
+    <!-- HALO -->
+    <section>
+      <div class="sec-head"><span class="tag">☆</span><h2>โพสต์ที่เกี่ยวข้อง</h2><span class="line"></span></div>
+      <div class="moments">
+        <div class="moment"><span class="av a1 orbit-round-data"></span><div class="mm"><div class="who">@orbitfan_th · 3 ชม.ที่แล้ว</div><div class="txt">มิ้ลค์ในงานแฟนมีตวันนี้คือที่สุด 🥹✦</div><div class="react">♥ 1.2K</div></div></div>
+        <div class="moment"><span class="av a2 orbit-round-data"></span><div class="mm"><div class="who">@milklovess · เมื่อวาน</div><div class="txt">รวมโมเมนต์ มิ้ลค์เลิฟ ช่วง press tour ไว้ให้แล้วในเธรดนี้ ↓</div><div class="react">♥ 856</div></div></div>
+      </div>
+      <div class="halo-cta">
+        <span class="k">Orbit Halo · Moments</span>
+        <a href="#">ดู Moment ทั้งหมด →</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>GL-ORBIT ✦ ARTIST MOCKUP I — STICKY SIDEBAR SPLIT — DATA: artists + socials + ships + seriesArtists + momentArtists</footer>
+
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>มิ้ลค์ พรรษา — Y2K Mockup A (Hero Portrait)</title>
+<style>
+  /* ============ Y2K TOKENS ============ */
+  :root {
+    --y2k-bg: #e8e6f0;
+    --y2k-paper: #f4f2fa;
+    --y2k-ink: #1a1a2e;
+    --y2k-chrome: linear-gradient(180deg, #ffffff 0%, #d5d5e6 45%, #a9a9c4 50%, #d5d5e6 55%, #f0f0f8 100%);
+    --y2k-irid: linear-gradient(120deg, #ffd6f5 0%, #c8b6ff 25%, #a8e6ff 50%, #b6ffd8 75%, #fff3b8 100%);
+    --y2k-pink: #ff7ad9;
+    --y2k-lav: #8f7bff;
+    --y2k-cyan: #4dd8ff;
+    --y2k-mint: #5df2b8;
+    --y2k-yellow: #ffe86b;
+    --y2k-win: 3px solid var(--y2k-ink);
+    --shadow-hard: 6px 6px 0 rgba(26,26,46,.9);
+    --shadow-soft: 4px 4px 0 rgba(26,26,46,.25);
+    --font-pixel: "Courier New", ui-monospace, monospace;
+    --font-main: "Segoe UI", "Sarabun", "Helvetica Neue", sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: var(--font-main);
+    background: var(--y2k-bg);
+    background-image: radial-gradient(circle at 1px 1px, rgba(26,26,46,.18) 1px, transparent 0);
+    background-size: 22px 22px;
+    color: var(--y2k-ink);
+    line-height: 1.55;
+    padding-bottom: 72px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 14px; }
+
+  /* HUD brackets */
+  .hud { position: relative; }
+  .hud::before, .hud::after {
+    content: ""; position: absolute; width: 12px; height: 12px; pointer-events: none; z-index: 2;
+    border: 3px solid var(--y2k-ink);
+  }
+  .hud::before { top: -3px; left: -3px; border-right: 0; border-bottom: 0; background: var(--y2k-cyan); }
+  .hud::after { bottom: -3px; right: -3px; border-left: 0; border-top: 0; background: var(--y2k-pink); }
+
+  /* ============ TOPBAR / MARQUEE ============ */
+  .topbar {
+    background: var(--y2k-chrome); border-bottom: var(--y2k-win);
+    padding: 10px 14px; display: flex; align-items: center; gap: 10px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar .dot { width: 14px; height: 14px; border: 2px solid var(--y2k-ink); border-radius: 50%; }
+  .dot.p { background: var(--y2k-pink); } .dot.l { background: var(--y2k-lav); } .dot.c { background: var(--y2k-cyan); }
+  .topbar .title {
+    font-family: var(--font-pixel); font-weight: bold; font-size: 14px; letter-spacing: 1px;
+    text-transform: uppercase; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+  .topbar .badge-y2k {
+    margin-left: auto; font-family: var(--font-pixel); font-size: 11px;
+    background: var(--y2k-ink); color: #b6ffd8; padding: 3px 8px;
+  }
+  .marquee {
+    background: var(--y2k-ink); color: var(--y2k-mint);
+    font-family: var(--font-pixel); font-size: 12px;
+    overflow: hidden; white-space: nowrap; padding: 6px 0; border-bottom: var(--y2k-win);
+  }
+  .marquee span { display: inline-block; padding-left: 100%; animation: mq 18s linear infinite; }
+  @keyframes mq { to { transform: translateX(-100%); } }
+
+  /* ============ SPLIT HERO (portrait left / info right) ============ */
+  .hero {
+    display: grid; grid-template-columns: 1fr;
+    border-bottom: var(--y2k-win);
+  }
+  .hero-photo {
+    position: relative; min-height: 60vh;
+    background:
+      radial-gradient(circle at 30% 20%, #ffd6f5 0%, transparent 45%),
+      linear-gradient(160deg, #8f7bff 0%, #ff7ad9 55%, #4dd8ff 100%);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; border-bottom: var(--y2k-win);
+  }
+  .hero-photo::before { /* scanlines */
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.08) 0 2px, transparent 2px 4px);
+    pointer-events: none;
+  }
+  .hero-photo .ph-label {
+    font-family: var(--font-pixel); color: #fff; font-weight: bold; font-size: 14px;
+    text-shadow: 1px 1px 0 var(--y2k-ink); text-align: center;
+    border: 2px dashed #fff; padding: 14px 18px;
+  }
+  .hero-photo .stars { position: absolute; inset: 0; }
+  .hero-photo .stars i {
+    position: absolute; color: #fff; font-style: normal;
+    text-shadow: 0 0 6px #fff; animation: tw 2.4s ease-in-out infinite;
+  }
+  @keyframes tw { 50% { opacity: .25; transform: scale(.7); } }
+  .hero-photo .corner-chip {
+    position: absolute; top: 10px; left: 10px;
+    font-family: var(--font-pixel); font-size: 10px; color: #fff;
+    background: rgba(26,26,46,.65); padding: 2px 8px; border: 1px solid #fff;
+  }
+  .hero-photo .rec {
+    position: absolute; top: 10px; right: 10px;
+    font-family: var(--font-pixel); font-size: 10px; color: #ff5b5b;
+    background: rgba(26,26,46,.65); padding: 2px 8px; border: 1px solid #ff5b5b;
+    animation: blink 1.2s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: .3; } }
+
+  .hero-info {
+    padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 14px;
+    background: var(--y2k-paper);
+  }
+  .status-chip {
+    align-self: flex-start; font-family: var(--font-pixel); font-size: 11px;
+    background: var(--y2k-mint); border: 2px solid var(--y2k-ink);
+    box-shadow: 3px 3px 0 var(--y2k-ink); padding: 2px 10px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  h1.th { font-size: clamp(30px, 8vw, 56px); line-height: 1.1; letter-spacing: -1px; }
+  h2.en {
+    font-family: var(--font-pixel); font-weight: normal; font-size: clamp(13px, 2.5vw, 18px);
+    background: var(--y2k-irid); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(1px 1px 0 rgba(26,26,46,.35));
+    margin-top: 2px;
+  }
+  .aka {
+    font-family: var(--font-pixel); font-size: 11px; color: var(--y2k-lav);
+    letter-spacing: 1px;
+  }
+  .bio {
+    border: var(--y2k-win); background: #fff; padding: 14px 16px;
+    box-shadow: var(--shadow-soft); font-size: 14.5px;
+  }
+  .bio .tag {
+    display: inline-block; font-family: var(--font-pixel); font-size: 10px;
+    background: var(--y2k-ink); color: #fff; padding: 2px 8px; margin-bottom: 8px;
+  }
+
+  .socials { display: flex; flex-wrap: wrap; gap: 10px; }
+  .soc {
+    font-family: var(--font-pixel); font-weight: bold; font-size: 12px; text-decoration: none;
+    color: var(--y2k-ink); border: var(--y2k-win); background: var(--y2k-chrome);
+    padding: 10px 16px; box-shadow: var(--shadow-soft);
+    min-height: 44px; display: inline-flex; align-items: center; gap: 8px;
+    text-transform: uppercase; transition: transform .08s, box-shadow .08s;
+  }
+  .soc:active { transform: translate(3px,3px); box-shadow: none; }
+  .soc .ico { font-size: 16px; }
+  .soc small { font-weight: normal; font-size: 10px; color: #555; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn {
+    font-family: var(--font-pixel); font-weight: bold; font-size: 13px;
+    border: var(--y2k-win); background: var(--y2k-chrome);
+    padding: 10px 16px; cursor: pointer; box-shadow: var(--shadow-soft);
+    text-transform: uppercase; letter-spacing: .5px;
+    min-height: 44px; display: inline-flex; align-items: center; gap: 6px;
+    transition: transform .08s, box-shadow .08s;
+  }
+  .btn:active { transform: translate(3px,3px); box-shadow: none; }
+  .btn.primary { background: var(--y2k-pink); color: #fff; text-shadow: 1px 1px 0 var(--y2k-ink); }
+  .btn.ghost { background: var(--y2k-paper); }
+
+  /* ============ SECTIONS ============ */
+  section { margin-top: 26px; }
+  .sec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 0 16px; }
+  .sec-head .tag {
+    font-family: var(--font-pixel); font-size: 11px; background: var(--y2k-ink);
+    color: #fff; padding: 3px 8px; text-transform: uppercase;
+  }
+  .sec-head h3 { font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
+  .sec-head .line { flex: 1; height: 3px; background: var(--y2k-irid); border: 1px solid var(--y2k-ink); }
+
+  /* stat grid */
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px; padding: 0 16px;
+  }
+  .stat {
+    border: var(--y2k-win); background: var(--y2k-paper); padding: 10px 12px;
+    box-shadow: var(--shadow-soft);
+  }
+  .stat .k { font-family: var(--font-pixel); font-size: 10px; text-transform: uppercase; color: var(--y2k-lav); }
+  .stat .v { font-weight: 700; font-size: 14px; margin-top: 2px; }
+
+  /* ship banner */
+  .ship-banner {
+    margin: 0 16px; border: var(--y2k-win); background: var(--y2k-irid);
+    padding: 14px; box-shadow: var(--shadow-hard);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .ship-banner .hearts { font-size: 26px; }
+  .ship-banner .names { font-size: 18px; font-weight: 800; }
+  .ship-banner .sub { font-family: var(--font-pixel); font-size: 11px; }
+  .ship-banner .go {
+    margin-left: auto; font-family: var(--font-pixel); font-size: 11px; font-weight: bold;
+    border: 2px solid var(--y2k-ink); background: #fff; padding: 8px 14px; text-decoration: none; color: var(--y2k-ink);
+    min-height: 44px; display: inline-flex; align-items: center;
+  }
+
+  /* series cards */
+  .series-row {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 200px;
+    gap: 14px; overflow-x: auto; padding: 4px 16px 14px;
+    scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+  }
+  .s-card { scroll-snap-align: start; border: var(--y2k-win); background: #fff; box-shadow: var(--shadow-soft); }
+  .s-card .poster {
+    aspect-ratio: 2/3; display: flex; align-items: flex-end; padding: 8px;
+    font-family: var(--font-pixel); color: #fff; font-size: 11px; font-weight: bold;
+    text-shadow: 1px 1px 0 var(--y2k-ink);
+  }
+  .p1 { background: linear-gradient(160deg,#8f7bff,#ff7ad9); }
+  .p2 { background: linear-gradient(160deg,#4dd8ff,#5df2b8); }
+  .p3 { background: linear-gradient(160deg,#ff7ad9,#ffe86b); }
+  .s-card .meta { padding: 8px 10px; border-top: var(--y2k-win); }
+  .s-card .t { font-weight: 700; font-size: 13px; }
+  .s-card .r { font-family: var(--font-pixel); font-size: 10px; color: var(--y2k-lav); }
+  .s-card .y { font-family: var(--font-pixel); font-size: 10px; color: #555; }
+
+  /* gallery strip */
+  .gallery-strip {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 46%;
+    gap: 12px; overflow-x: auto; padding: 4px 16px 12px;
+    scroll-snap-type: x mandatory;
+  }
+  .g-item { scroll-snap-align: start; border: var(--y2k-win); background: #fff; padding: 5px; box-shadow: var(--shadow-soft); position: relative; }
+  .g-item .ph { aspect-ratio: 4/5; display:flex; align-items:center; justify-content:center; font-family: var(--font-pixel); font-size: 10px; color: var(--y2k-ink); }
+  .g1 .ph { background: linear-gradient(135deg,#c8b6ff,#ffd6f5); }
+  .g2 .ph { background: linear-gradient(135deg,#a8e6ff,#b6ffd8); }
+  .g3 .ph { background: linear-gradient(135deg,#fff3b8,#ff7ad9); }
+  .g4 .ph { background: linear-gradient(135deg,#8f7bff,#4dd8ff); }
+  .g-item .cap { font-family: var(--font-pixel); font-size: 10px; padding: 6px 2px 2px; }
+  .g-item .num {
+    position: absolute; top: -8px; right: -8px; width: 26px; height: 26px;
+    background: var(--y2k-cyan); border: 2px solid var(--y2k-ink); border-radius: 50%;
+    font-family: var(--font-pixel); font-size: 11px; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* dock */
+  .dock {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: var(--y2k-chrome); border-top: var(--y2k-win);
+    display: flex; justify-content: space-around; padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+  }
+  .dock a {
+    font-family: var(--font-pixel); font-size: 10px; text-decoration: none; color: var(--y2k-ink);
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    min-width: 56px; min-height: 44px; justify-content: center;
+  }
+  .dock a .ico { font-size: 18px; }
+  .dock a.active { background: var(--y2k-pink); color: #fff; border: 2px solid var(--y2k-ink); box-shadow: 2px 2px 0 var(--y2k-ink); }
+
+  footer {
+    margin-top: 32px; padding: 12px 16px 8px;
+    font-family: var(--font-pixel); font-size: 10px; letter-spacing: 1px; color: #6a6a8a; text-align: center;
+  }
+
+  /* ============ DESKTOP: split hero 45/55 ============ */
+  @media (min-width: 900px) {
+    .hero { grid-template-columns: 45% 55%; min-height: 78vh; }
+    .hero-photo { border-bottom: 0; border-right: var(--y2k-win); min-height: 0; }
+    .hero-info { padding: 36px 32px; justify-content: center; gap: 18px; }
+    .sec-head, .stat-grid { padding-left: 28px; padding-right: 28px; }
+    .series-row { grid-auto-columns: 220px; padding-left: 28px; padding-right: 28px; }
+    .gallery-strip { grid-auto-columns: 24%; padding-left: 28px; padding-right: 28px; }
+    .ship-banner { margin: 0 28px; }
+    .dock { display: none; }
+    body { padding-bottom: 40px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee span, .hero-photo .stars i, .rec { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="dot p"></span><span class="dot l"></span><span class="dot c"></span>
+  <span class="title">GL-ORBIT.EXE — ARTIST_PROFILE</span>
+  <span class="badge-y2k">A · HERO</span>
+</div>
+
+<div class="marquee"><span>✦ มิ้ลค์ พรรษา ✦ MILK PANSA ✦ MILKLOVE FOREVER ✦ 23.5 องศาที่โลกเอียง ✦ FOLLOW ON IG @panly.v ✦&#160;</span></div>
+
+<!-- SPLIT HERO -->
+<header class="hero">
+  <div class="hero-photo" role="img" aria-label="Artist portrait (mock)">
+    <div class="stars">
+      <i style="top:12%;left:8%">✦</i><i style="top:30%;left:78%;animation-delay:.4s">✧</i>
+      <i style="top:60%;left:22%;animation-delay:.9s">✦</i><i style="top:18%;left:55%;animation-delay:1.3s">✧</i>
+      <i style="top:78%;left:60%;animation-delay:.7s">✦</i>
+    </div>
+    <span class="corner-chip">PROFILE_01.RAW</span>
+    <span class="rec">● REC</span>
+    <div class="ph-label">PHOTO<br>800×1000</div>
+  </div>
+  <div class="hero-info">
+    <span class="status-chip">● ACTRESS · GMMTV</span>
+    <div>
+      <h1 class="th">มิ้ลค์ พรรษา</h1>
+      <h2 class="en">MILK PANSA VOSBEIN</h2>
+      <div class="aka">AKA: MILK · มิ้ลค์ · #milkpansa</div>
+    </div>
+    <div class="bio">
+      <span class="tag">BIO.TXT</span>
+      <p>นักแสดงสาวสังกัด GMMTV โด่งดังจากบท “องศา” ใน 23.5 องศาที่โลกเอียง เป็นหนึ่งในคู่จิ้นมาแรง “มิ้ลค์เลิฟ” ✦ งานแสดงล่าสุด Whale Store xoxo (mock text)</p>
+    </div>
+    <div class="socials">
+      <a class="soc" href="#"><span class="ico">📸</span>IG <small>@panly.v</small></a>
+      <a class="soc" href="#"><span class="ico">𝕏</span>X <small>@panlyyy</small></a>
+      <a class="soc" href="#"><span class="ico">♪</span>TIKTOK <small>@panly.v</small></a>
+    </div>
+    <div class="actions">
+      <button class="btn primary"><span class="ico">♥</span> Favorite</button>
+      <button class="btn ghost"><span class="ico">🔔</span> Notify me</button>
+      <button class="btn ghost"><span class="ico">↗</span> Share</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- STATS -->
+  <section>
+    <div class="sec-head"><span class="tag">DATA</span><h3>ข้อมูลศิลปิน</h3><span class="line"></span></div>
+    <div class="stat-grid">
+      <div class="stat hud"><div class="k">วันเกิด</div><div class="v">31 ก.ค. 1996</div></div>
+      <div class="stat hud"><div class="k">ส่วนสูง</div><div class="v">171 ซม.</div></div>
+      <div class="stat hud"><div class="k">สังกัด</div><div class="v">GMMTV</div></div>
+      <div class="stat hud"><div class="k">เดบิวต์</div><div class="v">2019</div></div>
+      <div class="stat hud"><div class="k">การศึกษา</div><div class="v">ม.เกษตรศาสตร์</div></div>
+      <div class="stat hud"><div class="k">ผู้ติดตามรวม</div><div class="v">3.2M</div></div>
+    </div>
+  </section>
+
+  <!-- SHIP -->
+  <section>
+    <div class="sec-head"><span class="tag">OTP</span><h3>คู่จิ้น</h3><span class="line"></span></div>
+    <div class="ship-banner hud">
+      <span class="hearts">💜💗</span>
+      <div>
+        <div class="names">มิ้ลค์เลิฟ · MilkLove</div>
+        <div class="sub">PARTNER: เลิฟ ภัทรานิษฐ์ · SHIP_ID: ML-001 · FOLLOWERS: 128K</div>
+      </div>
+      <a class="go" href="#">ดูหน้าคู่จิ้น ↗</a>
+    </div>
+  </section>
+
+  <!-- SERIES -->
+  <section>
+    <div class="sec-head"><span class="tag">FILM</span><h3>ซีรีส์ที่เล่น</h3><span class="line"></span></div>
+    <div class="series-row">
+      <div class="s-card"><div class="poster p1">POSTER<br>600×900</div><div class="meta"><div class="t">23.5 องศาที่โลกเอียง</div><div class="r">as องศา · MAIN</div><div class="y">2024 · 12 EP</div></div></div>
+      <div class="s-card"><div class="poster p2">POSTER<br>600×900</div><div class="meta"><div class="t">Whale Store xoxo</div><div class="r">as หมูหวาน · MAIN</div><div class="y">2025</div></div></div>
+      <div class="s-card"><div class="poster p3">POSTER<br>600×900</div><div class="meta"><div class="t">Vice Versa</div><div class="r">GUEST</div><div class="y">2022</div></div></div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section>
+    <div class="sec-head"><span class="tag">IMG</span><h3>Gallery</h3><span class="line"></span></div>
+    <div class="gallery-strip">
+      <div class="g-item g1"><span class="num">1</span><div class="ph">IMG 400×500</div><div class="cap">PRESS_TOUR_01.JPG</div></div>
+      <div class="g-item g2"><span class="num">2</span><div class="ph">IMG 400×500</div><div class="cap">FAN_MEETING.JPG</div></div>
+      <div class="g-item g3"><span class="num">3</span><div class="ph">IMG 400×500</div><div class="cap">MAGAZINE_SHOOT.JPG</div></div>
+      <div class="g-item g4"><span class="num">4</span><div class="ph">IMG 400×500</div><div class="cap">AIRPORT_LOOK.JPG</div></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>GL-ORBIT ✦ ARTIST MOCKUP A — HERO SPLIT — NO EXTERNAL ASSETS</footer>
+
+<nav class="dock">
+  <a href="#"><span class="ico">⌂</span>HOME</a>
+  <a href="#"><span class="ico">✦</span>SERIES</a>
+  <a href="#"><span class="ico">◷</span>CAL</a>
+  <a href="#"><span class="ico">☆</span>HALO</a>
+  <a href="#" class="active"><span class="ico">☺</span>ME</a>
+</nav>
+
+</body>
+</html>

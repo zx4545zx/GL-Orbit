@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>มิ้ลค์ — Y2K Mockup E (Magazine Cover)</title>
+<style>
+  /* ============ Y2K TOKENS ============ */
+  :root {
+    --y2k-bg: #e8e6f0;
+    --y2k-paper: #f4f2fa;
+    --y2k-ink: #1a1a2e;
+    --y2k-chrome: linear-gradient(180deg, #ffffff 0%, #d5d5e6 45%, #a9a9c4 50%, #d5d5e6 55%, #f0f0f8 100%);
+    --y2k-irid: linear-gradient(120deg, #ffd6f5 0%, #c8b6ff 25%, #a8e6ff 50%, #b6ffd8 75%, #fff3b8 100%);
+    --y2k-pink: #ff7ad9;
+    --y2k-lav: #8f7bff;
+    --y2k-cyan: #4dd8ff;
+    --y2k-mint: #5df2b8;
+    --y2k-yellow: #ffe86b;
+    --y2k-win: 3px solid var(--y2k-ink);
+    --shadow-hard: 6px 6px 0 rgba(26,26,46,.9);
+    --shadow-soft: 4px 4px 0 rgba(26,26,46,.25);
+    --font-pixel: "Courier New", ui-monospace, monospace;
+    --font-main: "Segoe UI", "Sarabun", "Helvetica Neue", sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: var(--font-main);
+    background: var(--y2k-bg);
+    background-image: radial-gradient(circle at 1px 1px, rgba(26,26,46,.18) 1px, transparent 0);
+    background-size: 22px 22px;
+    color: var(--y2k-ink);
+    line-height: 1.6;
+    padding-bottom: 72px;
+  }
+  a:focus-visible, button:focus-visible { outline: 3px dashed var(--y2k-lav); outline-offset: 3px; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 16px; }
+
+  /* ============ CHROME TOPBAR + MARQUEE (site frame) ============ */
+  .topbar {
+    background: var(--y2k-chrome); border-bottom: var(--y2k-win);
+    padding: 10px 14px; display: flex; align-items: center; gap: 10px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar .dot { width: 14px; height: 14px; border: 2px solid var(--y2k-ink); border-radius: 50%; }
+  .dot.p { background: var(--y2k-pink); } .dot.l { background: var(--y2k-lav); } .dot.c { background: var(--y2k-cyan); }
+  .topbar .title {
+    font-family: var(--font-pixel); font-weight: bold; font-size: 14px; letter-spacing: 1px;
+    text-transform: uppercase; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+  .topbar .badge-y2k {
+    margin-left: auto; font-family: var(--font-pixel); font-size: 11px;
+    background: var(--y2k-ink); color: #b6ffd8; padding: 3px 8px;
+  }
+  .marquee {
+    background: var(--y2k-ink); color: var(--y2k-mint);
+    font-family: var(--font-pixel); font-size: 12px;
+    overflow: hidden; white-space: nowrap; padding: 6px 0; border-bottom: var(--y2k-win);
+  }
+  .marquee span { display: inline-block; padding-left: 100%; animation: mq 18s linear infinite; }
+  @keyframes mq { to { transform: translateX(-100%); } }
+
+  /* ============ MAGAZINE COVER ============ */
+  .cover {
+    margin: 24px auto 0; max-width: 860px;
+    border: var(--y2k-win); box-shadow: var(--shadow-hard);
+    background: var(--y2k-paper); position: relative; overflow: hidden;
+  }
+  /* masthead */
+  .masthead {
+    padding: 26px 24px 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+  }
+  .masthead h1 {
+    font-size: clamp(52px, 13vw, 110px); line-height: .85; letter-spacing: -3px; font-weight: 900;
+    color: var(--y2k-ink);
+  }
+  .masthead h1 span { color: var(--y2k-pink); }
+  .masthead .issue {
+    font-family: var(--font-pixel); font-size: 10px; text-align: right; line-height: 1.7;
+    color: var(--y2k-lav); letter-spacing: 1px; padding-bottom: 8px; white-space: nowrap;
+  }
+  .masthead .issue b { color: var(--y2k-ink); }
+
+  .cover-grid { display: grid; grid-template-columns: 1fr; }
+  .cover-photo {
+    position: relative; margin: 18px 24px 0; aspect-ratio: 4/3;
+    background:
+      radial-gradient(circle at 30% 20%, #ffd6f5 0%, transparent 45%),
+      linear-gradient(160deg, #8f7bff 0%, #ff7ad9 55%, #4dd8ff 100%);
+    border: var(--y2k-win); overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cover-photo::after {
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.07) 0 2px, transparent 2px 4px);
+  }
+  .cover-photo .ph {
+    font-family: var(--font-pixel); color: #fff; font-size: 12px; font-weight: bold;
+    text-shadow: 1px 1px 0 var(--y2k-ink); border: 2px dashed #fff; padding: 12px 16px; text-align: center;
+  }
+  /* cover lines (magazine teasers) */
+  .cover-lines { padding: 16px 24px 22px; display: grid; gap: 8px; }
+  .cline { display: flex; align-items: baseline; gap: 10px; }
+  .cline .no {
+    font-family: var(--font-pixel); font-size: 10px; color: var(--y2k-pink); font-weight: bold;
+    flex: 0 0 auto;
+  }
+  .cline .txt { font-weight: 800; font-size: clamp(14px, 2.6vw, 17px); letter-spacing: -0.2px; }
+  .cline .sub { font-family: var(--font-pixel); font-size: 10px; color: var(--y2k-lav); }
+  /* barcode */
+  .barcode {
+    position: absolute; right: 24px; bottom: 22px; width: 74px; height: 34px;
+    background: repeating-linear-gradient(90deg, var(--y2k-ink) 0 2px, transparent 2px 5px, var(--y2k-ink) 5px 6px, transparent 6px 10px);
+    border: 1px solid var(--y2k-ink);
+  }
+
+  /* fullname strip below cover */
+  .name-strip {
+    max-width: 860px; margin: 14px auto 0; padding: 0 0;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px;
+    text-align: center;
+  }
+  .name-strip .th { font-size: clamp(18px, 4vw, 24px); font-weight: 800; }
+  .name-strip .sep { color: var(--y2k-pink); font-size: 18px; }
+  .name-strip .en {
+    font-family: var(--font-pixel); font-size: clamp(11px, 2vw, 13px);
+    letter-spacing: 3px; color: var(--y2k-lav); text-transform: uppercase;
+  }
+
+  /* socials + actions */
+  .toolbar {
+    max-width: 860px; margin: 18px auto 0;
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center;
+  }
+  .soc {
+    font-family: var(--font-pixel); font-weight: bold; font-size: 11px; text-decoration: none;
+    color: var(--y2k-ink); border: var(--y2k-win); background: var(--y2k-chrome);
+    padding: 10px 16px; box-shadow: var(--shadow-soft); min-height: 44px;
+    display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase;
+    transition: transform .08s, box-shadow .08s;
+  }
+  .soc:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 rgba(26,26,46,.3); }
+  .soc:active { transform: translate(3px,3px); box-shadow: none; }
+  .btn {
+    font-family: var(--font-pixel); font-weight: bold; font-size: 12px;
+    border: var(--y2k-win); background: var(--y2k-chrome);
+    padding: 10px 16px; cursor: pointer; box-shadow: var(--shadow-soft);
+    text-transform: uppercase; min-height: 44px; display: inline-flex; align-items: center; gap: 6px;
+    transition: transform .08s, box-shadow .08s;
+  }
+  .btn:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 rgba(26,26,46,.3); }
+  .btn:active { transform: translate(3px,3px); box-shadow: none; }
+  .btn.primary { background: var(--y2k-pink); color: #fff; text-shadow: 1px 1px 0 var(--y2k-ink); }
+
+  /* ============ INSIDE PAGES (sections) ============ */
+  .pages { max-width: 860px; margin: 36px auto 0; display: grid; gap: 32px; padding-bottom: 10px; }
+  .page-label {
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px;
+  }
+  .page-label .pno {
+    font-family: var(--font-pixel); font-size: 11px; background: var(--y2k-ink); color: #fff;
+    padding: 3px 10px; letter-spacing: 1px;
+  }
+  .page-label h3 { font-size: clamp(20px, 4vw, 26px); font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; }
+  .page-label .line { flex: 1; height: 3px; background: var(--y2k-irid); border: 1px solid var(--y2k-ink); align-self: center; }
+
+  /* cover story (ship) */
+  .story {
+    border: var(--y2k-win); background: #fff; box-shadow: var(--shadow-hard);
+    display: grid; grid-template-columns: 1fr;
+  }
+  .story .photo {
+    min-height: 180px; border-bottom: var(--y2k-win);
+    background: var(--y2k-irid); display: flex; align-items: center; justify-content: center;
+    font-size: 44px; position: relative;
+  }
+  .story .photo .cap {
+    position: absolute; bottom: 8px; left: 8px; font-family: var(--font-pixel); font-size: 9.5px;
+    background: rgba(26,26,46,.7); color: #fff; padding: 2px 8px;
+  }
+  .story .text { padding: 20px 22px; }
+  .story .kicker {
+    font-family: var(--font-pixel); font-size: 10px; color: var(--y2k-pink);
+    letter-spacing: 2px; text-transform: uppercase; font-weight: bold;
+  }
+  .story h4 { font-size: clamp(22px, 4.5vw, 30px); font-weight: 900; letter-spacing: -0.5px; margin-top: 6px; }
+  .story .since { font-family: var(--font-pixel); font-size: 10.5px; color: var(--y2k-lav); margin-top: 4px; letter-spacing: 1px; }
+  .story .desc { font-size: 14.5px; margin-top: 12px; }
+  .story .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .story .tags span {
+    font-family: var(--font-pixel); font-size: 10px;
+    border: 2px solid var(--y2k-ink); background: var(--y2k-cyan); padding: 2px 8px;
+  }
+  .story .tags span.pk { background: var(--y2k-pink); color: #fff; }
+  .story .feat {
+    display: inline-block; margin-top: 14px; font-family: var(--font-pixel); font-size: 9.5px;
+    background: repeating-linear-gradient(45deg,#ffe86b 0 8px,#fff 8px 16px);
+    border: 2px solid var(--y2k-ink); padding: 2px 8px;
+  }
+
+  /* filmography — editorial index */
+  .index { border: var(--y2k-win); background: var(--y2k-paper); box-shadow: var(--shadow-hard); }
+  .irow {
+    display: grid; grid-template-columns: 52px 1fr auto; gap: 14px; align-items: baseline;
+    padding: 16px 20px; border-bottom: 2px solid rgba(26,26,46,.15);
+  }
+  .irow:last-child { border-bottom: 0; }
+  .irow .no {
+    font-family: var(--font-pixel); font-size: 22px; font-weight: bold; color: var(--y2k-pink);
+    text-shadow: 1px 1px 0 var(--y2k-ink);
+  }
+  .irow .t { font-size: clamp(16px, 3vw, 19px); font-weight: 800; letter-spacing: -0.3px; }
+  .irow .r { font-family: var(--font-pixel); font-size: 10px; color: var(--y2k-lav); margin-top: 2px; }
+  .irow .go {
+    font-family: var(--font-pixel); font-size: 10px; text-decoration: none; color: var(--y2k-ink);
+    border: 2px solid var(--y2k-ink); background: var(--y2k-chrome); padding: 6px 12px;
+    min-height: 36px; display: inline-flex; align-items: center; box-shadow: 2px 2px 0 var(--y2k-ink);
+  }
+  .irow .go:hover { background: var(--y2k-yellow); }
+
+  /* letters page (halo) */
+  .letters { display: grid; gap: 14px; }
+  .letter {
+    border: var(--y2k-win); background: #fff; box-shadow: var(--shadow-soft); padding: 16px 18px;
+  }
+  .letter .who {
+    font-family: var(--font-pixel); font-size: 10.5px; color: var(--y2k-lav);
+    display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+  }
+  .letter .txt { font-size: 14.5px; margin-top: 8px; }
+  .letter .txt::first-letter {
+    font-size: 30px; font-weight: 900; color: var(--y2k-pink); line-height: 1;
+    padding-right: 4px;
+  }
+  .letter .react { font-family: var(--font-pixel); font-size: 10px; color: #888; margin-top: 8px; }
+
+  /* dock */
+  .dock {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: var(--y2k-chrome); border-top: var(--y2k-win);
+    display: flex; justify-content: space-around; padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+  }
+  .dock a {
+    font-family: var(--font-pixel); font-size: 10px; text-decoration: none; color: var(--y2k-ink);
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    min-width: 56px; min-height: 44px; justify-content: center;
+  }
+  .dock a .ico { font-size: 18px; }
+  .dock a.active { background: var(--y2k-pink); color: #fff; border: 2px solid var(--y2k-ink); box-shadow: 2px 2px 0 var(--y2k-ink); }
+
+  footer {
+    margin-top: 36px; padding: 14px 16px 10px; text-align: center;
+    font-family: var(--font-pixel); font-size: 10px; letter-spacing: 1px; color: #6a6a8a;
+  }
+
+  /* ============ DESKTOP ============ */
+  @media (min-width: 820px) {
+    .cover { margin-top: 32px; }
+    .story { grid-template-columns: 40% 60%; }
+    .story .photo { border-bottom: 0; border-right: var(--y2k-win); min-height: 0; }
+    .letters { grid-template-columns: 1fr 1fr; }
+    .dock { display: none; }
+    body { padding-bottom: 40px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee span { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="dot p"></span><span class="dot l"></span><span class="dot c"></span>
+  <span class="title">GL-ORBIT.EXE — ARTIST_MAGAZINE</span>
+  <span class="badge-y2k">E · EDITORIAL</span>
+</div>
+
+<div class="marquee"><span>✦ ORBIT MAGAZINE ✦ ISSUE 07 ✦ COVER STAR: มิ้ลค์ พรรษา ✦ MILK PANSA ✦ ON SALE NOW ✦&#160;</span></div>
+
+<main class="wrap">
+
+  <!-- MAGAZINE COVER -->
+  <article class="cover">
+    <div class="masthead">
+      <h1>ORBIT<span>✦</span></h1>
+      <div class="issue"><b>ISSUE 07</b><br>AUG 2026 · ฿120<br>ARTIST EDITION</div>
+    </div>
+    <div class="cover-grid">
+      <div class="cover-photo" role="img" aria-label="Cover shoot (mock)">
+        <div class="ph">COVER SHOOT<br>PHOTO 800×600</div>
+      </div>
+    </div>
+    <div class="cover-lines">
+      <div class="cline"><span class="no">01</span><span class="txt">มิ้ลค์ พรรษา: ดาวดวงใหม่แห่งวงการ GL</span><span class="sub">COVER STORY</span></div>
+      <div class="cline"><span class="no">02</span><span class="txt">MilkLove — เรือลำนี้ไปได้ไกลแค่ไหน</span><span class="sub">EXCLUSIVE</span></div>
+      <div class="cline"><span class="no">03</span><span class="txt">ทุกบทบาท ตั้งแต่องศาถึงหมูหวาน</span><span class="sub">FILMOGRAPHY</span></div>
+    </div>
+    <span class="barcode"></span>
+  </article>
+
+  <!-- NAME + SOCIALS -->
+  <div class="name-strip">
+    <span class="th">พรรษา วอสเบียน</span>
+    <span class="sep">✦</span>
+    <span class="en">PANSA VOSBEIN · MILK PANSA</span>
+  </div>
+  <div class="toolbar">
+    <a class="soc" href="#">📸 INSTAGRAM</a>
+    <a class="soc" href="#">𝕏 X</a>
+    <a class="soc" href="#">♪ TIKTOK</a>
+    <button class="btn primary">♥ Favorite</button>
+    <button class="btn">↗ Share</button>
+  </div>
+
+  <!-- INSIDE PAGES -->
+  <div class="pages">
+
+    <!-- COVER STORY: SHIP -->
+    <section>
+      <div class="page-label"><span class="pno">P.12</span><h3>Cover Story</h3><span class="line"></span></div>
+      <div class="story">
+        <div class="photo">💜<span class="cap">SHIP_IMAGE.PNG</span></div>
+        <div class="text">
+          <div class="kicker">The Ship Issue</div>
+          <h4>มิ้ลค์เลิฟ · MilkLove</h4>
+          <div class="since">SHIP SINCE: 15 MAR 2024</div>
+          <p class="desc">คู่จิ้นจาก 23.5 องศาที่โลกเอียง เคมีดีต่อใจจนแฟน ๆ ตั้งเรือลำนี้กันทั้งโลก (mock desc)</p>
+          <div class="tags"><span>#มิ้ลค์เลิฟ</span><span class="pk">#MilkLove</span><span>#23point5</span></div>
+          <span class="feat">★ FEATURED SHIP</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILMOGRAPHY INDEX -->
+    <section>
+      <div class="page-label"><span class="pno">P.24</span><h3>Filmography</h3><span class="line"></span></div>
+      <div class="index">
+        <div class="irow"><span class="no">01</span><div><div class="t">23.5 องศาที่โลกเอียง</div><div class="r">ROLE: องศา</div></div><a class="go" href="#">READ</a></div>
+        <div class="irow"><span class="no">02</span><div><div class="t">Whale Store xoxo</div><div class="r">ROLE: หมูหวาน</div></div><a class="go" href="#">READ</a></div>
+        <div class="irow"><span class="no">03</span><div><div class="t">Vice Versa รักสลับโลก</div><div class="r">ROLE: GUEST</div></div><a class="go" href="#">READ</a></div>
+      </div>
+    </section>
+
+    <!-- LETTERS: HALO -->
+    <section>
+      <div class="page-label"><span class="pno">P.36</span><h3>Letters from Orbit</h3><span class="line"></span></div>
+      <div class="letters">
+        <div class="letter"><div class="who"><span>@orbitfan_th · HALO</span><span>3 ชม.ที่แล้ว</span></div><p class="txt">มิ้ลค์ในงานแฟนมีตวันนี้คือที่สุด 🥹✦</p><div class="react">♥ 1.2K</div></div>
+        <div class="letter"><div class="who"><span>@milklovess · HALO</span><span>เมื่อวาน</span></div><p class="txt">รวมโมเมนต์ มิ้ลค์เลิฟ ช่วง press tour ไว้ให้แล้วในเธรดนี้ ↓</p><div class="react">♥ 856</div></div>
+      </div>
+    </section>
+
+  </div>
+
+</main>
+
+<footer>GL-ORBIT ✦ ARTIST MOCKUP E — MAGAZINE EDITORIAL — DATA: artists + socials + ships + seriesArtists + momentArtists</footer>
+
+<nav class="dock">
+  <a href="#"><span class="ico">⌂</span>HOME</a>
+  <a href="#"><span class="ico">✦</span>SERIES</a>
+  <a href="#"><span class="ico">◷</span>CAL</a>
+  <a href="#"><span class="ico">☆</span>HALO</a>
+  <a href="#" class="active"><span class="ico">☺</span>ME</a>
+</nav>
+
+</body>
+</html>

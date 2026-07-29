@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>มิ้ลค์ — Orbit Mockup K (Broken Grid Editorial)</title>
+<style>
+  /* ============ ORBIT TOKENS ============ */
+  :root {
+    --orbit-paper: #fbf3e4; --orbit-paper-deep: #f3e7cf; --orbit-surface: #ffffff;
+    --orbit-ink: #3b2a20; --orbit-muted: #8a725f; --orbit-line: #d8c4a8; --orbit-line-strong: #b8a288;
+    --orbit-coral: #e4572e; --orbit-coral-dark: #b23f1d; --orbit-coral-soft: #fde4d6;
+    --orbit-lavender: #f6c9d8; --orbit-mint: #cfe7f5; --orbit-rail: #3b2a20; --orbit-success: #2f7a4f;
+    --orbit-shadow: 3px 3px 0 rgba(59,42,32,.12); --orbit-shadow-raised: 4px 4px 0 rgba(59,42,32,.16);
+    --orbit-shadow-interactive: 3px 3px 0 rgba(59,42,32,.16); --orbit-shadow-accent: 3px 3px 0 rgba(228,87,46,.25);
+    --orbit-shadow-overlay: 5px 5px 0 rgba(59,42,32,.18);
+    --orbit-border: 1px solid var(--orbit-line); --orbit-border-strong: 1px solid var(--orbit-line-strong);
+    --orbit-border-interactive: 1px solid var(--orbit-coral);
+    --font-display: 'Mali','Sarabun','Segoe UI',sans-serif;
+    --font-body: 'Sarabun','Mali','Segoe UI',sans-serif;
+    --font-pixel: 'Courier New',ui-monospace,monospace;
+  }
+  [data-theme="midnight"] {
+    --orbit-paper: #0d0a14; --orbit-paper-deep: #100c1b; --orbit-surface: #171224;
+    --orbit-ink: #f2ecfa; --orbit-muted: #9d8fb8; --orbit-line: #2d2344; --orbit-line-strong: #4a3670;
+    --orbit-coral: #ff4d7e; --orbit-coral-dark: #d12f60; --orbit-coral-soft: #3a1e33;
+    --orbit-lavender: #241a3f; --orbit-mint: #123c38; --orbit-rail: #100c1b; --orbit-success: #52e0a8;
+    --orbit-shadow: 0 0 24px rgba(95,242,224,.08); --orbit-shadow-raised: 0 0 32px rgba(95,242,224,.12);
+    --orbit-shadow-interactive: 0 0 12px rgba(255,77,126,.2); --orbit-shadow-accent: 0 0 18px rgba(95,242,224,.22);
+    --orbit-shadow-overlay: 0 0 40px rgba(95,242,224,.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; border-radius: 0; }
+  body {
+    font-family: var(--font-body); color: var(--orbit-ink);
+    background: var(--orbit-paper);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Ccircle cx='2' cy='2' r='1' fill='%233b2a20' fill-opacity='.05'/%3E%3C/svg%3E");
+    line-height: 1.55; min-height: 100dvh; overflow-x: hidden;
+  }
+  .orbit-round-data { border-radius: 9999px !important; }
+  a, button { transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease, transform 140ms ease; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--orbit-coral-dark); outline-offset: 2px; }
+
+  .marquee {
+    background: var(--orbit-rail); color: var(--orbit-paper);
+    font-size: 12px; font-weight: 600; overflow: hidden; white-space: nowrap;
+    padding: 6px 0; border-bottom: var(--orbit-border-strong);
+  }
+  .marquee span { display: inline-block; padding-left: 100%; animation: mq 24s linear infinite; }
+  @keyframes mq { to { transform: translateX(-100%); } }
+
+  .theme-toggle {
+    position: fixed; top: 40px; right: 10px; z-index: 80;
+    font-family: var(--font-pixel); font-size: 10px; font-weight: bold;
+    background: var(--orbit-surface); color: var(--orbit-ink);
+    border: var(--orbit-border-strong); box-shadow: var(--orbit-shadow-interactive);
+    padding: 8px 12px; cursor: pointer; min-height: 40px; text-transform: uppercase;
+  }
+  .theme-toggle:hover { border-color: var(--orbit-coral); }
+
+  .hud { position: relative; }
+  .hud::before, .hud::after {
+    content: ""; position: absolute; width: 10px; height: 10px; pointer-events: none; z-index: 5;
+    border: 1px solid var(--orbit-coral);
+  }
+  .hud::before { top: -4px; left: -4px; border-right: 0; border-bottom: 0; }
+  .hud::after { bottom: -4px; right: -4px; border-left: 0; border-top: 0; }
+
+  .wrap { max-width: 72rem; margin-inline: auto; padding: 0 16px; }
+
+  /* ============ BROKEN GRID HERO ============ */
+  .hero {
+    position: relative; padding: 56px 16px 0; max-width: 72rem; margin-inline: auto;
+    min-height: 92vw;
+  }
+  /* giant nickname behind/beside photo */
+  .hero .nick-bg {
+    position: absolute; top: 20px; left: 4px; z-index: 1;
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(72px, 22vw, 190px); line-height: .9; letter-spacing: -0.04em;
+    color: transparent; -webkit-text-stroke: 2px var(--orbit-line-strong);
+    user-select: none; pointer-events: none; white-space: nowrap;
+  }
+  .hero .photo-frame {
+    position: relative; z-index: 2;
+    width: min(300px, 68vw); margin-left: auto; margin-right: 4vw; margin-top: 12vw;
+    background: var(--orbit-surface); border: var(--orbit-border-strong);
+    box-shadow: var(--orbit-shadow-overlay); padding: 7px;
+    transform: rotate(1.2deg);
+  }
+  .hero .photo {
+    aspect-ratio: 4/5; display: flex; align-items: flex-end; padding: 10px;
+    font-family: var(--font-pixel); font-size: 11px; font-weight: bold; color: #fff;
+    text-shadow: 1px 1px 0 var(--orbit-ink);
+    background: linear-gradient(160deg, #8f7bff 0%, #ff7ad9 55%, #4dd8ff 100%);
+    position: relative; overflow: hidden;
+  }
+  .hero .photo::after {
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.08) 0 2px, transparent 2px 5px);
+  }
+  /* solid nickname overlapping photo corner */
+  .hero .nick-fg {
+    position: relative; z-index: 3; margin-top: -14vw; margin-left: 2vw;
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(56px, 16vw, 130px); line-height: .95; letter-spacing: -0.03em;
+    color: var(--orbit-ink);
+    text-shadow: 4px 4px 0 var(--orbit-coral-soft);
+    width: fit-content;
+  }
+  .hero .id-block {
+    position: relative; z-index: 3; margin-top: 18px; margin-left: 2vw; max-width: 420px;
+  }
+  .hero .kind-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    background: var(--orbit-mint); color: var(--orbit-ink);
+    border: var(--orbit-border-strong); box-shadow: var(--orbit-shadow-interactive);
+    padding: 3px 12px;
+  }
+  .hero .kind-chip::before { content: "●"; color: var(--orbit-success); }
+  .hero .fname { font-weight: 700; font-size: clamp(17px, 4vw, 24px); margin-top: 12px; }
+  .hero .ename {
+    font-size: clamp(11px, 2vw, 13px); font-weight: 600; color: var(--orbit-coral-dark);
+    text-transform: uppercase; letter-spacing: 0.14em; margin-top: 3px;
+  }
+  .hero .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .btn {
+    font-family: var(--font-body); font-weight: 600; font-size: 13px;
+    background: var(--orbit-surface); color: var(--orbit-ink);
+    border: var(--orbit-border-interactive); box-shadow: var(--orbit-shadow-interactive);
+    padding: 10px 16px; cursor: pointer; text-transform: uppercase;
+    min-height: 44px; display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+  }
+  .btn:hover { border-color: var(--orbit-coral-dark); box-shadow: var(--orbit-shadow-accent); }
+  .btn.primary { background: var(--orbit-coral); color: #fff; }
+  .btn.primary:hover { background: var(--orbit-coral-dark); }
+
+  /* floating social stack — offset right, overlapping photo bottom */
+  .hero .soc-stack {
+    position: absolute; z-index: 4; right: 6vw; bottom: -6vw;
+    display: grid; gap: 8px; transform: rotate(-1deg);
+  }
+  .soc {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    padding: 8px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    color: var(--orbit-ink); background: var(--orbit-surface);
+    border: var(--orbit-border-strong); box-shadow: var(--orbit-shadow-raised);
+    text-decoration: none;
+  }
+  .soc:hover { border-color: var(--orbit-coral); color: var(--orbit-coral-dark); transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(59,42,32,.16); }
+  .soc .dot { width: 12px; height: 12px; border: var(--orbit-border-strong); }
+  .d-ig { background: #e1306c; } .d-x { background: #000; } .d-tt { background: #010101; }
+
+  /* ============ SECTIONS (broken rhythm) ============ */
+  section { margin-top: 72px; position: relative; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .sec-head .no {
+    font-family: var(--font-pixel); font-size: clamp(28px, 7vw, 44px); font-weight: bold;
+    color: transparent; -webkit-text-stroke: 1.5px var(--orbit-coral); line-height: 1;
+  }
+  .sec-head h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(20px, 5vw, 30px); text-transform: uppercase; letter-spacing: -0.01em; }
+  .sec-head .tag {
+    font-family: var(--font-pixel); font-size: 10px; font-weight: bold;
+    background: var(--orbit-rail); color: var(--orbit-paper); padding: 3px 8px; text-transform: uppercase;
+    align-self: center;
+  }
+
+  /* ship — offset card, rotated slightly, overlapping tape number */
+  .ship-card {
+    position: relative; z-index: 2;
+    margin-left: 4vw; margin-right: 8vw;
+    background: linear-gradient(90deg, var(--orbit-coral-soft), var(--orbit-lavender));
+    border: var(--orbit-border-strong); box-shadow: var(--orbit-shadow-accent);
+    padding: 22px 20px; transform: rotate(-0.8deg);
+  }
+  .ship-faces { display: flex; align-items: center; }
+  .ship-face {
+    width: 76px; height: 76px; overflow: hidden; border: var(--orbit-border-strong);
+    box-shadow: var(--orbit-shadow); background: var(--orbit-surface);
+    display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700;
+  }
+  .ship-face.f1 { background: linear-gradient(135deg,#ff7ad9,#ffd6f5); }
+  .ship-face.f2 { background: linear-gradient(135deg,#8f7bff,#c8b6ff); }
+  .ship-face + .ship-face { margin-left: -18px; }
+  .ship-names { font-family: var(--font-display); font-size: clamp(22px, 5.5vw, 30px); font-weight: 700; margin-top: 14px; }
+  .ship-since { font-family: var(--font-pixel); font-size: 10px; color: var(--orbit-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
+  .ship-desc { font-size: 14px; margin-top: 10px; max-width: 480px; }
+  .ship-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .ship-tags span { font-family: var(--font-pixel); font-size: 10px; border: var(--orbit-border-strong); background: var(--orbit-surface); padding: 2px 8px; }
+  .ship-feat {
+    position: absolute; top: -12px; right: 14px;
+    font-family: var(--font-pixel); font-size: 9.5px; font-weight: bold;
+    background: var(--orbit-mint); border: var(--orbit-border-strong); padding: 3px 10px;
+    transform: rotate(2deg); box-shadow: var(--orbit-shadow-interactive);
+  }
+
+  /* works — staggered broken columns */
+  .works {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px 16px;
+    align-items: start;
+  }
+  .s-card { text-decoration: none; color: var(--orbit-ink); display: block; min-width: 0; }
+  .works .s-card:nth-child(2) { transform: translateY(28px); }
+  .works .s-card:nth-child(3) { grid-column: 1 / -1; width: min(300px, 60%); margin-left: auto; transform: translateY(-4px) rotate(0.8deg); }
+  .s-card .idx { display: block; font-family: var(--font-pixel); font-size: 10px; font-weight: bold; letter-spacing: 0.18em; color: var(--orbit-coral-dark); margin-bottom: 6px; }
+  .s-card .poster {
+    aspect-ratio: 2/3; border: var(--orbit-border); box-shadow: var(--orbit-shadow);
+    display: flex; align-items: flex-end; padding: 8px;
+    font-family: var(--font-pixel); font-size: 10px; font-weight: bold; color: #fff;
+    text-shadow: 1px 1px 0 var(--orbit-ink); background: var(--orbit-paper-deep);
+  }
+  .p1 { background: linear-gradient(160deg,#8f7bff,#ff7ad9); }
+  .p2 { background: linear-gradient(160deg,#4dd8ff,#5df2b8); }
+  .p3 { background: linear-gradient(160deg,#ff7ad9,#ffe86b); }
+  .s-card:hover .poster { border-color: var(--orbit-coral); box-shadow: var(--orbit-shadow-accent); }
+  .s-card .t { font-weight: 700; font-size: 14px; margin-top: 8px; }
+  .s-card .r { font-family: var(--font-pixel); font-size: 9.5px; color: var(--orbit-muted); text-transform: uppercase; margin-top: 2px; }
+
+  /* halo — rail block pulled out of flow to the left */
+  .halo {
+    margin-left: -16px; margin-right: 6vw;
+    background: var(--orbit-rail); color: var(--orbit-paper);
+    padding: 26px 22px 26px 32px; box-shadow: 8px 8px 0 var(--orbit-coral-soft);
+  }
+  .halo .k { font-size: 10px; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; color: var(--orbit-mint); }
+  .halo h3 { font-family: var(--font-display); font-weight: 700; font-size: clamp(22px, 5vw, 32px); margin-top: 8px; }
+  .halo .moments { display: grid; gap: 10px; margin-top: 16px; }
+  .moment { border: 1px solid color-mix(in srgb, var(--orbit-paper) 20%, transparent); padding: 12px 14px; }
+  .moment .who { font-family: var(--font-pixel); font-size: 10px; color: var(--orbit-mint); }
+  .moment .txt { font-size: 13.5px; margin-top: 4px; }
+  .moment .react { font-family: var(--font-pixel); font-size: 9.5px; opacity: .6; margin-top: 5px; }
+  .halo-link {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 16px;
+    background: var(--orbit-surface); color: var(--orbit-ink); padding: 10px 20px;
+    font-size: 13px; font-weight: 600; text-decoration: none; border: var(--orbit-border-strong);
+  }
+  .halo-link:hover { background: var(--orbit-coral-soft); }
+
+  footer {
+    margin-top: 80px; padding: 14px 16px 32px;
+    font-family: var(--font-pixel); font-size: 10px; letter-spacing: 1px; color: var(--orbit-muted);
+  }
+
+  /* ============ DESKTOP ============ */
+  @media (min-width: 900px) {
+    .hero { min-height: 640px; padding-top: 72px; }
+    .hero .nick-bg { top: 30px; left: 0; }
+    .hero .photo-frame { width: 360px; margin-right: 8vw; margin-top: 40px; }
+    .hero .nick-fg { margin-top: -110px; margin-left: 6vw; }
+    .hero .id-block { margin-left: 6vw; }
+    .hero .soc-stack { right: 10vw; bottom: 20px; }
+    section { margin-top: 110px; }
+    .wrap { padding: 0 28px; }
+    .ship-card { margin-left: 8vw; margin-right: 22vw; padding: 30px 28px; }
+    .works { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .works .s-card:nth-child(2) { transform: translateY(56px); }
+    .works .s-card:nth-child(3) { grid-column: auto; width: auto; margin-left: 0; transform: translateY(16px) rotate(0.8deg); }
+    .works { padding-bottom: 60px; }
+    .halo { margin-left: -28px; margin-right: 30vw; padding: 34px 30px 34px 48px; }
+    footer { padding-left: 28px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee span { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme==='midnight'?'light':'midnight'">◐ THEME</button>
+
+<div class="marquee"><span>✦ มิ้ลค์ พรรษา ✦ MILK PANSA ✦ MILKLOVE ✦ 23.5 องศาที่โลกเอียง ✦ GL-ORBIT ARTIST FILE ✦&#160;</span></div>
+
+<!-- BROKEN GRID HERO -->
+<header class="hero">
+  <span class="nick-bg" aria-hidden="true">มิ้ลค์</span>
+  <div class="photo-frame hud">
+    <div class="photo">PHOTO<br>800×1000</div>
+  </div>
+  <h1 class="nick-fg">มิ้ลค์</h1>
+  <div class="id-block">
+    <span class="kind-chip">ARTIST</span>
+    <div class="fname">พรรษา วอสเบียน</div>
+    <div class="ename">PANSA VOSBEIN · MILK PANSA</div>
+    <div class="actions">
+      <button class="btn primary">♥ Favorite</button>
+      <button class="btn">↗ Share</button>
+    </div>
+  </div>
+  <div class="soc-stack">
+    <a class="soc" href="#"><span class="dot d-ig"></span>IG</a>
+    <a class="soc" href="#"><span class="dot d-x"></span>X</a>
+    <a class="soc" href="#"><span class="dot d-tt"></span>TIKTOK</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- SHIP -->
+  <section>
+    <div class="sec-head"><span class="no">01</span><h2>คู่จิ้น</h2><span class="tag">OTP</span></div>
+    <article class="ship-card">
+      <span class="ship-feat">★ FEATURED</span>
+      <div class="ship-faces">
+        <span class="ship-face f1 orbit-round-data">ม</span>
+        <span class="ship-face f2 orbit-round-data">ล</span>
+      </div>
+      <div class="ship-names">มิ้ลค์เลิฟ · MilkLove</div>
+      <div class="ship-since">SHIP SINCE: 15 MAR 2024</div>
+      <p class="ship-desc">คู่จิ้นจาก 23.5 องศาที่โลกเอียง เคมีดีต่อใจจนแฟน ๆ ตั้งเรือลำนี้กันทั้งโลก (mock desc)</p>
+      <div class="ship-tags"><span>#มิ้ลค์เลิฟ</span><span>#MilkLove</span><span>#23point5</span></div>
+    </article>
+  </section>
+
+  <!-- WORKS -->
+  <section>
+    <div class="sec-head"><span class="no">02</span><h2>ซีรีส์ที่เล่น</h2><span class="tag">FILM</span></div>
+    <div class="works">
+      <a class="s-card" href="#"><span class="idx">01 / WORK</span><div class="poster p1">POSTER 600×900</div><div class="t">23.5 องศาที่โลกเอียง</div><div class="r">ROLE: องศา</div></a>
+      <a class="s-card" href="#"><span class="idx">02 / WORK</span><div class="poster p2">POSTER 600×900</div><div class="t">Whale Store xoxo</div><div class="r">ROLE: หมูหวาน</div></a>
+      <a class="s-card" href="#"><span class="idx">03 / WORK</span><div class="poster p3">POSTER 600×900</div><div class="t">Vice Versa รักสลับโลก</div><div class="r">ROLE: GUEST</div></a>
+    </div>
+  </section>
+
+  <!-- HALO -->
+  <section>
+    <div class="halo">
+      <p class="k">03 · Orbit Halo</p>
+      <h3>โพสต์ที่เกี่ยวข้อง</h3>
+      <div class="moments">
+        <div class="moment"><div class="who">@orbitfan_th · 3H AGO</div><div class="txt">มิ้ลค์ในงานแฟนมีตวันนี้คือที่สุด 🥹✦</div><div class="react">♥ 1.2K</div></div>
+        <div class="moment"><div class="who">@milklovess · 1D AGO</div><div class="txt">รวมโมเมนต์ มิ้ลค์เลิฟ ช่วง press tour ไว้ให้แล้วในเธรดนี้ ↓</div><div class="react">♥ 856</div></div>
+      </div>
+      <a class="halo-link" href="#">ดู Moment ทั้งหมด →</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>GL-ORBIT ✦ ARTIST MOCKUP K — BROKEN GRID EDITORIAL — DATA: artists + socials + ships + seriesArtists + momentArtists</footer>
+
+</body>
+</html>

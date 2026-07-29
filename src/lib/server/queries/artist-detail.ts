@@ -36,6 +36,8 @@ export type ArtistDetail = {
 		name: string;
 		imageUrl: string | null;
 		description: string | null;
+		startedAt: Date | null;
+		isFeatured: boolean;
 		partner: { id: string; nickname: string; imageUrl: string };
 		seriesCount: number;
 		hashtags: string[];
@@ -104,6 +106,8 @@ export async function getArtistDetail(id: string): Promise<ArtistDetail | null> 
 				name: ships.name,
 				imageUrl: ships.imageUrl,
 				description: ships.description,
+				startedAt: ships.startedAt,
+				isFeatured: ships.isFeatured,
 				artist1Id: ships.artist1Id,
 				artist2Id: ships.artist2Id,
 				artist1Nickname: artist1.nickname,
@@ -135,6 +139,8 @@ export async function getArtistDetail(id: string): Promise<ArtistDetail | null> 
 				name: r.name,
 				imageUrl: r.imageUrl,
 				description: r.description,
+				startedAt: r.startedAt ?? null,
+				isFeatured: r.isFeatured,
 				partner: {
 					id: isArtist1 ? r.artist2Id : r.artist1Id,
 					nickname: (isArtist1 ? r.artist2Nickname : r.artist1Nickname) ?? '',
