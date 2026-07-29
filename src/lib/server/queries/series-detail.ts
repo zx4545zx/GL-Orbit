@@ -34,6 +34,7 @@ export type SeriesDetail = {
 		trailerUrl: string | null;
 		schedules: { title: string | null; airDate: string; platform: string; platformLogo: string | null; streamLink: string | null; isUncut: boolean }[];
 	}[];
+	nextEpisode: { episode: number; title: string; airDateIso: string } | null;
 };
 
 type ScheduleRow = {
@@ -239,6 +240,18 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 		? new Date(scheduleResult[0].airDate).getFullYear()
 		: undefined;
 
+	// Next upcoming episode (scheduleResult is ordered by airDate asc).
+	const now = new Date();
+	const nextRow = scheduleResult.find((row) => row.airDate && new Date(row.airDate) >= now);
+	const nextEpisodeMeta = nextRow ? episodesResult.find((ep) => ep.id === nextRow.episodeId) : undefined;
+	const nextEpisode: SeriesDetail['nextEpisode'] = nextRow?.airDate && nextEpisodeMeta
+		? {
+			episode: nextEpisodeMeta.episodeNumber,
+			title: nextEpisodeMeta.title ?? `ตอนที่ ${nextEpisodeMeta.episodeNumber}`,
+			airDateIso: nextRow.airDate.toISOString()
+		}
+		: null;
+
 	const result: SeriesDetail = {
 		id: seriesResult.id,
 		titleEn: seriesResult.titleEn,
@@ -277,7 +290,8 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
 			artist2Name: ship.artist2Nickname ?? '',
 			artist2Image: ship.artist2ProfileImageUrl ?? '/placeholders/avatar.svg'
 		})),
-		schedule
+		schedule,
+		nextEpisode
 	};
 
 	setCached(cacheKey, result, CACHE_TTL);

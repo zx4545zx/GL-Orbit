@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import FavoriteButton from '$lib/components/FavoriteButton.svelte';
@@ -16,6 +17,7 @@
 		safeJsonLd,
 		truncateSeo
 	} from '$lib/seo.js';
+	import '@splidejs/splide/css/core';
 	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
@@ -25,10 +27,10 @@
 	const description = $derived(data.description);
 	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
 
-	const statusConfig: Record<string, { text: string; dot: string; chip: string }> = {
-		ONGOING: { text: m.status_ongoing(), dot: 'bg-mint', chip: 'text-mint-dark border-mint/40' },
-		UPCOMING: { text: m.status_upcoming(), dot: 'bg-lavender', chip: 'text-lavender-dark border-lavender/50' },
-		ENDED: { text: m.status_ended(), dot: 'bg-coral', chip: 'text-coral-dark border-coral/40' }
+	const statusConfig: Record<string, { text: string; live: boolean }> = {
+		ONGOING: { text: m.status_ongoing(), live: true },
+		UPCOMING: { text: m.status_upcoming(), live: false },
+		ENDED: { text: m.status_ended(), live: false }
 	};
 
 	const s = $derived(statusConfig[series.status] ?? null);
@@ -68,8 +70,7 @@
 		series.gallery.map((image, index) => ({
 			src: image.imageUrl,
 			alt: image.caption ?? `${series.titleEn} gallery ${index + 1}`,
-			label: m.series_detail_gallery(),
-			title: image.caption ?? ''
+			caption: image.caption ?? ''
 		}))
 	);
 	const episodeCoverCandidates = $derived(
@@ -78,26 +79,32 @@
 			.map((item) => ({
 				src: item.coverUrl as string,
 				alt: m.series_episode_cover_alt({ episode: item.episode }),
-				label: `EP ${item.episode}`,
-				title: item.title
+				caption: `EP ${item.episode} · ${item.title}`
 			}))
 	);
 	const galleryCandidates = $derived(
-		(officialGalleryCandidates.length > 0 ? officialGalleryCandidates : episodeCoverCandidates).slice(0, 7)
+		(officialGalleryCandidates.length > 0 ? officialGalleryCandidates : episodeCoverCandidates).slice(0, 10)
 	);
-	const primaryMeta = $derived(
+	const infoCells = $derived(
 		[
-			{ label: m.common_episodes(), value: series.episodes },
-			{ label: m.common_year(), value: series.year ?? null },
-			{ label: m.common_cast(), value: series.artists.length }
-		].filter((item) => item.value !== null)
+			{ label: m.series_detail_studio(), value: series.studio },
+			{ label: m.common_episodes(), value: String(series.episodes) },
+			{ label: m.common_year(), value: series.year ? String(series.year) : null },
+			{ label: m.series_detail_platform(), value: series.platforms.length > 0 ? series.platforms.map((p) => p.name).join(' · ') : null },
+			{ label: m.series_detail_genre(), value: series.genres.length > 0 ? series.genres.join(' · ') : null },
+			{ label: m.common_cast(), value: m.series_detail_cast_count({ count: String(series.artists.length) }) }
+		].filter((cell) => cell.value !== null && cell.value !== '')
 	);
 	const momentsHref = $derived(latestMomentsHref(page.data.lang, 'series', series.id));
+	const marqueeText = $derived(
+		`✦ ${series.titleEn}${series.titleTh ? ` ✦ ${series.titleTh}` : ''} ✦ ${s ? (series.status === 'ONGOING' ? m.series_detail_now_airing() : s.text) : ''} ✦ ${series.studio} ✦ `
+	);
 
 	let expandedEpisodes = $state(new Set<number>());
 	let activatedTrailers = $state(new Set<number>());
 	let initializedSeriesId = $state<string | null>(null);
 	let descriptionExpanded = $state(false);
+	let activeVideoTab = $state<'trailer' | 'pilot'>('trailer');
 
 	const episodeHasContent = $derived(
 		new Set(
@@ -121,6 +128,7 @@
 			expandedEpisodes = new Set<number>();
 			activatedTrailers = new Set<number>();
 			descriptionExpanded = false;
+			activeVideoTab = 'trailer';
 			initializedSeriesId = series.id;
 		}
 	});
@@ -166,6 +174,15 @@
 		return item.schedules[0]?.airDate ?? 'TBA';
 	}
 
+	type EpisodeListStatus = 'aired' | 'next' | 'tba';
+
+	function episodeStatus(item: { episode: number; schedules: { airDate: string }[] }): EpisodeListStatus {
+		if (series.nextEpisode && item.episode === series.nextEpisode.episode) return 'next';
+		const today = new Date().toISOString().split('T')[0];
+		const aired = item.schedules.some((schedule) => schedule.airDate !== 'TBA' && schedule.airDate < today);
+		return aired ? 'aired' : 'tba';
+	}
+
 	function youtubeEmbedUrl(rawUrl: string | null): string | null {
 		if (!rawUrl) return null;
 		try {
@@ -189,9 +206,97 @@
 		}
 	}
 
+	// --- Next-episode countdown (LED cells) ---
+	let nowTs = $state(Date.now());
+
+	onMount(() => {
+		const timer = setInterval(() => {
+			nowTs = Date.now();
+		}, 1000);
+		return () => clearInterval(timer);
+	});
+
+	const countdown = $derived.by(() => {
+		if (!series.nextEpisode) return null;
+		const target = new Date(series.nextEpisode.airDateIso).getTime();
+		const remaining = Math.max(0, target - nowTs);
+		if (remaining <= 0) return null;
+		const totalSeconds = Math.floor(remaining / 1000);
+		return {
+			days: Math.floor(totalSeconds / 86400),
+			hours: Math.floor((totalSeconds % 86400) / 3600),
+			minutes: Math.floor((totalSeconds % 3600) / 60),
+			seconds: totalSeconds % 60
+		};
+	});
+
+	const pad2 = (value: number) => String(value).padStart(2, '0');
+
+	// --- Splide scrollers (client-only; markup below is SSR-safe) ---
+	type SplideInstance = InstanceType<typeof import('@splidejs/splide').default>;
+
+	let gallerySplideEl = $state<HTMLElement | undefined>();
+	let castSplideEl = $state<HTMLElement | undefined>();
+
+	onMount(() => {
+		let disposed = false;
+		const mounted: SplideInstance[] = [];
+		(async () => {
+			const { Splide } = await import('@splidejs/splide');
+			if (disposed) return;
+
+			const splideI18n = {
+				prev: m.series_detail_slider_prev(),
+				next: m.series_detail_slider_next()
+			};
+			const reducedMotion = { speed: 0, rewindSpeed: 0, autoplay: 'pause' as const };
+
+			if (gallerySplideEl && galleryCandidates.length > 0) {
+				mounted.push(
+					new Splide(gallerySplideEl, {
+						type: 'slide',
+						rewind: true,
+						perPage: 3,
+						perMove: 1,
+						gap: '12px',
+						drag: 'free',
+						snap: true,
+						speed: 500,
+						breakpoints: {
+							1099: { perPage: 2 },
+							759: { perPage: 1, padding: { right: '18%' } }
+						},
+						i18n: splideI18n,
+						reducedMotion
+					}).mount()
+				);
+			}
+
+			if (castSplideEl && series.artists.length > 0) {
+				mounted.push(
+					new Splide(castSplideEl, {
+						type: 'slide',
+						rewind: true,
+						autoWidth: true,
+						gap: '12px',
+						drag: 'free',
+						snap: true,
+						pagination: false,
+						speed: 500,
+						i18n: splideI18n,
+						reducedMotion
+					}).mount()
+				);
+			}
+		})();
+		return () => {
+			disposed = true;
+			for (const splide of mounted) splide.destroy();
+		};
+	});
+
 	const artistPath = (id: string) => localizedPath(currentLang, `/artists/${id}`);
 	const shipPath = (slug: string) => localizedPath(currentLang, `/ships/${slug}`);
-	const backHref = $derived(localizedPath(currentLang, '/series'));
 	const goBack = () => {
 		if (typeof history !== 'undefined' && history.length > 1) history.back();
 		else goto(localizedPath(currentLang, '/series'));
@@ -217,271 +322,304 @@
 	{@html jsonLdScript(seriesJsonLd)}
 </svelte:head>
 
-<div class="-mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[var(--orbit-paper)] pb-[calc(3rem+var(--bottom-nav-reserved-space))] md:-mt-24 md:mb-0 md:pb-20 md:pt-24">
-	<main class="relative mx-auto max-w-[90rem] px-4 pt-4 sm:px-6 sm:pt-6 md:px-8">
-		<!-- The series artwork leads; actions and facts form a compact program rail. -->
-		<section class="overflow-hidden border-y border-[var(--orbit-line-strong)] bg-white shadow-[var(--orbit-shadow)] sm:rounded-xl sm:border" aria-labelledby="series-title">
-			<header class="flex !rounded-none items-center justify-between gap-3 bg-[var(--orbit-ink)] px-3 py-3 text-white sm:px-5">
-				<button type="button" onclick={goBack} class="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/5 px-4 py-2 text-sm font-bold transition hover:border-mint hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white touch-target">
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-					<span>{m.common_back()}</span>
-				</button>
-				{#if s}
-					<span class="inline-flex items-center gap-2 rounded-md border bg-white px-3 py-2 text-xs font-black sm:text-sm {s.chip}">
-						<span class="h-2 w-2 rounded-full {s.dot}"></span>
-						<span>{s.text}</span>
-					</span>
-				{/if}
-			</header>
+<div class="sd-page -mx-4 -mb-[var(--bottom-nav-reserved-space)] overflow-hidden bg-[var(--orbit-paper)] pb-[calc(1rem+var(--bottom-nav-reserved-space))] md:mb-0 md:pb-10">
+	<!-- Ticker strip -->
+	<div class="sd-marquee" aria-hidden="true"><span>{marqueeText}{marqueeText}</span></div>
 
-			<div class="grid min-w-0 lg:grid-cols-[minmax(20rem,0.78fr)_minmax(0,1.45fr)]">
-				<figure class="relative !rounded-none bg-[var(--orbit-ink)] p-3 sm:p-6 lg:flex lg:flex-col lg:justify-between lg:p-8">
-					<div class="mx-auto w-full max-w-[25rem] overflow-hidden rounded-md border border-white/20 bg-[var(--orbit-paper-deep)] shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
-						<Picture src={series.poster} type="posters" sizes="(max-width: 639px) calc(100vw - 3.5rem), (max-width: 1023px) 400px, 430px" alt={series.titleEn} width={720} height={1080} loading="eager" fetchpriority="high" class="aspect-[2/3] w-full object-cover" />
+	<!-- HERO: cover + overlapping poster frame -->
+	<header class="sd-hero">
+		<div class="sd-cover">
+			{#if series.coverUrl}
+				<Picture src={series.coverUrl} type="covers" sizes="100vw" alt="" width={1920} height={960} loading="eager" fetchpriority="high" class="sd-cover-img" />
+				<div class="sd-cover-tint" aria-hidden="true"></div>
+			{:else}
+				<Picture src={series.poster} type="posters" sizes="240px" alt="" width={1920} height={960} loading="eager" fetchpriority="high" class="sd-cover-img sd-cover-fb" />
+					<div class="sd-cover-tint" aria-hidden="true"></div>
+			{/if}
+		</div>
+		<div class="sd-wrap">
+			<div class="sd-hero-inner">
+				<div class="sd-poster-frame sd-hud">
+					<div class="sd-poster">
+						<Picture src={series.poster} type="posters" sizes="(max-width: 759px) 148px, 230px" alt={series.titleEn} width={460} height={690} loading="eager" fetchpriority="high" class="sd-poster-img" />
 					</div>
-					<figcaption class="mx-auto mt-3 flex w-full max-w-[25rem] items-center justify-between gap-4 text-[9px] font-black uppercase tracking-[0.22em] text-white/60">
-						<span>Official poster</span>
-						{#if series.year}<span>{series.year}</span>{/if}
-					</figcaption>
-				</figure>
+				</div>
+				<div class="sd-hero-titles">
+					<button type="button" onclick={goBack} class="sd-back">
+						<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+						<span>{m.common_back()}</span>
+					</button>
+					{#if s}
+						<span class="sd-status-chip" class:sd-status-live={s.live}>{s.text}</span>
+					{/if}
+					<h1 class="sd-title-th">{title}</h1>
+					{#if series.titleEn && title !== series.titleEn}
+						<p class="sd-title-en">{series.titleEn}</p>
+					{:else if series.titleTh && title !== series.titleTh}
+						<p class="sd-title-en">{series.titleTh}</p>
+					{/if}
+				</div>
+			</div>
+			<div class="sd-actions">
+				<FavoriteButton seriesId={series.id} variant="compact" className="sd-btn-like" />
+				<WatchedButton seriesId={series.id} variant="compact" className="sd-btn-like" />
+				<ShareButton title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`} text={m.series_share_text({ title })} url={canonicalUrl} ariaLabel={m.series_share_aria_label()} variant="compact" className="sd-btn-like" />
+			</div>
+		</div>
+	</header>
 
-				<div class="flex min-w-0 flex-col">
-					<div class="flex flex-1 flex-col justify-center p-5 sm:p-8 lg:p-12 xl:p-14">
-						<p class="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--orbit-coral-dark)]">GL-ORBIT / SERIES DOSSIER</p>
-						<h1 id="series-title" class="mt-4 break-words font-[family-name:var(--font-display)] text-[clamp(2.25rem,7vw,3.25rem)] font-black leading-[0.95] tracking-[-0.055em] text-[var(--orbit-ink)] [overflow-wrap:anywhere] lg:text-[clamp(3rem,4vw,4.5rem)]">
-							{series.titleEn}
-						</h1>
-						{#if series.titleTh}
-							<p class="mt-5 break-words font-[family-name:var(--font-thai)] text-xl font-semibold leading-snug text-[var(--orbit-muted)] [overflow-wrap:anywhere] sm:text-2xl lg:text-3xl">{series.titleTh}</p>
-						{/if}
-						<p class="mt-4 break-words text-sm font-bold text-[var(--orbit-muted)] [overflow-wrap:anywhere] sm:text-base">{series.studio}</p>
+	<main class="sd-wrap">
+		<!-- COUNTDOWN -->
+		{#if countdown && series.nextEpisode}
+			<section aria-labelledby="sd-countdown-heading">
+				<div class="sd-sec-head">
+					<span class="sd-tag">NEXT</span>
+					<h2 id="sd-countdown-heading">{m.series_detail_episode_countdown({ episode: series.nextEpisode.episode })}</h2>
+					<span class="sd-line"></span>
+				</div>
+				<div class="sd-countdown" aria-live="off">
+					<div class="sd-cd-cell sd-hud"><b>{pad2(countdown.days)}</b><small>{m.series_detail_days()}</small></div>
+					<span class="sd-cd-sep" aria-hidden="true">:</span>
+					<div class="sd-cd-cell sd-hud"><b>{pad2(countdown.hours)}</b><small>{m.series_detail_hours()}</small></div>
+					<span class="sd-cd-sep" aria-hidden="true">:</span>
+					<div class="sd-cd-cell sd-hud"><b>{pad2(countdown.minutes)}</b><small>{m.series_detail_minutes()}</small></div>
+					<span class="sd-cd-sep" aria-hidden="true">:</span>
+					<div class="sd-cd-cell sd-hud"><b>{pad2(countdown.seconds)}</b><small>{m.series_detail_seconds()}</small></div>
+				</div>
+			</section>
+		{/if}
 
-						<div class="mt-8 -mx-5 grid !rounded-none border-y border-[var(--orbit-line)] px-5 {primaryMeta.length === 3 ? 'grid-cols-[0.75fr_1.5fr_0.75fr]' : 'grid-cols-2'} sm:mt-10 sm:-mx-8 sm:px-8 sm:auto-cols-fr sm:grid-flow-col sm:grid-cols-none lg:-mx-12 lg:px-12 xl:-mx-14 xl:px-14">
-							{#each primaryMeta as item, index}
-								<div class="min-w-0 !rounded-none py-4 {index > 0 ? 'border-l border-[var(--orbit-line)] px-3 sm:pl-4 sm:pr-0' : 'pr-3 sm:pr-4'}">
-									<div class="whitespace-nowrap font-[family-name:var(--font-display)] text-[clamp(1.125rem,6vw,1.5rem)] font-black leading-none text-[var(--orbit-ink)] sm:text-3xl">{item.value}</div>
-									<div class="mt-1 truncate text-[9px] font-black uppercase tracking-[0.15em] text-[var(--orbit-muted)]">{item.label}</div>
-								</div>
-							{/each}
-						</div>
-
-						<div class="mt-6 space-y-4">
-							{#if series.genres.length > 0}
-								<div class="flex min-w-0 flex-wrap gap-1.5">
-									{#each series.genres as genre}
-										<span class="rounded-md bg-[var(--orbit-coral-soft)] px-2.5 py-1 text-[10px] font-bold text-[var(--orbit-coral-dark)] sm:text-xs">{genre}</span>
-									{/each}
-								</div>
-							{/if}
-							{#if series.platforms.length > 0}
-								<div class="flex min-w-0 flex-wrap gap-1.5">
-									{#each series.platforms as platform}
-										<span class="inline-flex max-w-full items-center gap-1.5 rounded-md border border-[var(--orbit-line)] bg-white px-2.5 py-1 text-[10px] font-bold text-[var(--orbit-ink)] sm:text-xs">
-											{#if platform.logo}<img src={platform.logo} alt="" width={16} height={16} loading="lazy" decoding="async" class="h-4 w-4 rounded-sm object-cover" />{/if}
-											<span class="truncate">{platform.name}</span>
-										</span>
-									{/each}
-								</div>
-							{/if}
-						</div>
+		<!-- INFO -->
+		<section aria-labelledby="sd-info-heading">
+			<div class="sd-sec-head">
+				<span class="sd-tag">SYS</span>
+				<h2 id="sd-info-heading">{m.series_detail_info()}</h2>
+				<span class="sd-line"></span>
+			</div>
+			<div class="sd-info-grid">
+				{#each infoCells as cell (cell.label)}
+					<div class="sd-info-cell">
+						<div class="sd-info-k">{cell.label}</div>
+						<div class="sd-info-v">{cell.value}</div>
 					</div>
+				{/each}
+			</div>
+			{#if series.studioOfficialSite || series.studioSocials.length > 0}
+				<div class="sd-studio-links">
+					{#if series.studioOfficialSite}
+						<a href={series.studioOfficialSite} target="_blank" rel="noopener noreferrer" class="sd-link-chip">
+							<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" /></svg>
+							<span>{m.series_detail_official_site()}</span>
+						</a>
+					{/if}
+					{#each series.studioSocials as social (social.url)}
+						<a href={social.url} target="_blank" rel="noopener noreferrer" class="sd-link-chip">
+							{#if social.iconUrl}<img src={social.iconUrl} alt="" width={16} height={16} loading="lazy" decoding="async" class="h-4 w-4" />{/if}
+							<span>{social.platform}</span>
+						</a>
+					{/each}
+				</div>
+			{/if}
+		</section>
 
-					<div class="grid !rounded-none grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] grid-rows-2 border-t border-[var(--orbit-line-strong)]">
-						<FavoriteButton seriesId={series.id} variant="orbit" className="row-span-2 min-h-[10.5rem] !rounded-none !border-y-0 !border-l-0 !border-r !border-[var(--orbit-line-strong)]" />
-						<WatchedButton seriesId={series.id} variant="orbit" className="min-h-[5.25rem] !rounded-none !border-x-0 !border-t-0 !border-b !border-[var(--orbit-line-strong)]" />
-						<div class="h-full min-w-0">
-							<ShareButton title={`${series.titleEn}${series.titleTh ? ` (${series.titleTh})` : ''}`} text={m.series_share_text({ title })} url={canonicalUrl} ariaLabel={m.series_share_aria_label()} variant="orbit" className="min-h-[5.25rem] !rounded-none !border-0" />
-						</div>
-					</div>
+		<!-- SYNOPSIS -->
+		{#if description}
+			<section aria-labelledby="sd-synopsis-heading">
+				<div class="sd-sec-head">
+					<span class="sd-tag">TXT</span>
+					<h2 id="sd-synopsis-heading">{m.series_detail_synopsis()}</h2>
+					<span class="sd-line"></span>
+				</div>
+				<div class="sd-synopsis">
+					<p class:line-clamp-6={!descriptionExpanded && hasLongDescription}>{description}</p>
+					{#if hasLongDescription}
+						<button type="button" onclick={() => (descriptionExpanded = !descriptionExpanded)} aria-expanded={descriptionExpanded} class="sd-btn sd-synopsis-toggle">
+							<span>{descriptionExpanded ? m.series_detail_synopsis_less() : m.series_detail_synopsis_more()}</span>
+							<svg class:rotate-180={descriptionExpanded} class="h-4 w-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" /></svg>
+						</button>
+					{/if}
+				</div>
+			</section>
+		{/if}
+
+		<!-- VIDEOS: TRAILER + PILOT (mock placeholders; no DB fields yet) -->
+		<section aria-labelledby="sd-video-heading">
+			<div class="sd-sec-head">
+				<span class="sd-tag">VID</span>
+				<h2 id="sd-video-heading">{m.series_detail_trailer()} &amp; {m.series_detail_pilot()}</h2>
+				<span class="sd-line"></span>
+				<span class="sd-soon">{m.series_detail_video_placeholder()}</span>
+			</div>
+			<div class="sd-vid-tabs" role="tablist" aria-label={m.series_detail_trailer()}>
+				<button class="sd-vid-tab" role="tab" aria-selected={activeVideoTab === 'trailer'} onclick={() => (activeVideoTab = 'trailer')}>▶ {m.series_detail_trailer()}</button>
+				<button class="sd-vid-tab" role="tab" aria-selected={activeVideoTab === 'pilot'} onclick={() => (activeVideoTab = 'pilot')}>▶ {m.series_detail_pilot()}</button>
+			</div>
+			<div class="sd-video-row">
+				<div class="sd-video-card" role="tabpanel" hidden={activeVideoTab !== 'trailer'}>
+					<span class="sd-empty">{m.series_detail_video_placeholder()}</span>
+					<div class="sd-screen"><div class="sd-play orbit-round-data" aria-hidden="true">▶</div></div>
+					<div class="sd-bar"><span>OFFICIAL_TRAILER.MP4</span><span>--:--</span></div>
+				</div>
+				<div class="sd-video-card" role="tabpanel" hidden={activeVideoTab !== 'pilot'}>
+					<span class="sd-empty">{m.series_detail_video_placeholder()}</span>
+					<div class="sd-screen"><div class="sd-play orbit-round-data" aria-hidden="true">▶</div></div>
+					<div class="sd-bar"><span>PILOT_EP0.MP4</span><span>--:--</span></div>
 				</div>
 			</div>
 		</section>
 
-		{#if description}
-			<section class="mt-20 grid !rounded-none border-t border-[var(--orbit-line-strong)] sm:mt-28 lg:grid-cols-12" aria-labelledby="synopsis-heading">
-				<header class="pt-6 lg:col-span-3 lg:pr-8 lg:pt-8">
-					<p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">Story file</p>
-					<h2 id="synopsis-heading" class="mt-2 max-w-xs text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-[0.95] tracking-[-0.05em]'}">{m.series_detail_synopsis()}</h2>
-				</header>
-
-				<div class="min-w-0 !rounded-none pt-7 lg:col-span-9 lg:border-l lg:border-[var(--orbit-line)] lg:px-10 lg:pt-8 xl:px-14">
-					<p class:line-clamp-6={!descriptionExpanded && hasLongDescription} class="max-w-[52rem] whitespace-pre-line font-[family-name:var(--font-thai)] text-base font-medium leading-[1.95] text-plum sm:text-lg sm:leading-[2] lg:text-xl lg:leading-[2.1]">{description}</p>
-					{#if hasLongDescription}
-						<button type="button" onclick={() => (descriptionExpanded = !descriptionExpanded)} aria-expanded={descriptionExpanded} class="mt-6 inline-flex items-center gap-2 rounded-md bg-plum px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#24151f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint touch-target">
-							<span>{descriptionExpanded ? (currentLang === 'th' ? 'ย่อเนื้อหา' : 'Show less') : (currentLang === 'th' ? 'อ่านเรื่องย่อเต็ม' : 'Read full synopsis')}</span>
-							<svg class:rotate-180={descriptionExpanded} class="h-4 w-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" /></svg>
-						</button>
-					{/if}
-
-					<div class="mt-10 grid min-w-0 !rounded-none border-y border-[var(--orbit-line)] sm:grid-cols-2 lg:-mx-10 lg:px-10 xl:-mx-14 xl:px-14">
-						<div class="min-w-0 py-5 sm:pr-6">
-							<p class="text-[10px] font-black uppercase tracking-[0.28em] text-coral-dark">Studio</p>
-							<p class="mt-2 break-words font-[family-name:var(--font-display)] text-xl font-black leading-tight text-plum [overflow-wrap:anywhere] sm:text-2xl">{series.studio}</p>
+		<!-- GALLERY (Splide) -->
+		{#if galleryCandidates.length > 0}
+			<section aria-labelledby="sd-gallery-heading">
+				<div class="sd-sec-head">
+					<span class="sd-tag">IMG</span>
+					<h2 id="sd-gallery-heading">{m.series_detail_gallery()}</h2>
+					<span class="sd-line"></span>
+				</div>
+				<div class="sd-splide splide" bind:this={gallerySplideEl} aria-roledescription="carousel">
+					<div class="splide__track">
+						<div class="splide__list">
+							{#each galleryCandidates as image, index (image.src)}
+								<div class="splide__slide">
+									<figure class="sd-g-item">
+										<span class="sd-g-num orbit-round-data" aria-hidden="true">{index + 1}</span>
+										<div class="sd-g-ph">
+											<Picture src={image.src} type="posters" sizes="(max-width: 759px) 82vw, (max-width: 1099px) 45vw, 30vw" alt={image.alt} width={640} height={480} loading="lazy" class="sd-g-img" />
+										</div>
+										{#if image.caption}<figcaption class="sd-g-cap">{image.caption}</figcaption>{/if}
+									</figure>
+								</div>
+							{/each}
 						</div>
-						{#if series.studioOfficialSite || series.studioSocials.length > 0}
-							<div class="flex min-w-0 !rounded-none flex-wrap content-center gap-2 border-t border-[var(--orbit-line)] py-4 sm:border-l sm:border-t-0 sm:pl-6">
-								{#if series.studioOfficialSite}
-									<a href={series.studioOfficialSite} target="_blank" rel="noopener noreferrer" class="inline-flex max-w-full items-center gap-1.5 rounded-md border border-[var(--orbit-line)] bg-white px-3.5 py-2 text-xs font-bold text-plum transition hover:border-coral hover:text-coral-dark touch-target">
-										<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" /></svg>
-										<span class="min-w-0 break-words [overflow-wrap:anywhere]">{m.series_detail_official_site()}</span>
-									</a>
-								{/if}
-								{#each series.studioSocials as social}
-									<a href={social.url} target="_blank" rel="noopener noreferrer" aria-label={social.platform} class="inline-flex max-w-full items-center gap-1.5 rounded-md border border-[var(--orbit-line)] bg-white px-3 py-2 text-xs font-bold text-plum transition hover:border-coral hover:text-coral-dark touch-target">
-										{#if social.iconUrl}<img src={social.iconUrl} alt="" width={16} height={16} loading="lazy" decoding="async" class="h-4 w-4 rounded-sm" />{/if}
-										<span class="min-w-0 break-words [overflow-wrap:anywhere]">{social.platform}</span>
-									</a>
-								{/each}
-							</div>
-						{/if}
 					</div>
 				</div>
 			</section>
 		{/if}
 
-		{#if series.artists.length > 0}
-			<section class="mt-24 !rounded-none border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8" aria-labelledby="cast-heading">
-				<header class="mb-8 flex flex-wrap items-end justify-between gap-5 sm:mb-12">
-					<div>
-						<h2 id="cast-heading" class="text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.common_cast()}</h2>
-					</div>
-					<div class="flex min-h-11 items-center border border-[var(--orbit-line-strong)] bg-mint px-3 text-center font-[family-name:var(--font-display)] text-xl font-black text-plum sm:px-4 sm:text-2xl">
-						<span>{series.artists.length}<small class="ml-1 text-[8px] font-black uppercase tracking-[0.18em]">{m.common_people()}</small></span>
-					</div>
-				</header>
-
-				<div class="grid grid-cols-2 gap-x-2 gap-y-5 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-10 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-12">
-					{#each series.artists as artist, index (artist.id)}
-						<a href={artistPath(artist.id)} class="group min-w-0 !rounded-none border-t border-[var(--orbit-line)] pt-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral sm:pt-3">
-							<div class="grid min-w-0 grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-2 sm:block">
-								<div class="relative overflow-hidden rounded-md bg-lavender/25">
-									<Picture src={artist.image} type="profiles" sizes="(max-width: 639px) 56px, (max-width: 1024px) 24vw, 220px" alt={artist.name} width={320} height={400} loading="lazy" class="aspect-square w-full object-cover transition duration-300 group-hover:scale-[1.025] sm:aspect-[4/5]" />
-									<span aria-hidden="true" class="absolute left-2 top-2 hidden bg-coral px-2 py-1 font-[family-name:var(--font-display)] text-[10px] font-black text-white sm:block">{String(index + 1).padStart(2, '0')}</span>
-								</div>
-								<div class="min-w-0 sm:pt-3">
-									<h3 class="break-words text-[11px] font-black leading-[1.35] text-plum transition [overflow-wrap:anywhere] group-hover:text-coral-dark min-[360px]:text-xs sm:text-base sm:leading-[1.45]">{artist.name}</h3>
-									<p class="mt-1 truncate font-[family-name:var(--font-thai)] text-[10px] font-medium text-plum-light/65 sm:text-sm">{artist.role}</p>
-								</div>
-							</div>
-						</a>
-					{/each}
-				</div>
-			</section>
-		{/if}
-
+		<!-- SHIPS -->
 		{#if series.ships.length > 0}
-			<section class="mt-24 !rounded-none border-t border-[var(--orbit-line-strong)] pt-6 text-plum sm:mt-32 sm:pt-8" aria-labelledby="ships-heading">
-				<header class="mb-8 sm:mb-12">
-					<p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">03 / Chemistry</p>
-					<h2 id="ships-heading" class="mt-2 text-3xl font-bold sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.series_detail_ships()}</h2>
-				</header>
-				<div class="grid grid-cols-1 gap-px overflow-hidden border border-[var(--orbit-line)] bg-[var(--orbit-line)] min-[340px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+			<section aria-labelledby="sd-ships-heading">
+				<div class="sd-sec-head">
+					<span class="sd-tag">OTP</span>
+					<h2 id="sd-ships-heading">{m.series_detail_ships()}</h2>
+					<span class="sd-line"></span>
+				</div>
+				<div class="sd-ship-list">
 					{#each series.ships as ship (ship.id)}
-						<a href={shipPath(ship.slug)} class="group min-w-0 !rounded-none bg-white p-3 transition hover:bg-[var(--orbit-coral-soft)] focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral sm:p-5">
-							<div class="mx-auto flex max-w-[10rem] items-center justify-center">
-								<div class="orbit-round-data relative z-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-coral-light shadow-sm">
-									<Picture src={ship.artist1Image} type="profiles" sizes="(max-width: 639px) 84px, 140px" alt={ship.artist1Name} width={280} height={280} loading="lazy" class="aspect-square w-full object-cover transition duration-300 group-hover:-rotate-2" />
-								</div>
-								<div class="orbit-round-data relative -ml-[23%] mt-10 w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-lavender-light shadow-sm">
-									<Picture src={ship.artist2Image} type="profiles" sizes="(max-width: 639px) 84px, 140px" alt={ship.artist2Name} width={280} height={280} loading="lazy" class="aspect-square w-full object-cover transition duration-300 group-hover:rotate-2" />
-								</div>
-							</div>
-							<div class="mt-4 min-w-0 text-center">
-								<h3 class="break-words font-[family-name:var(--font-display)] text-sm font-black leading-tight tracking-[-0.035em] text-plum [overflow-wrap:anywhere] sm:text-xl">{ship.name}</h3>
-								<p class="mt-1 break-words text-[9px] font-semibold leading-[1.45] text-plum-light/65 [overflow-wrap:anywhere] sm:text-xs">{ship.artist1Name} × {ship.artist2Name}</p>
-							</div>
+						<a href={shipPath(ship.slug)} class="sd-ship-sticker">
+							<span class="sd-ship-faces">
+								<span class="sd-ship-face orbit-round-data">
+									<Picture src={ship.artist1Image} type="profiles" sizes="56px" alt={ship.artist1Name} width={112} height={112} loading="lazy" class="sd-ship-img" />
+								</span>
+								<span class="sd-ship-face orbit-round-data">
+									<Picture src={ship.artist2Image} type="profiles" sizes="56px" alt={ship.artist2Name} width={112} height={112} loading="lazy" class="sd-ship-img" />
+								</span>
+							</span>
+							<span class="sd-ship-meta">
+								<span class="sd-ship-names">{ship.name}</span>
+								<span class="sd-ship-sub">{ship.artist1Name} × {ship.artist2Name}</span>
+							</span>
 						</a>
 					{/each}
 				</div>
 			</section>
 		{/if}
 
-		{#if galleryCandidates.length >= 3}
-			<section class="mt-24 !rounded-none border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8" aria-labelledby="gallery-heading">
-				<header class="mb-8 sm:mb-10">
-					<p class="text-[10px] font-black uppercase tracking-[0.32em] text-coral-dark">04 / Stills</p>
-					<h2 id="gallery-heading" class="mt-2 text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-none tracking-[-0.05em]'}">{m.series_detail_gallery()}</h2>
-				</header>
-				<div class="grid auto-rows-[8rem] grid-cols-12 gap-2 sm:auto-rows-[11rem] sm:gap-3">
-					{#each galleryCandidates as image, index (image.src)}
-						<figure class="group relative overflow-hidden rounded-md bg-plum {index === 0 ? 'col-span-12 row-span-3 sm:col-span-7' : index === 1 || index === 2 ? 'col-span-6 row-span-2 sm:col-span-5' : 'col-span-6 row-span-2 sm:col-span-4'}">
-							<Picture src={image.src} type="posters" sizes={index === 0 ? '(max-width: 768px) 92vw, 760px' : '(max-width: 768px) 46vw, 440px'} alt={image.alt} width={index === 0 ? 760 : 440} height={index === 0 ? 570 : 330} loading="lazy" class="h-full w-full object-cover opacity-90 transition duration-300 group-hover:scale-[1.02] group-hover:opacity-100" />
-							<figcaption class="absolute inset-x-0 bottom-0 bg-plum/90 p-4 text-white">
-								<span class="block text-[9px] font-black uppercase tracking-[0.24em] text-coral-light">{image.label}</span>
-								{#if image.title}<span class="mt-1 block truncate text-sm font-bold">{image.title}</span>{/if}
-							</figcaption>
-						</figure>
-					{/each}
+		<!-- CAST (Splide) -->
+		{#if series.artists.length > 0}
+			<section aria-labelledby="sd-cast-heading">
+				<div class="sd-sec-head">
+					<span class="sd-tag">PPL</span>
+					<h2 id="sd-cast-heading">{m.common_cast()}</h2>
+					<span class="sd-line"></span>
+				</div>
+				<div class="sd-splide splide" bind:this={castSplideEl} aria-roledescription="carousel">
+					<div class="splide__track">
+						<div class="splide__list">
+							{#each series.artists as artist (artist.id)}
+								<div class="splide__slide sd-cast-slide">
+									<a href={artistPath(artist.id)} class="sd-cast-card">
+										<span class="sd-cast-avatar orbit-round-data">
+											<Picture src={artist.image} type="profiles" sizes="(max-width: 759px) 84px, 104px" alt={artist.name} width={208} height={208} loading="lazy" class="sd-cast-img" />
+										</span>
+										<span class="sd-cast-n">{artist.name}</span>
+										<span class="sd-cast-r">{artist.role}</span>
+									</a>
+								</div>
+							{/each}
+						</div>
+					</div>
 				</div>
 			</section>
 		{/if}
 
+		<!-- EPISODES -->
 		{#if series.schedule.length > 0}
-			<section class="mt-24 grid !rounded-none border-t border-[var(--orbit-line-strong)] pt-6 sm:mt-32 sm:pt-8 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-12" aria-labelledby="schedule-heading">
-				<header class="pb-8 lg:sticky lg:top-28 lg:self-start lg:pb-0">
-					<h2 id="schedule-heading" class="max-w-xs text-3xl font-bold text-plum sm:text-5xl {currentLang === 'th' ? 'font-[family-name:var(--font-thai)] leading-[1.25] tracking-[-0.03em]' : 'font-[family-name:var(--font-display)] leading-[0.95] tracking-[-0.05em]'}">{m.common_schedule()}</h2>
-					<p class="mt-4 max-w-[14rem] text-sm font-medium leading-6 text-plum-light/60">{series.schedule.length} {m.common_episodes()}</p>
-					<button onclick={toggleAll} class="mt-4 inline-flex items-center gap-2 rounded-md bg-plum px-4 py-2.5 text-xs font-bold text-white transition hover:bg-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral touch-target" aria-label={allExpanded ? m.common_collapse_all() : m.common_expand_all()}>
+			<section aria-labelledby="sd-episodes-heading">
+				<div class="sd-sec-head">
+					<span class="sd-tag">EP</span>
+					<h2 id="sd-episodes-heading">{m.series_detail_episodes_heading()}</h2>
+					<span class="sd-line"></span>
+					<button onclick={toggleAll} class="sd-expand-all" aria-label={allExpanded ? m.common_collapse_all() : m.common_expand_all()}>
 						<span>{allExpanded ? m.common_collapse_all() : m.common_expand_all()}</span>
-						<svg class="h-4 w-4 transition-transform {allExpanded ? 'rotate-180' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
 					</button>
-				</header>
-
-				<ol class="min-w-0 divide-y divide-[var(--orbit-line)] !rounded-none border-y border-[var(--orbit-line-strong)] bg-white">
+				</div>
+				<ol class="sd-ep-list">
 					{#each series.schedule as item (item.episode)}
 						{@const hasSchedules = item.schedules.length > 0 && item.schedules.some((schedule: { platform: string }) => schedule.platform !== 'TBA')}
-						{@const hasEpisodeMedia = Boolean(item.trailerUrl)}
-						{@const hasEpisodeContent = hasSchedules || hasEpisodeMedia}
+						{@const hasEpisodeContent = hasSchedules || Boolean(item.trailerUrl)}
 						{@const trailerEmbedUrl = youtubeEmbedUrl(item.trailerUrl)}
 						{@const isOpen = hasEpisodeContent && expandedEpisodes.has(item.episode)}
-						<li class="min-w-0 !rounded-none">
-							<article class="min-w-0 max-w-full !rounded-none overflow-hidden">
-								<button type="button" disabled={!hasEpisodeContent} onclick={() => toggleEpisode(item.episode)} aria-expanded={hasEpisodeContent ? isOpen : undefined} class="grid w-full !rounded-none grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-3 gap-y-3 p-3 text-left transition hover:bg-[var(--orbit-paper-deep)] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-coral disabled:cursor-default disabled:hover:bg-white sm:grid-cols-[5.25rem_minmax(0,1fr)_auto] sm:gap-x-5 sm:p-5">
-									<div class="grid aspect-square place-items-center rounded-md border border-[var(--orbit-line)] {isOpen ? 'bg-coral text-white' : 'bg-cream text-plum'} transition-colors">
-										<span class="font-[family-name:var(--font-display)] text-2xl font-black tracking-[-0.06em] sm:text-4xl">{String(item.episode).padStart(2, '0')}</span>
-									</div>
-									<div class="min-w-0">
-										<p class="text-[9px] font-black uppercase tracking-[0.24em] text-coral-dark">Episode {item.episode}</p>
-										<h3 class="mt-1 truncate font-[family-name:var(--font-display)] text-lg font-black tracking-[-0.025em] text-plum sm:text-2xl">{item.title}</h3>
-										<p class="mt-1 truncate text-xs font-semibold text-plum-light/55 sm:text-sm">{scheduleSummary(item)}</p>
-									</div>
-									<div class="col-span-2 flex flex-wrap items-center justify-end gap-2 sm:col-span-1 sm:flex-nowrap">
-										{#if isToday(item.schedules)}<span class="rounded-md bg-coral/12 px-2.5 py-1 text-[10px] font-bold text-coral-dark">{m.common_today()}</span>{/if}
-										{#if hasUncut(item.schedules)}<span class="rounded-md bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-700">{m.common_uncut()}</span>{/if}
-										<span class="whitespace-nowrap text-xs font-bold text-plum-light/65 sm:text-sm">{firstAirDate(item)}</span>
-										{#if hasEpisodeContent}
-											<span class="grid h-9 w-9 place-items-center rounded-md border border-[var(--orbit-line)] bg-white text-plum"><svg class="h-4 w-4 transition-transform duration-300 {isOpen ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></span>
-										{/if}
-									</div>
+						{@const epStatus = episodeStatus(item)}
+						<li>
+							<article class="sd-ep" class:sd-ep-open={isOpen}>
+								<button type="button" disabled={!hasEpisodeContent} onclick={() => toggleEpisode(item.episode)} aria-expanded={hasEpisodeContent ? isOpen : undefined} class="sd-ep-head">
+									<span class="sd-ep-no">{String(item.episode).padStart(2, '0')}</span>
+									<span class="sd-ep-meta">
+										<span class="sd-ep-t">{item.title}</span>
+										<span class="sd-ep-d">
+											{firstAirDate(item)} · {scheduleSummary(item)}
+											{#if isToday(item.schedules)} · {m.common_today()}{/if}
+											{#if hasUncut(item.schedules)} · {m.common_uncut()}{/if}
+										</span>
+									</span>
+									<span class="sd-ep-st sd-st-{epStatus}">
+										{epStatus === 'aired' ? m.series_detail_episode_aired() : epStatus === 'next' ? m.series_detail_episode_next() : m.series_detail_episode_tba()}
+									</span>
+									{#if hasEpisodeContent}
+										<span class="sd-ep-chevron" aria-hidden="true">
+											<svg class:rotate-180={isOpen} class="h-4 w-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+										</span>
+									{/if}
 								</button>
 
 								{#if isOpen}
-									<div class="grid min-w-0 !rounded-none gap-3 border-t border-[var(--orbit-line)] bg-[var(--orbit-paper-deep)] p-3 sm:p-5 {item.trailerUrl && hasSchedules ? 'lg:grid-cols-2' : ''}">
+									<div class="sd-ep-body">
 										{#if item.trailerUrl}
 											{#if trailerEmbedUrl}
 												{#if activatedTrailers.has(item.episode)}
-													<div class="overflow-hidden rounded-md bg-plum"><iframe src={trailerEmbedUrl} title={`Trailer ${item.title}`} class="aspect-video w-full" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+													<div class="overflow-hidden rounded-md bg-[var(--orbit-rail)]"><iframe src={trailerEmbedUrl} title={`Trailer ${item.title}`} class="aspect-video w-full" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 												{:else}
-													<button type="button" onclick={(event) => activateTrailer(item.episode, event)} class="group relative flex min-h-[12rem] w-full items-end overflow-hidden rounded-md bg-plum p-5 text-left text-white transition hover:bg-coral-dark touch-target">
-														<div aria-hidden="true" class="orbit-round-data absolute right-5 top-5 grid h-14 w-14 place-items-center rounded-full bg-white text-plum transition group-hover:scale-105"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg></div>
-														<span><span class="block text-[9px] font-black uppercase tracking-[0.25em] text-coral-light">Trailer</span><span class="mt-1 block text-base font-bold">{currentLang === 'th' ? 'แตะเพื่อโหลดวิดีโอ' : 'Tap to load video'}</span></span>
+													<button type="button" onclick={(event) => activateTrailer(item.episode, event)} class="group relative flex min-h-[12rem] w-full items-end overflow-hidden rounded-md bg-[var(--orbit-rail)] p-5 text-left text-[var(--orbit-paper)] transition hover:opacity-90 touch-target">
+														<div aria-hidden="true" class="orbit-round-data absolute right-5 top-5 grid h-14 w-14 place-items-center rounded-full bg-[var(--orbit-surface)] text-[var(--orbit-ink)] transition group-hover:scale-105"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg></div>
+														<span><span class="block text-[9px] font-black uppercase tracking-[0.25em] opacity-75">{m.series_detail_trailer()}</span><span class="mt-1 block text-base font-bold">{currentLang === 'th' ? 'แตะเพื่อโหลดวิดีโอ' : 'Tap to load video'}</span></span>
 													</button>
 												{/if}
 											{:else}
-												<div class="rounded-md border border-[var(--orbit-line)] bg-white p-5"><p class="text-sm text-plum-light">{m.series_trailer_external_notice()}</p><a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center gap-2 rounded-md bg-coral px-4 py-2 text-sm font-bold text-white transition hover:bg-coral-dark touch-target">{m.series_trailer_open()}<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a></div>
+												<div class="rounded-md border border-[var(--orbit-line)] bg-[var(--orbit-surface)] p-5"><p class="text-sm text-[var(--orbit-muted)]">{m.series_trailer_external_notice()}</p><a href={item.trailerUrl} target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center gap-2 rounded-md bg-[var(--orbit-coral)] px-4 py-2 text-sm font-bold text-white transition hover:bg-[var(--orbit-coral-dark)] touch-target">{m.series_trailer_open()}<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a></div>
 											{/if}
 										{/if}
 
 										{#if hasSchedules}
-											<div class="min-w-0 max-w-full space-y-2 rounded-md border border-[var(--orbit-line)] bg-white p-3 sm:p-4">
+											<div class="min-w-0 max-w-full space-y-2 rounded-md border border-[var(--orbit-line)] bg-[var(--orbit-surface)] p-3 sm:p-4">
 												{#each item.schedules as schedule}
 													{@const hasStreamLink = schedule.streamLink && schedule.streamLink.length > 0}
-													<div class="flex min-w-0 max-w-full items-center justify-between gap-2 rounded-md bg-cream/70 px-3 py-2.5 min-[360px]:gap-3">
+													<div class="flex min-w-0 max-w-full items-center justify-between gap-2 rounded-md bg-[var(--orbit-paper-deep)] px-3 py-2.5 min-[360px]:gap-3">
 														<div class="flex min-w-0 flex-1 items-center gap-2 min-[360px]:gap-3">
-															{#if schedule.platformLogo}<img src={schedule.platformLogo} alt={schedule.platform} width={32} height={32} loading="lazy" decoding="async" class="orbit-round-data h-8 w-8 shrink-0 rounded-full object-cover" />{:else}<span class="orbit-round-data grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-xs font-black text-plum">{schedule.platform.charAt(0)}</span>{/if}
-															<div class="min-w-0 flex-1"><p class="truncate text-sm font-bold text-plum">{schedule.title || schedule.platform}</p>{#if schedule.title}<p class="mt-0.5 truncate text-[10px] font-semibold text-plum-light/55">{schedule.platform}</p>{/if}<p class="mt-0.5 truncate text-[10px] font-semibold text-plum-light/55">{schedule.airDate}{schedule.isUncut ? ` · ${m.common_uncut()}` : ''}</p></div>
+															{#if schedule.platformLogo}<img src={schedule.platformLogo} alt={schedule.platform} width={32} height={32} loading="lazy" decoding="async" class="orbit-round-data h-8 w-8 shrink-0 rounded-full object-cover" />{:else}<span class="orbit-round-data grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--orbit-surface)] text-xs font-black text-[var(--orbit-ink)]">{schedule.platform.charAt(0)}</span>{/if}
+															<div class="min-w-0 flex-1"><p class="truncate text-sm font-bold text-[var(--orbit-ink)]">{schedule.title || schedule.platform}</p>{#if schedule.title}<p class="mt-0.5 truncate text-[10px] font-semibold text-[var(--orbit-muted)]">{schedule.platform}</p>{/if}<p class="mt-0.5 truncate text-[10px] font-semibold text-[var(--orbit-muted)]">{schedule.airDate}{schedule.isUncut ? ` · ${m.common_uncut()}` : ''}</p></div>
 														</div>
-														{#if hasStreamLink}<a href={schedule.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex shrink-0 items-center gap-1 rounded-md bg-coral px-3 py-2 text-xs font-bold text-white transition hover:bg-coral-dark max-[359px]:h-11 max-[359px]:w-11 max-[359px]:justify-center max-[359px]:px-0 touch-target"><span class="max-[359px]:sr-only">{m.series_detail_watch_now()}</span><svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>{/if}
+														{#if hasStreamLink}<a href={schedule.streamLink} target="_blank" rel="noopener noreferrer" class="inline-flex shrink-0 items-center gap-1 rounded-md bg-[var(--orbit-coral)] px-3 py-2 text-xs font-bold text-white transition hover:bg-[var(--orbit-coral-dark)] max-[359px]:h-11 max-[359px]:w-11 max-[359px]:justify-center max-[359px]:px-0 touch-target"><span class="max-[359px]:sr-only">{m.series_detail_watch_now()}</span><svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>{/if}
 													</div>
 												{/each}
 											</div>
@@ -495,15 +633,867 @@
 			</section>
 		{/if}
 
-		<section class="mt-24 flex flex-wrap items-end justify-between gap-6 bg-plum px-6 py-8 text-white sm:mt-32 sm:px-10 sm:py-10">
-				<div>
-					<p class="text-[10px] font-black uppercase tracking-[0.32em] text-mint">Orbit Halo</p>
-					<h2 class="mt-3 font-[family-name:var(--font-display)] text-3xl font-bold leading-none tracking-[-0.05em] sm:text-5xl">Latest Moments</h2>
-				</div>
-				<a href={momentsHref} class="inline-flex min-h-11 items-center gap-3 bg-white px-5 text-sm font-bold text-plum transition hover:bg-coral-light focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
-					<span>{currentLang === 'th' ? 'ดู Moment ทั้งหมด' : 'View all moments'}</span>
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6" /></svg>
-				</a>
+		<!-- Orbit Halo moments link -->
+		<section class="sd-halo">
+			<div>
+				<p class="sd-halo-kicker">Orbit Halo</p>
+				<h2 class="sd-halo-title">Latest Moments</h2>
+			</div>
+			<a href={momentsHref} class="sd-halo-link">
+				<span>{currentLang === 'th' ? 'ดู Moment ทั้งหมด' : 'View all moments'}</span>
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6" /></svg>
+			</a>
 		</section>
 	</main>
 </div>
+
+<style>
+	.sd-page {
+		font-family: var(--orbit-font-body, inherit);
+		color: var(--orbit-ink);
+	}
+	.sd-wrap {
+		max-width: 72rem;
+		margin-inline: auto;
+	}
+
+	/* ============ MARQUEE ============ */
+	.sd-marquee {
+		background: var(--orbit-rail);
+		color: var(--orbit-paper);
+		font-size: 12px;
+		font-weight: var(--orbit-font-label-weight);
+		overflow: hidden;
+		white-space: nowrap;
+		padding: 6px 0;
+		border-bottom: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+	}
+	.sd-marquee span {
+		display: inline-block;
+		padding-left: 100%;
+		animation: sd-mq 24s linear infinite;
+	}
+	@keyframes sd-mq {
+		to { transform: translateX(-100%); }
+	}
+
+	/* ============ HERO ============ */
+	.sd-hero { position: relative; }
+	.sd-cover {
+		position: relative;
+		height: max(170px, calc(100vw / 3));
+		overflow: hidden;
+	}
+	.sd-cover :global(picture) {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+	.sd-cover :global(.sd-cover-img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center top;
+		display: block;
+		filter: saturate(1.12) contrast(1.04) brightness(1.01);
+	}
+	.sd-cover-tint {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		mix-blend-mode: soft-light;
+		background:
+			linear-gradient(120deg,
+				color-mix(in srgb, var(--orbit-coral) 70%, transparent) 0%,
+				color-mix(in srgb, var(--orbit-lavender) 70%, transparent) 50%,
+				color-mix(in srgb, var(--orbit-mint) 60%, transparent) 100%);
+	}
+	.sd-cover::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		background-image: var(--orbit-accent-image, none);
+		background-repeat: repeat;
+		opacity: 0.25;
+	}
+	.sd-cover::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		background:
+			linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--orbit-paper) 88%, transparent) 96%, var(--orbit-paper) 100%),
+			repeating-linear-gradient(0deg, color-mix(in srgb, var(--orbit-paper) 6%, transparent) 0 2px, transparent 2px 5px);
+	}
+	.sd-cover :global(.sd-cover-fb) {
+		filter: blur(26px) saturate(1.25) brightness(1.03);
+		transform: scale(1.2);
+	}
+	.sd-hero-inner {
+		display: flex;
+		gap: 18px;
+		align-items: flex-end;
+		padding: 0 16px;
+		margin-top: -96px;
+		position: relative;
+		z-index: 2;
+	}
+	.sd-poster-frame {
+		flex: 0 0 148px;
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow-overlay);
+		padding: 6px;
+	}
+	.sd-poster {
+		aspect-ratio: 2 / 3;
+		width: 100%;
+		overflow: hidden;
+		border-radius: calc(var(--orbit-radius-surface) / 2);
+		background: var(--orbit-paper-deep);
+	}
+	.sd-poster :global(.sd-poster-img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+	.sd-hero-titles {
+		padding-bottom: 6px;
+		min-width: 0;
+	}
+	.sd-back {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		min-height: 44px;
+		padding: 4px 12px;
+		margin-bottom: 8px;
+		font-size: 11px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		text-transform: uppercase;
+		color: var(--orbit-ink);
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-control);
+		box-shadow: var(--orbit-shadow-surface);
+		cursor: pointer;
+	}
+	.sd-back:hover { border-color: var(--orbit-border-interactive); }
+	.sd-back:focus-visible { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
+	.sd-status-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 11px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		text-transform: uppercase;
+		background: var(--orbit-mint);
+		color: var(--orbit-ink);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: var(--orbit-radius-badge);
+		box-shadow: var(--orbit-shadow-interactive);
+		padding: 3px 12px;
+		margin: 0 0 8px 8px;
+	}
+	.sd-status-chip::before { content: '●'; color: var(--orbit-muted); }
+	.sd-status-live::before { color: var(--orbit-success); }
+	.sd-title-th {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: clamp(24px, 6vw, 42px);
+		line-height: 1.15;
+		overflow-wrap: anywhere;
+	}
+	.sd-title-en {
+		font-size: clamp(12px, 2.4vw, 16px);
+		font-weight: var(--orbit-font-label-weight);
+		color: var(--orbit-coral-dark);
+		margin-top: 4px;
+		text-transform: uppercase;
+		overflow-wrap: anywhere;
+	}
+
+	/* ============ HUD CORNER BRACKETS ============ */
+	.sd-hud { position: relative; }
+	.sd-hud::before, .sd-hud::after {
+		content: '';
+		position: absolute;
+		width: 10px;
+		height: 10px;
+		pointer-events: none;
+		z-index: 3;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-coral);
+	}
+	.sd-hud::before { top: -4px; left: -4px; border-right: 0; border-bottom: 0; }
+	.sd-hud::after { bottom: -4px; right: -4px; border-left: 0; border-top: 0; }
+
+	/* ============ ACTIONS ============ */
+	.sd-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		padding: 18px 16px 4px;
+	}
+	.sd-actions :global(.sd-btn-like) {
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-interactive);
+		border-radius: var(--orbit-radius-control);
+		box-shadow: var(--orbit-shadow-interactive);
+		padding: 10px 16px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		text-transform: uppercase;
+		color: var(--orbit-ink);
+	}
+	.sd-actions :global(.sd-btn-like:hover) {
+		border-color: var(--orbit-coral-dark);
+		box-shadow: var(--orbit-shadow-accent);
+	}
+
+	/* ============ SECTIONS ============ */
+	.sd-page section { margin-top: 28px; }
+	.sd-sec-head {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-bottom: 12px;
+		padding: 0 16px;
+	}
+	.sd-tag {
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		background: var(--orbit-rail);
+		color: var(--orbit-paper);
+		border-radius: var(--orbit-radius-badge);
+		padding: 3px 8px;
+		text-transform: uppercase;
+	}
+	.sd-sec-head h2 {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: 17px;
+		text-transform: uppercase;
+	}
+	.sd-line {
+		flex: 1;
+		height: var(--orbit-border-width);
+		background: linear-gradient(90deg, var(--orbit-line-strong), var(--orbit-line), transparent);
+	}
+	.sd-soon {
+		font-size: 9.5px;
+		font-weight: var(--orbit-font-label-weight);
+		color: var(--orbit-warning);
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) dashed var(--orbit-warning);
+		border-radius: var(--orbit-radius-badge);
+		padding: 2px 7px;
+		white-space: nowrap;
+	}
+
+	/* ============ COUNTDOWN (LED cells) ============ */
+	.sd-countdown {
+		display: flex;
+		gap: 8px;
+		padding: 0 16px;
+		align-items: stretch;
+	}
+	.sd-cd-cell {
+		flex: 1 1 0;
+		min-width: 0;
+		background: var(--orbit-rail);
+		color: var(--orbit-success);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow-accent);
+		text-align: center;
+		padding: 12px 6px 10px;
+	}
+	.sd-cd-cell b {
+		display: block;
+		line-height: 1;
+		letter-spacing: 0.04em;
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: clamp(26px, 7vw, 42px);
+		font-variant-numeric: tabular-nums;
+	}
+	.sd-cd-cell small {
+		display: block;
+		margin-top: 6px;
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--orbit-paper);
+		opacity: 0.75;
+	}
+	.sd-cd-sep {
+		align-self: center;
+		font-family: var(--orbit-font-display);
+		font-size: 22px;
+		font-weight: var(--orbit-font-heading-weight);
+		color: var(--orbit-coral);
+	}
+
+	/* ============ INFO GRID ============ */
+	.sd-info-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 10px;
+		padding: 0 16px;
+	}
+	.sd-info-cell {
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow-surface);
+		padding: 10px 12px;
+		min-width: 0;
+	}
+	.sd-info-k {
+		font-size: 9.5px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		text-transform: uppercase;
+		color: var(--orbit-muted);
+	}
+	.sd-info-v {
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: 14px;
+		margin-top: 3px;
+		overflow-wrap: anywhere;
+	}
+	.sd-studio-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		padding: 12px 16px 0;
+	}
+	.sd-link-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		min-height: 44px;
+		max-width: 100%;
+		padding: 6px 12px;
+		font-size: 11px;
+		font-weight: var(--orbit-font-label-weight);
+		color: var(--orbit-ink);
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-badge);
+		overflow-wrap: anywhere;
+	}
+	.sd-link-chip:hover { border-color: var(--orbit-border-interactive); color: var(--orbit-coral-dark); }
+	.sd-link-chip:focus-visible { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
+
+	/* ============ SYNOPSIS ============ */
+	.sd-synopsis { padding: 0 16px; }
+	.sd-synopsis p {
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-left: calc(var(--orbit-border-width) + 2px) var(--orbit-border-style) var(--orbit-coral);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow-surface);
+		padding: 14px 16px;
+		font-size: 14.5px;
+		line-height: 1.9;
+		white-space: pre-line;
+	}
+	.sd-btn {
+		font-family: var(--orbit-font-body);
+		font-weight: var(--orbit-font-label-weight);
+		font-size: 13px;
+		letter-spacing: var(--orbit-font-letter-spacing);
+		color: var(--orbit-ink);
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-interactive);
+		border-radius: var(--orbit-radius-control);
+		box-shadow: var(--orbit-shadow-interactive);
+		padding: 10px 16px;
+		cursor: pointer;
+		text-transform: uppercase;
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+	}
+	.sd-btn:hover { box-shadow: var(--orbit-shadow-accent); }
+	.sd-btn:focus-visible { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
+	.sd-synopsis-toggle { margin-top: 12px; }
+
+	/* ============ VIDEO TABS + CARDS ============ */
+	.sd-vid-tabs {
+		display: flex;
+		gap: 8px;
+		padding: 0 16px 12px;
+	}
+	.sd-vid-tab {
+		font-family: var(--orbit-font-body);
+		font-size: 11px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		text-transform: uppercase;
+		cursor: pointer;
+		color: var(--orbit-ink);
+		background: var(--orbit-paper-deep);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-control);
+		padding: 8px 14px;
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.sd-vid-tab[aria-selected='true'] {
+		background: var(--orbit-coral-soft);
+		border-color: var(--orbit-border-interactive);
+		box-shadow: var(--orbit-shadow-interactive);
+	}
+	.sd-vid-tab:focus-visible { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
+	.sd-video-row {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 14px;
+		padding: 0 16px;
+	}
+	.sd-video-card {
+		background: var(--orbit-rail);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: var(--orbit-radius-menu-dialog);
+		box-shadow: var(--orbit-shadow-overlay);
+		overflow: hidden;
+		position: relative;
+	}
+	.sd-screen {
+		aspect-ratio: 16 / 9;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background:
+			repeating-linear-gradient(0deg, color-mix(in srgb, var(--orbit-paper) 6%, transparent) 0 2px, transparent 2px 5px),
+			radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--orbit-lavender) 35%, var(--orbit-rail)) 0%, var(--orbit-rail) 78%);
+	}
+	.sd-play {
+		width: 62px;
+		height: 62px;
+		border-radius: 50%;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-focus);
+		background: var(--orbit-coral);
+		color: #fff;
+		font-size: 20px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: var(--orbit-shadow-accent);
+	}
+	.sd-bar {
+		background: var(--orbit-surface);
+		border-top: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		font-size: 10.5px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		padding: 7px 10px;
+		display: flex;
+		justify-content: space-between;
+		text-transform: uppercase;
+		color: var(--orbit-muted);
+	}
+	.sd-empty {
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		z-index: 2;
+		font-size: 9.5px;
+		font-weight: var(--orbit-font-label-weight);
+		color: var(--orbit-warning);
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) dashed var(--orbit-warning);
+		border-radius: var(--orbit-radius-badge);
+		padding: 2px 7px;
+	}
+
+	/* ============ SPLIDE SCROLLERS ============ */
+	.sd-splide { overflow-x: clip; }
+	/* splide core hides uninitialized sliders; SSR markup should stay visible */
+	.sd-splide:global(.splide) { visibility: visible; }
+	/* Responsive pre-init widths mirror Splide options to limit hydration movement. */
+	.sd-splide :global(.splide__slide) { flex: 0 0 auto; width: calc((100% - 24px) / 3); }
+	.sd-splide :global(.splide__slide.sd-cast-slide) { width: 112px; }
+	.sd-splide :global(.splide__arrows) {
+		display: flex;
+		justify-content: flex-end;
+		gap: 8px;
+		padding: 10px 16px 0;
+	}
+	.sd-splide :global(.splide__arrow) {
+		position: static;
+		transform: none;
+		width: 44px;
+		height: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: var(--orbit-radius-control);
+		box-shadow: var(--orbit-shadow-interactive);
+		color: var(--orbit-ink);
+		opacity: 1;
+		cursor: pointer;
+	}
+	.sd-splide :global(.splide__arrow svg) {
+		fill: currentColor;
+		width: 1.1em;
+		height: 1.1em;
+	}
+	.sd-splide :global(.splide__arrow:hover:not(:disabled)) { box-shadow: var(--orbit-shadow-accent); border-color: var(--orbit-border-interactive); }
+	.sd-splide :global(.splide__arrow:disabled) { opacity: 0.4; cursor: default; }
+	.sd-splide :global(.splide__arrow:focus-visible) { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
+	.sd-splide :global(.splide__pagination) {
+		position: static;
+		display: flex;
+		justify-content: center;
+		gap: 8px;
+		padding: 10px 0 2px;
+	}
+	.sd-splide :global(.splide__pagination__page) {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--orbit-line);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		opacity: 1;
+		padding: 0;
+	}
+	.sd-splide :global(.splide__pagination__page.is-active) {
+		background: var(--orbit-coral);
+		transform: none;
+	}
+
+	/* ============ GALLERY ============ */
+	.sd-g-item {
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow-surface);
+		padding: 5px;
+		position: relative;
+		margin: 8px 4px 14px;
+	}
+	.sd-g-ph {
+		aspect-ratio: 4 / 3;
+		border-radius: calc(var(--orbit-radius-surface) / 2);
+		overflow: hidden;
+		background: var(--orbit-paper-deep);
+	}
+	.sd-g-ph :global(.sd-g-img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+	.sd-g-cap {
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		padding: 6px 2px 2px;
+		color: var(--orbit-muted);
+		text-transform: uppercase;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+	.sd-g-num {
+		position: absolute;
+		top: -8px;
+		right: -8px;
+		width: 26px;
+		height: 26px;
+		background: var(--orbit-coral);
+		color: #fff;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: 50%;
+		font-size: 11px;
+		font-weight: var(--orbit-font-label-weight);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: var(--orbit-shadow-interactive);
+		z-index: 2;
+	}
+
+	/* ============ SHIP STICKERS ============ */
+	.sd-ship-list {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 12px;
+		padding: 0 16px;
+	}
+	.sd-ship-sticker {
+		background: linear-gradient(90deg, var(--orbit-coral-soft), var(--orbit-lavender));
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: var(--orbit-radius-menu-dialog);
+		box-shadow: var(--orbit-shadow-accent);
+		padding: 14px;
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		min-height: 44px;
+	}
+	.sd-ship-sticker:hover { box-shadow: var(--orbit-shadow-raised); }
+	.sd-ship-sticker:focus-visible { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
+	.sd-ship-faces { display: flex; align-items: center; }
+	.sd-ship-face {
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		overflow: hidden;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		box-shadow: var(--orbit-shadow-surface);
+		background: var(--orbit-surface);
+	}
+	.sd-ship-face + .sd-ship-face { margin-left: -14px; }
+	.sd-ship-face :global(.sd-ship-img) { width: 100%; height: 100%; object-fit: cover; display: block; }
+	.sd-ship-meta { min-width: 0; }
+	.sd-ship-names {
+		display: block;
+		font-family: var(--orbit-font-display);
+		font-size: 18px;
+		font-weight: var(--orbit-font-heading-weight);
+		overflow-wrap: anywhere;
+	}
+	.sd-ship-sub {
+		display: block;
+		font-size: 10.5px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		color: var(--orbit-muted);
+		text-transform: uppercase;
+		overflow-wrap: anywhere;
+	}
+
+	/* ============ CAST ============ */
+	.sd-cast-card {
+		display: block;
+		text-align: center;
+		padding: 6px 2px 10px;
+	}
+	.sd-cast-card:focus-visible { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
+	.sd-cast-avatar {
+		display: block;
+		width: 84px;
+		height: 84px;
+		margin: 0 auto 7px;
+		border-radius: 50%;
+		overflow: hidden;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		box-shadow: var(--orbit-shadow-surface);
+		background: var(--orbit-paper-deep);
+	}
+	.sd-cast-avatar :global(.sd-cast-img) { width: 100%; height: 100%; object-fit: cover; display: block; }
+	.sd-cast-n {
+		display: block;
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: 12.5px;
+		overflow-wrap: anywhere;
+	}
+	.sd-cast-r {
+		display: block;
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		color: var(--orbit-muted);
+	}
+
+	/* ============ EPISODES ============ */
+	.sd-expand-all {
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		text-transform: uppercase;
+		color: var(--orbit-ink);
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-badge);
+		padding: 6px 12px;
+		min-height: 44px;
+		white-space: nowrap;
+		cursor: pointer;
+	}
+	.sd-expand-all:hover { border-color: var(--orbit-border-interactive); }
+	.sd-expand-all:focus-visible { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
+	.sd-ep-list {
+		padding: 0 16px;
+		display: grid;
+		gap: 8px;
+		list-style: none;
+	}
+	.sd-ep {
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow-surface);
+		overflow: hidden;
+	}
+	.sd-ep-head {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		width: 100%;
+		padding: 10px 12px;
+		min-height: 44px;
+		text-align: left;
+		cursor: pointer;
+		background: transparent;
+		border: 0;
+		font: inherit;
+		color: inherit;
+	}
+	.sd-ep-head:disabled { cursor: default; }
+	.sd-ep-head:not(:disabled):hover { background: var(--orbit-paper-deep); }
+	.sd-ep-head:focus-visible { outline: 2px solid var(--orbit-border-focus); outline-offset: -2px; }
+	.sd-ep-no {
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: 14px;
+		background: var(--orbit-rail);
+		color: var(--orbit-paper);
+		border-radius: var(--orbit-radius-badge);
+		padding: 4px 10px;
+		flex-shrink: 0;
+	}
+	.sd-ep-open .sd-ep-no { background: var(--orbit-coral); color: #fff; }
+	.sd-ep-meta { min-width: 0; flex: 1; }
+	.sd-ep-t {
+		display: block;
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: 14px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.sd-ep-d {
+		display: block;
+		font-size: 10.5px;
+		font-weight: var(--orbit-font-label-weight);
+		color: var(--orbit-muted);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		text-transform: uppercase;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.sd-ep-st {
+		font-size: 9.5px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: var(--orbit-font-letter-spacing);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: var(--orbit-radius-badge);
+		padding: 3px 9px;
+		text-transform: uppercase;
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+	.sd-st-aired { background: var(--orbit-mint); color: var(--orbit-ink); }
+	.sd-st-next { background: var(--orbit-coral); color: #fff; box-shadow: var(--orbit-shadow-interactive); }
+	.sd-st-tba { background: var(--orbit-paper-deep); color: var(--orbit-muted); }
+	.sd-ep-chevron {
+		display: grid;
+		place-items: center;
+		width: 36px;
+		height: 36px;
+		flex-shrink: 0;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		border-radius: var(--orbit-radius-control);
+		background: var(--orbit-surface);
+		color: var(--orbit-ink);
+	}
+	.sd-ep-body {
+		display: grid;
+		gap: 12px;
+		border-top: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		background: var(--orbit-paper-deep);
+		padding: 12px;
+	}
+
+	/* ============ HALO LINK ============ */
+	.sd-halo {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 24px;
+		margin: 44px 16px 0;
+		background: var(--orbit-rail);
+		color: var(--orbit-paper);
+		border-radius: var(--orbit-radius-menu-dialog);
+		padding: 28px 24px;
+	}
+	.sd-halo-kicker {
+		font-size: 10px;
+		font-weight: var(--orbit-font-label-weight);
+		letter-spacing: 0.32em;
+		text-transform: uppercase;
+		color: var(--orbit-mint);
+	}
+	.sd-halo-title {
+		margin-top: 8px;
+		font-family: var(--orbit-font-display);
+		font-weight: var(--orbit-font-heading-weight);
+		font-size: clamp(24px, 5vw, 42px);
+		line-height: 1;
+		letter-spacing: -0.02em;
+	}
+	.sd-halo-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 12px;
+		min-height: 44px;
+		background: var(--orbit-surface);
+		color: var(--orbit-ink);
+		padding: 10px 20px;
+		font-size: 13px;
+		font-weight: var(--orbit-font-label-weight);
+		border-radius: var(--orbit-radius-control);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+	}
+	.sd-halo-link:hover { background: var(--orbit-coral-soft); }
+	.sd-halo-link:focus-visible { outline: 2px solid var(--orbit-paper); outline-offset: 3px; }
+
+	/* ============ DESKTOP ============ */
+	@media (min-width: 760px) {
+		.sd-cover { height: min(calc(100vw / 3), 480px); }
+		.sd-hero-inner { margin-top: -128px; padding: 0 28px; gap: 28px; }
+		.sd-poster-frame { flex-basis: 230px; }
+		.sd-actions, .sd-sec-head, .sd-synopsis, .sd-countdown, .sd-info-grid { padding-left: 28px; padding-right: 28px; }
+		.sd-info-grid { grid-template-columns: repeat(3, 1fr); }
+		.sd-cd-cell { padding: 16px 10px 12px; }
+		.sd-vid-tabs { padding-left: 28px; padding-right: 28px; }
+		.sd-video-row { grid-template-columns: 1fr 1fr; padding: 0 28px; }
+		.sd-studio-links { padding-left: 28px; padding-right: 28px; }
+		.sd-ship-list { grid-template-columns: 1fr 1fr; padding: 0 28px; }
+		.sd-ep-list { padding: 0 28px; grid-template-columns: 1fr 1fr; align-items: start; }
+		.sd-halo { margin-inline: 28px; }
+		.sd-splide :global(.splide__slide.sd-cast-slide) { width: 132px; }
+		.sd-cast-avatar { width: 104px; height: 104px; }
+	}
+	@media (max-width: 759px) {
+		/* Mobile: one full gallery slide with an 18% peek (mirrors Splide padding). */
+		.sd-splide :global(.splide__slide:not(.sd-cast-slide)) { width: 82%; }
+	}
+	@media (min-width: 760px) and (max-width: 1099px) {
+		.sd-splide :global(.splide__slide:not(.sd-cast-slide)) { width: calc((100% - 12px) / 2); }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.sd-marquee span { animation: none; }
+	}
+</style>
