@@ -17,8 +17,25 @@ describe('ThemeMenu', () => {
    expect(trigger.classList.contains('touch-target')).toBe(true);
   expect(screen.getByRole('menuitemradio', { name: /y2k|วายทูเค/i }).getAttribute('aria-checked')).toBe('true');
  });
-  it('moves focus repeatedly and supports Home/End', async () => {
+ it('shows seven distinct option icons and updates the trigger icon after selection', async () => {
   setTheme('fanzine', false);
+  render(ThemeMenu);
+  const trigger = screen.getByRole('button', { name: /theme|ธีม/i });
+  expect(trigger.querySelector('[data-theme-icon]')?.getAttribute('data-theme-icon')).toBe('fanzine');
+
+  trigger.click();
+  await tick();
+  const options = screen.getAllByRole('menuitemradio');
+  const iconNames = options.map((option) => option.querySelector('[data-theme-icon]')?.getAttribute('data-theme-icon'));
+  expect(iconNames).toEqual(['y2k', 'fanzine', 'midnight', 'sakura', 'ocean', 'candy', 'mission']);
+  expect(options.every((option) => option.querySelector('svg')?.getAttribute('aria-hidden') === 'true')).toBe(true);
+
+  options[4].click();
+  await tick();
+  expect(trigger.querySelector('[data-theme-icon]')?.getAttribute('data-theme-icon')).toBe('ocean');
+ });
+  it('moves focus repeatedly and supports Home/End', async () => {
+  setTheme('y2k', false);
   render(ThemeMenu);
   screen.getByRole('button', { name: /theme|ธีม/i }).click();
   await tick();
@@ -37,7 +54,7 @@ describe('ThemeMenu', () => {
    expect(document.activeElement).toBe(options[0]);
   });
   it('handles keyboard events dispatched on the focused menu item', async () => {
-   setTheme('fanzine', false);
+    setTheme('y2k', false);
    render(ThemeMenu);
    screen.getByRole('button', { name: /theme|ธีม/i }).click();
    await tick();

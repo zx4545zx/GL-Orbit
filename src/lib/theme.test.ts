@@ -4,7 +4,7 @@ import { DEFAULT_THEME, THEME_NAMES, isThemeName, parseThemeName, readStoredThem
 
 describe('theme contract', () => {
  beforeEach(() => { document.documentElement.dataset.theme = 'fanzine'; });
- it('exposes exactly seven names with y2k default', () => { expect(THEME_NAMES).toEqual(['fanzine', 'midnight', 'y2k', 'sakura', 'ocean', 'candy', 'mission']); expect(DEFAULT_THEME).toBe('y2k'); expect(isThemeName('dark')).toBe(false); expect(isThemeName('orbit')).toBe(false); });
+ it('exposes exactly seven names with y2k first and default', () => { expect(THEME_NAMES).toEqual(['y2k', 'fanzine', 'midnight', 'sakura', 'ocean', 'candy', 'mission']); expect(DEFAULT_THEME).toBe('y2k'); expect(isThemeName('dark')).toBe(false); expect(isThemeName('orbit')).toBe(false); });
  it.each([undefined, null, '', 'dark', 'LIGHT', '#fff', 'orbit', 'space', 'love'])('falls back for %s', (value) => expect(parseThemeName(value)).toBe('y2k'));
  it('reads allowlisted values and survives failures', () => {
   expect(readStoredTheme({ getItem: () => 'sakura' } as unknown as Storage)).toBe('sakura');

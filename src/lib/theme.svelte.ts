@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 
 export type ThemeName = 'fanzine' | 'midnight' | 'y2k' | 'sakura' | 'ocean' | 'candy' | 'mission';
-export const THEME_NAMES = ['fanzine', 'midnight', 'y2k', 'sakura', 'ocean', 'candy', 'mission'] as const satisfies readonly ThemeName[];
+export const THEME_NAMES = ['y2k', 'fanzine', 'midnight', 'sakura', 'ocean', 'candy', 'mission'] as const satisfies readonly ThemeName[];
 export const DEFAULT_THEME: ThemeName = 'y2k';
 export const THEME_STORAGE_KEY = 'theme';
 const META_COLORS: Record<ThemeName, string> = {
