@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const rootLayout = readFileSync('src/routes/+layout.svelte', 'utf8');
+const rootPageServer = readFileSync('src/routes/+page.server.ts', 'utf8');
+const viteConfig = readFileSync('vite.config.ts', 'utf8');
 
 describe('installed PWA interaction regressions', () => {
 	it('keeps only the non-interactive top navigation progress bar', () => {
@@ -14,5 +16,10 @@ describe('installed PWA interaction regressions', () => {
 	it('does not cancel touch movement globally in iOS standalone mode', () => {
 		expect(rootLayout).not.toContain("window.addEventListener('touchmove'");
 		expect(rootLayout).not.toContain('e.preventDefault()');
+	});
+
+	it('lets the server choose the locale when navigating to the root in development', () => {
+		expect(rootPageServer).toContain("throw redirect(302, `/${locals.lang}`)");
+		expect(viteConfig).not.toContain("navigateFallback: '/'");
 	});
 });
