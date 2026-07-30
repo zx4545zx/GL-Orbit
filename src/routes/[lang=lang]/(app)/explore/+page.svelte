@@ -561,13 +561,13 @@
 					<div class="splide__slide">
 						<a class="xp-card" href="{langPrefix}/ships/{ship.slug}">
 						<div class="xp-poster xp-duo">
-							<span class="xp-duo-face orbit-round-data">
-								<Picture src={ship.artist1.imageUrl} type="profiles" sizes="120px" alt="" width={240} height={240} class="xp-poster-img" loading="lazy" decoding="async" />
+							<span class="xp-duo-half">
+								<Picture src={ship.artist1.imageUrl} type="profiles" sizes="(max-width: 639px) 84px, 116px" alt={ship.artist1.name} width={240} height={240} class="xp-duo-img" loading="lazy" decoding="async" />
 							</span>
-							<span class="xp-duo-face orbit-round-data">
-								<Picture src={ship.artist2.imageUrl} type="profiles" sizes="120px" alt="" width={240} height={240} class="xp-poster-img" loading="lazy" decoding="async" />
+							<span class="xp-duo-half">
+								<Picture src={ship.artist2.imageUrl} type="profiles" sizes="(max-width: 639px) 84px, 116px" alt={ship.artist2.name} width={240} height={240} class="xp-duo-img" loading="lazy" decoding="async" />
 							</span>
-							<span class="xp-duo-heart orbit-round-data" aria-hidden="true">♥</span>
+							<span class="xp-duo-rule" aria-hidden="true"></span>
 						</div>
 						<div class="xp-card-body">
 							<span class="xp-card-title">{ship.name}</span>
@@ -1305,52 +1305,38 @@
 	.xp-astar-name { font-weight: 700; font-size: 13px; text-align: center; }
 	.xp-astar-role { font-size: 10px; color: var(--orbit-muted); text-align: center; }
 
-	/* ship duo faces */
+	/* ship duo faces — rectangular split-frame */
 	.xp-duo {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--orbit-lavender);
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1px;
+		background: var(--orbit-line-strong);
 	}
 	.xp-duo::after { background: none; }
-	.xp-duo-face {
-		width: 58%;
-		aspect-ratio: 1;
+	.xp-duo-half {
+		position: relative;
 		overflow: hidden;
-		border: var(--orbit-border-width) solid var(--orbit-surface);
-		background: var(--orbit-mint);
-		display: grid;
-		place-items: center;
+		background: var(--orbit-lavender);
 	}
-	.xp-duo-face + .xp-duo-face { margin-left: -18%; margin-top: 24%; }
-	/* fill the circular face: without this the inner <picture> shrink-wraps the
-	   img and the face shows letterboxed areas instead of a full-bleed photo */
-	.xp-duo-face { position: relative; }
-	.xp-duo-face :global(picture) {
+	.xp-duo-half :global(picture) {
 		position: absolute;
 		inset: 0;
 		display: block;
 	}
-	.xp-duo-face :global(img) {
+	.xp-duo-half :global(img) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		display: block;
 	}
-	.xp-duo-heart {
+	.xp-duo-rule {
 		position: absolute;
 		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%);
-		z-index: 2;
-		width: 36px;
-		height: 36px;
-		display: grid;
-		place-items: center;
-		background: var(--orbit-surface);
-		border: var(--orbit-border-width) solid var(--orbit-line-strong);
-		color: var(--orbit-coral);
-		font-size: 15px;
+		top: 0;
+		bottom: 0;
+		width: 1px;
+		background: var(--orbit-line-strong);
+		transform: translateX(-50%);
 	}
 
 	/* platform strip */

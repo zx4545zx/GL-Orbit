@@ -36,15 +36,13 @@
 	<div class="flex h-full flex-col overflow-hidden border border-[var(--orbit-line)] bg-white transition-[border-color,box-shadow] group-hover:border-coral/60 group-hover:shadow-[var(--orbit-shadow)]">
 		<div class="ilc-poster relative aspect-[3/4] overflow-hidden bg-lavender/10">
 			{#if secondaryImage}
-				<div class="absolute inset-0 bg-lavender/25"></div>
-				<div class="relative h-full px-2.5 py-3 sm:px-3 sm:py-4">
-					<div class="absolute inset-y-3 left-2.5 w-[62%] -rotate-[3deg] overflow-hidden rounded-md border border-white sm:inset-y-4 sm:left-3">
-						<Picture src={image} type={imageType} sizes="(max-width: 640px) 31vw, (max-width: 1024px) 20.5vw, 15.5vw" {alt} width={250} height={533} class="h-full w-full object-cover" loading="lazy" decoding="async" />
+				<div class="grid h-full w-full grid-cols-2 gap-px bg-[var(--orbit-line-strong)]">
+					<div class="relative overflow-hidden bg-lavender/25">
+						<Picture src={image} type={imageType} sizes="(max-width: 640px) 31vw, (max-width: 1024px) 20.5vw, 15.5vw" {alt} width={250} height={533} class="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
 					</div>
-					<div class="absolute inset-y-3 right-2.5 w-[62%] rotate-[3deg] overflow-hidden rounded-md border border-white sm:inset-y-4 sm:right-3">
-						<Picture src={secondaryImage} type={imageType} sizes="(max-width: 640px) 31vw, (max-width: 1024px) 20.5vw, 15.5vw" alt={secondaryAlt || alt} width={250} height={533} class="h-full w-full object-cover" loading="lazy" decoding="async" />
+					<div class="relative overflow-hidden bg-lavender/25">
+						<Picture src={secondaryImage} type={imageType} sizes="(max-width: 640px) 31vw, (max-width: 1024px) 20.5vw, 15.5vw" alt={secondaryAlt || alt} width={250} height={533} class="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
 					</div>
-					<span class="orbit-round-data absolute left-1/2 top-1/2 grid size-8 -translate-x-1/2 -translate-y-1/2 place-items-center bg-white text-sm text-coral sm:size-9" aria-hidden="true">♥</span>
 				</div>
 			{:else}
 				<Picture
