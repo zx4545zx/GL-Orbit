@@ -5,7 +5,6 @@
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
-	import { latestMomentsHref } from '$lib/moments/latest-moments.js';
 	import {
 		buildBreadcrumbJsonLd,
 		buildCanonicalUrl,
@@ -55,8 +54,6 @@
 			{ label: m.artist_socials_label(), value: artist.socials.length }
 		]
 	);
-
-	const momentsHref = $derived(latestMomentsHref(page.data.lang, 'artist', artist.id));
 
 	const shipPath = (slug: string) => localizedPath(currentLang, `/ships/${slug}`);
 	const seriesPath = (id: string) => localizedPath(currentLang, `/series/${id}`);
@@ -310,17 +307,7 @@
 			</section>
 		{/if}
 
-		<!-- HALO BANNER -->
-		<section class="ad-halo" aria-labelledby="ad-halo-heading">
-			<div>
-				<p class="ad-halo-kicker">Orbit Halo</p>
-				<h2 id="ad-halo-heading" class="ad-halo-title">Latest Moments</h2>
-			</div>
-			<a href={momentsHref} class="ad-halo-link">
-				<span>{currentLang === 'th' ? 'ดู Moment ทั้งหมด' : 'View all moments'}</span>
-				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6" /></svg>
-			</a>
-		</section>
+		<!-- Orbit Halo banner hidden while the feature is closed; restore the moments link section here. -->
 
 	</main>
 </div>
@@ -872,58 +859,6 @@
 		box-shadow: var(--orbit-shadow-interactive);
 	}
 
-	/* ============ HALO BANNER ============ */
-	.ad-halo {
-		margin: 44px 16px 0;
-		background: var(--orbit-rail);
-		color: var(--orbit-paper);
-		border-radius: var(--orbit-radius-menu-dialog);
-		box-shadow: var(--orbit-shadow-overlay);
-		padding: 28px 24px;
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: space-between;
-		gap: 16px;
-	}
-	.ad-halo-kicker {
-		font-family: var(--orbit-font-display);
-		font-size: 10px;
-		font-weight: var(--orbit-font-label-weight);
-		letter-spacing: 0.28em;
-		text-transform: uppercase;
-		color: var(--orbit-mint);
-	}
-	.ad-halo-title {
-		font-family: var(--orbit-font-display);
-		font-weight: var(--orbit-font-heading-weight);
-		font-size: clamp(24px, 5vw, 42px);
-		line-height: 1;
-		letter-spacing: -0.02em;
-		margin-top: 8px;
-	}
-	.ad-halo-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 12px;
-		min-height: 44px;
-		background: var(--orbit-surface);
-		color: var(--orbit-ink);
-		padding: 10px 20px;
-		font-size: 13px;
-		font-weight: var(--orbit-font-label-weight);
-		border-radius: var(--orbit-radius-control);
-		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
-		text-decoration: none;
-	}
-	.ad-halo-link:hover {
-		background: var(--orbit-coral-soft);
-	}
-	.ad-halo-link:focus-visible {
-		outline: 2px solid var(--orbit-paper);
-		outline-offset: 3px;
-	}
-
 	/* ============ DESKTOP ============ */
 	@media (min-width: 860px) {
 		.ad-hero {
@@ -955,9 +890,6 @@
 		.ad-works {
 			grid-template-columns: repeat(3, 1fr);
 			gap: 20px 16px;
-		}
-		.ad-halo {
-			margin-inline: 24px;
 		}
 	}
 

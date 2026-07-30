@@ -9,7 +9,6 @@
 	import SeriesVideoPlayer from '$lib/components/series/SeriesVideoPlayer.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
-	import { latestMomentsHref } from '$lib/moments/latest-moments.js';
 	import {
 		buildBreadcrumbJsonLd,
 		buildCanonicalUrl,
@@ -98,7 +97,6 @@
 			{ label: m.common_cast(), value: m.series_detail_cast_count({ count: String(series.artists.length) }) }
 		].filter((cell) => cell.value !== null && cell.value !== '')
 	);
-	const momentsHref = $derived(latestMomentsHref(page.data.lang, 'series', series.id));
 	const marqueeText = $derived(
 		`✦ ${series.titleEn}${series.titleTh ? ` ✦ ${series.titleTh}` : ''} ✦ ${s ? (series.status === 'ONGOING' ? m.series_detail_now_airing() : s.text) : ''} ✦ ${series.studio} ✦ `
 	);
@@ -610,17 +608,7 @@
 			</section>
 		{/if}
 
-		<!-- Orbit Halo moments link -->
-		<section class="sd-halo">
-			<div>
-				<p class="sd-halo-kicker">Orbit Halo</p>
-				<h2 class="sd-halo-title">Latest Moments</h2>
-			</div>
-			<a href={momentsHref} class="sd-halo-link">
-				<span>{currentLang === 'th' ? 'ดู Moment ทั้งหมด' : 'View all moments'}</span>
-				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6" /></svg>
-			</a>
-		</section>
+		<!-- Orbit Halo banner hidden while the feature is closed; restore the moments link section here. -->
 	</main>
 </div>
 
@@ -1342,50 +1330,6 @@
 		padding: 12px;
 	}
 
-	/* ============ HALO LINK ============ */
-	.sd-halo {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: flex-end;
-		justify-content: space-between;
-		gap: 24px;
-		margin: 44px 16px 0;
-		background: var(--orbit-rail);
-		color: var(--orbit-paper);
-		border-radius: var(--orbit-radius-menu-dialog);
-		padding: 28px 24px;
-	}
-	.sd-halo-kicker {
-		font-size: 10px;
-		font-weight: var(--orbit-font-label-weight);
-		letter-spacing: 0.32em;
-		text-transform: uppercase;
-		color: var(--orbit-mint);
-	}
-	.sd-halo-title {
-		margin-top: 8px;
-		font-family: var(--orbit-font-display);
-		font-weight: var(--orbit-font-heading-weight);
-		font-size: clamp(24px, 5vw, 42px);
-		line-height: 1;
-		letter-spacing: -0.02em;
-	}
-	.sd-halo-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 12px;
-		min-height: 44px;
-		background: var(--orbit-surface);
-		color: var(--orbit-ink);
-		padding: 10px 20px;
-		font-size: 13px;
-		font-weight: var(--orbit-font-label-weight);
-		border-radius: var(--orbit-radius-control);
-		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
-	}
-	.sd-halo-link:hover { background: var(--orbit-coral-soft); }
-	.sd-halo-link:focus-visible { outline: 2px solid var(--orbit-paper); outline-offset: 3px; }
-
 	/* ============ DESKTOP ============ */
 	@media (min-width: 760px) {
 		.sd-cover { height: min(calc(100vw / 3), 480px); }
@@ -1399,7 +1343,6 @@
 		.sd-studio-links { padding-left: 28px; padding-right: 28px; }
 		.sd-ship-list { grid-template-columns: 1fr 1fr; padding: 0 28px; }
 		.sd-ep-list { padding: 0 28px; grid-template-columns: 1fr 1fr; align-items: start; }
-		.sd-halo { margin-inline: 28px; }
 		.sd-splide :global(.splide__slide.sd-cast-slide) { width: 132px; }
 		.sd-cast-avatar { width: 104px; height: 104px; }
 	}

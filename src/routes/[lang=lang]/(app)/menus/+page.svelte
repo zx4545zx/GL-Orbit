@@ -5,6 +5,7 @@
 	import { localizedHref, switchLanguageHref } from '$lib/i18n/link.js';
 	import Picture from '$lib/components/Picture.svelte';
 	import ThemeMenu from '$lib/components/ThemeMenu.svelte';
+	import ThemeIcon from '$lib/components/ThemeIcon.svelte';
 	import { themeState, type ThemeName } from '$lib/theme.svelte.js';
 
 	const themeLabels: Record<ThemeName, () => string> = { fanzine: m.theme_fanzine, midnight: m.theme_midnight, y2k: m.theme_y2k, sakura: m.theme_sakura, ocean: m.theme_ocean, candy: m.theme_candy, mission: m.theme_mission };
@@ -140,29 +141,7 @@
 				</div>
 			{/if}
 
-			{#if currentUser?.role === 'ADMIN'}
-			<a
-				href={localizedHref('/halo', page.data.lang)}
-				class="group orbit-surface flex items-center gap-4 rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 touch-target sm:p-5"
-			>
-				<div class="relative grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-yellow-100 sm:h-16 sm:w-16">
-					<svg class="h-7 w-7 text-yellow-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.75 14.37 8.55l5.3.77-3.84 3.74.9 5.28L12 15.85l-4.74 2.49.9-5.28-3.84-3.74 5.3-.77L12 3.75Z" /></svg>
-				</div>
-				<div class="relative min-w-0 flex-1">
-					<h2 class="font-[family-name:var(--font-display)] text-lg font-black leading-tight text-plum transition-colors group-hover:text-yellow-600 sm:text-xl">
-						{m.nav_halo()}
-					</h2>
-					<p class="mt-1 line-clamp-1 text-sm leading-5 text-plum-light">
-						{m.halo_tagline()}
-					</p>
-				</div>
-				<div class="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white text-yellow-600 transition-all duration-200 group-hover:translate-x-1 group-hover:bg-yellow-500 group-hover:text-white">
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-					</svg>
-				</div>
-			</a>
-		{/if}
+			<!-- Orbit Halo hidden while the feature is closed — restore the /halo card here. -->
 
 			{#if currentUser}
 				<div class="contents">
@@ -236,16 +215,8 @@
 
 			<section class="order-4 orbit-surface p-4 sm:p-5" aria-labelledby="menus-theme-heading">
 				<div class="flex items-center gap-3">
-					<div class="grid h-11 w-11 shrink-0 place-items-center rounded-[1.05rem] bg-lavender/15 text-lavender-dark" aria-hidden="true">
-						{#if themeState.theme === 'midnight'}
-							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
-							</svg>
-						{:else}
-							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
-							</svg>
-						{/if}
+					<div class="grid h-11 w-11 shrink-0 place-items-center bg-lavender/15 text-lavender-dark" aria-hidden="true">
+						<ThemeIcon theme={themeState.theme} />
 					</div>
 					<div class="min-w-0 flex-1">
 						<h2 id="menus-theme-heading" class="font-[family-name:var(--font-display)] text-lg font-black leading-tight text-plum sm:text-xl">
