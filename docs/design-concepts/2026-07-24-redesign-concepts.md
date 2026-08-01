@@ -150,7 +150,7 @@
 | Signature | วงแหวน countdown conic, ตารางฉายเป็นชิปกลม, ขีดใต้หัวข้อสั้นสีพีช |
 
 **เหมาะเมื่อ:** อยากได้ความ minimal ที่ยังอบอุ่นและเป็นมิตร เข้ากับ pastel themes เดิมได้ง่ายที่สุดในชุดนี้
-**ความเสี่ยง:** radius ใหญ่ขัดกับ Orbit Editorial เดิมโดยตรง; peach อ่อนต้องเช็ก contrast ของข้อความเล็ก
+**ความเสี่ยง:** radius ใหญ่แตกต่างจาก geometry เดิมโดยตรง; peach อ่อนต้องเช็ก contrast ของข้อความเล็ก
 
 **Mockup:** `mockups/concept-g-peach-studio.html`
 

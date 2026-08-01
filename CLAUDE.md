@@ -52,7 +52,8 @@ All major product areas are code-backed, not mock-only: catalog, calendar/countd
 ```txt
 src/routes/
 ├── [lang=lang]/
-│   ├── (app)/            # Home, catalog, calendar, subscriptions, auth/profile
+│   ├── (app)/            # Home, catalog, calendar, auth
+│   ├── (profile)/        # Member profile/menu, account/security, subscriptions, notifications shell
 │   ├── (orbit-halo)/     # Community feed, compose, moments, saved, profiles
 │   ├── (chat)/           # Chat list and conversation
 │   ├── admin/            # ADMIN-only UI
@@ -91,14 +92,6 @@ User-facing pages use `/th/*` or `/en/*`. `src/hooks.server.ts` validates sessio
 - Add/update both `messages/th.json` and `messages/en.json`, then run `npm run i18n:compile`.
 - Do not hand-edit generated files under `src/lib/i18n/paraglide/`.
 - Keep browser-only APIs behind client-safe execution.
-
-### Orbit Editorial UI
-
-- Rectangular surfaces and controls; no decorative rounded cards/pills.
-- Reuse `--orbit-*` tokens and structural borders from `src/app.css`.
-- No gradient blobs, rainbow dividers, heavy shadows or repeated generic cards.
-- Minimum 44×44px touch targets, visible keyboard focus, responsive reflow, light/dark support and reduced-motion behavior.
-- Pending Shell components were intentionally removed; layouts render children directly.
 
 ## Key Domains
 

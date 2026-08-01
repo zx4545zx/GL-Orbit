@@ -78,9 +78,13 @@ npx tsx scripts/seed-data.ts
 ├── (app)/
 │   ├── home, about, menus
 │   ├── series/[id], artists/[id], ships/[id], explore/*
-│   ├── calendar, countdown, notifications
+│   ├── calendar, countdown
+│   └── login, register
+├── (profile)/
+│   ├── profile
+│   ├── settings, account/profile, security/password, security/session
 │   ├── subscriptions, subscriptions/new, subscriptions/[id]/edit
-│   └── login, register, profile
+│   └── notifications
 ├── (orbit-halo)/halo/
 │   ├── feed, explore, compose, saved, notifications
 │   ├── moments/[id], moments/[id]/edit
@@ -168,16 +172,6 @@ Conventions:
 - Import generated route types from `./$types.js`
 - Prefer typed server loads/actions and explicit API response shapes
 - Preserve SSR/client boundaries; browser globals require client-safe execution
-
-## Orbit Editorial Design System
-
-- Reuse tokens from `src/app.css`: `--orbit-paper`, `--orbit-surface`, `--orbit-line`, `--orbit-line-strong`, semantic coral/lavender/mint/plum colors
-- Edited/new cards, controls, menus, modals and image frames remain rectangular; no decorative `rounded-*`
-- Circles only for inherently circular data such as avatars/status dots, marked `.orbit-round-data`
-- Avoid generic card soup, pills, gradient blobs, rainbow dividers and heavy shadows
-- Use shared grids/borders for information hierarchy; no decorative `<hr>`
-- Buttons and icon actions need visible focus, disabled/loading states and minimum 44×44px touch target
-- Verify mobile at narrow width, desktop, light/dark theme, keyboard focus and reduced motion
 
 Pending Shell components were intentionally removed. Layouts render children directly. Do not restore navigation skeleton switching without a new explicit requirement.
 

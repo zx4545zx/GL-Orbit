@@ -19,7 +19,7 @@
 - **ไทย/อังกฤษ** — URL localized ด้วย Paraglide (`/th/*`, `/en/*`) และตรวจภาษาจาก user/cookie/browser
 - **Admin CRUD** — จัดการข้อมูลหลัก ตารางฉาย รูปภาพ การแจ้งเตือน และ moderation
 - **SEO + PWA** — sitemap, robots.txt, llms.txt, dynamic Open Graph, JSON-LD, installable app และ share target
-- **Orbit Editorial UI** — โครงสร้าง grid เหลี่ยม รองรับ light/dark theme, responsive และ accessibility
+- **Responsive UI** — รองรับ light/dark theme, responsive และ accessibility
 
 ## เทคโนโลยี
 
@@ -123,7 +123,8 @@ npx tsx scripts/seed-data.ts
 src/
 ├── routes/
 │   ├── [lang=lang]/
-│   │   ├── (app)/            # Home, catalog, calendar, subscriptions, profile, auth
+│   │   ├── (app)/            # Home, catalog, calendar, auth
+│   │   ├── (profile)/        # Member profile/menu, account/security, subscriptions, notifications shell
 │   │   ├── (orbit-halo)/     # Community feed, compose, moments, saved, profiles
 │   │   ├── (chat)/           # AI chat list and conversation
 │   │   ├── admin/            # ADMIN-only pages

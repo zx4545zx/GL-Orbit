@@ -1,9 +1,0 @@
-{
-  "setup": [
-    "yarn && yarn build"
-  ],
-  "teardown": [],
-  "run": [
-    "yarn dev"
-  ]
-}
