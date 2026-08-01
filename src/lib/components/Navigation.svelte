@@ -1,15 +1,12 @@
 <script lang="ts">
-import { m } from '$lib/i18n/paraglide.js';
-import { page } from '$app/state';
-	import { useUnreadNotifications } from '$lib/client/unread-notifications.js';
-import NotificationDropdown from './NotificationDropdown.svelte';
-import NotificationBadge from './NotificationBadge.svelte';
-import LanguageSwitcher from './LanguageSwitcher.svelte';
-import ThemeMenu from './ThemeMenu.svelte';
-import Picture from './Picture.svelte';
+	import { m } from '$lib/i18n/paraglide.js';
+	import { page } from '$app/state';
+	import NotificationDropdown from './NotificationDropdown.svelte';
+	import LanguageSwitcher from './LanguageSwitcher.svelte';
+	import ThemeMenu from './ThemeMenu.svelte';
+	import Picture from './Picture.svelte';
 
 	const currentUser = $derived(page.data.user);
-	const unreadNotifications = useUnreadNotifications();
 	const isHomepage = $derived(
 		page.url.pathname === `/${page.data.lang}` || page.url.pathname === `/${page.data.lang}/`
 	);
@@ -21,9 +18,6 @@ import Picture from './Picture.svelte';
 			{ href: `/${page.data.lang}/explore`, label: m.nav_explore() }
 			// Orbit Halo hidden while the feature is closed — restore the /halo entry here.
 		];
-		if (currentUser) {
-			links.push({ href: `/${page.data.lang}/notifications`, label: m.nav_notifications() });
-		}
 		return links;
 	});
 
@@ -98,7 +92,7 @@ import Picture from './Picture.svelte';
 				{#if profileMenuOpen}
 					<div
 						role="menu"
-						class="orbit-menu absolute right-0 top-full z-[60] mt-2 w-56 overflow-hidden p-2"
+						class="orbit-menu absolute right-0 top-full z-[60] mt-2 w-56 overflow-hidden"
 					>
 						<a
 							href="/{page.data.lang}/profile"
@@ -110,17 +104,6 @@ import Picture from './Picture.svelte';
 								<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
 							</svg>
 							{m.menus_profile_title()}
-						</a>
-						<a
-							href="/{page.data.lang}/subscriptions"
-							role="menuitem"
-							onclick={closeProfileMenu}
-							class="orbit-menu-item"
-						>
-							<svg class="h-5 w-5 text-[var(--orbit-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5h16.5m-16.5 0A2.25 2.25 0 0 1 6 5.25h12a2.25 2.25 0 0 1 2.25 2.25m-16.5 0v9A2.25 2.25 0 0 0 6 18.75h12a2.25 2.25 0 0 0 2.25-2.25v-9M7.5 14.25h3" />
-							</svg>
-							{m.subscriptions_nav()}
 						</a>
 						{#if currentUser.role === 'ADMIN'}
 							<a
@@ -178,9 +161,6 @@ import Picture from './Picture.svelte';
 			class="orbit-nav-item shell-navlink touch-target {active ? 'orbit-nav-active' : ''}"
 		>
 			<span>{link.label}</span>
-			{#if link.href === `/${page.data.lang}/notifications`}
-				<NotificationBadge count={unreadNotifications.state.count} />
-			{/if}
 			<span class="orbit-nav-indicator" aria-hidden="true"></span>
 		</a>
 	{/each}

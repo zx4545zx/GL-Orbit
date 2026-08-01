@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const menu = readFileSync('src/routes/[lang=lang]/(app)/menus/+page.svelte', 'utf8');
-const profile = readFileSync('src/routes/[lang=lang]/(app)/profile/+page.svelte', 'utf8');
+const menu = readFileSync('src/routes/[lang=lang]/(profile)/settings/+page.svelte', 'utf8');
+const profile = readFileSync('src/routes/[lang=lang]/(profile)/profile/+page.svelte', 'utf8');
 const navigation = readFileSync('src/lib/components/Navigation.svelte', 'utf8');
-const detail = readFileSync('src/routes/[lang=lang]/(app)/subscriptions/[id]/+page.svelte', 'utf8');
-const dashboard = readFileSync('src/routes/[lang=lang]/(app)/subscriptions/+page.svelte', 'utf8');
-const create = readFileSync('src/routes/[lang=lang]/(app)/subscriptions/new/+page.svelte', 'utf8');
-const edit = readFileSync('src/routes/[lang=lang]/(app)/subscriptions/[id]/edit/+page.svelte', 'utf8');
+const detail = readFileSync('src/routes/[lang=lang]/(profile)/subscriptions/[id]/+page.svelte', 'utf8');
+const dashboard = readFileSync('src/routes/[lang=lang]/(profile)/subscriptions/+page.svelte', 'utf8');
+const create = readFileSync('src/routes/[lang=lang]/(profile)/subscriptions/new/+page.svelte', 'utf8');
+const edit = readFileSync('src/routes/[lang=lang]/(profile)/subscriptions/[id]/edit/+page.svelte', 'utf8');
 const schema = readFileSync('src/lib/server/db/schema.ts', 'utf8');
 const appCss = readFileSync('src/app.css', 'utf8');
 const currencySurfaces = [
@@ -18,15 +18,15 @@ const currencySurfaces = [
 ].map((file) => readFileSync(`src/lib/components/subscriptions/${file}`, 'utf8'));
 
 describe('subscription feature integration', () => {
-	it('links authenticated menu and profile surfaces through localizedHref', () => {
+	it('links member menu and profile surfaces through localizedHref', () => {
 		expect(menu).toContain("localizedHref('/subscriptions', page.data.lang)");
 		expect(profile).toContain("localizedHref('/subscriptions'");
 		expect(menu).toContain('m.subscriptions_nav()');
 	});
 
-	it('exposes subscriptions in the desktop profile menu', () => {
-		expect(navigation).toContain('href="/{page.data.lang}/subscriptions"');
-		expect(navigation).toContain('m.subscriptions_nav()');
+	it('keeps subscriptions out of the desktop app profile menu', () => {
+		expect(navigation).not.toContain('href="/{page.data.lang}/subscriptions"');
+		expect(navigation).not.toContain('m.subscriptions_nav()');
 	});
 
 	it('does not add notification, cron, timezone, or route pending-shell coupling', () => {
@@ -72,7 +72,7 @@ describe('subscription feature integration', () => {
 	it('maps plum text utilities through the active theme tokens', () => {
 		expect(appCss).toContain('--color-plum: var(--orbit-ink);');
 		expect(appCss).toContain('--color-plum-light: var(--orbit-muted);');
-		for (const opacity of [50, 55, 60, 65, 75]) {
+		for (const opacity of [50, 55, 60, 65]) {
 			expect(`${detail}${currencySurfaces.join('')}`).toContain(`text-plum/${opacity}`);
 		}
 	});

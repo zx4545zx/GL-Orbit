@@ -77,7 +77,7 @@ const subscriptions = [
 ];
 
 describe('SubscriptionList', () => {
-	it('searches identity fields and preserves duplicate platform plans', async () => {
+	it('searches identity fields and preserves duplicate platform plans without status filters', async () => {
 		const user = userEvent.setup();
 		render(SubscriptionList, {
 			props: {
@@ -92,9 +92,9 @@ describe('SubscriptionList', () => {
 		expect(screen.getByText('Mobile')).toBeTruthy();
 		expect(screen.queryByText('Premium')).toBeNull();
 		await user.clear(screen.getByRole('searchbox'));
-		await user.click(screen.getByRole('button', { name: /ยกเลิก|canceled/i }));
+		expect(screen.queryByRole('button', { name: /ยกเลิก|canceled/i })).toBeNull();
 		expect(screen.getByText('Mobile')).toBeTruthy();
-		expect(screen.queryByText('Premium')).toBeNull();
+		expect(screen.getByText('Premium')).toBeTruthy();
 	});
 
 	it('omits related series from subscription rows', () => {

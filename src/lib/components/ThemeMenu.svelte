@@ -32,7 +32,7 @@
    <ThemeIcon theme={themeState.theme} className="h-5 w-5" /><span class="hidden sm:inline">{m.theme_trigger()}</span>
  </button>
  {#if open}
-    <div role="menu" tabindex="-1" class="orbit-menu absolute right-0 top-full z-50 mt-2 w-52 p-1">
+     <div role="menu" tabindex="-1" class="orbit-menu absolute right-0 top-full z-50 mt-2 w-52">
    {#each THEME_NAMES as name, index}
         <button bind:this={options[index]} type="button" role="menuitemradio" aria-checked={isCurrentTheme(name)} tabindex={activeIndex === index ? 0 : -1} onclick={() => select(name)} onkeydown={keydown} class="orbit-menu-item">
        <ThemeIcon theme={name} className="h-5 w-5 shrink-0" /><span>{labels[name]()}</span>{#if isCurrentTheme(name)}<span class="ml-auto font-bold" aria-label={m.theme_current()}>✓</span>{/if}

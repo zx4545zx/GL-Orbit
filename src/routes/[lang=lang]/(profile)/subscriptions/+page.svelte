@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { m } from '$lib/i18n/paraglide.js';
 	import { localizedHref } from '$lib/i18n/link.js';
+	import MemberPageHeader from '$lib/components/profile/MemberPageHeader.svelte';
 	import BudgetControls from '$lib/components/subscriptions/BudgetControls.svelte';
 	import RenewalDialog from '$lib/components/subscriptions/RenewalDialog.svelte';
 	import SubscriptionList from '$lib/components/subscriptions/SubscriptionList.svelte';
@@ -100,22 +101,17 @@
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<main class="mx-auto grid w-full max-w-6xl gap-4 pb-24 pt-5 sm:pt-8 md:pb-12">
-	<header class="grid gap-5 border border-[var(--orbit-line)] bg-[var(--orbit-surface)] p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-7">
-		<div>
-			<p class="text-xs font-bold uppercase tracking-[0.18em] text-[var(--orbit-coral)]">GL Orbit</p>
-			<h1 class="mt-2 font-display text-3xl text-[var(--orbit-ink)] sm:text-4xl">{m.subscriptions_title()}</h1>
-			<p class="mt-2 max-w-2xl text-sm leading-6 text-[var(--orbit-muted)] sm:text-base">
-				{m.subscriptions_subtitle()}
-			</p>
-		</div>
+<main class="grid w-full gap-4 pb-24 pt-5 sm:pt-8 md:pb-12">
+	<MemberPageHeader title={m.subscriptions_title()} description={m.subscriptions_subtitle()}>
+		{#snippet actions()}
 		<a
 			class="touch-target inline-flex min-h-11 items-center justify-center border border-[var(--orbit-coral)] bg-[var(--orbit-coral)] px-5 font-semibold text-white transition-colors hover:bg-[var(--orbit-coral-dark)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--orbit-coral)]"
 			href={localizedHref('/subscriptions/new', page.data.lang)}
 		>
 			{m.subscriptions_add()}
 		</a>
-	</header>
+		{/snippet}
+	</MemberPageHeader>
 
 	<SubscriptionSummary
 		{summary}

@@ -7,7 +7,9 @@
 		placeholder?: string;
 		required?: boolean;
 		minlength?: number;
+		autocomplete?: 'current-password' | 'new-password';
 		label?: string;
+		variant?: 'default' | 'flat';
 	}
 
 	let {
@@ -17,7 +19,9 @@
 		placeholder = '••••••••',
 		required = true,
 		minlength,
-		label = m.password_input_default_label()
+		autocomplete,
+		label = m.password_input_default_label(),
+		variant = 'default'
 	}: Props = $props();
 
 	let show = $state(false);
@@ -38,7 +42,10 @@
 			{placeholder}
 			{required}
 			{minlength}
-			class="orbit-input w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-12 orbit-control placeholder:text-plum-light/50 text-sm sm:text-base touch-target"
+			{autocomplete}
+			class={variant === 'flat'
+				? 'orbit-field touch-target pr-12 text-sm placeholder:text-plum-light/50 sm:text-base'
+				: 'orbit-input orbit-control touch-target w-full px-3 py-2.5 pr-12 text-sm placeholder:text-plum-light/50 sm:px-4 sm:py-3 sm:text-base'}
 		/>
 		<button
 			type="button"

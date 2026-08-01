@@ -8,7 +8,12 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 export function isPushSupported(): boolean {
-	return typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window;
+	return (
+		typeof window !== 'undefined' &&
+		'Notification' in window &&
+		'serviceWorker' in navigator &&
+		'PushManager' in window
+	);
 }
 
 export async function getExistingSubscription(): Promise<PushSubscription | null> {

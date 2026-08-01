@@ -128,7 +128,7 @@
 </script>
 
 <section class="border border-[var(--orbit-line)] bg-[var(--orbit-surface)]" aria-labelledby="session-devices-title">
-	<header class="flex flex-col gap-3 border-b border-[var(--orbit-line)] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+	<header class="flex flex-col gap-3 border-b border-[var(--orbit-line)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
 		<div>
 			<h2 id="session-devices-title" class="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--orbit-ink)]">
 				{m.profile_sessions_title()}
@@ -142,7 +142,7 @@
 				type="button"
 				disabled={mutationInFlight}
 				onclick={askToRevokeOthers}
-				class="touch-target border border-coral px-4 py-2 text-sm font-semibold text-coral-dark transition-colors hover:bg-coral/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:cursor-not-allowed disabled:opacity-50"
+				class="orbit-control touch-target px-4 py-2 text-sm font-semibold text-coral-dark disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{m.profile_sessions_logout_others()}
 			</button>
@@ -154,16 +154,16 @@
 	{:else if sessions.length === 0 && !errorMessage}
 		<p class="p-5 text-sm text-[var(--orbit-muted)]">{m.profile_sessions_empty()}</p>
 	{:else}
-		<ul aria-label={m.profile_sessions_title()}>
+		<ul class="grid gap-px bg-[var(--orbit-line)]" aria-label={m.profile_sessions_title()}>
 			{#each sessions as session (session.id)}
-				<li class="grid gap-4 border-b border-[var(--orbit-line)] p-4 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-5">
+				<li class="grid gap-4 bg-[var(--orbit-surface)] p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-7">
 					<div class="min-w-0">
 						<div class="flex flex-wrap items-center gap-x-2 gap-y-1">
 							<strong class="text-sm text-[var(--orbit-ink)] sm:text-base">
 								{session.browser ?? m.profile_sessions_unknown_browser()}
 							</strong>
 							{#if session.isCurrent}
-								<span class="border border-mint-dark bg-mint/15 px-2 py-0.5 text-xs font-semibold text-mint-dark">
+								<span class="rounded-[var(--orbit-radius-badge)] bg-mint/20 px-2 py-0.5 text-xs font-semibold text-mint-dark">
 									{m.profile_sessions_current_device()}
 								</span>
 							{/if}
@@ -195,7 +195,7 @@
 							type="button"
 							disabled={mutationInFlight}
 							onclick={() => askToRevoke(session.id)}
-							class="touch-target self-start border border-[var(--orbit-line-strong)] px-4 py-2 text-sm font-semibold text-coral-dark transition-colors hover:border-coral hover:bg-coral/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:cursor-not-allowed disabled:opacity-50"
+							class="orbit-control touch-target self-start px-4 py-2 text-sm font-semibold text-coral-dark disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							{m.profile_sessions_revoke()}
 						</button>
@@ -206,21 +206,21 @@
 	{/if}
 
 	{#if errorMessage}
-		<div class="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--orbit-line)] bg-coral/5 p-4" role="alert">
+		<div class="flex flex-wrap items-center justify-between gap-3 bg-coral/5 p-4" role="alert">
 			<p class="text-sm font-medium text-coral-dark">{errorMessage}</p>
-			<button type="button" onclick={loadSessions} class="touch-target border border-coral px-3 py-2 text-sm font-semibold text-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral">
+			<button type="button" onclick={loadSessions} class="orbit-control touch-target px-3 py-2 text-sm font-semibold text-coral-dark">
 				{m.profile_sessions_retry()}
 			</button>
 		</div>
 	{/if}
 
 	{#if successMessage}
-		<p class="border-t border-[var(--orbit-line)] bg-mint/10 p-4 text-sm font-medium text-mint-dark" role="status">
+		<p class="bg-mint/10 p-4 text-sm font-medium text-mint-dark" role="status">
 			{successMessage}
 		</p>
 	{/if}
 
-	<p class="border-t border-[var(--orbit-line)] bg-[var(--orbit-paper-deep)] p-4 text-xs leading-relaxed text-[var(--orbit-muted)] sm:px-5">
+	<p class="border-t border-[var(--orbit-line)] p-5 text-xs leading-relaxed text-[var(--orbit-muted)] sm:px-7">
 		{m.profile_sessions_privacy()}
 	</p>
 </section>

@@ -597,6 +597,24 @@ body {
   border-color: var(--orbit-coral, #e4572e);
 }
 
+.orbit-field {
+  min-height: 2.75rem;
+  width: 100%;
+  border: 1px solid var(--orbit-line-strong, #b8a288);
+  background: var(--orbit-surface, #ffffff);
+  padding-inline: 0.75rem;
+  color: var(--orbit-ink, #24151f);
+  font-weight: 400;
+  outline: none;
+  box-shadow: none;
+  transition: border-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease), box-shadow var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
+}
+
+.orbit-field:focus {
+  border-color: var(--orbit-coral, #e4572e);
+  box-shadow: 0 0 0 2px var(--orbit-coral-soft, #f8d2df);
+}
+
 .orbit-menu {
   background: var(--orbit-surface, #ffffff);
   border: var(--orbit-border-width, 1px) var(--orbit-border-style, solid) var(--orbit-border-strong, #b8a288);

@@ -5,8 +5,7 @@
 	import { classifyUrgency } from '$lib/subscriptions/summary.js';
 	import type {
 		CalendarDate,
-		SubscriptionListItem,
-		SubscriptionStatus
+		SubscriptionListItem
 	} from '$lib/subscriptions/types.js';
 
 	let {
@@ -20,7 +19,6 @@
 	} = $props();
 
 	let query = $state('');
-	let status = $state<'ALL' | SubscriptionStatus>('ALL');
 	let filtered = $derived(
 		subscriptions.filter((item) => {
 			const haystack = [
@@ -32,10 +30,7 @@
 				.filter(Boolean)
 				.join(' ')
 				.toLocaleLowerCase();
-			return (
-				(status === 'ALL' || item.status === status) &&
-				haystack.includes(query.trim().toLocaleLowerCase())
-			);
+			return haystack.includes(query.trim().toLocaleLowerCase());
 		})
 	);
 
@@ -73,31 +68,15 @@
 </script>
 
 <section class="border border-[var(--orbit-line)] bg-[var(--orbit-surface)]">
-	<div class="grid gap-3 border-b border-[var(--orbit-line)] p-4 md:grid-cols-[1fr_auto] md:items-end">
+	<div class="grid gap-3 border-b border-[var(--orbit-line)] p-4">
 		<label class="grid gap-1 text-sm font-medium text-[var(--orbit-ink)]">
 			<span>{m.subscriptions_search_label()}</span>
 			<input
 				type="search"
 				bind:value={query}
-				class="touch-target border border-[var(--orbit-line-strong)] bg-[var(--orbit-surface)] px-3 text-[var(--orbit-ink)] outline-none focus:border-[var(--orbit-coral)] focus:ring-2 focus:ring-[var(--orbit-coral-soft)]"
+				class="orbit-field touch-target"
 			/>
 		</label>
-		<div class="grid grid-cols-3" aria-label={m.subscriptions_status()}>
-			{#each [
-				{ value: 'ALL' as const, label: m.subscriptions_filter_all() },
-				{ value: 'ACTIVE' as const, label: m.subscriptions_filter_active() },
-				{ value: 'CANCELED' as const, label: m.subscriptions_filter_canceled() }
-			] as filter}
-				<button
-					type="button"
-					class="touch-target -ml-px border border-[var(--orbit-line)] px-3 text-sm text-[var(--orbit-muted)] first:ml-0 aria-pressed:border-[var(--orbit-ink)] aria-pressed:bg-[var(--orbit-ink)] aria-pressed:text-[var(--orbit-surface)] focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-[var(--orbit-coral)]"
-					aria-pressed={status === filter.value}
-					onclick={() => (status = filter.value)}
-				>
-					{filter.label}
-				</button>
-			{/each}
-		</div>
 	</div>
 
 	{#if filtered.length === 0}

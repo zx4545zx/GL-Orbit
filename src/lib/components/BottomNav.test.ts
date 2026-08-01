@@ -18,13 +18,13 @@ describe('shared responsive navigation boundary', () => {
 		expect(bottomNav).toContain("aria-current={active ? 'page' : undefined}");
 	});
 
-	it('uses the home/calendar/explore/notifications/menus item set (halo hidden)', () => {
+	it('uses the home/calendar/explore/menus item set (halo hidden)', () => {
 		expect(bottomNav).toContain('m.nav_home()');
 		expect(bottomNav).toContain('m.nav_calendar()');
 		expect(bottomNav).toContain('m.nav_explore()');
-		expect(bottomNav).toContain('m.nav_notifications()');
 		expect(bottomNav).toContain('m.nav_menus()');
-		expect(bottomNav).toContain('NotificationBadge');
+		expect(bottomNav).not.toContain('m.nav_notifications()');
+		expect(bottomNav).not.toContain('NotificationBadge');
 		expect(bottomNav).not.toContain('m.nav_halo()');
 	});
 
@@ -38,10 +38,10 @@ describe('shared responsive navigation boundary', () => {
 		expect(navigation).toContain('hidden md:flex');
 		expect(navigation).toContain('zine-brand');
 		expect(navigation).toContain('m.home_zine_tagline()');
-		// Desktop row covers explore; notifications only when logged in; halo hidden.
+		// Desktop row covers explore; member-only destinations live in the profile shell.
 		expect(navigation).toContain('m.nav_explore()');
 		expect(navigation).not.toContain('m.nav_halo()');
-		expect(navigation).toContain('m.nav_notifications()');
+		expect(navigation).not.toContain('m.nav_notifications()');
 		expect(navigation).not.toContain('fixed top-');
 	});
 

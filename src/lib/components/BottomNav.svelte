@@ -1,13 +1,8 @@
 <script lang="ts">
 import { m } from '$lib/i18n/paraglide.js';
 import { navigating, page } from '$app/state';
-import { useUnreadNotifications } from '$lib/client/unread-notifications.js';
-import NotificationBadge from './NotificationBadge.svelte';
 
 	let { bottomNavHidden = false }: { bottomNavHidden?: boolean } = $props();
-
-	const currentUser = $derived(page.data.user);
-	const unreadNotifications = useUnreadNotifications();
 
 	const homeItem = $derived({
 		href: `/${page.data.lang}/`,
@@ -51,25 +46,8 @@ import NotificationBadge from './NotificationBadge.svelte';
 		`
 	});
 
-	const notificationItem = $derived(
-		currentUser
-			? {
-					href: `/${page.data.lang}/notifications`,
-					label: m.nav_notifications(),
-					icon: (active: boolean) => `
-						<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-[var(--orbit-coral)]' : 'opacity-70'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-						</svg>
-					`
-				}
-			: null
-	);
-
 	const navItems = $derived.by(() => {
 		const items = [homeItem, ...secondaryItems];
-		if (notificationItem) {
-			items.push(notificationItem);
-		}
 		items.push(menuItem);
 		return items;
 	});
@@ -104,9 +82,6 @@ import NotificationBadge from './NotificationBadge.svelte';
 					<div class="relative flex items-center justify-center">
 						<div class="relative {active ? 'zine-tilt' : ''}">
 							{@html item.icon(active)}
-							{#if item.href === `/${page.data.lang}/notifications`}
-								<NotificationBadge count={unreadNotifications.state.count} />
-							{/if}
 						</div>
 					</div>
 					<span

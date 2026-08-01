@@ -2,6 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import MemberPageHeader from '$lib/components/profile/MemberPageHeader.svelte';
 	import PaymentHistory from '$lib/components/subscriptions/PaymentHistory.svelte';
 	import RenewalDialog from '$lib/components/subscriptions/RenewalDialog.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
@@ -15,6 +16,11 @@
 	let renewalOpen = $state(false);
 	let renewalTrigger = $state<HTMLElement | null>(null);
 	let today = $state<CalendarDate | null>(null);
+	const headerDescription = $derived(
+		[data.subscription.planName, data.subscription.accountLabel]
+			.filter((value): value is string => Boolean(value))
+			.join(' · ')
+	);
 	let urgency = $derived(
 		today
 			? classifyUrgency(
@@ -100,7 +106,7 @@
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<main class="mx-auto grid w-full max-w-6xl gap-6 pb-24 pt-5 sm:gap-8 sm:pt-8 md:pb-12">
+<main class="grid w-full gap-6 pb-24 pt-5 sm:gap-8 sm:pt-8 md:pb-12">
 	<a
 		class="touch-target inline-flex w-fit items-center border border-[var(--orbit-line)] bg-white px-4 text-sm text-plum"
 		href={href('/subscriptions')}
@@ -109,8 +115,13 @@
 	</a>
 
 	<section class="border border-[var(--orbit-line)] bg-white">
-		<header class="grid gap-5 border-b border-[var(--orbit-line)] p-5 sm:grid-cols-[1fr_auto] sm:items-end sm:p-7">
-			<div class="flex min-w-0 items-start gap-4">
+		<MemberPageHeader
+			title={identity()}
+			description={headerDescription || undefined}
+			eyebrow={m.subscriptions_overview()}
+			embedded
+		>
+			{#snippet leading()}
 				{#if data.subscription.platform?.logoUrl}
 					<img
 						src={data.subscription.platform.logoUrl}
@@ -122,31 +133,25 @@
 						{initials()}
 					</div>
 				{/if}
-				<div class="min-w-0">
-					<p class="text-xs font-bold uppercase tracking-[0.18em] text-coral">{m.subscriptions_overview()}</p>
-					<h1 class="mt-2 break-words font-display text-3xl text-plum sm:text-4xl">{identity()}</h1>
-					{#if data.subscription.planName}<p class="mt-2 text-plum/75">{data.subscription.planName}</p>{/if}
-					{#if data.subscription.accountLabel}<p class="mt-1 text-sm text-plum/55">{data.subscription.accountLabel}</p>{/if}
-				</div>
-			</div>
-			<div class="grid grid-cols-2 gap-2 sm:grid-cols-1">
+			{/snippet}
+			{#snippet actions()}
 				{#if data.subscription.status === 'ACTIVE'}
 					<button
 						type="button"
-						class="touch-target border border-coral bg-coral px-5 font-semibold text-white"
+						class="touch-target inline-flex min-h-11 items-center justify-center border border-[var(--orbit-coral)] bg-[var(--orbit-coral)] px-5 font-semibold text-white transition-colors hover:bg-[var(--orbit-coral-dark)]"
 						onclick={(event) => openRenewal(event.currentTarget)}
 					>
 						{m.subscriptions_renew()}
 					</button>
 				{/if}
 				<a
-					class="touch-target inline-flex items-center justify-center border border-plum/25 px-5 font-semibold text-plum"
+					class="orbit-control touch-target inline-flex min-h-11 items-center justify-center px-5 font-semibold text-plum"
 					href={href(`/subscriptions/${data.subscription.id}/edit`)}
 				>
 					{m.subscriptions_edit()}
 				</a>
-			</div>
-		</header>
+			{/snippet}
+		</MemberPageHeader>
 
 		<div class="grid gap-px bg-[var(--orbit-line)] sm:grid-cols-2 lg:grid-cols-4">
 			<div class="bg-white p-5">

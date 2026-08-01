@@ -251,6 +251,7 @@
 					new Splide(gallerySplideEl, {
 						type: 'slide',
 						rewind: true,
+						arrows: false,
 						perPage: 3,
 						perMove: 1,
 						gap: '12px',
@@ -261,7 +262,6 @@
 							1099: { perPage: 2 },
 							759: { perPage: 1, padding: { right: '18%' } }
 						},
-						i18n: splideI18n,
 						reducedMotion
 					}).mount()
 				);
@@ -271,8 +271,10 @@
 				mounted.push(
 					new Splide(castSplideEl, {
 						type: 'slide',
-						rewind: true,
+						rewind: false,
 						autoWidth: true,
+						focus: 0,
+						omitEnd: true,
 						gap: '12px',
 						drag: 'free',
 						snap: true,
@@ -504,7 +506,7 @@
 					<h2 id="sd-cast-heading">{m.common_cast()}</h2>
 					<span class="sd-line"></span>
 				</div>
-				<div class="sd-splide splide" bind:this={castSplideEl} aria-roledescription="carousel">
+				<div class="sd-splide sd-cast-splide splide" bind:this={castSplideEl} aria-roledescription="carousel">
 					<div class="splide__track">
 						<div class="splide__list">
 							{#each series.artists as artist (artist.id)}
@@ -1030,36 +1032,6 @@
 	/* Responsive pre-init widths mirror Splide options to limit hydration movement. */
 	.sd-splide :global(.splide__slide) { flex: 0 0 auto; width: calc((100% - 24px) / 3); }
 	.sd-splide :global(.splide__slide.sd-cast-slide) { width: 112px; }
-	.sd-splide :global(.splide__arrows) {
-		display: flex;
-		justify-content: flex-end;
-		gap: 8px;
-		padding: 10px 16px 0;
-	}
-	.sd-splide :global(.splide__arrow) {
-		position: static;
-		transform: none;
-		width: 44px;
-		height: 44px;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--orbit-surface);
-		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
-		border-radius: var(--orbit-radius-control);
-		box-shadow: var(--orbit-shadow-interactive);
-		color: var(--orbit-ink);
-		opacity: 1;
-		cursor: pointer;
-	}
-	.sd-splide :global(.splide__arrow svg) {
-		fill: currentColor;
-		width: 1.1em;
-		height: 1.1em;
-	}
-	.sd-splide :global(.splide__arrow:hover:not(:disabled)) { box-shadow: var(--orbit-shadow-accent); border-color: var(--orbit-border-interactive); }
-	.sd-splide :global(.splide__arrow:disabled) { opacity: 0.4; cursor: default; }
-	.sd-splide :global(.splide__arrow:focus-visible) { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
 	.sd-splide :global(.splide__pagination) {
 		position: static;
 		display: flex;
@@ -1079,6 +1051,54 @@
 	.sd-splide :global(.splide__pagination__page.is-active) {
 		background: var(--orbit-coral);
 		transform: none;
+	}
+	.sd-cast-splide { position: relative; }
+	.sd-cast-splide :global(.splide__arrows) {
+		position: absolute;
+		z-index: 3;
+		top: 28px;
+		inset-inline: 8px;
+		display: flex;
+		justify-content: space-between;
+		pointer-events: none;
+	}
+	.sd-cast-splide :global(.splide__arrow) {
+		position: static;
+		transform: none;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: 50%;
+		background: var(--orbit-surface);
+		box-shadow: var(--orbit-shadow-interactive);
+		color: var(--orbit-ink);
+		opacity: 0.94;
+		cursor: pointer;
+		pointer-events: auto;
+	}
+	.sd-cast-splide :global(.splide__arrow svg) {
+		width: 16px;
+		height: 16px;
+		fill: currentColor;
+	}
+	.sd-cast-splide :global(.splide__arrow--prev svg) { transform: scaleX(-1); }
+	.sd-cast-splide :global(.splide__arrow:hover) {
+		border-color: var(--orbit-border-interactive);
+		background: var(--orbit-coral);
+		box-shadow: var(--orbit-shadow-accent);
+		color: var(--orbit-surface);
+	}
+	.sd-cast-splide :global(.splide__arrow:focus-visible) {
+		outline: 2px solid var(--orbit-border-focus);
+		outline-offset: 2px;
+	}
+	.sd-cast-splide :global(.splide__arrow:disabled) {
+		opacity: 0;
+		pointer-events: none;
 	}
 
 	/* ============ GALLERY ============ */
@@ -1344,6 +1364,7 @@
 		.sd-ep-list { padding: 0 28px; grid-template-columns: 1fr 1fr; align-items: start; }
 		.sd-splide :global(.splide__slide.sd-cast-slide) { width: 132px; }
 		.sd-cast-avatar { width: 104px; height: 104px; }
+		.sd-cast-splide :global(.splide__arrows) { top: 38px; }
 	}
 	@media (max-width: 759px) {
 		/* Mobile: one full gallery slide with an 18% peek (mirrors Splide padding). */

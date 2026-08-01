@@ -65,7 +65,7 @@
 	}
 </script>
 
-<section class="border border-[var(--orbit-line)] bg-[var(--orbit-surface)]" aria-labelledby="library-share-title">
+<section class="rounded-[var(--orbit-radius-surface)] bg-[var(--orbit-paper-deep)] shadow-[var(--orbit-shadow-surface)]" aria-labelledby="library-share-title">
 	<div class="grid gap-4 p-4 sm:grid-cols-[1fr_auto] sm:items-center sm:p-5">
 		<div>
 			<h3 id="library-share-title" class="font-display text-base font-bold text-[var(--orbit-ink)]">
@@ -80,7 +80,7 @@
 			type="button"
 			onclick={createAndShare}
 			disabled={busy}
-			class="touch-target border border-coral bg-coral px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-coral-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:cursor-not-allowed disabled:opacity-60"
+			class="orbit-action touch-target inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
 		>
 			{busy ? m.profile_library_share_creating() : m.profile_library_share_action()}
 		</button>
