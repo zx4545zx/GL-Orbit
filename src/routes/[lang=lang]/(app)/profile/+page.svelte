@@ -85,7 +85,7 @@
 			if (pushEnabled) {
 				await unsubscribePush();
 				pushEnabled = false;
-				successMessage = 'ปิดการแจ้งเตือนแล้ว';
+				successMessage = m.profile_push_disabled();
 			} else {
 				pushEnabled = await requestPushPermission();
 				successMessage = pushEnabled ? m.push_prompt_success() : m.push_prompt_error();
@@ -231,8 +231,8 @@
 	</div>
 {/snippet}
 
-<div class="py-4 sm:py-6 pb-8">
-	<div class="max-w-5xl mx-auto px-3 sm:px-6">
+<main class="profile-shell py-4 pb-8 sm:py-6">
+	<div class="mx-auto max-w-5xl px-3 sm:px-6">
 		{#if loadingProfilePage}
 			<!-- Loading state -->
 			<div class="glass-card overflow-hidden">
@@ -254,9 +254,9 @@
 			</div>
 		{:else if profileUser}
 			<!-- ================= FACEBOOK-STYLE PROFILE CARD ================= -->
-			<div class="glass-card border border-[var(--orbit-line-strong)] overflow-hidden animate-slide-up">
+			<section class="profile-hero animate-slide-up" aria-labelledby="profile-name">
 				<!-- COVER -->
-				<div class="relative h-36 overflow-hidden bg-plum sm:h-52 md:h-60 lg:h-72">
+				<div class="profile-cover relative h-36 overflow-hidden sm:h-52 md:h-60 lg:h-72">
 					{#if profileUser.coverUrl}
 						<img
 							src={profileUser.coverUrl}
@@ -276,8 +276,8 @@
 					<div class="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between gap-4">
 						<!-- Avatar overlapping the cover -->
 						<div class="relative -mt-14 sm:-mt-20 md:-mt-24">
-						<div class="orbit-round-data w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 p-1.5 sm:p-2 bg-cream shadow-xl">
-							<div class="orbit-round-data w-full h-full overflow-hidden bg-cream">
+						<div class="profile-avatar orbit-round-data w-28 h-28 bg-[var(--orbit-paper)] p-1.5 sm:h-36 sm:w-36 sm:p-2 md:h-40 md:w-40">
+							<div class="orbit-round-data h-full w-full overflow-hidden bg-[var(--orbit-paper)]">
 									{#if profileUser.avatarUrl}
 										<Picture src={profileUser.avatarUrl} type="profiles" sizes="160px" alt="" width={160} height={160} loading="eager" class="w-full h-full object-cover" />
 									{:else}
@@ -306,7 +306,7 @@
 					<!-- Name + role -->
 					<div class="mt-3 text-center sm:text-left">
 						<div class="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-							<h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-plum">
+							<h1 id="profile-name" class="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--orbit-ink)] sm:text-3xl">
 								{profileUser.displayName || profileUser.username}
 							</h1>
 							{#if profileUser.role === 'ADMIN'}
@@ -319,22 +319,22 @@
 					</div>
 
 					<!-- STATS ROW -->
-					<div class="grid grid-cols-3 gap-2.5 sm:gap-4 mt-5">
-						<div class="glass-card-strong border border-[var(--orbit-line)] p-3 sm:p-4 text-center">
+					<div class="profile-stats mt-5 grid grid-cols-3 gap-2.5 sm:gap-4">
+						<div class="profile-stat p-3 text-center sm:p-4">
 							<div class="flex items-center justify-center mb-1.5 text-coral-dark">
 								<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
 							</div>
 							<div class="text-xl sm:text-2xl font-bold text-plum font-[family-name:var(--font-display)]">{favoriteSeries.length}</div>
 							<div class="text-[11px] sm:text-xs text-plum-light">{m.profile_favorites_label()}</div>
 						</div>
-						<div class="glass-card-strong border border-[var(--orbit-line)] p-3 sm:p-4 text-center">
+						<div class="profile-stat p-3 text-center sm:p-4">
 							<div class="flex items-center justify-center mb-1.5 text-mint-dark">
 								<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
 							</div>
 							<div class="text-xl sm:text-2xl font-bold text-plum font-[family-name:var(--font-display)]">{watchedSeries.length}</div>
 							<div class="text-[11px] sm:text-xs text-plum-light">{m.profile_watched_label()}</div>
 						</div>
-						<div class="glass-card-strong border border-[var(--orbit-line)] p-3 sm:p-4 text-center">
+						<div class="profile-stat p-3 text-center sm:p-4">
 							<div class="flex items-center justify-center mb-1.5 text-lavender-dark">
 								<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
 							</div>
@@ -345,12 +345,13 @@
 				</div>
 
 				<!-- STICKY TAB BAR (Facebook-style underline tabs) -->
-				<div class="border-t border-lavender/15 px-2 sm:px-6">
-					<div class="flex gap-1 sm:gap-2 relative">
+				<div class="border-t border-[var(--orbit-line)] px-2 sm:px-6">
+					<div class="relative flex gap-1 sm:gap-2" role="tablist" aria-label={m.profile_seo_title()}>
 						{#each profileTabs as tab}
 							<button
 								onclick={() => (activeTab = tab.id as 'library' | 'account')}
-								aria-pressed={activeTab === tab.id}
+								role="tab"
+								aria-selected={activeTab === tab.id}
 								class="relative flex-1 sm:flex-none sm:px-8 py-3.5 text-sm sm:text-base font-semibold transition-colors duration-200 flex items-center justify-center gap-2 touch-target {activeTab === tab.id ? 'text-coral-dark' : 'text-plum-light hover:text-plum'}"
 							>
 								<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={tab.icon} /></svg>
@@ -361,10 +362,10 @@
 						{/each}
 					</div>
 				</div>
-			</div>
+			</section>
 
 			<!-- TOAST MESSAGES -->
-			<div class="mt-4">
+			<div class="mt-4" aria-live="polite">
 				{#if successMessage}
 						<div class="border border-mint/30 bg-mint/10 p-3 text-mint-dark text-sm text-center flex items-center justify-center gap-2" in:fly={{ y: -10, duration: 250 }}>
 						<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
@@ -382,7 +383,7 @@
 			<!-- ================= TAB CONTENT ================= -->
 			<div class="mt-4">
 				{#if activeTab === 'library'}
-					<div in:fly={{ y: 8, duration: 250 }}>
+					<section in:fly={{ y: 8, duration: 250 }} aria-label={m.profile_library_tab()}>
 						<div class="mb-5">
 							<LibraryShareCard
 								lang={page.data.lang}
@@ -436,13 +437,13 @@
 								{@render emptyState('watch', m.profile_empty_watched_title(), m.profile_empty_watched_desc(), localizedHref('/series', page.data.lang))}
 							{/if}
 						{/if}
-					</div>
+					</section>
 				{:else}
 					<!-- TAB: ACCOUNT (settings sidebar) -->
 					<div in:fly={{ y: 8, duration: 250 }} class="lg:grid lg:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] lg:gap-6">
 						<!-- SIDEBAR: section nav + account actions -->
-						<aside class="lg:sticky lg:top-24 lg:self-start mb-4 lg:mb-0 space-y-3">
-							<nav class="glass-card border border-[var(--orbit-line-strong)] grid grid-cols-3 lg:grid-cols-1 gap-0">
+						<aside class="mb-4 space-y-3 lg:sticky lg:top-24 lg:mb-0 lg:self-start">
+							<nav class="profile-section-nav grid grid-cols-3 gap-0 lg:grid-cols-1" aria-label={m.profile_account_tab()}>
 								{#each accountSections as section}
 									<button
 										onclick={() => { accountSection = section.id; }}
@@ -495,7 +496,7 @@
 
 								<a
 									href={localizedHref('/subscriptions', page.data.lang)}
-									class="flex min-h-14 items-center justify-between gap-4 border border-[var(--orbit-line-strong)] bg-white p-4 text-plum transition-colors hover:bg-cream touch-target sm:p-5"
+									class="profile-presence flex min-h-14 items-center justify-between gap-4 p-4 text-[var(--orbit-ink)] transition-colors touch-target sm:p-5"
 								>
 									<span>
 										<strong class="block font-[family-name:var(--font-display)]">{m.subscriptions_nav()}</strong>
@@ -505,12 +506,12 @@
 								</a>
 
 								{#if isPushSupported()}
-									<div class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6">
+									<div class="profile-section p-5 sm:p-6">
 										<div class="flex items-center gap-2 mb-4">
 											<svg class="w-4 h-4 text-coral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
-											<h2 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">การแจ้งเตือน</h2>
+										<h2 class="font-[family-name:var(--font-display)] text-lg font-bold text-plum">{m.push_prompt_title()}</h2>
 										</div>
-										<p class="text-sm text-plum-light mb-4">รับแจ้งเตือนเมื่อมีซีรีส์ใหม่หรือข่าวสารจาก GL-Orbit</p>
+										<p class="mb-4 text-sm text-plum-light">{m.push_prompt_description()}</p>
 										<button
 											onclick={togglePush}
 											disabled={pushLoading}
@@ -520,7 +521,7 @@
 												<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
 												{m.push_prompt_enabling()}
 											{:else}
-												{pushEnabled ? 'ปิดการแจ้งเตือน' : 'เปิดรับการแจ้งเตือน'}
+											{pushEnabled ? m.profile_push_disabled() : m.push_prompt_enable()}
 											{/if}
 										</button>
 									</div>
@@ -593,4 +594,21 @@
 			</div>
 		{/if}
 	</div>
-</div>
+</main>
+
+<style>
+	.profile-shell { background: var(--orbit-paper); }
+	.profile-hero, .profile-section, .profile-section-nav, .profile-presence, .profile-stat {
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		box-shadow: var(--orbit-shadow-surface);
+	}
+	.profile-cover { background: var(--orbit-ink); }
+	.profile-cover::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--orbit-accent-image); background-position: right center; background-repeat: no-repeat; background-size: auto 100%; opacity: .7; }
+	.profile-avatar { box-shadow: var(--orbit-shadow-raised); }
+	.profile-stat { border-color: var(--orbit-line); box-shadow: none; }
+	.profile-presence:hover { background: var(--orbit-paper-deep); border-color: var(--orbit-border-interactive); }
+	.profile-section-nav button:first-child { border-left: 0; }
+	@media (min-width: 1024px) { .profile-section-nav button { border-right: 0; } }
+	@media (prefers-reduced-motion: reduce) { .profile-cover::after { transition: none; } }
+</style>

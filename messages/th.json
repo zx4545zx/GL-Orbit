@@ -405,6 +405,7 @@
   "profile_admin_panel": "หน้าจัดการ",
   "profile_logout": "ออกจากระบบ",
   "profile_logout_loading": "กำลังออกจากระบบ...",
+  "profile_push_disabled": "ปิดการแจ้งเตือนแล้ว",
   "profile_username": "ชื่อผู้ใช้",
   "profile_email": "อีเมล",
   "profile_display_name": "ชื่อที่แสดง",

@@ -405,6 +405,7 @@
   "profile_admin_panel": "Admin panel",
   "profile_logout": "Log out",
   "profile_logout_loading": "Logging out...",
+  "profile_push_disabled": "Notifications disabled",
   "profile_username": "Username",
   "profile_email": "Email",
   "profile_display_name": "Display name",

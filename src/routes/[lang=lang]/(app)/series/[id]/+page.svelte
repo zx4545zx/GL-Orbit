@@ -7,6 +7,7 @@
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import WatchedButton from '$lib/components/WatchedButton.svelte';
 	import SeriesVideoPlayer from '$lib/components/series/SeriesVideoPlayer.svelte';
+	import { getEpisodeListStatus } from '$lib/series/episode-status.js';
 	import { m } from '$lib/i18n/paraglide.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import {
@@ -173,13 +174,8 @@
 		return item.schedules[0]?.airDate ?? 'TBA';
 	}
 
-	type EpisodeListStatus = 'aired' | 'next' | 'tba';
-
-	function episodeStatus(item: { episode: number; schedules: { airDate: string }[] }): EpisodeListStatus {
-		if (series.nextEpisode && item.episode === series.nextEpisode.episode) return 'next';
-		const today = new Date().toISOString().split('T')[0];
-		const aired = item.schedules.some((schedule) => schedule.airDate !== 'TBA' && schedule.airDate < today);
-		return aired ? 'aired' : 'tba';
+	function episodeStatus(item: { episode: number; schedules: { airDateIso: string | null }[] }) {
+		return getEpisodeListStatus(item.episode, item.schedules, series.nextEpisode?.episode ?? null, nowTs);
 	}
 
 	function youtubeEmbedUrl(rawUrl: string | null): string | null {
@@ -1242,6 +1238,9 @@
 		gap: 8px;
 		list-style: none;
 	}
+	/* Grid items must be allowed to shrink below the row's min-content (badge +
+	   nowrap date + status), otherwise narrow viewports overflow horizontally. */
+	.sd-ep-list > li { min-width: 0; }
 	.sd-ep {
 		background: var(--orbit-surface);
 		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
