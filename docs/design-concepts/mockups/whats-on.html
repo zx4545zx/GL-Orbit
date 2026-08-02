@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="th" data-theme="y2k" data-layout="portal">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="สี่แนวทางสำหรับหน้าข่าวและอีเวนต์ GL-Orbit รวมแบบพอร์ทัลข่าวที่อ้างอิงโครงสร้าง Yahoo News">
+  <title>What's On — News Layout Studies</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Barlow+Condensed:wght@500;600;700&family=Chakra+Petch:wght@400;500;600;700&family=Comfortaa:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=Mali:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;500;600;700&family=Shippori+Mincho:wght@500;600;700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root,
+    [data-theme="fanzine"] {
+      color-scheme:light;
+      --paper:#fbf3e4; --paper-deep:#f3e7cf; --surface:#fff; --ink:#3b2a20; --muted:#806b5b;
+      --line:#d8c4a8; --line-strong:#b8a288; --accent:#e4572e; --accent-dark:#b23f1d;
+      --accent-soft:#fde4d6; --lavender:#f6c9d8; --mint:#cfe7f5; --link:#b23f1d; --focus:#b23f1d;
+      --shadow:3px 3px 0 rgba(59,42,32,.12); --border-width:1px; --radius:0; --radius-control:0;
+      --font-display:"Mali","Sarabun",sans-serif; --font-body:"Sarabun","Mali",sans-serif;
+      --heading-weight:700; --label-weight:600;
+    }
+    [data-theme="midnight"] {
+      color-scheme:dark;
+      --paper:#0d0a14; --paper-deep:#100c1b; --surface:#171224; --ink:#f2ecfa; --muted:#9d8fb8;
+      --line:#2d2344; --line-strong:#4a3670; --accent:#ff4d7e; --accent-dark:#ff6f98;
+      --accent-soft:#3a1e33; --lavender:#241a3f; --mint:#123c38; --link:#5ff2e0; --focus:#5ff2e0;
+      --shadow:0 0 20px rgba(95,242,224,.08); --border-width:1px; --radius:0; --radius-control:0;
+      --font-display:"Chakra Petch","Mali",sans-serif; --font-body:"Chakra Petch","Mali",sans-serif;
+      --heading-weight:600; --label-weight:500;
+    }
+    [data-theme="y2k"] {
+      color-scheme:light;
+      --paper:#e8e6f5; --paper-deep:#ddd9f0; --surface:#fdfcff; --ink:#241a3a; --muted:#6f6390;
+      --line:#b3a8d6; --line-strong:#241a3a; --accent:#ff3fbf; --accent-dark:#c21e92;
+      --accent-soft:#ffd6f5; --lavender:#d9c8ff; --mint:#b8f0ff; --link:#3f7dff; --focus:#3f7dff;
+      --shadow:3px 3px 0 #d9c8ff; --border-width:2px; --radius:0; --radius-control:0;
+      --font-display:"Silkscreen","Prompt",sans-serif; --font-body:"Prompt","Mali",sans-serif;
+      --heading-weight:700; --label-weight:700;
+    }
+    [data-theme="sakura"] {
+      color-scheme:light;
+      --paper:#faf6f0; --paper-deep:#f3ece1; --surface:#fffdf9; --ink:#2f2a28; --muted:#81756f;
+      --line:#e8ddd2; --line-strong:#c9b8a8; --accent:#c73e3a; --accent-dark:#9c2b28;
+      --accent-soft:#fce7ec; --lavender:#fce7ec; --mint:#e8f0e4; --link:#c73e3a; --focus:#9c2b28;
+      --shadow:0 1px 2px rgba(47,42,40,.08); --border-width:1px; --radius:0; --radius-control:0;
+      --font-display:"Shippori Mincho","Sarabun",serif; --font-body:"Sarabun","Mali",sans-serif;
+      --heading-weight:600; --label-weight:500;
+    }
+    [data-theme="ocean"] {
+      color-scheme:light;
+      --paper:#eef7fa; --paper-deep:#d3edf4; --surface:#fff; --ink:#14384a; --muted:#5f8294;
+      --line:#cde4ec; --line-strong:#9cc3d4; --accent:#1f9ab8; --accent-dark:#0d6d8a;
+      --accent-soft:#d3edf4; --lavender:#dde9f6; --mint:#d9f2ec; --link:#0d6d8a; --focus:#0d6d8a;
+      --shadow:0 6px 18px rgba(31,154,184,.1); --border-width:1px; --radius:18px; --radius-control:999px;
+      --font-display:"Comfortaa","Prompt",sans-serif; --font-body:"Prompt","Mali",sans-serif;
+      --heading-weight:700; --label-weight:500;
+    }
+    [data-theme="candy"] {
+      color-scheme:light;
+      --paper:#fff6ec; --paper-deep:#ffe9d6; --surface:#fff; --ink:#37204a; --muted:#826f94;
+      --line:#f3ddc4; --line-strong:#37204a; --accent:#ff5c9e; --accent-dark:#d93d82;
+      --accent-soft:#ffe3ef; --lavender:#e8d8f8; --mint:#c8f4e4; --link:#7d43c2; --focus:#7d43c2;
+      --shadow:3px 3px 0 rgba(55,32,74,.14); --border-width:3px; --radius:16px; --radius-control:13px;
+      --font-display:"Baloo 2","Prompt",sans-serif; --font-body:"Prompt","Mali",sans-serif;
+      --heading-weight:800; --label-weight:700;
+    }
+    [data-theme="mission"] {
+      color-scheme:light;
+      --paper:#edeae2; --paper-deep:#e0dccf; --surface:#f7f5ef; --ink:#1c1f26; --muted:#686d63;
+      --line:#c9c4b6; --line-strong:#1c1f26; --accent:#0b3d91; --accent-dark:#082a66;
+      --accent-soft:#d8e2f5; --lavender:#dde3f0; --mint:#d4ecdc; --link:#0b3d91; --focus:#c8352b;
+      --shadow:0 1px 2px rgba(28,31,38,.12); --border-width:2px; --radius:0; --radius-control:0;
+      --font-display:"Barlow Condensed","Sarabun",sans-serif; --font-body:"Sarabun","Mali",sans-serif;
+      --heading-weight:700; --label-weight:600;
+    }
+
+    * { box-sizing:border-box; }
+    html { min-width:320px; scroll-behavior:smooth; }
+    body {
+      margin:0; background:var(--paper); color:var(--ink); font:400 15px/1.55 var(--font-body);
+      -webkit-font-smoothing:antialiased; font-synthesis:none;
+    }
+    button,select,a { font:inherit; }
+    button,select { color:inherit; }
+    button { cursor:pointer; }
+    a { color:inherit; }
+    [hidden] { display:none !important; }
+    :focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+    .skip-link { position:fixed; z-index:100; top:.5rem; left:.5rem; transform:translateY(-150%); padding:.55rem .8rem; background:var(--ink); color:var(--paper); }
+    .skip-link:focus { transform:none; }
+
+    .study-bar {
+      position:sticky; z-index:30; top:0; display:flex; align-items:center; gap:.75rem;
+      min-height:54px; padding:.4rem max(.75rem,calc((100vw - 1120px)/2));
+      border-bottom:var(--border-width) solid var(--line-strong); background:var(--surface);
+    }
+    .study-name { margin-right:.25rem; font:600 .67rem/1.2 "IBM Plex Mono",monospace; letter-spacing:.05em; white-space:nowrap; }
+    .layout-switch { display:flex; gap:.25rem; }
+    .layout-button {
+      min-height:38px; padding:.35rem .7rem; border:var(--border-width) solid transparent;
+      border-radius:var(--radius-control); background:transparent; color:var(--muted); font-size:.75rem; font-weight:var(--label-weight);
+    }
+    .layout-button:hover { background:var(--paper-deep); color:var(--ink); }
+    .layout-button[aria-pressed="true"] { border-color:var(--line-strong); background:var(--ink); color:var(--paper); }
+    .theme-control { display:flex; align-items:center; gap:.4rem; margin-left:auto; }
+    .theme-control label { color:var(--muted); font-size:.68rem; }
+    .theme-control select { min-height:38px; padding:.3rem 1.7rem .3rem .55rem; border:var(--border-width) solid var(--line); border-radius:var(--radius-control); background:var(--paper); font-size:.72rem; }
+
+    .app-header { border-bottom:var(--border-width) solid var(--line); background:var(--paper); }
+    .app-header-inner { width:min(1120px,calc(100% - 2rem)); min-height:54px; margin:auto; display:flex; align-items:center; gap:1.6rem; }
+    .brand { font-family:var(--font-display); font-size:1rem; font-weight:var(--heading-weight); text-decoration:none; white-space:nowrap; }
+    .brand i { color:var(--accent); font-style:normal; }
+    .app-nav { display:flex; align-self:stretch; gap:1.3rem; }
+    .app-nav a { display:grid; place-items:center; border-bottom:2px solid transparent; color:var(--muted); font-size:.75rem; font-weight:var(--label-weight); text-decoration:none; }
+    .app-nav a[aria-current="page"] { border-color:var(--accent); color:var(--ink); }
+    .app-date { margin-left:auto; color:var(--muted); font:400 .65rem/1.3 "IBM Plex Mono",monospace; }
+
+    main { width:min(1120px,calc(100% - 2rem)); margin:auto; padding:1.8rem 0 6rem; }
+    .page-head { display:flex; align-items:end; justify-content:space-between; gap:2rem; padding-bottom:1.35rem; border-bottom:var(--border-width) solid var(--line-strong); }
+    .eyebrow,.meta,.event-time { font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; }
+    .eyebrow { margin:0 0 .35rem; color:var(--accent-dark); font-size:.64rem; font-weight:600; letter-spacing:.07em; text-transform:uppercase; }
+    .page-title { margin:0; font-family:var(--font-display); font-size:clamp(1.7rem,2.5vw,2.2rem); font-weight:var(--heading-weight); line-height:1.15; }
+    .page-intro { max-width:32rem; margin:0; color:var(--muted); font-size:.86rem; line-height:1.65; }
+    .page-update { flex:0 0 auto; color:var(--muted); font:400 .64rem/1.5 "IBM Plex Mono",monospace; text-align:right; }
+
+    .section { padding:2.2rem 0; }
+    .section + .section { border-top:var(--border-width) solid var(--line-strong); }
+    .section-head { display:flex; align-items:end; justify-content:space-between; gap:1.5rem; margin-bottom:1rem; }
+    .section-title { margin:0; font-size:1.3rem; font-weight:600; line-height:1.25; }
+    .section-note { margin:.25rem 0 0; color:var(--muted); font-size:.76rem; }
+    .section-count { color:var(--muted); font:400 .64rem/1.4 "IBM Plex Mono",monospace; white-space:nowrap; }
+
+    .news-grid { min-width:0; }
+    .news-card { min-width:0; }
+    .news-card h3 { margin:0; font-size:1rem; font-weight:600; line-height:1.42; text-wrap:pretty; }
+    .news-card h3 a { text-decoration:none; }
+    .news-card h3 a:hover { color:var(--link); text-decoration:underline; text-underline-offset:.18rem; }
+    .news-side { color:var(--muted); font:400 .62rem/1.5 "IBM Plex Mono",monospace; }
+    .news-side time,.news-side span { display:block; }
+    .news-side time { color:var(--accent-dark); font-weight:600; }
+    .story-summary { margin:.35rem 0 0; color:var(--muted); font-size:.76rem; line-height:1.6; }
+    .story-link { display:inline-flex; margin-top:.7rem; color:var(--link); font-size:.72rem; font-weight:var(--label-weight); text-underline-offset:.2rem; }
+    .story-media { display:none; }
+
+    /* 1 — Digest: one compact lead, quick headlines beside it. */
+    [data-layout="digest"] main { width:min(1040px,calc(100% - 2rem)); }
+    [data-layout="digest"] .news-grid { display:grid; grid-template-columns:minmax(0,1.08fr) minmax(18rem,.92fr); border:var(--border-width) solid var(--line-strong); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow); overflow:hidden; }
+    [data-layout="digest"] .news-card { display:grid; grid-template-columns:4.4rem minmax(0,1fr); gap:.8rem; padding:.75rem .9rem; border-bottom:var(--border-width) solid var(--line); }
+    [data-layout="digest"] .news-card:last-child { border-bottom:0; }
+    [data-layout="digest"] .news-card:not(.is-lead) .story-summary,[data-layout="digest"] .news-card:not(.is-lead) .story-link { display:none; }
+    [data-layout="digest"] .is-lead { grid-row:1 / span 5; display:flex; flex-direction:column; justify-content:center; padding:1.4rem 1.5rem; border-right:var(--border-width) solid var(--line-strong); border-bottom:0; }
+    [data-layout="digest"] .is-lead .news-side { margin-bottom:1.1rem; }
+    [data-layout="digest"] .is-lead h3 { max-width:25ch; font-size:1.35rem; line-height:1.38; }
+    [data-layout="digest"] .is-lead .story-summary { max-width:54ch; }
+
+    /* 2 — Stream: every story equal in one chronological list. */
+    [data-layout="stream"] main { width:min(920px,calc(100% - 2rem)); }
+    [data-layout="stream"] .news-grid { border-top:var(--border-width) solid var(--line-strong); }
+    [data-layout="stream"] .news-card { display:grid; grid-template-columns:6.3rem minmax(0,1fr) 1rem; gap:1rem; align-items:start; padding:.9rem .2rem; border-bottom:var(--border-width) solid var(--line); }
+    [data-layout="stream"] .news-card::after { content:"→"; color:var(--muted); font-size:.75rem; }
+    [data-layout="stream"] .story-link { display:none; }
+    [data-layout="stream"] .story-summary { max-width:70ch; margin-top:.25rem; display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+
+    /* 3 — Board: equal cards, no featured hierarchy. */
+    [data-layout="board"] .news-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; }
+    [data-layout="board"] .news-card { display:flex; min-height:168px; flex-direction:column; padding:1rem; border:var(--border-width) solid var(--line); border-radius:var(--radius); background:var(--surface); }
+    [data-layout="board"] .news-side { display:flex; justify-content:space-between; gap:.5rem; margin-bottom:.75rem; }
+    [data-layout="board"] .news-card h3 { font-size:.96rem; }
+    [data-layout="board"] .story-summary { display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+    [data-layout="board"] .story-link { margin-top:auto; padding-top:.75rem; }
+
+    /* 4 — Portal: Yahoo News-inspired lead package and thumbnail rail. */
+    [data-layout="portal"] main { width:min(1120px,calc(100% - 2rem)); }
+    [data-layout="portal"] .news-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.9rem; }
+    [data-layout="portal"] .news-card { display:flex; min-width:0; flex-direction:column; }
+    [data-layout="portal"] .story-media {
+      position:relative; display:flex; aspect-ratio:16/9; align-items:flex-end; justify-content:space-between;
+      overflow:hidden; padding:.75rem; border:var(--border-width) solid var(--line); border-radius:var(--radius);
+      background:var(--media-bg,var(--accent-soft)); color:var(--ink); isolation:isolate;
+    }
+    [data-layout="portal"] .story-media::before {
+      content:""; position:absolute; z-index:-1; width:58%; aspect-ratio:1; top:-34%; right:-10%;
+      border:clamp(12px,2vw,24px) solid color-mix(in srgb,var(--surface) 68%,transparent); border-radius:50%;
+    }
+    [data-layout="portal"] .story-media::after {
+      content:""; position:absolute; z-index:-1; width:46%; height:28%; left:-8%; bottom:12%;
+      border:var(--border-width) solid color-mix(in srgb,var(--ink) 30%,transparent); background:color-mix(in srgb,var(--surface) 50%,transparent); transform:rotate(-7deg);
+    }
+    [data-layout="portal"] .story-media[data-art="blue"] { --media-bg:var(--mint); }
+    [data-layout="portal"] .story-media[data-art="pink"] { --media-bg:var(--accent-soft); }
+    [data-layout="portal"] .story-media[data-art="purple"] { --media-bg:var(--lavender); }
+    [data-layout="portal"] .story-media[data-art="paper"] { --media-bg:var(--paper-deep); }
+    [data-layout="portal"] .story-mark { position:relative; z-index:1; font-family:var(--font-display); font-size:clamp(1.1rem,2.4vw,2rem); font-weight:var(--heading-weight); line-height:1; }
+    [data-layout="portal"] .story-stamp { position:relative; z-index:1; font:600 .55rem/1.3 "IBM Plex Mono",monospace; letter-spacing:.04em; text-align:right; }
+    [data-layout="portal"] .news-side { display:flex; justify-content:space-between; gap:.5rem; margin-top:.55rem; }
+    [data-layout="portal"] .news-card:not(.is-lead) .story-summary,
+    [data-layout="portal"] .news-card:not(.is-lead) .story-link { display:none; }
+    [data-layout="portal"] .news-card:not(.is-lead) h3 { margin-top:.25rem; font-size:.78rem; line-height:1.38; }
+    [data-layout="portal"] .is-lead {
+      grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,1.38fr) minmax(18rem,.82fr);
+      grid-template-rows:auto 1fr; gap:.3rem 1.45rem; padding-bottom:1.25rem;
+      border-bottom:var(--border-width) solid var(--line-strong);
+    }
+    [data-layout="portal"] .is-lead .story-media { grid-column:1; grid-row:1 / span 2; min-height:300px; }
+    [data-layout="portal"] .is-lead .story-mark { font-size:clamp(2rem,5vw,4rem); }
+    [data-layout="portal"] .is-lead .news-side { grid-column:2; align-self:end; margin:0 0 .45rem; }
+    [data-layout="portal"] .is-lead .news-copy { grid-column:2; align-self:start; }
+    [data-layout="portal"] .is-lead h3 { font-size:clamp(1.25rem,2vw,1.7rem); line-height:1.3; }
+    [data-layout="portal"] .is-lead .story-summary { font-size:.8rem; }
+
+    .events-tools { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.75rem; }
+    .view-tabs { display:flex; gap:.25rem; overflow-x:auto; scrollbar-width:none; }
+    .view-tabs::-webkit-scrollbar { display:none; }
+    .view-button { min-height:40px; padding:.42rem .65rem; border:var(--border-width) solid var(--line); border-radius:var(--radius-control); background:var(--surface); color:var(--muted); font-size:.7rem; font-weight:var(--label-weight); white-space:nowrap; }
+    .view-button:hover { border-color:var(--line-strong); color:var(--ink); }
+    .view-button[aria-selected="true"] { border-color:var(--ink); background:var(--ink); color:var(--paper); }
+    .period-nav { display:flex; align-items:center; gap:.35rem; }
+    .period-title { min-width:10rem; margin:0; font-size:.76rem; font-weight:600; text-align:center; }
+    .period-button { width:38px; height:38px; border:var(--border-width) solid var(--line); border-radius:var(--radius-control); background:var(--surface); }
+    .period-button:hover { background:var(--paper-deep); }
+    .view-panel { border:var(--border-width) solid var(--line-strong); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow); overflow:hidden; }
+
+    .week-scroll { overflow-x:auto; }
+    .week-board { display:grid; grid-template-columns:repeat(7,minmax(128px,1fr)); min-width:896px; }
+    .mobile-week { display:none; }
+    .mobile-day-tabs { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:var(--border-width); border:var(--border-width) solid var(--line-strong); background:var(--line); }
+    .mobile-day-tab { min-height:58px; padding:.4rem .1rem; border:0; background:var(--surface); color:var(--ink); text-align:center; }
+    .mobile-day-tab span,.mobile-day-tab strong { display:block; }
+    .mobile-day-tab span { color:var(--muted); font-size:.58rem; }
+    .mobile-day-tab strong { margin-top:.1rem; font:600 .76rem/1.2 "IBM Plex Mono",monospace; }
+    .mobile-day-tab i { display:inline-block; width:.25rem; height:.25rem; margin:.2rem .05rem 0; border-radius:50%; background:var(--accent); }
+    .mobile-day-tab[aria-selected="true"] { background:var(--ink); color:var(--paper); }
+    .mobile-day-tab[aria-selected="true"] span { color:color-mix(in srgb,var(--paper) 70%,transparent); }
+    .mobile-day-tab.is-today { box-shadow:inset 0 0 0 2px var(--accent); }
+    .mobile-day-panel { margin-top:.7rem; padding:.8rem; border:var(--border-width) solid var(--line-strong); background:var(--surface); }
+    .mobile-day-panel-head { display:flex; justify-content:space-between; gap:1rem; align-items:start; margin-bottom:.7rem; padding-bottom:.65rem; border-bottom:var(--border-width) solid var(--line); }
+    .mobile-day-panel-head strong,.mobile-day-panel-head span { display:block; }
+    .mobile-day-panel-head strong { font-size:.86rem; }
+    .mobile-day-panel-head span { color:var(--muted); font-size:.64rem; }
+    .mobile-day-count { min-width:2.6rem; padding:.35rem; border:var(--border-width) solid var(--line); background:var(--accent-soft); color:var(--accent-dark); font:600 .7rem/1.2 "IBM Plex Mono",monospace; text-align:center; }
+    .mobile-day-events { display:grid; gap:.45rem; }
+    .day-column { min-width:0; border-right:var(--border-width) solid var(--line); }
+    .day-column:last-child { border-right:0; }
+    .day-head { padding:.6rem .45rem; border-bottom:var(--border-width) solid var(--line); text-align:center; }
+    .day-head strong { display:block; font-size:.72rem; }
+    .day-head span { color:var(--muted); font:400 .6rem/1.3 "IBM Plex Mono",monospace; }
+    .day-column.is-today .day-head { background:var(--ink); color:var(--paper); }
+    .day-column.is-today .day-head span { color:color-mix(in srgb,var(--paper) 70%,transparent); }
+    .day-events { display:grid; align-content:start; gap:.45rem; min-height:238px; padding:.45rem; }
+    .event-card { position:relative; padding:.55rem .55rem .55rem .7rem; border:var(--border-width) solid var(--line); background:var(--paper); }
+    .event-card::before { content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--event-color,var(--accent)); }
+    .event-card[data-tone="blue"] { --event-color:var(--link); }
+    .event-card[data-tone="green"] { --event-color:color-mix(in srgb,var(--mint) 35%,var(--ink)); }
+    .event-card[data-tone="yellow"] { --event-color:color-mix(in srgb,var(--accent) 55%,var(--mint)); }
+    .event-time { color:var(--accent-dark); font-size:.58rem; font-weight:600; }
+    .event-card h3 { margin:.2rem 0 0; font-size:.72rem; font-weight:600; line-height:1.38; }
+    .event-card p { margin:.2rem 0 0; color:var(--muted); font-size:.62rem; line-height:1.4; }
+    .empty-day { display:grid; place-items:center; min-height:110px; padding:.5rem; color:var(--muted); font-size:.64rem; text-align:center; }
+
+    .agenda-day { display:grid; grid-template-columns:7.2rem minmax(0,1fr); border-bottom:var(--border-width) solid var(--line); }
+    .agenda-day:last-child { border-bottom:0; }
+    .agenda-date { padding:.8rem; background:var(--paper-deep); }
+    .agenda-date strong { display:block; font-size:.78rem; }
+    .agenda-date span { color:var(--muted); font:400 .58rem/1.4 "IBM Plex Mono",monospace; }
+    .agenda-row { display:grid; grid-template-columns:4.5rem minmax(0,1fr) 7rem; gap:.8rem; padding:.8rem 1rem; border-bottom:var(--border-width) solid var(--line); }
+    .agenda-row:last-child { border-bottom:0; }
+    .agenda-row time { color:var(--accent-dark); font:600 .6rem/1.4 "IBM Plex Mono",monospace; }
+    .agenda-row h3 { margin:0; font-size:.78rem; font-weight:600; }
+    .agenda-row p { margin:.18rem 0 0; color:var(--muted); font-size:.65rem; }
+    .event-type { justify-self:end; color:var(--muted); font-size:.6rem; text-align:right; }
+
+    .all-events { display:grid; }
+    .all-event-row { display:grid; grid-template-columns:6.5rem minmax(0,1fr) 9rem; gap:1rem; align-items:start; padding:.85rem 1rem; border-bottom:var(--border-width) solid var(--line); }
+    .all-event-row:last-child { border-bottom:0; }
+    .all-event-date { color:var(--muted); font:400 .6rem/1.45 "IBM Plex Mono",monospace; }
+    .all-event-date strong { display:block; color:var(--accent-dark); font-size:.66rem; }
+    .all-event-copy h3 { margin:0; font-size:.8rem; font-weight:600; line-height:1.4; }
+    .all-event-copy p { margin:.18rem 0 0; color:var(--muted); font-size:.65rem; }
+    .all-event-type { justify-self:end; color:var(--muted); font-size:.62rem; text-align:right; }
+    .load-more-wrap { padding:.8rem; border-top:var(--border-width) solid var(--line); text-align:center; }
+    .load-more { min-height:40px; padding:.5rem 1rem; border:var(--border-width) solid var(--line-strong); border-radius:var(--radius-control); background:var(--surface); font-size:.7rem; font-weight:var(--label-weight); }
+    .load-more:hover { background:var(--paper-deep); }
+    .load-more:disabled { cursor:default; opacity:.55; }
+
+    .month-layout { display:grid; grid-template-columns:minmax(0,1fr) 15rem; }
+    .month-main { min-width:0; border-right:var(--border-width) solid var(--line); }
+    .month-weekdays,.month-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); }
+    .month-weekdays { border-bottom:var(--border-width) solid var(--line); }
+    .month-weekdays span { padding:.45rem .2rem; color:var(--muted); font-size:.6rem; text-align:center; }
+    .month-cell { min-height:68px; padding:.35rem; border:0; border-right:var(--border-width) solid var(--line); border-bottom:var(--border-width) solid var(--line); background:transparent; text-align:left; }
+    .month-cell:nth-child(7n) { border-right:0; }
+    .month-cell:nth-last-child(-n+7) { border-bottom:0; }
+    .month-cell:hover { background:var(--paper-deep); }
+    .month-cell.is-muted { opacity:.45; }
+    .month-cell.is-selected { background:var(--accent-soft); box-shadow:inset 0 0 0 2px var(--accent); }
+    .month-date { font:600 .6rem/1 "IBM Plex Mono",monospace; }
+    .month-dots { display:flex; gap:.15rem; margin-top:.5rem; }
+    .month-dots i { width:.28rem; height:.28rem; border-radius:50%; background:var(--accent); }
+    .month-dots i:nth-child(2) { background:var(--link); }
+    .selected-day { padding:1rem; }
+    .selected-day h3 { margin:.2rem 0 .75rem; font-size:.88rem; }
+    .selected-day .event-card + .event-card { margin-top:.45rem; }
+    .selected-day-empty { margin:0; padding:.9rem; border:var(--border-width) dashed var(--line); color:var(--muted); font-size:.68rem; line-height:1.55; }
+
+    .data-note { margin:.7rem 0 0; color:var(--muted); font-size:.66rem; }
+    .bottom-nav { display:none; }
+
+    @media (max-width:820px) {
+      [data-layout="digest"] .news-grid { grid-template-columns:1fr; }
+      [data-layout="digest"] .is-lead { grid-row:auto; border-right:0; border-bottom:var(--border-width) solid var(--line-strong); }
+      [data-layout="board"] .news-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      [data-layout="portal"] .news-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      [data-layout="portal"] .is-lead { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(16rem,.8fr); }
+      .month-layout { grid-template-columns:1fr; }
+      .month-main { border-right:0; border-bottom:var(--border-width) solid var(--line); }
+    }
+    @media (max-width:620px) {
+      .study-bar { position:static; flex-wrap:wrap; gap:.35rem; padding:.45rem .6rem; }
+      .study-name { width:100%; margin:0; }
+      .layout-switch { flex:1; }
+      .layout-button { flex:1; padding:.3rem .4rem; }
+      .theme-control { margin-left:0; }
+      .theme-control label { display:none; }
+      .app-header-inner { width:calc(100% - 1.2rem); min-height:50px; }
+      .app-nav,.app-date { display:none; }
+      main,[data-layout="digest"] main,[data-layout="stream"] main { width:calc(100% - 1.2rem); padding-top:1.2rem; }
+      .page-head { display:block; padding-bottom:1rem; }
+      .page-title { font-size:1.55rem; }
+      .page-intro { margin-top:.55rem; }
+      .page-update { margin-top:.55rem; text-align:left; }
+      .section { padding:1.65rem 0; }
+      .section-head { align-items:start; margin-bottom:.8rem; }
+      .section-title { font-size:1.12rem; }
+      [data-layout="digest"] .is-lead { padding:1rem; }
+      [data-layout="digest"] .is-lead h3 { font-size:1.15rem; }
+      [data-layout="digest"] .news-card { grid-template-columns:3.8rem minmax(0,1fr); gap:.6rem; padding:.7rem; }
+      [data-layout="stream"] .news-card { grid-template-columns:4.6rem minmax(0,1fr) .7rem; gap:.65rem; padding:.75rem .1rem; }
+      [data-layout="stream"] .story-summary { -webkit-line-clamp:1; }
+      [data-layout="board"] .news-grid { grid-template-columns:1fr; gap:.5rem; }
+      [data-layout="board"] .news-card { min-height:0; padding:.85rem; }
+      [data-layout="board"] .story-summary { -webkit-line-clamp:1; }
+      [data-layout="portal"] .news-grid { grid-template-columns:1fr; gap:0; }
+      [data-layout="portal"] .is-lead { display:grid; grid-template-columns:1fr; grid-template-rows:auto auto auto; gap:.45rem; padding-bottom:1rem; }
+      [data-layout="portal"] .is-lead .story-media { grid-column:1; grid-row:1; min-height:0; }
+      [data-layout="portal"] .is-lead .news-side { grid-column:1; grid-row:2; margin-top:.2rem; }
+      [data-layout="portal"] .is-lead .news-copy { grid-column:1; grid-row:3; }
+      [data-layout="portal"] .is-lead h3 { font-size:1.18rem; }
+      [data-layout="portal"] .news-card:not(.is-lead) { display:grid; grid-template-columns:7rem minmax(0,1fr); grid-template-rows:auto 1fr; gap:.2rem .7rem; padding:.7rem 0; border-bottom:var(--border-width) solid var(--line); }
+      [data-layout="portal"] .news-card:not(.is-lead) .story-media { grid-column:1; grid-row:1 / span 2; }
+      [data-layout="portal"] .news-card:not(.is-lead) .news-side { grid-column:2; grid-row:1; margin:0; }
+      [data-layout="portal"] .news-card:not(.is-lead) .news-copy { grid-column:2; grid-row:2; }
+      [data-layout="portal"] .news-card:not(.is-lead) h3 { margin:0; }
+      .events-tools { display:grid; gap:.6rem; }
+      .view-tabs { width:100%; }
+      .view-button { flex:1 0 auto; }
+      .period-nav { justify-content:space-between; }
+      .period-title { min-width:0; }
+      .agenda-day { grid-template-columns:1fr; }
+      .agenda-date { padding:.55rem .75rem; }
+      .agenda-row { grid-template-columns:3.8rem minmax(0,1fr); gap:.6rem; padding:.75rem; }
+      .event-type { grid-column:2; justify-self:start; }
+      .all-event-row { grid-template-columns:4.6rem minmax(0,1fr); gap:.65rem; padding:.75rem; }
+      .all-event-type { grid-column:2; justify-self:start; }
+      .week-scroll { display:none; }
+      .mobile-week { display:block; }
+      .month-cell { min-height:52px; padding:.25rem; }
+      .selected-day { padding:.8rem; }
+      .bottom-nav { position:fixed; z-index:25; inset:auto 0 0; display:grid; grid-template-columns:repeat(5,1fr); padding:.25rem .2rem calc(.25rem + env(safe-area-inset-bottom)); border-top:var(--border-width) solid var(--line-strong); background:var(--surface); box-shadow:0 -3px 14px color-mix(in srgb,var(--ink) 10%,transparent); }
+      .bottom-nav a { min-height:48px; display:grid; place-items:center; color:var(--muted); font-size:.58rem; font-weight:var(--label-weight); text-decoration:none; }
+      .bottom-nav a[aria-current="page"] { color:var(--accent-dark); }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *,*::before,*::after { scroll-behavior:auto !important; transition:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#content">ข้ามไปยังเนื้อหา</a>
+
+  <aside class="study-bar" aria-label="เครื่องมือเปรียบเทียบแบบ">
+    <strong class="study-name">NEWS LAYOUT STUDIES</strong>
+    <div class="layout-switch" role="group" aria-label="เลือกแนวทางการจัดหน้า">
+      <button class="layout-button" type="button" data-layout-choice="digest" aria-pressed="false">1 · สรุปเร็ว</button>
+      <button class="layout-button" type="button" data-layout-choice="stream" aria-pressed="false">2 · ลำดับข่าว</button>
+      <button class="layout-button" type="button" data-layout-choice="board" aria-pressed="false">3 · บอร์ดข่าว</button>
+      <button class="layout-button" type="button" data-layout-choice="portal" aria-pressed="true">4 · ข่าวพอร์ทัล</button>
+    </div>
+    <div class="theme-control">
+      <label for="theme-select">ธีม</label>
+      <select id="theme-select" aria-label="เลือกธีม">
+        <option value="fanzine">Fan Zine</option>
+        <option value="midnight">Midnight</option>
+        <option value="y2k" selected>Y2K Diary</option>
+        <option value="sakura">Sakura</option>
+        <option value="ocean">Ocean</option>
+        <option value="candy">Candy</option>
+        <option value="mission">Mission</option>
+      </select>
+    </div>
+  </aside>
+
+  <header class="app-header">
+    <div class="app-header-inner">
+      <a class="brand" href="#content" aria-label="GL-Orbit หน้าหลัก">GL<i>•</i>Orbit</a>
+      <nav class="app-nav" aria-label="เมนูหลัก">
+        <a href="#content">หน้าหลัก</a><a href="#news">สำรวจ</a><a href="#events">ตารางฉาย</a><a href="#content" aria-current="page">ข่าว &amp; อีเวนต์</a>
+      </nav>
+      <span class="app-date">TH · 03 AUG 2026</span>
+    </div>
+  </header>
+
+  <main id="content">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">GL-Orbit · What's on</p>
+        <h1 class="page-title">ข่าวและอีเวนต์</h1>
+        <p class="page-intro">ติดตามข่าวล่าสุดก่อน แล้วค่อยวางแผนอีเวนต์ในปฏิทินเดียว</p>
+      </div>
+      <p class="page-update">อัปเดต 3 ส.ค. 2026<br>6 ข่าว · 23 อีเวนต์</p>
+    </header>
+
+    <section class="section" id="news" aria-labelledby="news-title">
+      <header class="section-head">
+        <div><h2 class="section-title" id="news-title">ข่าวล่าสุด</h2><p class="section-note">ข่าวที่ผ่านการอนุมัติ เรียงจากใหม่ไปเก่า</p></div>
+        <span class="section-count">06 STORIES</span>
+      </header>
+
+      <div class="news-grid">
+        <article class="news-card is-lead">
+          <div class="story-media" data-art="pink" aria-hidden="true"><strong class="story-mark">EJ</strong><span class="story-stamp">GL NEWS<br>24.07.26</span></div>
+          <div class="news-side"><time datetime="2026-07-24">24 JUL 2026</time><span>Conversation Thailand</span></div>
+          <div class="news-copy"><h3><a href="#news">EnjoyJune conclude their work as a pairing</a></h3><p class="story-summary">Conversation Thailand ประกาศยุติการทำงานคู่ EnjoyJune โดย Enjoy ออกจากต้นสังกัดและทำงานอิสระ ส่วน June ยังทำงานกับต้นสังกัดต่อ</p><a class="story-link" href="#news">อ่านต้นทาง →</a></div>
+        </article>
+        <article class="news-card">
+          <div class="story-media" data-art="blue" aria-hidden="true"><strong class="story-mark">LE</strong><span class="story-stamp">CAST<br>UPDATE</span></div>
+          <div class="news-side"><time datetime="2026-07-18">18 JUL 2026</time><span>GMMTV</span></div>
+          <div class="news-copy"><h3><a href="#news">GMMTV announces lead recast for Love’s Echo</a></h3><p class="story-summary">Jaoying รับบทนำแทน หลังการยุติการทำงานคู่ JuneMewnich</p><a class="story-link" href="#news">อ่านต้นทาง →</a></div>
+        </article>
+        <article class="news-card">
+          <div class="story-media" data-art="paper" aria-hidden="true"><strong class="story-mark">SOS</strong><span class="story-stamp">PUBLIC<br>NOTE</span></div>
+          <div class="news-side"><time datetime="2026-07-16">16 JUL 2026</time><span>Community</span></div>
+          <div class="news-copy"><h3><a href="#news">Mass apology over the misuse of the ‘Signal for Help’ gesture</a></h3><p class="story-summary">นักแสดง GL หลายคนขอโทษ หลังใช้สัญลักษณ์ขอความช่วยเหลือในบริบทที่ไม่เหมาะสม</p><a class="story-link" href="#news">อ่านต้นทาง →</a></div>
+        </article>
+        <article class="news-card">
+          <div class="story-media" data-art="purple" aria-hidden="true"><strong class="story-mark">IM</strong><span class="story-stamp">PAIRING<br>UPDATE</span></div>
+          <div class="news-side"><time datetime="2026-07-16">16 JUL 2026</time><span>Heart Pop Studio</span></div>
+          <div class="news-copy"><h3><a href="#news">IceMemi pairing has concluded</a></h3><p class="story-summary">Heart Pop Studio ประกาศยุติการทำงานคู่ของ IceMemi ซึ่งเป็นที่รู้จักจาก Player</p><a class="story-link" href="#news">อ่านต้นทาง →</a></div>
+        </article>
+        <article class="news-card">
+          <div class="story-media" data-art="pink" aria-hidden="true"><strong class="story-mark">JM</strong><span class="story-stamp">14.07<br>2026</span></div>
+          <div class="news-side"><time datetime="2026-07-14">14 JUL 2026</time><span>GMMTV</span></div>
+          <div class="news-copy"><h3><a href="#news">JuneMewnich pairing splits</a></h3><p class="story-summary">ทั้งคู่ยุติการทำงานร่วมกัน และ GMMTV นำ pilot ของ Love’s Echo ออก</p><a class="story-link" href="#news">อ่านต้นทาง →</a></div>
+        </article>
+        <article class="news-card">
+          <div class="story-media" data-art="blue" aria-hidden="true"><strong class="story-mark">?</strong><span class="story-stamp">NEW<br>PARTNER</span></div>
+          <div class="news-side"><time datetime="2026-07-06">06 JUL 2026</time><span>North Star</span></div>
+          <div class="news-copy"><h3><a href="#news">Who will be Mew’s new partner?</a></h3><p class="story-summary">North Star ยุติการทำงานคู่ Mew และ Renee พร้อมเริ่มคัดเลือกนักแสดงใหม่ให้ Beauty &amp; The Bike</p><a class="story-link" href="#news">อ่านต้นทาง →</a></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="events" aria-labelledby="events-title">
+      <header class="section-head">
+        <div><h2 class="section-title" id="events-title">อีเวนต์</h2><p class="section-note">ทั้งหมดเป็นลิสต์ต่อเนื่อง ส่วนสัปดาห์และปฏิทินใช้รูปแบบเดียวกับหน้าตารางฉาย</p></div>
+        <span class="section-count">AUG–SEP 2026</span>
+      </header>
+
+      <div class="events-tools">
+        <div class="view-tabs" role="tablist" aria-label="รูปแบบอีเวนต์">
+          <button class="view-button" type="button" role="tab" data-view="all" aria-selected="true" aria-controls="view-all">ทั้งหมด</button>
+          <button class="view-button" type="button" role="tab" data-view="week" aria-selected="false" aria-controls="view-week">สัปดาห์</button>
+          <button class="view-button" type="button" role="tab" data-view="calendar" aria-selected="false" aria-controls="view-calendar">ปฏิทิน</button>
+        </div>
+        <div class="period-nav" aria-label="เปลี่ยนช่วงเวลา"><button class="period-button" type="button" data-period-button aria-label="ช่วงก่อนหน้า" hidden>←</button><p class="period-title" data-period-title>อีเวนต์ที่กำลังจะมาถึง</p><button class="period-button" type="button" data-period-button aria-label="ช่วงถัดไป" hidden>→</button></div>
+      </div>
+
+      <div class="view-panel" id="view-all" data-view-panel="all" role="tabpanel">
+        <div class="all-events" aria-live="polite">
+          <article class="all-event-row" data-load-item><time class="all-event-date" datetime="2026-08-08"><strong>08 AUG</strong>ทั้งวัน</time><div class="all-event-copy"><h3>Freen · SOLD OUT Concert</h3><p>คอนเสิร์ต · รายละเอียดสถานที่ในประกาศต้นทาง</p></div><span class="all-event-type">Official fan meet</span></article>
+          <article class="all-event-row" data-load-item><time class="all-event-date" datetime="2026-08-08"><strong>08 AUG</strong>ทั้งวัน</time><div class="all-event-copy"><h3>Weibo Gala</h3><p>China · Asia/Shanghai</p></div><span class="all-event-type">Public event</span></article>
+          <article class="all-event-row" data-load-item><time class="all-event-date" datetime="2026-08-08"><strong>08 AUG</strong>ทั้งวัน</time><div class="all-event-copy"><h3>Girl Rules · Macau</h3><p>Macau · Asia/Shanghai</p></div><span class="all-event-type">Shows / trailers</span></article>
+          <article class="all-event-row" data-load-item><time class="all-event-date" datetime="2026-08-08"><strong>08 AUG</strong>ทั้งวัน</time><div class="all-event-copy"><h3>Englot · Macau</h3><p>Macau · Asia/Shanghai</p></div><span class="all-event-type">Official fan meet</span></article>
+          <article class="all-event-row" data-load-item><time class="all-event-date" datetime="2026-08-14T10:00:00+07:00"><strong>14 AUG</strong>10:00</time><div class="all-event-copy"><h3>JanJingJing · Character Fest Thailand 2</h3><p>centralWorld · Bangkok</p></div><span class="all-event-type">Public event</span></article>
+          <article class="all-event-row" data-load-item hidden><time class="all-event-date" datetime="2026-08-14T14:15:00+07:00"><strong>14 AUG</strong>14:15</time><div class="all-event-copy"><h3>GMMTV · Character Fest Thailand 2</h3><p>centralWorld · Bangkok</p></div><span class="all-event-type">Public event</span></article>
+          <article class="all-event-row" data-load-item hidden><time class="all-event-date" datetime="2026-08-15"><strong>15 AUG</strong>ทั้งวัน</time><div class="all-event-copy"><h3>LingOrm · SOLD OUT Fan Meeting in Chiang Mai</h3><p>Chiang Mai · Asia/Bangkok</p></div><span class="all-event-type">Official fan meet</span></article>
+          <article class="all-event-row" data-load-item hidden><time class="all-event-date" datetime="2026-08-15T15:00:00+08:00"><strong>15 AUG</strong>15:00</time><div class="all-event-copy"><h3>Girl Rules · Taipei</h3><p>Taipei · Asia/Shanghai</p></div><span class="all-event-type">Shows / trailers</span></article>
+          <article class="all-event-row" data-load-item hidden><time class="all-event-date" datetime="2026-08-21"><strong>21 AUG</strong>ทั้งวัน</time><div class="all-event-copy"><h3>AppleMim · CANCELED Fan Meeting in Macau</h3><p>ยกเลิกแล้ว · ตรวจสอบประกาศก่อนเดินทาง</p></div><span class="all-event-type">Postponed / canceled</span></article>
+          <article class="all-event-row" data-load-item hidden><time class="all-event-date" datetime="2026-08-27"><strong>27 AUG</strong>ทั้งวัน</time><div class="all-event-copy"><h3>Apple · Beauty Awards 2026</h3><p>รายละเอียดสถานที่ยังไม่ยืนยัน</p></div><span class="all-event-type">Award-related</span></article>
+          <article class="all-event-row" data-load-item hidden><time class="all-event-date" datetime="2026-08-28"><strong>28 AUG</strong>ทั้งวัน</time><div class="all-event-copy"><h3>Charlotte · Fan Meeting in Shanghai</h3><p>Shanghai · Asia/Shanghai</p></div><span class="all-event-type">Official fan meet</span></article>
+          <article class="all-event-row" data-load-item hidden><time class="all-event-date" datetime="2026-09-06T14:30:00+08:00"><strong>06 SEP</strong>14:30</time><div class="all-event-copy"><h3>JanJingJing / KapookCiize · Fan Meeting in Taipei</h3><p>Taipei · 14:30–17:00</p></div><span class="all-event-type">Official fan meet</span></article>
+          <article class="all-event-row" data-load-item hidden><time class="all-event-date" datetime="2026-09-06T23:30:00+07:00"><strong>06 SEP</strong>23:30</time><div class="all-event-copy"><h3>Lis · Show schedule</h3><p>เวลาไทย · Asia/Bangkok</p></div><span class="all-event-type">Shows / trailers</span></article>
+        </div>
+        <div class="load-more-wrap"><button class="load-more" type="button" data-load-more>ดูเพิ่มเติมอีก 4 รายการ</button></div>
+      </div>
+
+      <div class="view-panel" id="view-week" data-view-panel="week" role="tabpanel" hidden>
+        <div class="mobile-week">
+          <div class="mobile-day-tabs" role="tablist" aria-label="เลือกวันในสัปดาห์">
+            <button class="mobile-day-tab is-today" type="button" role="tab" aria-selected="false" data-week-day="2026-08-03"><span>จ.</span><strong>3</strong></button>
+            <button class="mobile-day-tab" type="button" role="tab" aria-selected="false" data-week-day="2026-08-04"><span>อ.</span><strong>4</strong></button>
+            <button class="mobile-day-tab" type="button" role="tab" aria-selected="false" data-week-day="2026-08-05"><span>พ.</span><strong>5</strong></button>
+            <button class="mobile-day-tab" type="button" role="tab" aria-selected="false" data-week-day="2026-08-06"><span>พฤ.</span><strong>6</strong></button>
+            <button class="mobile-day-tab" type="button" role="tab" aria-selected="false" data-week-day="2026-08-07"><span>ศ.</span><strong>7</strong></button>
+            <button class="mobile-day-tab" type="button" role="tab" aria-selected="true" data-week-day="2026-08-08"><span>ส.</span><strong>8</strong><i></i><i></i><i></i></button>
+            <button class="mobile-day-tab" type="button" role="tab" aria-selected="false" data-week-day="2026-08-09"><span>อา.</span><strong>9</strong></button>
+          </div>
+          <div class="mobile-day-panel" role="tabpanel">
+            <header class="mobile-day-panel-head"><div><strong data-mobile-week-day>เสาร์</strong><span data-mobile-week-date>8 สิงหาคม 2026</span></div><span class="mobile-day-count" data-mobile-week-count>4 รายการ</span></header>
+            <div class="mobile-day-events" data-mobile-week-events><article class="event-card"><span class="event-time">ALL DAY</span><h3>Freen · SOLD OUT Concert</h3><p>Official fan meet</p></article><article class="event-card" data-tone="green"><span class="event-time">ALL DAY</span><h3>Weibo Gala</h3><p>China</p></article><article class="event-card" data-tone="blue"><span class="event-time">ALL DAY</span><h3>Girl Rules · Macau</h3><p>Show</p></article><article class="event-card"><span class="event-time">ALL DAY</span><h3>Englot · Macau</h3><p>Fan meet</p></article></div>
+          </div>
+        </div>
+        <div class="week-scroll" tabindex="0" aria-label="ตารางอีเวนต์รายสัปดาห์ เลื่อนแนวนอนได้">
+          <div class="week-board">
+            <section class="day-column is-today"><header class="day-head"><strong>จันทร์</strong><span>03 AUG</span></header><div class="day-events"><div class="empty-day">ยังไม่มีอีเวนต์</div></div></section>
+            <section class="day-column"><header class="day-head"><strong>อังคาร</strong><span>04 AUG</span></header><div class="day-events"><div class="empty-day">ยังไม่มีอีเวนต์</div></div></section>
+            <section class="day-column"><header class="day-head"><strong>พุธ</strong><span>05 AUG</span></header><div class="day-events"><div class="empty-day">ยังไม่มีอีเวนต์</div></div></section>
+            <section class="day-column"><header class="day-head"><strong>พฤหัส</strong><span>06 AUG</span></header><div class="day-events"><div class="empty-day">ยังไม่มีอีเวนต์</div></div></section>
+            <section class="day-column"><header class="day-head"><strong>ศุกร์</strong><span>07 AUG</span></header><div class="day-events"><div class="empty-day">ยังไม่มีอีเวนต์</div></div></section>
+            <section class="day-column"><header class="day-head"><strong>เสาร์</strong><span>08 AUG</span></header><div class="day-events"><article class="event-card"><span class="event-time">ALL DAY</span><h3>Freen · SOLD OUT Concert</h3><p>Official fan meet</p></article><article class="event-card" data-tone="green"><span class="event-time">ALL DAY</span><h3>Weibo Gala</h3><p>China</p></article><article class="event-card" data-tone="blue"><span class="event-time">ALL DAY</span><h3>Girl Rules · Macau</h3><p>Show</p></article><article class="event-card"><span class="event-time">ALL DAY</span><h3>Englot · Macau</h3><p>Fan meet</p></article></div></section>
+            <section class="day-column"><header class="day-head"><strong>อาทิตย์</strong><span>09 AUG</span></header><div class="day-events"><div class="empty-day">ยังไม่มีอีเวนต์</div></div></section>
+          </div>
+        </div>
+      </div>
+
+      <div class="view-panel" id="view-calendar" data-view-panel="calendar" role="tabpanel" hidden>
+        <div class="month-layout">
+          <div class="month-main">
+            <div class="month-weekdays"><span>จ.</span><span>อ.</span><span>พ.</span><span>พฤ.</span><span>ศ.</span><span>ส.</span><span>อา.</span></div>
+            <div class="month-grid">
+              <button class="month-cell is-muted" type="button"><span class="month-date">27</span></button><button class="month-cell is-muted" type="button"><span class="month-date">28</span></button><button class="month-cell is-muted" type="button"><span class="month-date">29</span></button><button class="month-cell is-muted" type="button"><span class="month-date">30</span></button><button class="month-cell is-muted" type="button"><span class="month-date">31</span></button><button class="month-cell" type="button"><span class="month-date">01</span><span class="month-dots"><i></i><i></i></span></button><button class="month-cell" type="button"><span class="month-date">02</span></button>
+              <button class="month-cell" type="button"><span class="month-date">03</span></button><button class="month-cell" type="button"><span class="month-date">04</span></button><button class="month-cell" type="button"><span class="month-date">05</span></button><button class="month-cell" type="button"><span class="month-date">06</span></button><button class="month-cell" type="button"><span class="month-date">07</span></button><button class="month-cell is-selected" type="button"><span class="month-date">08</span><span class="month-dots"><i></i><i></i><i></i></span></button><button class="month-cell" type="button"><span class="month-date">09</span></button>
+              <button class="month-cell" type="button"><span class="month-date">10</span></button><button class="month-cell" type="button"><span class="month-date">11</span></button><button class="month-cell" type="button"><span class="month-date">12</span></button><button class="month-cell" type="button"><span class="month-date">13</span></button><button class="month-cell" type="button"><span class="month-date">14</span><span class="month-dots"><i></i><i></i></span></button><button class="month-cell" type="button"><span class="month-date">15</span><span class="month-dots"><i></i><i></i></span></button><button class="month-cell" type="button"><span class="month-date">16</span></button>
+              <button class="month-cell" type="button"><span class="month-date">17</span></button><button class="month-cell" type="button"><span class="month-date">18</span></button><button class="month-cell" type="button"><span class="month-date">19</span></button><button class="month-cell" type="button"><span class="month-date">20</span></button><button class="month-cell" type="button"><span class="month-date">21</span><span class="month-dots"><i></i><i></i></span></button><button class="month-cell" type="button"><span class="month-date">22</span></button><button class="month-cell" type="button"><span class="month-date">23</span></button>
+              <button class="month-cell" type="button"><span class="month-date">24</span></button><button class="month-cell" type="button"><span class="month-date">25</span></button><button class="month-cell" type="button"><span class="month-date">26</span></button><button class="month-cell" type="button"><span class="month-date">27</span><span class="month-dots"><i></i></span></button><button class="month-cell" type="button"><span class="month-date">28</span><span class="month-dots"><i></i><i></i></span></button><button class="month-cell" type="button"><span class="month-date">29</span></button><button class="month-cell" type="button"><span class="month-date">30</span></button>
+              <button class="month-cell" type="button"><span class="month-date">31</span></button><button class="month-cell is-muted" type="button"><span class="month-date">01</span></button><button class="month-cell is-muted" type="button"><span class="month-date">02</span></button><button class="month-cell is-muted" type="button"><span class="month-date">03</span></button><button class="month-cell is-muted" type="button"><span class="month-date">04</span></button><button class="month-cell is-muted" type="button"><span class="month-date">05</span></button><button class="month-cell is-muted" type="button"><span class="month-date">06</span></button>
+            </div>
+          </div>
+          <aside class="selected-day"><p class="eyebrow">Selected day</p><h3 data-selected-day>เสาร์ 8 สิงหาคม</h3><div data-selected-events><article class="event-card"><span class="event-time">ALL DAY</span><h3>Freen · SOLD OUT Concert</h3><p>Official fan meet</p></article><article class="event-card" data-tone="green"><span class="event-time">ALL DAY</span><h3>Weibo Gala</h3><p>China</p></article><article class="event-card" data-tone="blue"><span class="event-time">ALL DAY</span><h3>Girl Rules · Macau</h3><p>Show</p></article></div></aside>
+        </div>
+      </div>
+      <p class="data-note">ตัวอย่างใช้ข้อมูลชั่วคราวเพื่อทดสอบ layout — เปลี่ยนเป็น query จริงเมื่อ schema ข่าวและอีเวนต์พร้อม</p>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="เมนูมือถือ"><a href="#content">หน้าหลัก</a><a href="#events">ตารางฉาย</a><a href="#news">สำรวจ</a><a href="#content" aria-current="page">ข่าว</a><a href="#content">เมนู</a></nav>
+
+  <script>
+    const root = document.documentElement;
+    const layoutButtons = [...document.querySelectorAll('[data-layout-choice]')];
+    const themeSelect = document.querySelector('#theme-select');
+    const viewButtons = [...document.querySelectorAll('[data-view]')];
+    const viewPanels = [...document.querySelectorAll('[data-view-panel]')];
+    const periodTitle = document.querySelector('[data-period-title]');
+    const periodButtons = [...document.querySelectorAll('[data-period-button]')];
+    const loadMoreButton = document.querySelector('[data-load-more]');
+    const loadItems = [...document.querySelectorAll('[data-load-item]')];
+    const selectedDayHeading = document.querySelector('[data-selected-day]');
+    const selectedEvents = document.querySelector('[data-selected-events]');
+    const mobileWeekTabs = [...document.querySelectorAll('[data-week-day]')];
+    const mobileWeekDay = document.querySelector('[data-mobile-week-day]');
+    const mobileWeekDate = document.querySelector('[data-mobile-week-date]');
+    const mobileWeekCount = document.querySelector('[data-mobile-week-count]');
+    const mobileWeekEvents = document.querySelector('[data-mobile-week-events]');
+    const periodLabels = {
+      all: 'อีเวนต์ที่กำลังจะมาถึง',
+      week: '3–9 สิงหาคม 2026',
+      calendar: 'สิงหาคม 2026'
+    };
+
+    layoutButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        root.dataset.layout = button.dataset.layoutChoice;
+        layoutButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+      });
+    });
+
+    themeSelect.addEventListener('change', () => {
+      root.dataset.theme = themeSelect.value;
+    });
+
+    viewButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const view = button.dataset.view;
+        viewButtons.forEach((item) => item.setAttribute('aria-selected', String(item === button)));
+        viewPanels.forEach((panel) => { panel.hidden = panel.dataset.viewPanel !== view; });
+        periodTitle.textContent = periodLabels[view];
+        periodButtons.forEach((item) => { item.hidden = view === 'all'; });
+      });
+    });
+
+    function updateLoadMore() {
+      const remaining = loadItems.filter((item) => item.hidden).length;
+      if (remaining === 0) {
+        loadMoreButton.textContent = 'แสดงครบแล้ว';
+        loadMoreButton.disabled = true;
+        return;
+      }
+      loadMoreButton.textContent = `ดูเพิ่มเติมอีก ${Math.min(4, remaining)} รายการ`;
+    }
+
+    loadMoreButton.addEventListener('click', () => {
+      loadItems.filter((item) => item.hidden).slice(0, 4).forEach((item) => { item.hidden = false; });
+      updateLoadMore();
+    });
+
+    const calendarEvents = {
+      '2026-08-01': [
+        ['14:00', 'Ch3 Girl Cup', 'BITEC · Bangkok', 'green'],
+        ['17:00', 'FayeAtom · Fan Meeting Manila', 'Manila', '']
+      ],
+      '2026-08-08': [
+        ['ALL DAY', 'Freen · SOLD OUT Concert', 'Official fan meet', ''],
+        ['ALL DAY', 'Weibo Gala', 'China', 'green'],
+        ['ALL DAY', 'Girl Rules · Macau', 'Show', 'blue']
+      ],
+      '2026-08-14': [
+        ['10:00', 'JanJingJing · Character Fest Thailand 2', 'centralWorld', 'green'],
+        ['14:15', 'GMMTV · Character Fest Thailand 2', 'centralWorld', 'green']
+      ],
+      '2026-08-15': [
+        ['ALL DAY', 'LingOrm · SOLD OUT Fan Meeting', 'Chiang Mai', ''],
+        ['15:00', 'Girl Rules · Taipei', 'Taipei', 'blue']
+      ],
+      '2026-08-21': [
+        ['ALL DAY', 'AppleMim · CANCELED Fan Meeting', 'Macau · ยกเลิกแล้ว', 'yellow']
+      ],
+      '2026-08-27': [
+        ['ALL DAY', 'Apple · Beauty Awards 2026', 'สถานที่ยังไม่ยืนยัน', 'green']
+      ],
+      '2026-08-28': [
+        ['ALL DAY', 'Charlotte · Fan Meeting', 'Shanghai', ''],
+        ['21:30', 'Lis · Show schedule', 'เวลาไทย', 'blue']
+      ]
+    };
+    const thaiWeekdays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์'];
+    const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+
+    function dateForMonthCell(index) {
+      if (index < 5) return new Date(Date.UTC(2026, 6, 27 + index));
+      if (index < 36) return new Date(Date.UTC(2026, 7, index - 4));
+      return new Date(Date.UTC(2026, 8, index - 35));
+    }
+
+    function renderSelectedDay(date) {
+      const key = date.toISOString().slice(0, 10);
+      selectedDayHeading.textContent = `${thaiWeekdays[date.getUTCDay()]} ${date.getUTCDate()} ${thaiMonths[date.getUTCMonth()]}`;
+      selectedEvents.replaceChildren();
+      const events = calendarEvents[key] || [];
+      if (events.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'selected-day-empty';
+        empty.textContent = 'ยังไม่มีอีเวนต์ในวันนี้';
+        selectedEvents.append(empty);
+        return;
+      }
+      events.forEach(([time, title, detail, tone]) => {
+        const card = document.createElement('article');
+        card.className = 'event-card';
+        if (tone) card.dataset.tone = tone;
+        const timeLabel = document.createElement('span');
+        timeLabel.className = 'event-time';
+        timeLabel.textContent = time;
+        const titleLabel = document.createElement('h3');
+        titleLabel.textContent = title;
+        const detailLabel = document.createElement('p');
+        detailLabel.textContent = detail;
+        card.append(timeLabel, titleLabel, detailLabel);
+        selectedEvents.append(card);
+      });
+    }
+
+    const weekEvents = {
+      '2026-08-08': [
+        ['ALL DAY', 'Freen · SOLD OUT Concert', 'Official fan meet', ''],
+        ['ALL DAY', 'Weibo Gala', 'China', 'green'],
+        ['ALL DAY', 'Girl Rules · Macau', 'Show', 'blue'],
+        ['ALL DAY', 'Englot · Macau', 'Fan meet', '']
+      ]
+    };
+
+    function renderMobileWeekDay(key) {
+      const date = new Date(`${key}T00:00:00Z`);
+      const events = weekEvents[key] || [];
+      mobileWeekDay.textContent = thaiWeekdays[date.getUTCDay()];
+      mobileWeekDate.textContent = `${date.getUTCDate()} ${thaiMonths[date.getUTCMonth()]} 2026`;
+      mobileWeekCount.textContent = `${events.length} รายการ`;
+      mobileWeekEvents.replaceChildren();
+      if (events.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'selected-day-empty';
+        empty.textContent = 'ยังไม่มีอีเวนต์ในวันนี้';
+        mobileWeekEvents.append(empty);
+        return;
+      }
+      events.forEach(([time, title, detail, tone]) => {
+        const card = document.createElement('article');
+        card.className = 'event-card';
+        if (tone) card.dataset.tone = tone;
+        const timeLabel = document.createElement('span');
+        timeLabel.className = 'event-time';
+        timeLabel.textContent = time;
+        const titleLabel = document.createElement('h3');
+        titleLabel.textContent = title;
+        const detailLabel = document.createElement('p');
+        detailLabel.textContent = detail;
+        card.append(timeLabel, titleLabel, detailLabel);
+        mobileWeekEvents.append(card);
+      });
+    }
+
+    mobileWeekTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        mobileWeekTabs.forEach((item) => item.setAttribute('aria-selected', String(item === tab)));
+        renderMobileWeekDay(tab.dataset.weekDay);
+      });
+    });
+
+    document.querySelectorAll('.month-cell').forEach((cell, index) => {
+      cell.addEventListener('click', () => {
+        document.querySelectorAll('.month-cell').forEach((item) => item.classList.remove('is-selected'));
+        cell.classList.add('is-selected');
+        renderSelectedDay(dateForMonthCell(index));
+      });
+    });
+  </script>
+</body>
+</html>

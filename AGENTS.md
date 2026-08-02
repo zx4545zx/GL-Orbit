@@ -62,6 +62,7 @@ npx tsx scripts/seed-data.ts
 
 - Core: `DB_PROVIDER`, `NEON_DATABASE_URL` or `SUPABASE_DATABASE_URL`, `AUTH_SECRET`
 - AI Chat: matching `*_READONLY_DATABASE_URL`, `MINIMAX_API_KEY`, `MINIMAX_API_BASE_URL`, `MINIMAX_MODEL`
+- News & Events: server-only `WHATS_ON_API_URL`, `WHATS_ON_API_KEY`
 - Migration: `DATABASE_MIGRATION_URL` must be direct; Supabase runtime uses transaction pooler port `6543`
 - Legacy `DATABASE_URL`/`READONLY_DATABASE_URL` work only when `DB_PROVIDER` is absent (default Neon)
 - Web Push: VAPID server keys + `VITE_VAPID_PUBLIC_KEY`
@@ -78,7 +79,7 @@ npx tsx scripts/seed-data.ts
 ├── (app)/
 │   ├── home, about, menus
 │   ├── series/[id], artists/[id], ships/[id], explore/*
-│   ├── calendar, countdown
+│   ├── calendar, countdown, whats-on
 │   └── login, register
 ├── (profile)/
 │   ├── profile
@@ -106,6 +107,8 @@ Request flow:
 3. Non-localized browser routes redirect to `/{lang}/*`; API and special routes are excluded.
 4. Page server load or API handler calls query/service layer.
 5. Server code obtains Drizzle through `await getDb()`.
+
+`/[lang]/whats-on` เป็นข้อยกเว้นของข้อ 5: server load เรียก external Supabase REST API ผ่าน `src/lib/server/queries/whats-on.ts` โดยใช้ server-only publishable key, validate payload และ fail แยกข่าว/อีเวนต์ได้
 
 ## Database Architecture
 
@@ -145,7 +148,7 @@ Conventions:
 
 - `src/lib/server/auth/` — password, user, session
 - `src/lib/server/db/` — connection and schema
-- `src/lib/server/queries/` — calendar/listing page queries
+- `src/lib/server/queries/` — calendar/listing queries และ validated external What's On adapter
 - `src/lib/server/series/`, `ships/` — catalog domain logic
 - `src/lib/server/subscriptions/` — validation, queries, mutations, summary
 - `src/lib/server/moments/` — Halo queries, mutations, permissions, serializers

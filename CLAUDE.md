@@ -44,15 +44,16 @@ npx tsx scripts/seed-data.ts
 - Vitest + Testing Library Svelte
 - PWA/Web Push via `src/service-worker.ts`
 - R2/Sharp media pipeline and Vercel deployment in `sin1`
+- External Supabase REST source for News & Events, accessed server-side only
 
-All major product areas are code-backed, not mock-only: catalog, calendar/countdown, admin CRUD, Orbit Halo, notifications, AI Chat and Subscription Tracker.
+All major product areas are code-backed, not mock-only: catalog, calendar/countdown, News & Events, admin CRUD, Orbit Halo, notifications, AI Chat and Subscription Tracker.
 
 ## Routes
 
 ```txt
 src/routes/
 ├── [lang=lang]/
-│   ├── (app)/            # Home, catalog, calendar, auth
+│   ├── (app)/            # Home, catalog, calendar, news/events, auth
 │   ├── (profile)/        # Member profile/menu, account/security, subscriptions, notifications shell
 │   ├── (orbit-halo)/     # Community feed, compose, moments, saved, profiles
 │   ├── (chat)/           # Chat list and conversation
@@ -85,6 +86,12 @@ User-facing pages use `/th/*` or `/en/*`. `src/hooks.server.ts` validates sessio
 - Scope subscription/chat/Halo resources by `locals.user.id`.
 - AI Chat database context must use the selected provider's `*_READONLY_DATABASE_URL` and existing SQL-safety code.
 
+### External News & Events
+
+- `/[lang]/whats-on` fetches News and Events through `src/lib/server/queries/whats-on.ts`.
+- Keep `WHATS_ON_API_URL` and `WHATS_ON_API_KEY` server-only; never expose them through page data or client code.
+- Validate external payloads and preserve independent news/events failure states. Event-type metadata remains local until an endpoint exists.
+
 ### Svelte and i18n
 
 - Use Svelte 5 Runes; never add legacy `export let`.
@@ -95,7 +102,7 @@ User-facing pages use `/th/*` or `/en/*`. `src/hooks.server.ts` validates sessio
 
 ## Key Domains
 
-- `src/lib/server/series/`, `ships/`, `queries/` — catalog/calendar
+- `src/lib/server/series/`, `ships/`, `queries/` — catalog/calendar and external News & Events
 - `src/lib/server/subscriptions/` + `src/lib/subscriptions/` — subscriptions, payments, budgets, calculations
 - `src/lib/server/moments/` + `src/lib/components/moments/` — Orbit Halo
 - `src/lib/server/chat/` + `src/lib/components/chat/` — AI Chat/history/safety

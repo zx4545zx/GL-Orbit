@@ -27,6 +27,7 @@
 		page.url.pathname === `${langPrefix}/series` ||
 		page.url.pathname === `${langPrefix}/artists` ||
 		page.url.pathname === `${langPrefix}/ships` ||
+		page.url.pathname === `${langPrefix}/whats-on` ||
 		page.url.pathname.startsWith(`${langPrefix}/explore/series`) ||
 		page.url.pathname.startsWith(`${langPrefix}/explore/ships`) ||
 		page.url.pathname.startsWith(`${langPrefix}/explore/artists`)

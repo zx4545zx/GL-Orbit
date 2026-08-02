@@ -50,6 +50,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		...localizedUrlEntries(origin, '/series', 'daily', '0.9'),
 		...localizedUrlEntries(origin, '/artists', 'weekly', '0.7'),
 		...localizedUrlEntries(origin, '/calendar', 'hourly', '0.9'),
+		...localizedUrlEntries(origin, '/whats-on', 'hourly', '0.9'),
 		...localizedUrlEntries(origin, '/countdown', 'hourly', '0.7'),
 		...localizedUrlEntries(origin, '/explore/series', 'weekly', '0.6'),
 		...localizedUrlEntries(origin, '/explore/artists', 'weekly', '0.6'),

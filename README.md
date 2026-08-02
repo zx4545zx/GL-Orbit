@@ -12,6 +12,7 @@
 
 - **ฐานข้อมูล GL** — ซีรีส์ ตอน นักแสดง คู่จิ้น สตูดิโอ แพลตฟอร์ม แนว และแกลเลอรี
 - **ตารางฉายและ Countdown** — ข้อมูลจากฐานข้อมูลจริง รองรับ timezone, stream link และ Uncut version
+- **ข่าวและอีเวนต์** — ข่าวที่อนุมัติแล้วและปฏิทินอีเวนต์จาก external Supabase REST API
 - **Orbit Halo** — ฟีดชุมชน โพสต์รูป/ลิงก์ ไลก์ บันทึก แสดงความคิดเห็น รายงาน และ moderation
 - **Subscription Tracker** — ติดตามบริการสตรีมมิ่ง รอบบิล การต่ออายุ ประวัติการจ่าย และงบแยกสกุลเงิน
 - **AI Chat** — ผู้ช่วยค้นข้อมูลซีรีส์และตารางฉาย พร้อมประวัติการสนทนา
@@ -53,6 +54,7 @@ npm install
 |---|---|
 | จำเป็น | `DB_PROVIDER`, URL ของ provider ที่เลือก, `AUTH_SECRET` |
 | AI Chat | URL read-only ของ provider ที่เลือก, `MINIMAX_API_KEY`, `MINIMAX_API_BASE_URL`, `MINIMAX_MODEL` |
+| News & Events | `WHATS_ON_API_URL`, `WHATS_ON_API_KEY` (server-only) |
 | Web Push | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `VITE_VAPID_PUBLIC_KEY` |
 | Media upload | `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL` |
 
@@ -105,6 +107,7 @@ npx tsx scripts/seed-data.ts
 |---|---|---|
 | Series / Artists / Ships / Explore | Live | Neon + Drizzle |
 | Calendar / Countdown | Live | Episodes + schedules + platforms |
+| News & Events | Live when configured | External Supabase REST API |
 | Orbit Halo / Moments | Live | Moments, media, interactions, moderation |
 | Subscription Tracker | Live | Subscriptions, payments, budgets, currencies |
 | Authentication / Profile | Live | JWT sessions + users |
@@ -123,7 +126,7 @@ npx tsx scripts/seed-data.ts
 src/
 ├── routes/
 │   ├── [lang=lang]/
-│   │   ├── (app)/            # Home, catalog, calendar, auth
+│   │   ├── (app)/            # Home, catalog, calendar, news/events, auth
 │   │   ├── (profile)/        # Member profile/menu, account/security, subscriptions, notifications shell
 │   │   ├── (orbit-halo)/     # Community feed, compose, moments, saved, profiles
 │   │   ├── (chat)/           # AI chat list and conversation

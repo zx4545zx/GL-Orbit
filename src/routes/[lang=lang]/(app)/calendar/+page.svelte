@@ -7,7 +7,9 @@
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { CalendarEvent, CalendarApiResponse } from '$lib/types/calendar.js';
 	import { getViewUrl } from './calendar.js';
-	import CalendarWeekHeader from './CalendarWeekHeader.svelte';
+	import CalendarMonthHeader from '$lib/components/calendar/CalendarMonthHeader.svelte';
+	import CalendarViewToggle from '$lib/components/calendar/CalendarViewToggle.svelte';
+	import CalendarWeekHeader from '$lib/components/calendar/CalendarWeekHeader.svelte';
 	import CardScheduleBoard from './CardScheduleBoard.svelte';
 	import Picture from '$lib/components/Picture.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
@@ -146,6 +148,12 @@
 		await scrollToSchedule();
 	}
 
+	async function selectView(view: 'grid' | 'calendar' | 'list' | 'card') {
+		viewMode = view;
+		await navigateCalendar(getViewUrl(view, lang, params_y, params_m, params_sd, params_ed));
+		await scrollToSchedule();
+	}
+
 	function isToday(fullDate: string) {
 		const today = formatDateLocal(new Date());
 		return fullDate === today;
@@ -239,12 +247,6 @@
 		])
 	]));
 
-	const viewButtons = [
-		{ key: 'card' as const, label: m.calendar_view_week(), icon: '<rect x="1.5" y="2" width="13" height="12"/><path d="M1.5 6h13M5.5 2v12M10.5 2v12"/>' },
-		{ key: 'list' as const, label: m.calendar_view_list(), icon: '<path d="M1.5 3.5h13M1.5 8h13M1.5 12.5h13"/>' },
-		{ key: 'calendar' as const, label: m.calendar_view_month_calendar(), icon: '<rect x="1.5" y="2" width="13" height="12"/><path d="M1.5 6h13M5.5 2v4M10.5 2v4"/>' },
-		{ key: 'grid' as const, label: m.calendar_view_month_grid(), icon: '<rect x="1.5" y="1.5" width="5.5" height="5.5"/><rect x="9" y="1.5" width="5.5" height="5.5"/><rect x="1.5" y="9" width="5.5" height="5.5"/><rect x="9" y="9" width="5.5" height="5.5"/>' }
-	];
 </script>
 
 <svelte:head>
@@ -265,79 +267,6 @@
 	{@html jsonLdScript(calendarJsonLd)}
 </svelte:head>
 
-{#snippet viewToggle()}
-	<div class="cal-toggle" role="group" aria-label={m.calendar_title_plain()}>
-		{#each viewButtons as btn}
-			{@const active = viewMode === btn.key}
-			<button
-				type="button"
-				class="cal-toggle-btn {active ? 'cal-toggle-btn--active' : ''}"
-				aria-label={btn.label}
-				aria-pressed={active}
-				title={btn.label}
-				onclick={async () => {
-					viewMode = btn.key;
-					await navigateCalendar(getViewUrl(btn.key, lang, params_y, params_m, params_sd, params_ed));
-					await scrollToSchedule();
-				}}
-			>
-				<svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16" aria-hidden="true">{@html btn.icon}</svg>
-				<span class="hidden sm:inline">{btn.label}</span>
-			</button>
-		{/each}
-	</div>
-{/snippet}
-
-{#snippet monthHeader()}
-	<nav class="cal-monthnav" aria-label={viewMode === 'grid' ? m.calendar_view_month_grid() : m.calendar_view_month_calendar()}>
-		<button
-			type="button"
-			aria-label={m.calendar_month_prev_aria()}
-			onclick={prevMonth}
-			class="cal-sqbtn"
-		>
-			<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-		</button>
-
-		<div class="min-w-0 flex-1 text-center">
-			<div class="cal-monthnav-label">
-				{viewMode === 'grid' ? m.calendar_view_month_grid() : m.calendar_view_month_calendar()}
-			</div>
-			<h2 class="cal-monthnav-name">
-				<span class="sm:hidden">{new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'short' }).format(currentMonth)}</span>
-				<span class="hidden sm:inline">{new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' }).format(currentMonth)}</span>
-			</h2>
-		</div>
-
-		<button
-			type="button"
-			onclick={goToToday}
-			aria-label={m.calendar_month_today_aria()}
-			class="cal-today-btn hidden sm:inline-flex"
-		>
-			{m.calendar_month_today_text()}
-		</button>
-		<button
-			type="button"
-			onclick={goToToday}
-			aria-label={m.calendar_month_today_aria()}
-			class="cal-today-btn cal-today-btn--icon sm:hidden"
-		>
-			<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-			</svg>
-		</button>
-		<button
-			type="button"
-			aria-label={m.calendar_month_next_aria()}
-			onclick={nextMonth}
-			class="cal-sqbtn"
-		>
-			<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-		</button>
-	</nav>
-{/snippet}
-
 <div class="mx-auto max-w-6xl py-6 sm:py-8">
 	<!-- ============ 1. HERO ============ -->
 	<header class="cal-hero">
@@ -355,7 +284,7 @@
 					{m.calendar_this_week_cta()}
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
 				</button>
-				{@render viewToggle()}
+				<CalendarViewToggle {viewMode} ariaLabel={m.calendar_title_plain()} onSelect={selectView} />
 			</div>
 		</div>
 
@@ -386,7 +315,14 @@
 	<div bind:this={scheduleSection} class="scroll-mt-24 sm:scroll-mt-28">
 	<!-- ============ 6. GRID VIEW ============ -->
 	{#if viewMode === 'grid'}
-		{@render monthHeader()}
+		<CalendarMonthHeader
+			{currentMonth}
+			viewMode="grid"
+			{lang}
+			onPrevMonth={prevMonth}
+			onNextMonth={nextMonth}
+			onToday={goToToday}
+		/>
 		<div class="cal-card overflow-hidden">
 			{#if contentLoading}
 				<div class="grid-loading-skeleton p-3 sm:p-4">
@@ -497,7 +433,14 @@
 
 	<!-- ============ 3. MONTH CALENDAR VIEW ============ -->
 	{:else if viewMode === 'calendar'}
-		{@render monthHeader()}
+		<CalendarMonthHeader
+			{currentMonth}
+			viewMode="calendar"
+			{lang}
+			onPrevMonth={prevMonth}
+			onNextMonth={nextMonth}
+			onToday={goToToday}
+		/>
 		<div class="cal-month-layout">
 			<div class="cal-card overflow-hidden">
 				{#if contentLoading}
@@ -884,43 +827,6 @@
 	.cal-cta:hover { transform: translate(-1px, -1px); }
 	.cal-cta:active { transform: translate(1px, 1px); box-shadow: var(--orbit-shadow); }
 
-	.cal-toggle {
-		display: inline-flex;
-		border: var(--orbit-border-width) solid var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-control);
-		background: var(--orbit-surface);
-		box-shadow: var(--orbit-shadow);
-		overflow: hidden;
-	}
-	.cal-toggle-btn {
-		appearance: none;
-		border: none;
-		background: transparent;
-		cursor: pointer;
-		min-width: 48px;
-		min-height: 44px;
-		padding: 10px 14px;
-		font-family: var(--orbit-font-display);
-		font-weight: var(--orbit-font-label-weight, 600);
-		font-size: 12px;
-		color: var(--orbit-ink);
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 6px;
-		border-right: var(--orbit-border-width) solid var(--orbit-line-strong);
-		/* flush segments: the container clips the outer corners (overflow: hidden) */
-		border-radius: 0 !important;
-		transition: background-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
-	}
-	.cal-toggle-btn:last-child { border-right: none; }
-	.cal-toggle-btn:hover { background: var(--orbit-coral-soft); }
-	.cal-toggle-btn--active,
-	.cal-toggle-btn--active:hover {
-		background: var(--orbit-ink);
-		color: var(--orbit-mint);
-	}
-
 	.cal-stats {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
@@ -946,79 +852,6 @@
 	.cal-stat-num--text { font-size: 16px; padding-top: 4px; color: var(--orbit-ink); }
 	.cal-stat-detail { font-size: 13px; margin-top: 2px; color: var(--orbit-muted); }
 	.cal-stat-detail b { color: var(--orbit-ink); }
-
-	/* ===== month nav ===== */
-	.cal-monthnav {
-		margin: 8px 0 16px;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		flex-wrap: nowrap;
-		background: var(--orbit-surface);
-		border: var(--orbit-border-width) solid var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-surface);
-		box-shadow: var(--orbit-shadow);
-		padding: 10px 14px;
-	}
-	.cal-monthnav-label {
-		font-size: 11px;
-		font-weight: 700;
-		color: var(--orbit-coral-dark);
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		margin-bottom: 2px;
-	}
-	.cal-monthnav-name {
-		font-family: var(--orbit-font-display);
-		font-weight: var(--orbit-font-heading-weight, 700);
-		font-size: 20px;
-		color: var(--orbit-ink);
-		margin: 0;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	@media (max-width: 639px) {
-		.cal-monthnav { gap: 6px; padding: 8px 10px; }
-		.cal-monthnav-name { font-size: 15px; }
-		.cal-toggle-btn { min-width: 44px; padding: 10px 11px; }
-		.cal-toggle { align-self: flex-start; max-width: 100%; }
-	}
-	.cal-sqbtn {
-		flex: 0 0 auto;
-		width: 44px;
-		height: 44px;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--orbit-lavender);
-		color: var(--orbit-ink);
-		border: var(--orbit-border-width) solid var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-control);
-		box-shadow: var(--orbit-shadow);
-		cursor: pointer;
-		transition: background-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease), transform var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
-	}
-	.cal-sqbtn:hover { background: var(--orbit-coral-soft); }
-	.cal-sqbtn:active { transform: translate(1px, 1px); box-shadow: none; }
-	.cal-today-btn {
-		flex: 0 0 auto;
-		min-height: 44px;
-		padding: 10px 18px;
-		align-items: center;
-		justify-content: center;
-		font-family: var(--orbit-font-display);
-		font-weight: var(--orbit-font-label-weight, 700);
-		font-size: 13px;
-		background: var(--orbit-coral);
-		color: #fff;
-		border: var(--orbit-border-width) solid var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-control);
-		box-shadow: var(--orbit-shadow);
-		cursor: pointer;
-	}
-	.cal-today-btn:hover { background: var(--orbit-coral-dark); }
-	.cal-today-btn--icon { width: 44px; padding: 0; display: inline-flex; }
 
 	/* ===== month calendar view ===== */
 	.cal-month-layout {
@@ -1397,15 +1230,12 @@
 	@media (prefers-reduced-motion: reduce) {
 		.cal-blink { animation: none; }
 		.cal-cta,
-		.cal-toggle-btn,
-		.cal-sqbtn,
 		.cal-cell,
 		.cal-lrow,
 		.cal-lrow-arrow,
 		.cal-banner-go { transition: none; }
 		.cal-cta:hover,
 		.cal-cta:active,
-		.cal-sqbtn:active,
 		.cal-banner:hover .cal-banner-go,
 		.cal-lrow:hover .cal-lrow-arrow { transform: none; }
 	}

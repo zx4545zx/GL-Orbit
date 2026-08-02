@@ -120,9 +120,9 @@ describe('calendar page loading structure — source-level regression', () => {
 		expect(titlePos).toBeLessThan(loadingPos);
 	});
 
-	it('view toggle snippet is rendered outside contentLoading block', () => {
+	it('shared view toggle is rendered outside contentLoading block', () => {
 		const source = readFileSync(pagePath, 'utf-8');
-		const togglePos = source.indexOf('{@render viewToggle()}');
+		const togglePos = source.indexOf('<CalendarViewToggle');
 		const loadingPos = source.indexOf('{#if contentLoading}');
 		expect(togglePos).toBeGreaterThan(0);
 		expect(togglePos).toBeLessThan(loadingPos);
@@ -131,8 +131,8 @@ describe('calendar page loading structure — source-level regression', () => {
 	it('month prev/next controls appear outside (before first) contentLoading block', () => {
 		const source = readFileSync(pagePath, 'utf-8');
 		const loadingPos = source.indexOf('{#if contentLoading}');
-		const prevPos = source.indexOf('onclick={prevMonth}');
-		const nextPos = source.indexOf('onclick={nextMonth}');
+		const prevPos = source.indexOf('onPrevMonth={prevMonth}');
+		const nextPos = source.indexOf('onNextMonth={nextMonth}');
 		expect(prevPos).toBeGreaterThan(0);
 		expect(nextPos).toBeGreaterThan(0);
 		// In the CURRENT buggy code these are INSIDE {:else} after contentLoading
@@ -143,7 +143,7 @@ describe('calendar page loading structure — source-level regression', () => {
 
 	it('week prev/next controls are delegated to shared CalendarWeekHeader component', () => {
 		const source = readFileSync(pagePath, 'utf-8');
-		const headerImportPos = source.indexOf("import CalendarWeekHeader from './CalendarWeekHeader.svelte'");
+		const headerImportPos = source.indexOf("import CalendarWeekHeader from '$lib/components/calendar/CalendarWeekHeader.svelte'");
 		const prevPropPos = source.indexOf('onPrevWeek={prevWeek}');
 		const nextPropPos = source.indexOf('onNextWeek={nextWeek}');
 		expect(headerImportPos).toBeGreaterThan(0);
@@ -151,9 +151,9 @@ describe('calendar page loading structure — source-level regression', () => {
 		expect(nextPropPos).toBeGreaterThan(0);
 	});
 
-	it('goToToday appears outside contentLoading block', () => {
+	it('month today control appears outside contentLoading block', () => {
 		const source = readFileSync(pagePath, 'utf-8');
-		const todayPos = source.indexOf('onclick={goToToday}');
+		const todayPos = source.indexOf('onToday={goToToday}');
 		const todayLoadingPos = source.indexOf('{#if contentLoading}', todayPos);
 		expect(todayPos).toBeGreaterThan(0);
 		expect(todayPos).toBeLessThan(todayLoadingPos);
@@ -214,14 +214,10 @@ describe('calendar page loading structure — source-level regression', () => {
 		expect(notesPos).toBeGreaterThan(lastClosingIf);
 	});
 
-	it('view toggle onclick delegates to getViewUrl(...) for ALL view modes (not just list)', () => {
+	it('view toggle delegates every mode through selectView and getViewUrl', () => {
 		const source = readFileSync(pagePath, 'utf-8');
-		// The onclick handler should NOT have a per-mode guard like `if (btn.key === 'list')`.
-		// Instead it should call getViewUrl(btn.key, ...) unconditionally for all modes.
-		const hasPerModeGuard = source.includes(`if (btn.key === 'list')`);
-		const hasBtnKeyPattern = source.includes(`getViewUrl(btn.key`);
-		expect(hasPerModeGuard).toBe(false);
-		expect(hasBtnKeyPattern).toBe(true);
+		expect(source).toContain('onSelect={selectView}');
+		expect(source).toContain('getViewUrl(view, lang');
 	});
 
 	it('month navigation preserves the active monthly view in the URL', () => {
