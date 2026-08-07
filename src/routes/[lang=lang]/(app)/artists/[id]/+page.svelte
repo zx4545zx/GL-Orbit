@@ -529,6 +529,15 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
+	:global([data-theme='midnight']) .ad-hero {
+		color: var(--orbit-ink);
+	}
+	:global([data-theme='midnight']) .ad-hero :is(.ad-back, .ad-hero-chip, .ad-kicker, .ad-photo-cap, .ad-meta-no, .ad-meta-n) {
+		color: var(--orbit-ink);
+	}
+	:global([data-theme='midnight']) .ad-meta-k {
+		color: color-mix(in srgb, var(--orbit-ink) 60%, transparent);
+	}
 
 	/* ============ SECTION HEADS ============ */
 	.ad-page section {

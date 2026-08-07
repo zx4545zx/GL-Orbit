@@ -534,6 +534,15 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
+	:global([data-theme='midnight']) .sh-hero {
+		color: var(--orbit-ink);
+	}
+	:global([data-theme='midnight']) .sh-hero :is(.sh-back, .sh-hero-chip, .sh-kicker, .sh-photo-cap, .sh-tag, .sh-meta-no, .sh-meta-n) {
+		color: var(--orbit-ink);
+	}
+	:global([data-theme='midnight']) .sh-meta-k {
+		color: color-mix(in srgb, var(--orbit-ink) 60%, transparent);
+	}
 
 	/* ============ SECTION HEADS ============ */
 	.sh-page section {

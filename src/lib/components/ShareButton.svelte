@@ -37,7 +37,7 @@
 	);
 	const buttonClass = $derived(
 		variant === 'orbit'
-			? `group relative flex h-full ${orientation === 'row' ? 'min-h-14 flex-row items-center gap-3' : 'min-h-[5rem] flex-col justify-between'} w-full overflow-hidden rounded-md border border-[#d8caee] bg-[#f0ebf8] p-3 text-left text-plum transition duration-200 touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a992d0] ${menuOpen ? 'border-[#b9a7db] bg-[#e7dff3]' : 'hover:bg-[#e7dff3]'} ${className}`
+			? `group relative flex h-full ${orientation === 'row' ? 'min-h-14 flex-row items-center gap-3' : 'min-h-[5rem] flex-col justify-between'} w-full overflow-hidden rounded-md border border-[#d8caee] bg-[#f0ebf8] p-3 text-left text-[color:var(--orbit-rail)] transition duration-200 touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--orbit-rail)] focus-visible:text-[color:var(--orbit-rail)] ${menuOpen ? 'border-[#b9a7db] bg-[#e7dff3]' : 'hover:bg-[#e7dff3] hover:text-[color:var(--orbit-rail)]'} ${className}`
 			: variant === 'command'
 			? `inline-flex min-h-[3.35rem] items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/60 bg-lavender/18 text-lavender-dark' : 'border border-lavender/40 bg-white/95 text-plum hover:border-lavender/60 hover:bg-lavender/8'} ${className}`
 			: `inline-flex items-center gap-2.5 rounded-full px-3.5 py-2 text-sm font-semibold touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lavender ${menuOpen ? 'border border-lavender/60 bg-lavender/18 text-lavender-dark' : 'border border-lavender/35 bg-white/95 text-plum hover:border-lavender/55 hover:bg-lavender/8 hover:text-lavender-dark'} ${className}`
@@ -118,7 +118,7 @@
 	>
 		{#if variant === 'orbit'}
 			{#if ordinal}<span aria-hidden="true" class="absolute right-3 top-3 font-[family-name:var(--font-display)] text-[9px] font-black tracking-[0.2em] opacity-45">{ordinal}</span>{/if}
-			<span class="grid h-9 w-9 shrink-0 place-items-center rounded-md {menuOpen ? 'bg-[#a992d0] text-white' : 'bg-white text-[#8068aa]'}">
+			<span class="grid h-9 w-9 shrink-0 place-items-center rounded-md {menuOpen ? 'bg-[#a992d0] text-white' : 'bg-white text-[color:var(--orbit-rail)]'}">
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
 						stroke-linecap="round"
@@ -165,9 +165,9 @@
 		<div
 			role="menu"
 			aria-label={m.share_menu_label()}
-			class="absolute right-0 z-50 w-64 overflow-hidden rounded-3xl border border-white/70 bg-white/95 p-2 {variant === 'orbit' ? `${menuPlacement === 'above' ? 'bottom-full mb-3' : 'top-full mt-3'} max-sm:fixed max-sm:inset-x-4 max-sm:top-auto max-sm:bottom-24 max-sm:mb-0 max-sm:w-auto` : 'top-full mt-3'}"
+			class="absolute right-0 z-50 w-64 overflow-hidden rounded-3xl border border-white/70 bg-white/95 p-2 {variant === 'orbit' ? `text-[color:var(--orbit-rail)] ${menuPlacement === 'above' ? 'bottom-full mb-3' : 'top-full mt-3'} max-sm:fixed max-sm:inset-x-4 max-sm:top-auto max-sm:bottom-24 max-sm:mb-0 max-sm:w-auto` : 'top-full mt-3'}"
 		>
-			<p class="px-3 pb-2 pt-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-plum-light">{m.share_to()}</p>
+			<p class="px-3 pb-2 pt-1.5 text-[10px] font-bold uppercase tracking-[0.24em] {variant === 'orbit' ? 'text-[color:var(--orbit-rail)] opacity-70' : 'text-plum-light'}">{m.share_to()}</p>
 
 			<a
 				href={lineUrl}
@@ -175,12 +175,12 @@
 				rel="noopener noreferrer"
 				role="menuitem"
 				onclick={selectOption}
-				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 touch-target"
+				class="flex items-center gap-3 rounded-xl px-3 py-2.5 touch-target {variant === 'orbit' ? 'hover:bg-[#e7dff3] focus-visible:bg-[#e7dff3] focus-visible:text-[color:var(--orbit-rail)]' : 'hover:bg-white/70'}"
 			>
 				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center share-brand-line">
 					<svg class="text-white share-icon-line" fill="currentColor" viewBox="0 0 24 24"><path d={LINE_PATH} /></svg>
 				</span>
-				<span class="text-sm font-medium text-plum">LINE</span>
+				<span class="text-sm font-medium {variant === 'orbit' ? 'text-[color:var(--orbit-rail)]' : 'text-plum'}">LINE</span>
 			</a>
 
 			<a
@@ -189,12 +189,12 @@
 				rel="noopener noreferrer"
 				role="menuitem"
 				onclick={selectOption}
-				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 touch-target"
+				class="flex items-center gap-3 rounded-xl px-3 py-2.5 touch-target {variant === 'orbit' ? 'hover:bg-[#e7dff3] focus-visible:bg-[#e7dff3] focus-visible:text-[color:var(--orbit-rail)]' : 'hover:bg-white/70'}"
 			>
 				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center share-brand-facebook">
 					<svg class="text-white share-icon-facebook" fill="currentColor" viewBox="0 0 24 24"><path d={FB_PATH} /></svg>
 				</span>
-				<span class="text-sm font-medium text-plum">Facebook</span>
+				<span class="text-sm font-medium {variant === 'orbit' ? 'text-[color:var(--orbit-rail)]' : 'text-plum'}">Facebook</span>
 			</a>
 
 			<a
@@ -203,12 +203,12 @@
 				rel="noopener noreferrer"
 				role="menuitem"
 				onclick={selectOption}
-				class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 touch-target"
+				class="flex items-center gap-3 rounded-xl px-3 py-2.5 touch-target {variant === 'orbit' ? 'hover:bg-[#e7dff3] focus-visible:bg-[#e7dff3] focus-visible:text-[color:var(--orbit-rail)]' : 'hover:bg-white/70'}"
 			>
 				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-black">
 					<svg class="text-white share-icon-x" fill="currentColor" viewBox="0 0 24 24"><path d={X_PATH} /></svg>
 				</span>
-				<span class="text-sm font-medium text-plum">X (Twitter)</span>
+				<span class="text-sm font-medium {variant === 'orbit' ? 'text-[color:var(--orbit-rail)]' : 'text-plum'}">X (Twitter)</span>
 			</a>
 
 			<div class="my-1.5 h-px bg-lavender/20"></div>
@@ -218,16 +218,16 @@
 				type="button"
 				role="menuitem"
 				onclick={copyLink}
-				class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/70 touch-target text-left"
+				class="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left touch-target {variant === 'orbit' ? 'hover:bg-[#e7dff3] focus-visible:bg-[#e7dff3] focus-visible:text-[color:var(--orbit-rail)]' : 'hover:bg-white/70'}"
 			>
 				<span class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-lavender/20">
 					{#if copied}
-						<svg class="w-4 h-4 text-mint-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+						<svg class="h-4 w-4 {variant === 'orbit' ? 'text-[color:var(--orbit-rail)]' : 'text-mint-dark'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
 					{:else}
-						<svg class="w-4 h-4 text-lavender-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+						<svg class="h-4 w-4 {variant === 'orbit' ? 'text-[color:var(--orbit-rail)]' : 'text-lavender-dark'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
 					{/if}
 				</span>
-				<span class="text-sm font-medium text-plum">{copied ? m.share_copied() : m.share_copy()}</span>
+				<span class="text-sm font-medium {variant === 'orbit' ? 'text-[color:var(--orbit-rail)]' : 'text-plum'}">{copied ? m.share_copied() : m.share_copy()}</span>
 			</button>
 		</div>
 	{/if}

@@ -184,7 +184,7 @@
 							type="button"
 							onclick={() => switchLanguage(lang)}
 							aria-pressed={active}
-							class="relative overflow-hidden rounded-xl border px-3 py-3 text-left transition-all duration-200 touch-target sm:px-4 {active ? 'border-coral bg-coral text-white' : 'border-lavender/30 bg-white text-plum hover:bg-lavender/10'}"
+							class="relative overflow-hidden rounded-xl border px-3 py-3 text-left transition-all duration-200 touch-target sm:px-4 {active ? 'border-coral bg-coral text-white' : 'border-lavender/30 bg-white text-[color:var(--orbit-rail)] hover:bg-lavender/10'}"
 						>
 							<span class="block text-[10px] font-black tracking-[0.18em] opacity-70">{lang.toUpperCase()}</span>
 							<span class="mt-0.5 block font-[family-name:var(--font-display)] text-base font-black sm:text-lg">
