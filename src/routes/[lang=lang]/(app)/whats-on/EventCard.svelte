@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
 	import type { EventType, OrbitEvent } from '$lib/types/whats-on.js';
+	import { googleMapsSearchUrl, venueName } from './whats-on.js';
 
 	let {
 		event,
@@ -26,9 +27,6 @@
 		}).format(new Date(value));
 	}
 
-	function displayLocation(value: string | null) {
-		return value && !/^https?:\/\//i.test(value) ? value : m.whats_on_no_location();
-	}
 </script>
 
 <article class:compact class="event-card" data-tone={tone}>
@@ -47,10 +45,15 @@
 		</div>
 		<h3>{event.performer ? `${event.performer} · ${event.title}` : event.title}</h3>
 		{#if !compact}
+			{@const venue = venueName(event.location)}
 			<div class="event-details">
-				<span>
+				<span class="event-location">
 					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-5.3 7-12a7 7 0 1 0-14 0c0 6.7 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
-					{displayLocation(event.location)}
+					{#if venue}
+						<a href={googleMapsSearchUrl(venue)} target="_blank" rel="noopener noreferrer">{venue}</a>
+					{:else}
+						{m.whats_on_no_location()}
+					{/if}
 				</span>
 				<span>
 					<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
@@ -73,7 +76,16 @@
 		background: var(--orbit-surface);
 		overflow: hidden;
 		box-shadow: var(--orbit-shadow-sm);
+		transition: transform var(--orbit-motion-fast) var(--orbit-motion-ease), border-color var(--orbit-motion-fast), box-shadow var(--orbit-motion-fast);
 	}
+
+	.event-card:hover {
+		border-color: var(--event-tone);
+		transform: translateY(-2px);
+		box-shadow: var(--orbit-shadow-raised, var(--orbit-shadow));
+	}
+
+	.event-card:active { transform: translateY(0) scale(0.99); }
 
 	.event-card[data-tone='blue'] { --event-tone: var(--orbit-link, var(--orbit-coral-dark)); --event-soft: var(--orbit-mint); }
 	.event-card[data-tone='purple'] { --event-tone: var(--orbit-coral-dark); --event-soft: var(--orbit-lavender); }
@@ -92,9 +104,19 @@
 	.event-details { display: grid; gap: 0.32rem; margin-top: 0.7rem; padding-top: 0.65rem; border-top: 1px var(--orbit-border-style) var(--orbit-line); color: var(--orbit-muted); font-size: 0.72rem; }
 	.event-details span { display: flex; min-width: 0; align-items: flex-start; gap: 0.38rem; overflow-wrap: anywhere; }
 	.event-details svg { width: 0.9rem; height: 0.9rem; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; }
+	.event-location a { color: inherit; text-decoration: underline; text-decoration-style: dotted; text-decoration-thickness: 1px; text-underline-offset: 0.16em; }
+	.event-location a:hover { color: var(--event-tone); text-decoration-style: solid; }
+	.event-location a:focus-visible { outline: 2px solid var(--event-tone); outline-offset: 2px; border-radius: 0.15rem; }
 
 	.compact { box-shadow: none; }
+	.compact:hover { transform: none; box-shadow: none; }
 	.compact .event-body { padding: 0.65rem 0.7rem; }
 	.compact h3 { font-size: 0.76rem; line-height: 1.35; }
 	.compact .event-meta { font-size: 0.65rem; }
+
+	@media (prefers-reduced-motion: reduce) {
+		.event-card { transition: none; }
+		.event-card:hover,
+		.event-card:active { transform: none; }
+	}
 </style>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { onDestroy } from 'svelte';
 	import CalendarMonthHeader from '$lib/components/calendar/CalendarMonthHeader.svelte';
 	import CalendarWeekHeader from '$lib/components/calendar/CalendarWeekHeader.svelte';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
@@ -8,7 +9,8 @@
 	import { buildCanonicalUrl, buildWebPageJsonLd, jsonLdScript, localizedPath, safeJsonLd } from '$lib/seo.js';
 	import type { EventType, EventView, OrbitEvent } from '$lib/types/whats-on.js';
 	import EventCard from './EventCard.svelte';
-	import { buildWhatsOnUrl, eventsForDate, formatDateLocal, getStartOfWeek } from './whats-on.js';
+	import NewsCarousel from './NewsCarousel.svelte';
+	import { buildWhatsOnUrl, eventsForDate, formatDateLocal, getStartOfWeek, googleMapsSearchUrl, venueName } from './whats-on.js';
 	import type { PageData } from './$types.js';
 
 	const INITIAL_EVENT_COUNT = 5;
@@ -26,7 +28,13 @@
 	const monthDays = $derived(generateMonthDays(currentMonth));
 	let selectedDateOverride = $state<string | null>(null);
 	let visibleEventCount = $state(INITIAL_EVENT_COUNT);
+	let pendingView = $state<EventView | null>(null);
+	let showPendingSkeleton = $state(false);
+	let pendingSkeletonTimer: ReturnType<typeof setTimeout> | undefined;
+	let pendingViewNavigationId = 0;
 	const routeSelectionKey = $derived(`${data.params.view}:${data.params.year}:${data.params.month}:${data.params.anchorDate}`);
+	const selectedView = $derived(pendingView ?? viewMode);
+	const eventViewLoading = $derived(pendingView !== null && showPendingSkeleton);
 
 	$effect(() => {
 		routeSelectionKey;
@@ -53,7 +61,6 @@
 	);
 	const typeMap = $derived(new Map(localizedTypes.map((type) => [type.id, type])));
 	const featured = $derived(data.whatsOn.news[0]);
-	const recentNews = $derived(data.whatsOn.news.slice(1, 6));
 	const upcomingEvents = $derived(data.whatsOn.events.filter((event) => (event.endDateKey ?? event.dateKey) >= data.params.anchorDate));
 	const visibleEvents = $derived(upcomingEvents.slice(0, visibleEventCount));
 	const remainingEventCount = $derived(Math.max(0, upcomingEvents.length - visibleEventCount));
@@ -61,10 +68,10 @@
 	const selectedDate = $derived(selectedDateOverride ?? defaultSelectedDate());
 	const selectedEvents = $derived(eventsForDate(data.whatsOn.events, selectedDate));
 
-	const views: Array<{ id: EventView; label: () => string }> = [
-		{ id: 'all', label: m.whats_on_view_all },
-		{ id: 'week', label: m.whats_on_view_week },
-		{ id: 'calendar', label: m.whats_on_view_calendar }
+	const views: Array<{ id: EventView; label: () => string; icon: string }> = [
+		{ id: 'all', label: m.whats_on_view_all, icon: '<path d="M3 4.5h12M3 9h12M3 13.5h12"/><path d="M1 4.5h.01M1 9h.01M1 13.5h.01"/>' },
+		{ id: 'week', label: m.whats_on_view_week, icon: '<rect x="1.5" y="2" width="13" height="12"/><path d="M1.5 6h13M5.5 2v12M10.5 2v12"/>' },
+		{ id: 'calendar', label: m.whats_on_view_calendar, icon: '<rect x="1.5" y="2" width="13" height="12"/><path d="M1.5 6h13M5.5 2v4M10.5 2v4"/>' }
 	];
 
 	function parseDateKey(key: string) {
@@ -99,10 +106,6 @@
 
 	function eventTitle(event: OrbitEvent) {
 		return event.performer ? `${event.performer} · ${event.title}` : event.title;
-	}
-
-	function displayLocation(value: string | null) {
-		return value && !/^https?:\/\//i.test(value) ? value : m.whats_on_no_location();
 	}
 
 	function isInMonth(dateKey: string, month: Date) {
@@ -171,6 +174,32 @@
 		return goto(url, { noScroll: true, keepFocus: true });
 	}
 
+	function clearPendingView() {
+		if (pendingSkeletonTimer) clearTimeout(pendingSkeletonTimer);
+		pendingSkeletonTimer = undefined;
+		pendingView = null;
+		showPendingSkeleton = false;
+	}
+
+	function beginViewNavigation(event: MouseEvent, view: EventView) {
+		if (view === viewMode || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+		event.preventDefault();
+		clearPendingView();
+		pendingView = view;
+		const navigationId = ++pendingViewNavigationId;
+		pendingSkeletonTimer = setTimeout(() => {
+			if (pendingViewNavigationId === navigationId && pendingView === view) showPendingSkeleton = true;
+		}, 120);
+
+		void navigateTo(viewUrl(view)).then(
+			() => { if (pendingViewNavigationId === navigationId) clearPendingView(); },
+			() => { if (pendingViewNavigationId === navigationId) clearPendingView(); }
+		);
+	}
+
+	onDestroy(clearPendingView);
+
 	function goToThisWeek() {
 		const today = new Date();
 		return navigateTo(buildWhatsOnUrl(lang, {
@@ -213,67 +242,31 @@
 </svelte:head>
 
 <main class="whats-on-page mx-auto w-full pb-20 pt-6 sm:pt-8 md:pb-24">
-	<header class="page-head">
+	<header class="page-head zine-masthead page-reveal">
 		<div>
 			<p class="eyebrow">{m.whats_on_eyebrow()}</p>
-			<h1>{m.whats_on_title()}</h1>
+			<h1><span class="zine-tape zine-tape-sky">{m.whats_on_title()}</span></h1>
 			<p class="page-intro">{m.whats_on_intro()}</p>
 		</div>
 		{#if featured}
-			<p class="page-update">
+			<p class="page-update" aria-label={m.whats_on_updated({ date: formatNewsDate(featured.publishedDate) })}>
 				<span>{m.whats_on_updated({ date: formatNewsDate(featured.publishedDate) })}</span>
 				<span>{m.whats_on_content_summary({ news: data.whatsOn.news.length, events: upcomingEvents.length })}</span>
 			</p>
 		{/if}
 	</header>
 
-	<section class="content-section" aria-labelledby="news-heading">
+	<section class="content-section section-reveal news-section" aria-labelledby="news-heading">
 		<header class="section-head">
 			<div>
-				<h2 id="news-heading">{m.whats_on_news_title()}</h2>
+				<h2 id="news-heading"><span class="zine-tape zine-tape-pink">{m.whats_on_news_title()}</span></h2>
 				<p>{m.whats_on_news_subtitle()}</p>
 			</div>
-			<span>{m.whats_on_story_count({ count: data.whatsOn.news.length })}</span>
+			<span class="section-count-chip">{m.whats_on_story_count({ count: data.whatsOn.news.length })}</span>
 		</header>
 
 		{#if featured}
-			<div class="news-digest">
-				<article class="news-story lead-story">
-					<div class="news-meta">
-						<time datetime={featured.publishedDate}>{formatNewsDate(featured.publishedDate)}</time>
-						<span>{m.whats_on_source_label({ source: featured.sourceName })}</span>
-					</div>
-					<div class="news-copy">
-						<h3>
-							{#if featured.sourceUrl}
-								<a href={featured.sourceUrl} target="_blank" rel="noreferrer">{featured.headline}</a>
-							{:else}
-								{featured.headline}
-							{/if}
-						</h3>
-						<p>{featured.blurb}</p>
-					</div>
-				</article>
-
-				{#each recentNews as item}
-					<article class="news-story quick-story">
-						<div class="news-meta">
-							<time datetime={item.publishedDate}>{formatNewsDate(item.publishedDate)}</time>
-							<span>{m.whats_on_source_label({ source: item.sourceName })}</span>
-						</div>
-						<div class="news-copy">
-							<h3>
-								{#if item.sourceUrl}
-									<a href={item.sourceUrl} target="_blank" rel="noreferrer">{item.headline}</a>
-								{:else}
-									{item.headline}
-								{/if}
-							</h3>
-							<p>{item.blurb}</p>
-						</div>
-					</article>
-				{/each}
-			</div>
+			<NewsCarousel news={data.whatsOn.news} {locale} />
 		{:else}
 			<div class="data-state" role="status">
 				<strong>
@@ -286,25 +279,30 @@
 		{/if}
 	</section>
 
-	<section class="content-section events-section" aria-labelledby="events-heading">
+	<section class="content-section events-section section-reveal" aria-labelledby="events-heading">
 		<header class="section-head">
 			<div>
-				<h2 id="events-heading">{m.whats_on_events_title()}</h2>
+				<h2 id="events-heading"><span class="zine-tape">{m.whats_on_events_title()}</span></h2>
 				<p>{m.whats_on_events_subtitle()}</p>
 			</div>
-			<span>{m.whats_on_event_count({ count: upcomingEvents.length })}</span>
+			<span class="section-count-chip">{m.whats_on_event_count({ count: upcomingEvents.length })}</span>
 		</header>
 
 		<div class="events-tools">
 			<nav class="view-tabs" aria-label={m.whats_on_view_label()}>
 				{#each views as view}
+					{@const active = selectedView === view.id}
 					<a
 						href={viewUrl(view.id)}
-						aria-current={viewMode === view.id ? 'page' : undefined}
-						class:active={viewMode === view.id}
+						aria-label={view.label()}
+						aria-current={active ? 'page' : undefined}
+						title={view.label()}
+						class:active
+						onclick={(event) => beginViewNavigation(event, view.id)}
 						data-sveltekit-noscroll
 					>
-						{view.label()}
+						<svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16" aria-hidden="true">{@html view.icon}</svg>
+						<span>{view.label()}</span>
 					</a>
 				{/each}
 			</nav>
@@ -313,7 +311,20 @@
 			{/if}
 		</div>
 
-		{#if data.whatsOn.sourceStatus.events === 'unavailable'}
+		<div class="event-view-content" aria-busy={eventViewLoading}>
+		{#if eventViewLoading}
+			<div class="event-view-loading" role="status" aria-live="polite">
+				<span class="sr-only">{m.whats_on_view_loading()}</span>
+				<div class="event-view-loading-lines" aria-hidden="true">
+					<div class="event-view-loading-heading"></div>
+					{#each Array(4) as _}
+						<div class="event-view-loading-row">
+							<i></i><span></span><b></b>
+						</div>
+					{/each}
+				</div>
+			</div>
+		{:else if data.whatsOn.sourceStatus.events === 'unavailable'}
 			<div class="data-state" role="status">
 				<strong>{m.whats_on_events_unavailable()}</strong>
 				<span>{m.whats_on_source_retry()}</span>
@@ -324,14 +335,23 @@
 					<div class="all-events" aria-live="polite">
 						{#each visibleEvents as event}
 							{@const eventType = getType(event)}
+							{@const venue = venueName(event.location)}
 							<article class="all-event-row" data-tone={eventType?.colorName.toLowerCase() ?? 'other'}>
 								<time datetime={event.startsAt} class="all-event-date">
+									<span class="date-ticket-notch" aria-hidden="true"></span>
 									<strong>{formatDate(parseDateKey(event.dateKey), { day: '2-digit', month: 'short' })}</strong>
 									<span>{formatEventTime(event)}</span>
 								</time>
 								<div class="all-event-copy">
 									<h3>{eventTitle(event)}</h3>
-									<p>{displayLocation(event.location)} · {event.sourceTimezone.replaceAll('_', ' ')}</p>
+									<p>
+										{#if venue}
+											<a href={googleMapsSearchUrl(venue)} target="_blank" rel="noopener noreferrer">{venue}</a>
+										{:else}
+											{m.whats_on_no_location()}
+										{/if}
+										 · {event.sourceTimezone.replaceAll('_', ' ')}
+									</p>
 								</div>
 								<span class="all-event-type">{eventType?.name ?? m.whats_on_type_other()}</span>
 							</article>
@@ -420,7 +440,6 @@
 				onToday={goToThisMonth}
 			/>
 
-			<p class="view-help">{m.whats_on_calendar_help()}</p>
 			<div class="view-surface month-layout">
 				<div class="month-main">
 					<div class="month-weekdays" aria-hidden="true">
@@ -450,9 +469,9 @@
 						{/each}
 					</div>
 				</div>
-				<aside class="selected-day-panel">
+				<section class="selected-day-panel" aria-labelledby="selected-day-heading">
 					<p class="eyebrow">{m.whats_on_selected_day()}</p>
-					<h3>{formatDate(parseDateKey(selectedDate), { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
+					<h3 id="selected-day-heading">{formatDate(parseDateKey(selectedDate), { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
 					<div class="event-stack">
 						{#each selectedEvents as event}
 							<EventCard {event} eventType={getType(event)} {lang} />
@@ -460,9 +479,10 @@
 							<div class="empty-day"><strong>{m.whats_on_no_events()}</strong><span>{m.whats_on_no_events_hint()}</span></div>
 						{/each}
 					</div>
-				</aside>
+				</section>
 			</div>
 		{/if}
+		</div>
 
 		<p class="data-note">{m.whats_on_data_note()}</p>
 	</section>
@@ -474,13 +494,42 @@
 		color: var(--orbit-ink);
 	}
 
+	.page-reveal,
+	.section-reveal {
+		animation: whats-on-enter var(--orbit-motion-standard) var(--orbit-motion-ease) both;
+	}
+
+	.section-reveal {
+		animation-delay: 80ms;
+	}
+
+	.events-section.section-reveal {
+		animation-delay: 150ms;
+	}
+
 	.page-head {
+		position: relative;
 		display: flex;
 		align-items: end;
 		justify-content: space-between;
 		gap: 2rem;
-		padding-bottom: 1.35rem;
-		border-bottom: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line-strong);
+		padding: 0.8rem 0 1.35rem;
+		border-bottom: var(--orbit-border-width) dashed var(--orbit-line-strong);
+	}
+
+	.zine-masthead::after {
+		position: absolute;
+		top: -0.75rem;
+		right: min(20%, 12rem);
+		width: 7.5rem;
+		height: 5rem;
+		background-image: var(--orbit-accent-image, none);
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: contain;
+		opacity: 0.72;
+		pointer-events: none;
+		content: '';
 	}
 
 	.eyebrow {
@@ -500,7 +549,7 @@
 
 	h1 {
 		margin: 0;
-		font-size: clamp(1.7rem, 2.5vw, 2.2rem);
+		font-size: clamp(1.3rem, 2.2vw, 1.75rem);
 		line-height: 1.15;
 		letter-spacing: -0.02em;
 	}
@@ -514,18 +563,54 @@
 	}
 
 	.page-update {
+		position: relative;
 		display: grid;
 		flex: 0 0 auto;
-		gap: 0.08rem;
+		gap: 0.12rem;
+		min-width: 12rem;
+		padding: 0.6rem 0.75rem;
+		border: var(--orbit-border-width) dashed var(--orbit-line-strong);
+		background: color-mix(in srgb, var(--orbit-paper-deep) 64%, var(--orbit-surface));
+		box-shadow: 3px 3px 0 color-mix(in srgb, var(--orbit-coral-soft) 72%, transparent);
 		color: var(--orbit-muted);
 		font-size: 0.68rem;
 		font-variant-numeric: tabular-nums;
 		line-height: 1.5;
 		text-align: right;
+		transform: rotate(1.2deg);
+	}
+
+	.page-update::before {
+		position: absolute;
+		top: -0.45rem;
+		left: 50%;
+		width: 3.5rem;
+		height: 0.8rem;
+		background: var(--orbit-washi-pink, var(--orbit-coral-soft));
+		opacity: 0.76;
+		transform: translateX(-50%) rotate(-3deg);
+		pointer-events: none;
+		content: '';
 	}
 
 	.content-section {
+		position: relative;
 		padding: 2.2rem 0;
+	}
+
+	.news-section::after {
+		position: absolute;
+		top: 2.3rem;
+		right: 0.35rem;
+		width: 2.75rem;
+		height: 2.75rem;
+		background-image: var(--orbit-accent-image, none);
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: contain;
+		opacity: 0.48;
+		pointer-events: none;
+		content: '';
 	}
 
 	.content-section + .content-section {
@@ -542,7 +627,7 @@
 
 	.section-head h2 {
 		margin: 0;
-		font-size: 1.3rem;
+		font-size: 1rem;
 		line-height: 1.25;
 	}
 
@@ -552,152 +637,106 @@
 		font-size: 0.76rem;
 	}
 
-	.section-head > span {
-		color: var(--orbit-muted);
+	.section-count-chip {
+		padding: 0.3rem 0.5rem;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
+		background: var(--orbit-paper-deep);
+		color: var(--orbit-coral-dark);
 		font-size: 0.68rem;
 		font-variant-numeric: tabular-nums;
 		white-space: nowrap;
 	}
 
-	.news-digest {
-		display: grid;
-		grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.92fr);
-		overflow: hidden;
-		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-surface);
-		background: var(--orbit-surface);
-		box-shadow: var(--orbit-shadow);
-	}
-
-	.news-story {
-		min-width: 0;
-	}
-
-	.quick-story {
-		display: grid;
-		grid-template-columns: 4.4rem minmax(0, 1fr);
-		gap: 0.8rem;
-		padding: 0.75rem 0.9rem;
-		border-bottom: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
-	}
-
-	.quick-story:last-child {
-		border-bottom: 0;
-	}
-
-	.lead-story {
-		grid-row: 1 / span 5;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		padding: 1.4rem 1.5rem;
-		border-right: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line-strong);
-	}
-
-	.news-meta {
-		color: var(--orbit-muted);
-		font-size: 0.64rem;
-		font-variant-numeric: tabular-nums;
-		line-height: 1.5;
-	}
-
-	.news-meta time,
-	.news-meta span {
-		display: block;
-	}
-
-	.news-meta time {
-		color: var(--orbit-coral-dark);
-		font-weight: 800;
-	}
-
-	.lead-story .news-meta {
-		margin-bottom: 1.1rem;
-	}
-
-	.news-copy h3 {
-		margin: 0;
-		font-size: 1rem;
-		font-weight: 700;
-		line-height: 1.42;
-		text-wrap: pretty;
-	}
-
-	.lead-story h3 {
-		max-width: 25ch;
-		font-size: 1.35rem;
-		line-height: 1.38;
-	}
-
-	.news-copy h3 a {
-		color: inherit;
-		text-decoration: none;
-	}
-
-	.news-copy h3 a:hover {
-		color: var(--orbit-link, var(--orbit-coral-dark));
-		text-decoration: underline;
-		text-underline-offset: 0.18rem;
-	}
-
-	.news-copy p {
-		margin-top: 0.35rem;
-		color: var(--orbit-muted);
-		font-size: 0.76rem;
-		line-height: 1.6;
-	}
-
-	.lead-story .news-copy p {
-		max-width: 54ch;
-	}
-
-	.quick-story .news-copy p {
-		display: none;
-	}
 
 	.events-tools {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 1rem;
-		margin-bottom: 0.75rem;
+		gap: 0.8rem;
+		margin: 0.15rem 0 0.85rem;
 	}
 
 	.view-tabs {
-		display: flex;
-		gap: 0.25rem;
+		display: inline-flex;
+		overflow: hidden;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-control);
+		background: var(--orbit-surface);
+		box-shadow: var(--orbit-shadow);
 	}
 
 	.view-tabs a {
-		display: grid;
-		min-height: 44px;
-		place-items: center;
-		padding: 0.45rem 0.8rem;
-		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
-		border-radius: var(--orbit-radius-control);
-		background: var(--orbit-surface);
-		color: var(--orbit-muted);
-		font-size: 0.72rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.38rem;
+		min-width: 3rem;
+		min-height: 2.75rem;
+		padding: 0.5rem 0.75rem;
+		border-right: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: 0 !important;
+		background: transparent;
+		color: var(--orbit-ink);
+		font-family: var(--orbit-font-display);
+		font-size: 0.7rem;
 		font-weight: var(--orbit-font-label-weight, 700);
+		line-height: 1;
+		text-decoration: none;
 		white-space: nowrap;
-		transition: background-color var(--orbit-motion-fast), color var(--orbit-motion-fast), border-color var(--orbit-motion-fast);
+		transition: background-color var(--orbit-motion-fast) var(--orbit-motion-ease), color var(--orbit-motion-fast) var(--orbit-motion-ease), transform var(--orbit-motion-fast) var(--orbit-motion-ease);
+	}
+
+	.view-tabs a:last-child { border-right: 0; }
+
+	.view-tabs svg {
+		width: 1rem;
+		height: 1rem;
+		flex: none;
 	}
 
 	.view-tabs a:hover {
-		border-color: var(--orbit-line-strong);
-		color: var(--orbit-ink);
+		background: var(--orbit-coral-soft);
+		text-decoration: none;
+	}
+
+	.view-tabs a:active { transform: scale(0.97); }
+
+	.view-tabs a:focus-visible {
+		position: relative;
+		z-index: 1;
+		outline: 2px solid var(--orbit-link, var(--orbit-coral-dark));
+		outline-offset: -2px;
 	}
 
 	.view-tabs a.active {
-		border-color: var(--orbit-ink);
 		background: var(--orbit-ink);
-		color: var(--orbit-paper);
+		color: var(--orbit-mint, var(--orbit-paper));
 	}
 
 	.period-label {
+		position: relative;
+		margin: 0;
+		padding: 0.38rem 0.55rem 0.38rem 0.75rem;
+		border: var(--orbit-border-width) dashed var(--orbit-line);
+		background: color-mix(in srgb, var(--orbit-paper-deep) 74%, var(--orbit-surface));
+		box-shadow: 2px 2px 0 color-mix(in srgb, var(--orbit-coral-soft) 82%, transparent);
 		color: var(--orbit-muted);
-		font-size: 0.76rem;
-		font-weight: 700;
+		font-size: 0.68rem;
+		font-weight: var(--orbit-font-label-weight, 700);
+		line-height: 1.35;
+		transform: rotate(0.55deg);
+	}
+
+	.period-label::before {
+		position: absolute;
+		top: 50%;
+		left: 0.3rem;
+		width: 0.22rem;
+		height: 0.22rem;
+		border-radius: 50%;
+		background: var(--orbit-coral);
+		transform: translateY(-50%);
+		content: '';
 	}
 
 	.view-surface {
@@ -708,6 +747,58 @@
 		box-shadow: var(--orbit-shadow);
 	}
 
+	.event-view-loading {
+		min-height: 17rem;
+		padding: 1rem;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		background: var(--orbit-surface);
+		box-shadow: var(--orbit-shadow);
+	}
+
+	.event-view-loading-lines {
+		display: grid;
+		gap: 0.7rem;
+	}
+
+	.event-view-loading-heading,
+	.event-view-loading-row i,
+	.event-view-loading-row span,
+	.event-view-loading-row b {
+		background: color-mix(in srgb, var(--orbit-lavender) 46%, var(--orbit-paper));
+		animation: event-view-skeleton-pulse 1.15s ease-in-out infinite alternate;
+	}
+
+	.event-view-loading-heading {
+		width: min(14rem, 45%);
+		height: 1.1rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.event-view-loading-row {
+		display: grid;
+		grid-template-columns: 5.2rem minmax(0, 1fr) 6rem;
+		gap: 1rem;
+		align-items: center;
+		min-height: 3.5rem;
+		padding: 0.75rem 0.9rem;
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
+	}
+
+	.event-view-loading-row i,
+	.event-view-loading-row span,
+	.event-view-loading-row b {
+		display: block;
+		height: 0.7rem;
+	}
+
+	.event-view-loading-row i { width: 100%; }
+	.event-view-loading-row span { width: min(100%, 19rem); }
+	.event-view-loading-row b { width: 100%; justify-self: end; }
+	.event-view-loading-row:nth-child(3) > * { animation-delay: 80ms; }
+	.event-view-loading-row:nth-child(4) > * { animation-delay: 160ms; }
+	.event-view-loading-row:nth-child(5) > * { animation-delay: 240ms; }
+
 	.all-event-row {
 		--event-tone: var(--orbit-muted);
 		position: relative;
@@ -717,6 +808,12 @@
 		align-items: start;
 		padding: 0.85rem 1rem 0.85rem 1.2rem;
 		border-bottom: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
+		transition: background-color var(--orbit-motion-fast), transform var(--orbit-motion-fast) var(--orbit-motion-ease);
+	}
+
+	.all-event-row:hover {
+		background: color-mix(in srgb, var(--event-tone) 6%, var(--orbit-surface));
+		transform: translateX(2px);
 	}
 
 	.all-event-row::before {
@@ -731,6 +828,15 @@
 		border-bottom: 0;
 	}
 
+	.all-event-row:nth-child(-n + 5) {
+		animation: whats-on-enter var(--orbit-motion-standard) var(--orbit-motion-ease) both;
+	}
+
+	.all-event-row:nth-child(2) { animation-delay: 45ms; }
+	.all-event-row:nth-child(3) { animation-delay: 90ms; }
+	.all-event-row:nth-child(4) { animation-delay: 135ms; }
+	.all-event-row:nth-child(5) { animation-delay: 180ms; }
+
 	.all-event-row[data-tone='blue'] { --event-tone: var(--orbit-link, var(--orbit-coral-dark)); }
 	.all-event-row[data-tone='purple'] { --event-tone: var(--orbit-coral-dark); }
 	.all-event-row[data-tone='lavender'] { --event-tone: var(--orbit-ink); }
@@ -740,10 +846,28 @@
 	.all-event-row[data-tone='red'] { --event-tone: var(--orbit-error, var(--orbit-coral-dark)); }
 
 	.all-event-date {
+		position: relative;
+		align-self: center;
+		padding: 0.48rem 0.65rem;
+		border: var(--orbit-border-width) dashed var(--event-tone);
+		background: color-mix(in srgb, var(--event-tone) 7%, var(--orbit-surface));
 		color: var(--orbit-muted);
 		font-size: 0.65rem;
 		font-variant-numeric: tabular-nums;
 		line-height: 1.45;
+		transform: rotate(-0.6deg);
+	}
+
+	.date-ticket-notch {
+		position: absolute;
+		top: 50%;
+		right: -1px;
+		width: 0.45rem;
+		height: 0.7rem;
+		border: var(--orbit-border-width) solid var(--event-tone);
+		border-right: 0;
+		background: var(--orbit-surface);
+		transform: translateY(-50%);
 	}
 
 	.all-event-date strong,
@@ -771,6 +895,25 @@
 		font-size: 0.66rem;
 		line-height: 1.45;
 		overflow-wrap: anywhere;
+	}
+
+	.all-event-copy p a {
+		color: inherit;
+		text-decoration: underline;
+		text-decoration-style: dotted;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 0.16em;
+	}
+
+	.all-event-copy p a:hover {
+		color: var(--event-tone);
+		text-decoration-style: solid;
+	}
+
+	.all-event-copy p a:focus-visible {
+		outline: 2px solid var(--event-tone);
+		outline-offset: 2px;
+		border-radius: 0.15rem;
 	}
 
 	.all-event-type {
@@ -806,11 +949,16 @@
 		font-size: 0.72rem;
 		font-weight: var(--orbit-font-label-weight, 700);
 		box-shadow: var(--orbit-shadow-sm);
+		transition: transform var(--orbit-motion-fast) var(--orbit-motion-ease), background-color var(--orbit-motion-fast), box-shadow var(--orbit-motion-fast);
 	}
 
 	.load-more-wrap button:hover:not(:disabled) {
 		background: var(--orbit-coral-soft);
+		transform: translateY(-1px);
+		box-shadow: var(--orbit-shadow-raised, var(--orbit-shadow));
 	}
+
+	.load-more-wrap button:active:not(:disabled) { transform: translateY(0) scale(0.98); }
 
 	.load-more-wrap button:disabled {
 		cursor: default;
@@ -840,7 +988,10 @@
 		padding: 0.35rem 0.1rem;
 		background: var(--orbit-surface);
 		color: var(--orbit-ink);
+		transition: transform var(--orbit-motion-fast) var(--orbit-motion-ease), background-color var(--orbit-motion-fast), color var(--orbit-motion-fast);
 	}
+
+	.mobile-day-tabs button:active { transform: scale(0.96); }
 
 	.mobile-day-tabs button span {
 		color: var(--orbit-muted);
@@ -990,13 +1141,6 @@
 		text-align: center;
 	}
 
-	.view-help {
-		margin: -0.2rem 0 0.7rem;
-		color: var(--orbit-muted);
-		font-size: 0.7rem;
-		text-align: center;
-	}
-
 	.month-layout {
 		display: grid;
 	}
@@ -1032,6 +1176,7 @@
 		background: transparent;
 		color: var(--orbit-ink);
 		text-align: left;
+		transition: background-color var(--orbit-motion-fast), box-shadow var(--orbit-motion-fast), transform var(--orbit-motion-fast) var(--orbit-motion-ease);
 	}
 
 	.month-grid button:nth-child(7n) {
@@ -1044,6 +1189,7 @@
 
 	.month-grid button:hover {
 		background: var(--orbit-paper-deep, var(--orbit-coral-soft));
+		transform: scale(1.025);
 	}
 
 	.month-grid button.outside {
@@ -1125,6 +1271,16 @@
 		line-height: 1.5;
 	}
 
+	@keyframes whats-on-enter {
+		from { opacity: 0; transform: translateY(0.7rem); }
+		to { opacity: 1; transform: translateY(0); }
+	}
+
+	@keyframes event-view-skeleton-pulse {
+		from { opacity: 0.52; }
+		to { opacity: 0.9; }
+	}
+
 	@media (min-width: 740px) {
 		.mobile-week {
 			display: none;
@@ -1136,43 +1292,31 @@
 	}
 
 	@media (min-width: 820px) {
-		.month-layout {
-			grid-template-columns: minmax(0, 1fr) 16rem;
-		}
-
-		.month-main {
-			border-right: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
-			border-bottom: 0;
-		}
-
 		.month-grid button {
 			min-height: 4.5rem;
 		}
 	}
 
-	@media (max-width: 819px) {
-		.news-digest {
-			grid-template-columns: 1fr;
-		}
-
-		.lead-story {
-			grid-row: auto;
-			border-right: 0;
-			border-bottom: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line-strong);
-		}
-	}
-
 	@media (max-width: 620px) {
+		.news-section::after {
+			top: 1.7rem;
+			right: 0;
+			width: 2.2rem;
+			height: 2.2rem;
+			opacity: 0.34;
+		}
 		.page-head {
 			display: block;
 			padding-bottom: 1rem;
 		}
 
 		h1 {
-			font-size: 1.55rem;
+			font-size: 1.2rem;
 		}
 
 		.page-update {
+			display: inline-grid;
+			min-width: 0;
 			margin-top: 0.55rem;
 			text-align: left;
 		}
@@ -1187,21 +1331,7 @@
 		}
 
 		.section-head h2 {
-			font-size: 1.12rem;
-		}
-
-		.lead-story {
-			padding: 1rem;
-		}
-
-		.lead-story h3 {
-			font-size: 1.15rem;
-		}
-
-		.quick-story {
-			grid-template-columns: 3.8rem minmax(0, 1fr);
-			gap: 0.6rem;
-			padding: 0.7rem;
+			font-size: 0.88rem;
 		}
 
 		.events-tools {
@@ -1215,10 +1345,17 @@
 
 		.view-tabs a {
 			flex: 1;
-			padding-inline: 0.45rem;
+			min-width: 0;
+			gap: 0.3rem;
+			padding-inline: 0.4rem;
+		}
+
+		.view-tabs a span {
+			font-size: 0.64rem;
 		}
 
 		.period-label {
+			justify-self: end;
 			text-align: right;
 		}
 
@@ -1226,6 +1363,10 @@
 			grid-template-columns: 4.4rem minmax(0, 1fr);
 			gap: 0.7rem;
 			padding: 0.78rem 0.75rem 0.78rem 0.95rem;
+		}
+
+		.all-event-date {
+			padding: 0.42rem 0.45rem;
 		}
 
 		.all-event-type {
@@ -1242,8 +1383,24 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.view-tabs a {
+		.page-reveal,
+		.section-reveal,
+		.all-event-row:nth-child(-n + 5),
+		.event-view-loading-heading,
+		.event-view-loading-row i,
+		.event-view-loading-row span,
+		.event-view-loading-row b,
+		.view-tabs a,
+		.load-more-wrap button,
+		.mobile-day-tabs button,
+		.month-grid button {
+			animation: none;
 			transition: none;
 		}
+
+		.view-tabs a:hover,
+		.all-event-row:hover,
+		.load-more-wrap button:hover:not(:disabled),
+		.month-grid button:hover { transform: none; }
 	}
 </style>

@@ -85,6 +85,14 @@ export function buildWhatsOnUrl(lang: string, params: WhatsOnParams): string {
 	return `/${lang}/whats-on?${search.toString()}`;
 }
 
+export function venueName(location: string | null): string | null {
+	return location && !/^https?:\/\//i.test(location) ? location : null;
+}
+
+export function googleMapsSearchUrl(venue: string): string {
+	return `https://www.google.com/maps?q=${encodeURIComponent(venue)}`;
+}
+
 function parseDateKey(dateKey: string): Date {
 	const [year, month, day] = dateKey.split('-').map(Number);
 	return new Date(year, month - 1, day, 12);

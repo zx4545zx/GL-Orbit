@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { OrbitEvent } from '$lib/types/whats-on.js';
-import { buildWhatsOnUrl, eventsForDate, getWhatsOnEventWindow, parseWhatsOnParams } from './whats-on.js';
+import { buildWhatsOnUrl, eventsForDate, getWhatsOnEventWindow, googleMapsSearchUrl, parseWhatsOnParams, venueName } from './whats-on.js';
 
 const multiDayEvent: OrbitEvent = {
 	id: 'event-1',
@@ -72,5 +72,19 @@ describe('buildWhatsOnUrl', () => {
 			.toBe('/th/whats-on?view=week&date=2026-08-03');
 		expect(buildWhatsOnUrl('en', { view: 'calendar', year: 2026, month: 8, anchorDate: '2026-08-03' }))
 			.toBe('/en/whats-on?view=calendar&year=2026&month=8');
+	});
+});
+
+describe('venueName', () => {
+	it('keeps venue names and excludes missing or URL locations', () => {
+		expect(venueName('Queen Sirikit National Convention Center')).toBe('Queen Sirikit National Convention Center');
+		expect(venueName(null)).toBeNull();
+		expect(venueName('https://example.com/location')).toBeNull();
+	});
+});
+
+describe('googleMapsSearchUrl', () => {
+	it('URL-encodes the venue for a Google Maps search', () => {
+		expect(googleMapsSearchUrl('Queen Sirikit & Hall')).toBe('https://www.google.com/maps?q=Queen%20Sirikit%20%26%20Hall');
 	});
 });
