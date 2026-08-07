@@ -241,19 +241,36 @@
 	{@html jsonLdScript(pageJsonLd)}
 </svelte:head>
 
-<main class="whats-on-page mx-auto w-full pb-20 pt-6 sm:pt-8 md:pb-24">
-	<header class="page-head zine-masthead page-reveal">
-		<div>
-			<p class="eyebrow">{m.whats_on_eyebrow()}</p>
-			<h1><span class="zine-tape zine-tape-sky">{m.whats_on_title()}</span></h1>
+<main class="whats-on-page mx-auto w-full max-w-6xl pb-20 pt-6 sm:pt-8 md:pb-24">
+	<header class="whats-on-hero page-reveal">
+		<div class="whats-on-hero-copy">
+			<p class="whats-on-kicker">
+				<span class="whats-on-live-dot orbit-round-data" aria-hidden="true"></span>
+				{m.whats_on_eyebrow()}
+			</p>
+			<h1 class="whats-on-title">{m.whats_on_title()} <span class="whats-on-title-accent" aria-hidden="true">✦</span></h1>
 			<p class="page-intro">{m.whats_on_intro()}</p>
 		</div>
-		{#if featured}
-			<p class="page-update" aria-label={m.whats_on_updated({ date: formatNewsDate(featured.publishedDate) })}>
-				<span>{m.whats_on_updated({ date: formatNewsDate(featured.publishedDate) })}</span>
-				<span>{m.whats_on_content_summary({ news: data.whatsOn.news.length, events: upcomingEvents.length })}</span>
-			</p>
-		{/if}
+
+		<dl class="whats-on-stats" aria-label={m.whats_on_content_summary({ news: data.whatsOn.news.length, events: upcomingEvents.length })}>
+			{#if featured}
+				<div class="whats-on-stat whats-on-stat--updated">
+					<dt>{m.whats_on_eyebrow()}</dt>
+					<dd class="whats-on-stat-value">{formatNewsDate(featured.publishedDate)}</dd>
+					<dd class="whats-on-stat-detail">{m.whats_on_updated({ date: formatNewsDate(featured.publishedDate) })}</dd>
+				</div>
+			{/if}
+			<div class="whats-on-stat">
+				<dt>{m.whats_on_news_title()}</dt>
+				<dd class="whats-on-stat-value">{data.whatsOn.news.length}</dd>
+				<dd class="whats-on-stat-detail">{m.whats_on_story_count({ count: data.whatsOn.news.length })}</dd>
+			</div>
+			<div class="whats-on-stat">
+				<dt>{m.whats_on_events_title()}</dt>
+				<dd class="whats-on-stat-value">{upcomingEvents.length}</dd>
+				<dd class="whats-on-stat-detail">{m.whats_on_event_count({ count: upcomingEvents.length })}</dd>
+			</div>
+		</dl>
 	</header>
 
 	<section class="content-section section-reveal news-section" aria-labelledby="news-heading">
@@ -490,7 +507,6 @@
 
 <style>
 	.whats-on-page {
-		max-width: 65rem;
 		color: var(--orbit-ink);
 	}
 
@@ -507,29 +523,31 @@
 		animation-delay: 150ms;
 	}
 
-	.page-head {
-		position: relative;
-		display: flex;
+	.whats-on-hero {
+		display: grid;
+		gap: 1.5rem;
 		align-items: end;
-		justify-content: space-between;
-		gap: 2rem;
-		padding: 0.8rem 0 1.35rem;
-		border-bottom: var(--orbit-border-width) dashed var(--orbit-line-strong);
+		padding: 0.65rem 0 2rem;
 	}
 
-	.zine-masthead::after {
-		position: absolute;
-		top: -0.75rem;
-		right: min(20%, 12rem);
-		width: 7.5rem;
-		height: 5rem;
-		background-image: var(--orbit-accent-image, none);
-		background-position: center;
-		background-repeat: no-repeat;
-		background-size: contain;
-		opacity: 0.72;
-		pointer-events: none;
-		content: '';
+	.whats-on-kicker {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		width: fit-content;
+		margin: 0 0 0.9rem;
+		padding: 0.38rem 0.7rem;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-badge);
+		background: var(--orbit-mint);
+		box-shadow: var(--orbit-shadow);
+		color: var(--orbit-ink);
+		font-family: var(--orbit-font-display);
+		font-size: 0.7rem;
+		font-weight: var(--orbit-font-label-weight, 700);
+		letter-spacing: 0.1em;
+		line-height: 1.2;
+		text-transform: uppercase;
 	}
 
 	.eyebrow {
@@ -541,17 +559,33 @@
 		text-transform: uppercase;
 	}
 
-	h1,
+	.whats-on-live-dot {
+		width: 0.55rem;
+		height: 0.55rem;
+		flex: none;
+		border: 1px solid var(--orbit-line-strong);
+		border-radius: 999px;
+		background: var(--orbit-coral);
+		animation: whats-on-live 1.2s steps(2, start) infinite;
+	}
+
+	.whats-on-title {
+		margin: 0;
+		font-family: var(--orbit-font-display);
+		font-size: clamp(2.25rem, 5vw, 3.75rem);
+		font-weight: var(--orbit-font-heading-weight, 700);
+		letter-spacing: -0.04em;
+		line-height: 1.05;
+	}
+
+	.whats-on-title-accent {
+		color: var(--orbit-coral);
+		text-shadow: 2px 2px 0 var(--orbit-lavender);
+	}
+
 	h2 {
 		font-family: var(--orbit-font-display);
 		font-weight: var(--orbit-font-heading-weight, 700);
-	}
-
-	h1 {
-		margin: 0;
-		font-size: clamp(1.3rem, 2.2vw, 1.75rem);
-		line-height: 1.15;
-		letter-spacing: -0.02em;
 	}
 
 	.page-intro {
@@ -562,59 +596,64 @@
 		line-height: 1.65;
 	}
 
-	.page-update {
-		position: relative;
+	.whats-on-stats {
 		display: grid;
-		flex: 0 0 auto;
-		gap: 0.12rem;
-		min-width: 12rem;
-		padding: 0.6rem 0.75rem;
-		border: var(--orbit-border-width) dashed var(--orbit-line-strong);
-		background: color-mix(in srgb, var(--orbit-paper-deep) 64%, var(--orbit-surface));
-		box-shadow: 3px 3px 0 color-mix(in srgb, var(--orbit-coral-soft) 72%, transparent);
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.7rem;
+		margin: 0;
+	}
+
+	.whats-on-stat {
+		min-width: 0;
+		padding: 0.75rem 0.85rem;
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		background: var(--orbit-surface);
+		box-shadow: var(--orbit-shadow);
+	}
+
+	.whats-on-stat--updated {
+		grid-column: 1 / -1;
+		background: #fff;
+		color: #3b2a20;
+	}
+
+	.whats-on-stat--updated dt,
+	.whats-on-stat--updated .whats-on-stat-detail {
+		color: #735d4b;
+	}
+
+	.whats-on-stat dt {
 		color: var(--orbit-muted);
 		font-size: 0.68rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.whats-on-stat-value {
+		margin: 0.15rem 0 0;
+		color: var(--orbit-coral-dark);
+		font-family: var(--orbit-font-display);
+		font-size: 1.55rem;
 		font-variant-numeric: tabular-nums;
-		line-height: 1.5;
-		text-align: right;
-		transform: rotate(1.2deg);
+		line-height: 1.05;
 	}
 
-	.page-update::before {
-		position: absolute;
-		top: -0.45rem;
-		left: 50%;
-		width: 3.5rem;
-		height: 0.8rem;
-		background: var(--orbit-washi-pink, var(--orbit-coral-soft));
-		opacity: 0.76;
-		transform: translateX(-50%) rotate(-3deg);
-		pointer-events: none;
-		content: '';
+	.whats-on-stat--updated .whats-on-stat-value {
+		color: #3b2a20;
+		font-size: 1rem;
 	}
 
-	.content-section {
-		position: relative;
-		padding: 2.2rem 0;
+	.whats-on-stat-detail {
+		margin: 0.25rem 0 0;
+		color: var(--orbit-muted);
+		font-size: 0.68rem;
+		line-height: 1.4;
 	}
 
-	.news-section::after {
-		position: absolute;
-		top: 2.3rem;
-		right: 0.35rem;
-		width: 2.75rem;
-		height: 2.75rem;
-		background-image: var(--orbit-accent-image, none);
-		background-position: center;
-		background-repeat: no-repeat;
-		background-size: contain;
-		opacity: 0.48;
-		pointer-events: none;
-		content: '';
-	}
-
-	.content-section + .content-section {
-		border-top: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line-strong);
+	.content-section:not(:last-of-type) {
+		margin-bottom: clamp(2rem, 4vw, 3rem);
 	}
 
 	.section-head {
@@ -1276,6 +1315,10 @@
 		to { opacity: 1; transform: translateY(0); }
 	}
 
+	@keyframes whats-on-live {
+		to { visibility: hidden; }
+	}
+
 	@keyframes event-view-skeleton-pulse {
 		from { opacity: 0.52; }
 		to { opacity: 0.9; }
@@ -1297,32 +1340,34 @@
 		}
 	}
 
+	@media (min-width: 1024px) {
+		.whats-on-hero {
+			grid-template-columns: minmax(0, 3fr) minmax(18rem, 2fr);
+			gap: 2rem;
+			padding-block: 1.75rem 2.25rem;
+		}
+
+		.whats-on-stats {
+			grid-template-columns: 1fr;
+		}
+	}
+
 	@media (max-width: 620px) {
-		.news-section::after {
-			top: 1.7rem;
-			right: 0;
-			width: 2.2rem;
-			height: 2.2rem;
-			opacity: 0.34;
-		}
-		.page-head {
-			display: block;
-			padding-bottom: 1rem;
+		.whats-on-hero {
+			gap: 1.2rem;
+			padding-bottom: 1.4rem;
 		}
 
-		h1 {
-			font-size: 1.2rem;
+		.whats-on-title {
+			font-size: clamp(2rem, 10vw, 2.6rem);
 		}
 
-		.page-update {
-			display: inline-grid;
-			min-width: 0;
-			margin-top: 0.55rem;
-			text-align: left;
+		.whats-on-stats {
+			gap: 0.55rem;
 		}
 
-		.content-section {
-			padding: 1.65rem 0;
+		.whats-on-stat {
+			padding: 0.65rem 0.7rem;
 		}
 
 		.section-head {
@@ -1335,28 +1380,40 @@
 		}
 
 		.events-tools {
-			display: grid;
-			gap: 0.6rem;
+			display: flex;
+			flex-wrap: nowrap;
+			align-items: center;
+			gap: 0.4rem;
 		}
 
 		.view-tabs {
-			width: 100%;
+			flex: 1 1 auto;
+			min-width: 0;
+			height: 50px;
+			align-items: stretch;
 		}
 
 		.view-tabs a {
 			flex: 1;
 			min-width: 0;
-			gap: 0.3rem;
-			padding-inline: 0.4rem;
+			height: 100%;
+			min-height: 0;
+			box-sizing: border-box;
+			gap: 0.22rem;
+			padding-inline: 0.3rem;
 		}
 
 		.view-tabs a span {
-			font-size: 0.64rem;
+			font-size: 0.6rem;
+		}
+
+		.view-tabs svg {
+			width: 0.85rem;
+			height: 0.85rem;
 		}
 
 		.period-label {
-			justify-self: end;
-			text-align: right;
+			display: none;
 		}
 
 		.all-event-row {
@@ -1385,6 +1442,7 @@
 	@media (prefers-reduced-motion: reduce) {
 		.page-reveal,
 		.section-reveal,
+		.whats-on-live-dot,
 		.all-event-row:nth-child(-n + 5),
 		.event-view-loading-heading,
 		.event-view-loading-row i,

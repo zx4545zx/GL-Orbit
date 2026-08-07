@@ -67,7 +67,21 @@
 						<div class="news-copy">
 							<h3>
 								{#if item.sourceUrl}
-									<a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">{item.headline}</a>
+									<a href={item.sourceUrl} target="_blank" rel="noopener noreferrer"
+										>{item.headline}<svg
+											class="news-external-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											aria-hidden="true"
+										><path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="M14 4h6m0 0v6m0-6L10 14M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"
+											/></svg
+										></a
+									>
 								{:else}
 									{item.headline}
 								{/if}
@@ -236,6 +250,19 @@
 		text-underline-offset: 0.18rem;
 	}
 
+	.news-external-icon {
+		display: inline-block;
+		width: 0.8em;
+		height: 0.8em;
+		margin-inline-start: 0.24em;
+		vertical-align: -0.08em;
+		transition: transform var(--orbit-motion-fast) var(--orbit-motion-ease);
+	}
+
+	.news-copy h3 a:hover .news-external-icon {
+		transform: translate(0.08em, -0.08em);
+	}
+
 	.news-copy h3 a:focus-visible,
 	.splide__arrow:focus-visible,
 	:global(.splide__pagination__page:focus-visible) {
@@ -354,9 +381,11 @@
 		}
 
 		.splide__arrow,
-		.news-copy h3 a { transition: none; }
+		.news-copy h3 a,
+		.news-external-icon { transition: none; }
 
 		.splide__arrow:hover:not(:disabled),
-		.splide__arrow:active:not(:disabled) { transform: none; }
+		.splide__arrow:active:not(:disabled),
+		.news-copy h3 a:hover .news-external-icon { transform: none; }
 	}
 </style>

@@ -212,7 +212,9 @@
 					snap: true,
 					gap: '18px',
 					arrows: false,
-					pagination: false,
+					// Keep the other rails arrow/swipe-only; TOP 10 also exposes Splide's
+					// accessible, keyboard-operable page dots.
+					pagination: i === 1,
 					speed: 500,
 					i18n: splideI18n,
 					...railOptions[i]
@@ -1071,6 +1073,57 @@
 	/* Responsive pre-init widths mirror Splide to limit hydration movement. */
 	.xp-rail-scroll :global(.splide__slide) { flex: 0 0 auto; width: calc((100% - 54px) / 4); }
 	.xp-rail-scroll--avatars :global(.splide__slide) { width: calc((100% - 90px) / 6); }
+	/* TOP 10 keeps Splide's default semantic pagination markup, styled as a
+	   compact in-flow navigator so mobile pages never overlap the cards. */
+	.xp-rail-scroll--top10 :global(.splide__pagination) {
+		position: static;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 4px;
+		max-width: 100%;
+		margin: 18px auto 0;
+		padding: 0;
+	}
+	.xp-rail-scroll--top10 :global(.splide__pagination li) {
+		display: flex;
+	}
+	.xp-rail-scroll--top10 :global(.splide__pagination__page) {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		margin: 0;
+		padding: 0;
+		background: transparent;
+		border: 0;
+		border-radius: 0;
+		box-shadow: none;
+		cursor: pointer;
+		opacity: 1;
+		transform: none;
+	}
+	.xp-rail-scroll--top10 :global(.splide__pagination__page::before) {
+		content: "";
+		width: 10px;
+		height: 10px;
+		background: var(--orbit-surface);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: 50%;
+		box-shadow: 1px 1px 0 color-mix(in srgb, var(--orbit-coral-dark) 55%, transparent);
+		transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+	}
+	.xp-rail-scroll--top10 :global(.splide__pagination__page:hover::before),
+	.xp-rail-scroll--top10 :global(.splide__pagination__page.is-active::before) {
+		background: var(--orbit-coral);
+		border-color: var(--orbit-coral);
+		transform: scale(1.15);
+	}
+	.xp-rail-scroll--top10 :global(.splide__pagination__page:focus-visible) {
+		outline: 3px solid var(--orbit-coral);
+		outline-offset: 2px;
+	}
 	/* splide core hides uninitialized sliders; SSR markup should stay visible */
 	.xp :global(.splide) { visibility: visible; }
 
@@ -1391,6 +1444,8 @@
 		.xp-search { max-width: none; order: 2; flex-basis: 100%; }
 		.xp-rail-scroll :global(.splide__slide) { width: calc((100% - 18px) / 2); }
 		.xp-rail-scroll--top10 :global(.splide__slide) { width: 100%; }
+		.xp-rail-scroll--top10 :global(.splide__pagination) { margin-top: 16px; gap: 2px; }
+		.xp-rail-scroll--top10 :global(.splide__pagination__page) { width: 26px; height: 26px; }
 		.xp-rail-scroll--avatars :global(.splide__slide) { width: calc((100% - 18px) / 2); }
 		.xp-face { width: 108px; }
 		.xp-rank { font-size: clamp(88px, 30vw, 108px); min-width: 64px; margin-right: -8px; }
@@ -1430,6 +1485,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.xp-btn, .xp-chip, .xp-card, .xp-face, .xp-rail-arrow { transition: none; }
+		.xp-btn, .xp-chip, .xp-card, .xp-face, .xp-rail-arrow,
+		.xp-rail-scroll--top10 :global(.splide__pagination__page::before) { transition: none; }
 	}
 </style>

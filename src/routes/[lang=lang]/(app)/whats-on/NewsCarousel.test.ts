@@ -46,6 +46,9 @@ describe('NewsCarousel', () => {
 		const link = screen.getByRole('link', { name: 'First story' });
 		expect(link.getAttribute('href')).toBe('https://example.com/first');
 		expect(link.getAttribute('target')).toBe('_blank');
+		expect(link.getAttribute('rel')).toBe('noopener noreferrer');
+		const icon = link.querySelector('.news-external-icon');
+		expect(icon?.getAttribute('aria-hidden')).toBe('true');
 		expect(screen.queryByRole('link', { name: 'Second story' })).toBeNull();
 	});
 
