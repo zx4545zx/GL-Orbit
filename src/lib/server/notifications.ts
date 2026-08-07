@@ -27,7 +27,7 @@ function resultRows<T>(result: unknown): T[] {
 export interface NotificationRecord {
 	id: string;
 	userId: string;
-	seriesId: string;
+	seriesId: string | null;
 	type: NotificationType;
 	message: string;
 	isRead: boolean;
@@ -161,7 +161,7 @@ export async function createAndBroadcastNotification(
 }
 
 export async function sendNotificationToUsers(
-	seriesId: string,
+	seriesId: string | null,
 	type: NotificationType,
 	message: string,
 	recipientType: 'followers' | 'global',
@@ -171,6 +171,7 @@ export async function sendNotificationToUsers(
 
 	let userIds: string[];
 	if (recipientType === 'followers') {
+		if (!seriesId) throw new Error('Series ID is required for follower notifications');
 		const rows = await db
 			.select({ userId: favorites.userId })
 			.from(favorites)
@@ -186,10 +187,12 @@ export async function sendNotificationToUsers(
 
 	if (userIds.length === 0) return 0;
 
-	const seriesRow = (await db
-		.select({ titleEn: series.titleEn })
-		.from(series)
-		.where(eq(series.id, seriesId)))[0];
+	const seriesRow = seriesId
+		? (await db
+			.select({ titleEn: series.titleEn })
+			.from(series)
+			.where(eq(series.id, seriesId)))[0]
+		: null;
 	const sqlClient = db.$client;
 	const insertStatements = chunks(userIds, NOTIFICATION_BATCH_SIZE).map((userIdBatch) => sqlClient`
 		INSERT INTO notifications (user_id, series_id, type, message)

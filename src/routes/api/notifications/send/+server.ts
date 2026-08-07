@@ -12,26 +12,28 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		return json({ error: 'ไม่มีสิทธิ์เข้าถึง' }, { status: 403 });
 	}
 
-	const body = (await request.json()) as {
+	const body = await request.json().catch(() => null) as {
 		seriesId?: unknown;
 		recipientType?: unknown;
 		message?: unknown;
-	};
+	} | null;
 
-	const seriesId = typeof body.seriesId === 'string' ? body.seriesId : undefined;
-	const recipientType = body.recipientType === 'followers' || body.recipientType === 'global' ? body.recipientType : undefined;
-	const message = typeof body.message === 'string' ? body.message.trim() : undefined;
+	const seriesId = typeof body?.seriesId === 'string' && body.seriesId.length > 0 ? body.seriesId : null;
+	const recipientType = body?.recipientType === 'followers' || body?.recipientType === 'global' ? body.recipientType : undefined;
+	const message = typeof body?.message === 'string' ? body.message.trim() : undefined;
 
-	if (!seriesId) return json({ error: 'กรุณาเลือกซีรีส์' }, { status: 400 });
 	if (!recipientType) return json({ error: 'กรุณาเลือกประเภทผู้รับ' }, { status: 400 });
+	if (recipientType === 'followers' && !seriesId) return json({ error: 'กรุณาเลือกซีรีส์' }, { status: 400 });
 	if (!message || message.length === 0) return json({ error: 'กรุณากรอกข้อความ' }, { status: 400 });
 	if (message.length > MESSAGE_MAX_LENGTH) {
 		return json({ error: `ข้อความต้องไม่เกิน ${MESSAGE_MAX_LENGTH} ตัวอักษร` }, { status: 400 });
 	}
 
-	const db = await getDb();
-	const [seriesRow] = await db.select({ id: series.id }).from(series).where(eq(series.id, seriesId));
-	if (!seriesRow) return json({ error: 'ไม่พบซีรีส์' }, { status: 404 });
+	if (seriesId) {
+		const db = await getDb();
+		const [seriesRow] = await db.select({ id: series.id }).from(series).where(eq(series.id, seriesId));
+		if (!seriesRow) return json({ error: 'ไม่พบซีรีส์' }, { status: 404 });
+	}
 
 	const sentCount = await sendNotificationToUsers(seriesId, 'announcement', message, recipientType, locals.user.id);
 

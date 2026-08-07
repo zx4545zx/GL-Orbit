@@ -122,6 +122,16 @@ describe('series video mutations', () => {
 		expect(mocks.deleteCached).toHaveBeenCalledWith(`query:series:${seriesId}`);
 	});
 
+	it.each(['MUSIC', 'EVENT', 'OTHER'] as const)('accepts and persists the %s video type', async (type) => {
+		const created = {
+			id: videoId, seriesId, type, youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+			youtubeVideoId: 'dQw4w9WgXcQ', titleTh: 'ชื่อไทย', titleEn: 'English title', sortOrder: 0, createdAt
+		};
+		const { db, values } = dbMock([[{ id: seriesId }], [{ maximum: null }]], { insertResult: [created] });
+		await expect(createSeriesVideo(db, validInput({ type, titleTh: 'ชื่อไทย', titleEn: 'English title' }))).resolves.toEqual(created);
+		expect(values).toHaveBeenCalledWith(expect.objectContaining({ type }));
+	});
+
 	it('starts an empty group at zero', async () => {
 		const created = { id: videoId, seriesId, type: 'TRAILER', sortOrder: 0, createdAt };
 		const { db, values } = dbMock([[{ id: seriesId }], [{ maximum: null }]], { insertResult: [created] });

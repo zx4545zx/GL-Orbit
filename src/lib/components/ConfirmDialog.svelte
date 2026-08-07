@@ -32,15 +32,12 @@
 		oncancel?.();
 	}
 
-	function onKeydown(e: KeyboardEvent) {
-		if (!open) return;
-		if (e.key === 'Escape') handleCancel();
-	}
-
-	function portal(node: HTMLElement) {
-		const previousOverflow = document.body.style.overflow;
-		document.body.style.overflow = 'hidden';
-		document.body.appendChild(node);
+	function modal(node: HTMLDialogElement) {
+		if (!node.open) {
+			node.showModal?.();
+			// jsdom has dialog methods but does not implement their state changes.
+			if (!node.open) node.setAttribute('open', '');
+		}
 
 		requestAnimationFrame(() => {
 			node.querySelector<HTMLElement>('[data-cancel-button]')?.focus();
@@ -48,31 +45,27 @@
 
 		return {
 			destroy() {
-				document.body.style.overflow = previousOverflow;
-				node.remove();
+				node.close?.();
 			}
 		};
 	}
+
+	function handleNativeCancel(event: Event) {
+		event.preventDefault();
+		handleCancel();
+	}
 </script>
 
-<svelte:window onkeydown={onKeydown} />
-
 {#if open}
-	<div use:portal>
-	<!-- Backdrop -->
-	<button
-		type="button"
-		class="fixed inset-0 z-50 bg-plum/35 transition-opacity duration-200"
-		onclick={handleCancel}
-		aria-label={m.common_close()}
-	></button>
-
-	<!-- Dialog -->
-	<div
-		class="orbit-dialog fixed inset-0 z-50 flex items-center justify-center p-4"
-		role="dialog"
+	<dialog
+		use:modal
+		class="confirm-dialog orbit-dialog z-50"
 		aria-modal="true"
 		aria-labelledby="confirm-title"
+		oncancel={handleNativeCancel}
+		onclick={(event) => {
+			if (event.currentTarget === event.target) handleCancel();
+		}}
 	>
 		<div class="orbit-dialog-panel relative max-w-sm w-full overflow-hidden p-6 animate-slide-up sm:p-8">
 			<!-- Icon -->
@@ -114,6 +107,33 @@
 				</button>
 			</div>
 		</div>
-	</div>
-	</div>
+	</dialog>
 {/if}
+
+<style>
+	/* Keep the hit area viewport-sized so backdrop clicks work inside constrained layouts. */
+	.confirm-dialog {
+		position: fixed;
+		inset: 0;
+		box-sizing: border-box;
+		display: flex;
+		width: 100vw;
+		height: 100dvh;
+		max-height: none;
+		max-width: none;
+		margin: 0;
+		align-items: center;
+		justify-content: center;
+		border: 0;
+		background: transparent;
+		padding: 1rem;
+	}
+
+	.confirm-dialog::backdrop {
+		position: fixed;
+		inset: 0;
+		width: 100vw;
+		height: 100dvh;
+		background: rgb(36 21 31 / 0.35);
+	}
+</style>

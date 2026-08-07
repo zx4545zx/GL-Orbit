@@ -1,18 +1,20 @@
 <script lang="ts">
 
 	import { page } from '$app/state';
-	import { localizedHref } from '$lib/i18n/link.js';	import { beforeNavigate, invalidateAll, goto } from '$app/navigation';
+	import { localizedHref } from '$lib/i18n/link.js';
+	import { beforeNavigate, invalidateAll, goto } from '$app/navigation';
 	import SeriesMainSection from '$lib/components/admin/SeriesMainSection.svelte';
 	import SeriesCastSection from '$lib/components/admin/SeriesCastSection.svelte';
 	import SeriesEpisodesSection from '$lib/components/admin/SeriesEpisodesSection.svelte';
 	import SeriesScheduleSection from '$lib/components/admin/SeriesScheduleSection.svelte';
 	import SeriesVideosSection from '$lib/components/admin/SeriesVideosSection.svelte';
+	import SeriesAnnouncementSection from '$lib/components/admin/SeriesAnnouncementSection.svelte';
 	import StatusBadge from '$lib/components/admin/StatusBadge.svelte';
 	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
 
-	type TabId = 'main' | 'cast' | 'episodes' | 'schedule' | 'videos';
+	type TabId = 'main' | 'cast' | 'episodes' | 'schedule' | 'videos' | 'announcements';
 	let activeTab = $state<TabId>('main');
 	let metadataDirty = $state(false);
 
@@ -21,7 +23,8 @@
 		{ id: 'cast', label: 'นักแสดง', subtitle: 'Cast & role names', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
 		{ id: 'episodes', label: 'ตอน', subtitle: 'Episodes & streaming links', icon: 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
 		{ id: 'schedule', label: 'ตารางฉาย', subtitle: 'Weekly broadcast rules', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-		{ id: 'videos', label: page.data.lang === 'en' ? 'Videos' : 'วิดีโอ', subtitle: 'Trailers & pilots', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' }
+		{ id: 'videos', label: page.data.lang === 'en' ? 'Videos' : 'วิดีโอ', subtitle: 'Trailers & pilots', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
+		{ id: 'announcements', label: page.data.lang === 'en' ? 'Announcements' : 'ประกาศ', subtitle: 'Notify followers or all active users', icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 01-6 0v-1m6 0H9' }
 	];
 
 	function tabCount(id: TabId) {
@@ -185,6 +188,8 @@
 						<SeriesScheduleSection seriesId={data.full.series.id} schedules={data.full.schedules} reference={data.reference} onrefresh={refresh} />
 					{:else if activeTab === 'videos'}
 						<SeriesVideosSection seriesId={data.full.series.id} videos={data.full.videos} lang={page.data.lang === 'en' ? 'en' : 'th'} onrefresh={refresh} />
+					{:else if activeTab === 'announcements'}
+						<SeriesAnnouncementSection seriesId={data.full.series.id} seriesTitle={page.data.lang === 'en' ? data.full.series.titleEn : (data.full.series.titleTh || data.full.series.titleEn)} lang={page.data.lang === 'en' ? 'en' : 'th'} />
 					{/if}
 				{/key}
 			</div>

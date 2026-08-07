@@ -10,7 +10,7 @@ vi.mock('./push-notifications.js', () => ({
 	sendPushNotifications: vi.fn()
 }));
 
-import { createFollowerNotifications } from './notifications.js';
+import { createFollowerNotifications, sendNotificationToUsers } from './notifications.js';
 import { getDb } from './db/index.js';
 import { sendPushNotifications } from './push-notifications.js';
 
@@ -101,6 +101,23 @@ describe('createFollowerNotifications', () => {
 		const count = await createFollowerNotifications('series-1', 'new_episode', 'New episode!');
 		expect(count).toBe(2);
 		expect(db.$client.transaction).toHaveBeenCalledTimes(1);
+	});
+
+	it('creates global announcements without a series association', async () => {
+		const db = mockDb({
+			where: vi.fn().mockResolvedValueOnce([{ id: 'user-1' }, { id: 'user-2' }])
+		});
+		db.$client.transaction.mockResolvedValue([[
+			{ id: 'n1', userId: 'user-1', seriesId: null, type: 'announcement', message: 'Site maintenance', isRead: false, createdAt: new Date() },
+			{ id: 'n2', userId: 'user-2', seriesId: null, type: 'announcement', message: 'Site maintenance', isRead: false, createdAt: new Date() }
+		]]);
+		vi.mocked(getDb).mockResolvedValue(db as any);
+
+		await expect(sendNotificationToUsers(null, 'announcement', 'Site maintenance', 'global')).resolves.toBe(2);
+		expect(db.select).toHaveBeenCalledTimes(1);
+		expect(sendPushNotifications).toHaveBeenCalledWith(expect.arrayContaining([
+			expect.objectContaining({ item: expect.objectContaining({ seriesId: null, seriesTitle: null }) })
+		]));
 	});
 
 	it('chunks large notification inserts and push delivery', async () => {

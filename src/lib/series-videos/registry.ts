@@ -6,7 +6,10 @@ export interface SeriesVideoRegistryEntry {
 
 export const SERIES_VIDEO_TYPES = [
 	{ key: 'TRAILER', labelTh: 'ตัวอย่าง', labelEn: 'Trailer' },
-	{ key: 'PILOT', labelTh: 'ไพล็อต', labelEn: 'Pilot' }
+	{ key: 'PILOT', labelTh: 'ไพล็อต', labelEn: 'Pilot' },
+	{ key: 'MUSIC', labelTh: 'เพลงประกอบ', labelEn: 'Music' },
+	{ key: 'EVENT', labelTh: 'กิจกรรม', labelEn: 'Event' },
+	{ key: 'OTHER', labelTh: 'อื่นๆ', labelEn: 'Other' }
 ] as const satisfies readonly SeriesVideoRegistryEntry[];
 
 export type SeriesVideoType = (typeof SERIES_VIDEO_TYPES)[number]['key'];

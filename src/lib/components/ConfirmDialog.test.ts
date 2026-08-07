@@ -25,4 +25,31 @@ describe('ConfirmDialog', () => {
 		screen.getAllByRole('button').at(-1)?.click();
 		expect(onconfirm).toHaveBeenCalledOnce();
 	});
+
+	it('uses the native dialog top layer instead of moving the dialog to document.body', () => {
+		const { container } = render(ConfirmDialog, { open: true });
+		const dialog = screen.getByRole('dialog');
+
+		expect(dialog.tagName).toBe('DIALOG');
+		expect(dialog.parentElement).toBe(container);
+		expect(document.body.lastElementChild).not.toBe(dialog);
+	});
+
+	it('marks the native dialog for the viewport overlay and centered panel styles', () => {
+		render(ConfirmDialog, { open: true });
+		const dialog = screen.getByRole('dialog');
+
+		expect(dialog.classList.contains('confirm-dialog')).toBe(true);
+		expect(dialog.classList.contains('orbit-dialog')).toBe(true);
+		expect(dialog.querySelector('.orbit-dialog-panel')).toBeTruthy();
+	});
+
+	it('handles the native Escape cancellation event', () => {
+		const oncancel = vi.fn();
+		render(ConfirmDialog, { open: true, oncancel });
+
+		screen.getByRole('dialog').dispatchEvent(new Event('cancel', { cancelable: true }));
+
+		expect(oncancel).toHaveBeenCalledOnce();
+	});
 });

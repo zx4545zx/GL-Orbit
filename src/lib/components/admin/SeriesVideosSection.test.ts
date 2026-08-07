@@ -48,6 +48,13 @@ describe('SeriesVideosSection', () => {
 		expect(form.url.getAttribute('type')).toBe('url');
 		expect(form.th.getAttribute('maxlength')).toBe('255');
 		expect(form.en.getAttribute('maxlength')).toBe('255');
+		expect(Array.from((form.type as HTMLSelectElement).options).map(({ value, text }) => ({ value, text }))).toEqual([
+			{ value: 'TRAILER', text: 'Trailer' },
+			{ value: 'PILOT', text: 'Pilot' },
+			{ value: 'MUSIC', text: 'Music' },
+			{ value: 'EVENT', text: 'Event' },
+			{ value: 'OTHER', text: 'Other' }
+		]);
 		const add = screen.getByRole('button', { name: /add video|เพิ่มวิดีโอ/i }) as HTMLButtonElement;
 		expect(add.disabled).toBe(true);
 		await user.type(form.th, '   ');
@@ -113,6 +120,7 @@ describe('SeriesVideosSection', () => {
 		const headings = screen.getAllByRole('heading', { level: 3 });
 		expect(headings[0].textContent).toMatch(/Trailer/);
 		expect(headings[1].textContent).toMatch(/Pilot/);
+		expect(headings.slice(2).map((heading) => heading.textContent)).toEqual(['Music (0)', 'Event (0)', 'Other (0)']);
 		expect(screen.getByText(/Trailer one/)).toBeTruthy();
 		expect(screen.getByText(/ตัวอย่างหนึ่ง/)).toBeTruthy();
 		expect(screen.getByRole('link', { name: videos[1].youtubeUrl }).getAttribute('href')).toBe(videos[1].youtubeUrl);

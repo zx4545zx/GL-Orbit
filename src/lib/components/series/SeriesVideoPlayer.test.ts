@@ -8,7 +8,10 @@ import SeriesVideoPlayer from './SeriesVideoPlayer.svelte';
 const videos: PublicSeriesVideo[] = [
 	{ id: 'trailer-1', type: 'TRAILER', youtubeUrl: 'https://www.youtube.com/watch?v=aaaaaaaaaaa', youtubeVideoId: 'aaaaaaaaaaa', titleTh: 'ตัวอย่างหนึ่ง', titleEn: 'Trailer one', sortOrder: 0 },
 	{ id: 'trailer-2', type: 'TRAILER', youtubeUrl: 'https://www.youtube.com/watch?v=bbbbbbbbbbb', youtubeVideoId: 'bbbbbbbbbbb', titleTh: 'ตัวอย่างสอง', titleEn: 'Trailer two', sortOrder: 1 },
-	{ id: 'pilot-1', type: 'PILOT', youtubeUrl: 'https://www.youtube.com/watch?v=ccccccccccc', youtubeVideoId: 'ccccccccccc', titleTh: 'ไพล็อตหนึ่ง', titleEn: 'Pilot one', sortOrder: 0 }
+	{ id: 'pilot-1', type: 'PILOT', youtubeUrl: 'https://www.youtube.com/watch?v=ccccccccccc', youtubeVideoId: 'ccccccccccc', titleTh: 'ไพล็อตหนึ่ง', titleEn: 'Pilot one', sortOrder: 0 },
+	{ id: 'music-1', type: 'MUSIC', youtubeUrl: 'https://www.youtube.com/watch?v=ddddddddddd', youtubeVideoId: 'ddddddddddd', titleTh: 'เพลงประกอบหนึ่ง', titleEn: 'Soundtrack one', sortOrder: 0 },
+	{ id: 'event-1', type: 'EVENT', youtubeUrl: 'https://www.youtube.com/watch?v=eeeeeeeeeee', youtubeVideoId: 'eeeeeeeeeee', titleTh: 'กิจกรรมหนึ่ง', titleEn: 'Event one', sortOrder: 0 },
+	{ id: 'other-1', type: 'OTHER', youtubeUrl: 'https://www.youtube.com/watch?v=fffffffffff', youtubeVideoId: 'fffffffffff', titleTh: 'อื่นๆ หนึ่ง', titleEn: 'Other one', sortOrder: 0 }
 ];
 
 afterEach(cleanup);
@@ -22,9 +25,9 @@ describe('SeriesVideoPlayer', () => {
 
 	it('renders only non-empty types in registry order and selects the first clip', async () => {
 		render(SeriesVideoPlayer, { videos, lang: 'en' });
-		await waitFor(() => expect(screen.getAllByRole('tab').length).toBe(2));
+		await waitFor(() => expect(screen.getAllByRole('tab').length).toBe(5));
 		const tabs = screen.getAllByRole('tab');
-		expect(tabs.map((tab) => tab.textContent)).toEqual(['Trailer', 'Pilot']);
+		expect(tabs.map((tab) => tab.textContent)).toEqual(['Trailer', 'Pilot', 'Music', 'Event', 'Other']);
 		expect(tabs[0].getAttribute('aria-selected')).toBe('true');
 		expect(screen.getByRole('button', { name: /Trailer one/i }).getAttribute('aria-pressed')).toBe('true');
 	});
