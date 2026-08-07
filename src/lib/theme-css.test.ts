@@ -41,10 +41,8 @@ describe('theme CSS contract', () => {
       expect(css).toContain('.orbit-round-data');
       expect(css).toContain('border-radius: 9999px !important');
     });
-    it('gives rounded themes a legacy radius while square themes stay sharp', () => {
-      expect(themeBlock('ocean')).toMatch(/--orbit-radius-legacy:\s*\.5rem/);
-      expect(themeBlock('candy')).toMatch(/--orbit-radius-legacy:\s*\.5rem/);
-      for (const theme of ['midnight', 'y2k', 'sakura', 'mission'] as const) {
+    it('keeps a sharp legacy radius across all themes for consistent clipping', () => {
+      for (const theme of themes) {
         expect(themeBlock(theme)).toMatch(/--orbit-radius-legacy:\s*0(px)?/);
       }
     });

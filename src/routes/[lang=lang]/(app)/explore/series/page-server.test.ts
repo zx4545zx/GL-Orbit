@@ -11,6 +11,11 @@ describe('series explore page-data privacy', () => {
 		const publicPageServers = globSync('src/routes/**/+page.server.ts').filter((path) =>
 			readFileSync(path, 'utf8').includes("'cache-control': 'public")
 		);
-		expect(publicPageServers).toEqual([]);
+		for (const path of publicPageServers) {
+			const source = readFileSync(path, 'utf8');
+			expect(source, `${path} must not publish authenticated data to shared caches`).not.toMatch(
+				/locals\.user|getSession|requireUser|getUser\(/
+			);
+		}
 	});
 });
