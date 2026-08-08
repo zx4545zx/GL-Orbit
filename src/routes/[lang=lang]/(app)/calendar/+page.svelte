@@ -6,7 +6,7 @@
 	import type { PageData } from './$types.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { CalendarEvent, CalendarApiResponse } from '$lib/types/calendar.js';
-	import { getViewUrl } from './calendar.js';
+	import { getCalendarWeekdayShort, getViewUrl } from './calendar.js';
 	import CalendarMonthHeader from '$lib/components/calendar/CalendarMonthHeader.svelte';
 	import CalendarViewToggle from '$lib/components/calendar/CalendarViewToggle.svelte';
 	import CalendarWeekHeader from '$lib/components/calendar/CalendarWeekHeader.svelte';
@@ -56,11 +56,7 @@
 	function getWeekDayLong(date: Date, l: string) {
 		return new Intl.DateTimeFormat(l, { weekday: 'long' }).format(date);
 	}
-	function getWeekDayShort(date: Date, l: string) {
-		return new Intl.DateTimeFormat(l, { weekday: 'short' }).format(date);
-	}
-
-	const weekDays = $derived(Array.from({ length: 7 }, (_, i) => getWeekDayShort(new Date(2024, 0, 7 + i), lang)));
+	const weekDays = $derived(Array.from({ length: 7 }, (_, i) => getCalendarWeekdayShort(i, lang)));
 	const weekDayNames = $derived(Array.from({ length: 7 }, (_, i) => getWeekDayLong(new Date(2024, 0, 1 + i), lang)));
 
 	function formatDateLocal(date: Date): string {

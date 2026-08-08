@@ -14,6 +14,20 @@ export interface CalendarParams {
 	key: string;
 }
 
+const THAI_WEEKDAY_SHORT_NAMES = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'] as const;
+
+/**
+ * Return compact weekday labels for calendar headers.
+ * Thai uses the conventional abbreviations consistently across browser locales.
+ */
+export function getCalendarWeekdayShort(dayIndex: number, lang: string): string {
+	if (lang === 'th') {
+		return THAI_WEEKDAY_SHORT_NAMES[dayIndex] ?? '';
+	}
+
+	return new Intl.DateTimeFormat(lang, { weekday: 'short' }).format(new Date(2024, 0, 7 + dayIndex));
+}
+
 /**
  * Parse query search params into structured fetch arguments.
  * Pure function, no side effects, fully testable.

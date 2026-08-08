@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { parseCalendarParams, getViewUrl } from './calendar.js';
+import { getCalendarWeekdayShort, parseCalendarParams, getViewUrl } from './calendar.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -107,6 +107,20 @@ describe('getViewUrl', () => {
 	it('generates week URL for card view when no week params exist', () => {
 		const url = getViewUrl('card', 'th', 2026, 6, null, null);
 		expect(url).toMatch(/^\/th\/calendar\?startDate=\d{4}-\d{2}-\d{2}&endDate=\d{4}-\d{2}-\d{2}&view=card$/);
+	});
+});
+
+describe('getCalendarWeekdayShort', () => {
+	it('uses standard Thai abbreviations for compact calendar headers', () => {
+		expect(Array.from({ length: 7 }, (_, index) => getCalendarWeekdayShort(index, 'th'))).toEqual([
+			'อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'
+		]);
+	});
+
+	it('preserves Intl English weekday abbreviations', () => {
+		expect(Array.from({ length: 7 }, (_, index) => getCalendarWeekdayShort(index, 'en'))).toEqual([
+			'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+		]);
 	});
 });
 
