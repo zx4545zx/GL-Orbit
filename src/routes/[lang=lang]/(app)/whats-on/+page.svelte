@@ -260,16 +260,6 @@
 					<dd class="whats-on-stat-detail">{m.whats_on_updated({ date: formatNewsDate(featured.publishedDate) })}</dd>
 				</div>
 			{/if}
-			<div class="whats-on-stat">
-				<dt>{m.whats_on_news_title()}</dt>
-				<dd class="whats-on-stat-value">{data.whatsOn.news.length}</dd>
-				<dd class="whats-on-stat-detail">{m.whats_on_story_count({ count: data.whatsOn.news.length })}</dd>
-			</div>
-			<div class="whats-on-stat">
-				<dt>{m.whats_on_events_title()}</dt>
-				<dd class="whats-on-stat-value">{upcomingEvents.length}</dd>
-				<dd class="whats-on-stat-detail">{m.whats_on_event_count({ count: upcomingEvents.length })}</dd>
-			</div>
 		</dl>
 	</header>
 

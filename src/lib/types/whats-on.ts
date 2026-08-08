@@ -3,8 +3,10 @@ export type WhatsOnSourceStatus = 'live' | 'unavailable';
 
 export interface NewsItem {
 	id: string;
+	slug: string;
 	headline: string;
 	blurb: string;
+	coverImageUrl: string | null;
 	sourceUrl: string | null;
 	sourceName: string;
 	publishedDate: string;

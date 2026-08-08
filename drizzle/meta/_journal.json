@@ -197,6 +197,13 @@
       "when": 1785330489155,
       "tag": "0027_series_videos",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1786195180250,
+      "tag": "0028_lethal_songbird",
+      "breakpoints": true
     }
   ]
 }

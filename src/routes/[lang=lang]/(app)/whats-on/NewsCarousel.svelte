@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import '@splidejs/splide/css/core';
 	import { m } from '$lib/i18n/paraglide.js';
+	import Picture from '$lib/components/Picture.svelte';
 	import type { NewsItem } from '$lib/types/whats-on.js';
 
 	let { news, locale }: { news: NewsItem[]; locale: string } = $props();
@@ -57,6 +58,9 @@
 			{#each news as item (item.id)}
 				<li class="splide__slide">
 					<article class="news-story">
+						{#if item.coverImageUrl}
+							<div class="news-cover"><Picture src={item.coverImageUrl} type="posters" sizes="(min-width: 620px) 180px, 35vw" alt={item.headline} class="h-full w-full object-cover" /></div>
+						{/if}
 						<div class="news-meta">
 							<p class="news-kicker">{m.whats_on_news_carousel_kicker()}</p>
 							<div class="news-stamp">
@@ -65,27 +69,7 @@
 							</div>
 						</div>
 						<div class="news-copy">
-							<h3>
-								{#if item.sourceUrl}
-									<a href={item.sourceUrl} target="_blank" rel="noopener noreferrer"
-										>{item.headline}<svg
-											class="news-external-icon"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											aria-hidden="true"
-										><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												d="M14 4h6m0 0v6m0-6L10 14M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"
-											/></svg
-										></a
-									>
-								{:else}
-									{item.headline}
-								{/if}
-							</h3>
+							<h3><a href={`/${locale.startsWith('th') ? 'th' : 'en'}/news/${item.slug}`}>{item.headline}</a></h3>
 							<p>{item.blurb}</p>
 						</div>
 					</article>
@@ -155,6 +139,16 @@
 			linear-gradient(180deg, color-mix(in srgb, var(--orbit-surface) 96%, var(--orbit-paper)) 0%, var(--orbit-surface) 100%);
 		box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--orbit-line) 72%, transparent);
 	}
+
+	.news-cover {
+		align-self: stretch;
+		aspect-ratio: 3 / 4;
+		overflow: hidden;
+		border: 1px solid var(--orbit-line);
+	}
+
+	.news-cover :global(img) { display: block; }
+	.news-story:has(.news-cover) { grid-template-columns: minmax(6rem, 0.18fr) minmax(7rem, 0.2fr) minmax(0, 1fr); }
 
 	.splide__slide {
 		display: flex;
@@ -248,19 +242,6 @@
 		color: var(--orbit-link, var(--orbit-coral-dark));
 		text-decoration: underline;
 		text-underline-offset: 0.18rem;
-	}
-
-	.news-external-icon {
-		display: inline-block;
-		width: 0.8em;
-		height: 0.8em;
-		margin-inline-start: 0.24em;
-		vertical-align: -0.08em;
-		transition: transform var(--orbit-motion-fast) var(--orbit-motion-ease);
-	}
-
-	.news-copy h3 a:hover .news-external-icon {
-		transform: translate(0.08em, -0.08em);
 	}
 
 	.news-copy h3 a:focus-visible,
@@ -358,6 +339,8 @@
 			padding: 1rem;
 		}
 
+		.news-cover { width: min(10rem, 48vw); }
+
 		.news-story::after {
 			right: 0.25rem;
 			bottom: 0.1rem;
@@ -381,11 +364,9 @@
 		}
 
 		.splide__arrow,
-		.news-copy h3 a,
-		.news-external-icon { transition: none; }
+		.news-copy h3 a { transition: none; }
 
 		.splide__arrow:hover:not(:disabled),
-		.splide__arrow:active:not(:disabled),
-		.news-copy h3 a:hover .news-external-icon { transform: none; }
+		.splide__arrow:active:not(:disabled) { transform: none; }
 	}
 </style>

@@ -14,8 +14,10 @@ vi.mock('@splidejs/splide', () => ({
 const news: NewsItem[] = [
 	{
 		id: 'news-1',
+		slug: 'first-story',
 		headline: 'First story',
 		blurb: 'First story summary.',
+		coverImageUrl: 'https://images.example/first.jpg',
 		sourceUrl: 'https://example.com/first',
 		sourceName: 'Example News',
 		publishedDate: '2026-08-01',
@@ -23,8 +25,10 @@ const news: NewsItem[] = [
 	},
 	{
 		id: 'news-2',
+		slug: 'second-story',
 		headline: 'Second story',
 		blurb: 'Second story summary.',
+		coverImageUrl: null,
 		sourceUrl: null,
 		sourceName: 'Orbit Desk',
 		publishedDate: '2026-07-31',
@@ -35,7 +39,7 @@ const news: NewsItem[] = [
 afterEach(cleanup);
 
 describe('NewsCarousel', () => {
-	it('renders every story with its date, source, and optional headline link', () => {
+	it('renders every story with its date, source, local link, and portrait cover', () => {
 		render(NewsCarousel, { news, locale: 'en-US' });
 
 		expect(screen.getAllByRole('listitem')).toHaveLength(2);
@@ -44,12 +48,9 @@ describe('NewsCarousel', () => {
 		expect(screen.getByText(/Orbit Desk/)).toBeTruthy();
 		expect(screen.getByText('Aug 1, 2026')).toBeTruthy();
 		const link = screen.getByRole('link', { name: 'First story' });
-		expect(link.getAttribute('href')).toBe('https://example.com/first');
-		expect(link.getAttribute('target')).toBe('_blank');
-		expect(link.getAttribute('rel')).toBe('noopener noreferrer');
-		const icon = link.querySelector('.news-external-icon');
-		expect(icon?.getAttribute('aria-hidden')).toBe('true');
-		expect(screen.queryByRole('link', { name: 'Second story' })).toBeNull();
+		expect(link.getAttribute('href')).toBe('/en/news/first-story');
+		expect(screen.getByRole('link', { name: 'Second story' }).getAttribute('href')).toBe('/en/news/second-story');
+		expect(document.querySelector('.news-cover')).toBeTruthy();
 	});
 
 	it('exposes labeled carousel controls and pagination markup', () => {

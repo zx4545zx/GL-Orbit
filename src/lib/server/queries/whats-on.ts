@@ -1,10 +1,9 @@
-import { parseSafeExternalUrl } from '$lib/server/embeds/url-security.js';
+import { listPublishedNews } from '$lib/server/news.js';
 import type { EventType, NewsItem, OrbitEvent, WhatsOnData } from '$lib/types/whats-on.js';
 
 const REQUEST_TIMEOUT_MS = 8_000;
 const MAX_ROWS = '3000';
 const DEFAULT_TIMEZONE = 'Asia/Bangkok';
-const NEWS_SELECT = 'news_id,headline,blurb,source_url,source_name,published_date,status';
 const EVENT_SELECT = 'event_id,title,performer,full_title,starts_at,ends_at,all_day,location,event_type,pairing_id,actress_id,company_id,source_timezone,lat,lng';
 
 type Environment = Record<string, string | undefined>;
@@ -17,6 +16,7 @@ export interface WhatsOnQueryOptions {
 	};
 	fetcher?: Fetcher;
 	env?: Environment;
+	language?: 'th' | 'en';
 }
 
 const eventTypes: EventType[] = [
@@ -34,25 +34,28 @@ class WhatsOnConfigError extends Error {}
 
 export async function getWhatsOnData(options: WhatsOnQueryOptions): Promise<WhatsOnData> {
 	const fetcher = options.fetcher ?? globalThis.fetch;
+	const newsResult = await Promise.resolve().then(listPublishedNews).then(
+		(value) => ({ status: 'fulfilled' as const, value }),
+		(reason) => ({ status: 'rejected' as const, reason })
+	);
+	if (newsResult.status === 'rejected') reportFailure('news', newsResult.reason);
 	let config: ReturnType<typeof getConfig>;
 
 	try {
 		config = getConfig(options.env ?? process.env);
 	} catch (error) {
 		reportFailure('configuration', error);
-		return unavailableData();
+		return { news: newsResult.status === 'fulfilled' ? mapNews(newsResult.value, options.language) : [], eventTypes, events: [], sourceStatus: { news: newsResult.status === 'fulfilled' ? 'live' : 'unavailable', events: 'unavailable' } };
 	}
 
-	const [newsResult, eventsResult] = await Promise.allSettled([
-		fetchNews(config, fetcher),
-		fetchEvents(config, options.eventWindow, fetcher)
-	]);
-
-	if (newsResult.status === 'rejected') reportFailure('news', newsResult.reason);
+	const eventsResult = await Promise.resolve().then(() => fetchEvents(config, options.eventWindow, fetcher)).then(
+		(value) => ({ status: 'fulfilled' as const, value }),
+		(reason) => ({ status: 'rejected' as const, reason })
+	);
 	if (eventsResult.status === 'rejected') reportFailure('events', eventsResult.reason);
 
 	return {
-		news: newsResult.status === 'fulfilled' ? newsResult.value : [],
+		news: newsResult.status === 'fulfilled' ? mapNews(newsResult.value, options.language) : [],
 		eventTypes,
 		events: eventsResult.status === 'fulfilled' ? eventsResult.value : [],
 		sourceStatus: {
@@ -89,19 +92,6 @@ function getConfig(env: Environment) {
 	};
 }
 
-async function fetchNews(config: ReturnType<typeof getConfig>, fetcher: Fetcher): Promise<NewsItem[]> {
-	const url = new URL(`${config.baseUrl}/rest/v1/HotNews`);
-	url.searchParams.set('select', NEWS_SELECT);
-	url.searchParams.set('order', 'created_at.desc');
-	url.searchParams.set('limit', MAX_ROWS);
-
-	const rows = await fetchRows(url, config.headers, fetcher, 'news');
-	return rows.flatMap((row) => {
-		const parsed = parseNews(row);
-		return parsed ? [parsed] : [];
-	});
-}
-
 async function fetchEvents(
 	config: ReturnType<typeof getConfig>,
 	eventWindow: WhatsOnQueryOptions['eventWindow'],
@@ -128,7 +118,7 @@ async function fetchRows(
 	url: URL,
 	headers: Record<string, string>,
 	fetcher: Fetcher,
-	source: 'news' | 'events'
+	source: 'events'
 ): Promise<unknown[]> {
 	const response = await fetcher(url, {
 		headers,
@@ -141,23 +131,13 @@ async function fetchRows(
 	return payload;
 }
 
-function parseNews(value: unknown): NewsItem | null {
-	if (!isRecord(value) || value.status !== 'approved') return null;
-	const id = requiredText(value.news_id);
-	const headline = requiredText(value.headline);
-	const publishedDate = dateKey(value.published_date);
-	if (!id || !headline || !publishedDate) return null;
-
-	const sourceUrl = safeSourceUrl(value.source_url);
-	return {
-		id,
-		headline,
-		blurb: optionalText(value.blurb) ?? '',
-		sourceUrl,
-		sourceName: optionalText(value.source_name) ?? (sourceUrl ? new URL(sourceUrl).hostname : 'Source'),
-		publishedDate,
-		status: 'approved'
-	};
+function mapNews(rows: Awaited<ReturnType<typeof listPublishedNews>>, language: 'th' | 'en' = 'en'): NewsItem[] {
+	return rows.flatMap((item) => item.publishedAt ? [{
+		id: item.id, slug: item.slug, headline: language === 'th' ? item.titleTh : item.titleEn,
+		blurb: (language === 'th' ? item.contentTh : item.contentEn).slice(0, 220), coverImageUrl: item.coverImageUrl,
+		sourceUrl: item.sourceUrl, sourceName: item.sourceName ?? (item.sourceUrl ? new URL(item.sourceUrl).hostname : 'GL-Orbit'),
+		publishedDate: item.publishedAt.toISOString().slice(0, 10), status: 'approved' as const
+	}] : []);
 }
 
 function parseEvent(value: unknown): OrbitEvent | null {
@@ -224,15 +204,6 @@ function dateKey(value: unknown): string | null {
 	return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === key ? key : null;
 }
 
-function safeSourceUrl(value: unknown): string | null {
-	const rawUrl = optionalText(value);
-	if (!rawUrl) return null;
-	try {
-		return parseSafeExternalUrl(rawUrl).toString();
-	} catch {
-		return null;
-	}
-}
 
 function safeTimezone(value: unknown): string {
 	const timezone = optionalText(value) ?? DEFAULT_TIMEZONE;

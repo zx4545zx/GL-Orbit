@@ -33,6 +33,7 @@ export const momentReportStatusEnum = pgEnum('moment_report_status', ['PENDING',
 export const subscriptionStatusEnum = pgEnum('subscription_status', ['ACTIVE', 'CANCELED']);
 export const subscriptionBillingUnitEnum = pgEnum('subscription_billing_unit', ['DAY', 'MONTH', 'YEAR']);
 export const subscriptionPaymentKindEnum = pgEnum('subscription_payment_kind', ['INITIAL', 'RENEWAL', 'MANUAL']);
+export const newsStatusEnum = pgEnum('news_status', ['DRAFT', 'PUBLISHED', 'ARCHIVED']);
 
 export const users = pgTable('users', {
 	id: uuid('id').defaultRandom().primaryKey(),
@@ -247,6 +248,30 @@ export const series = pgTable('series', {
 	status: seriesStatusEnum('status').notNull().default('UPCOMING'),
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
 });
+
+export const news = pgTable('news', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	slug: varchar('slug', { length: 255 }).notNull().unique(),
+	titleTh: varchar('title_th', { length: 255 }).notNull(),
+	titleEn: varchar('title_en', { length: 255 }).notNull(),
+	contentTh: text('content_th').notNull(),
+	contentEn: text('content_en').notNull(),
+	coverImageUrl: text('cover_image_url'),
+	sourceUrl: text('source_url'),
+	sourceName: varchar('source_name', { length: 255 }),
+	publishedAt: timestamp('published_at', { withTimezone: true }),
+	status: newsStatusEnum('status').notNull().default('DRAFT'),
+	createdBy: uuid('created_by').notNull().references(() => users.id, { onDelete: 'restrict' }),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+	deletedAt: timestamp('deleted_at', { withTimezone: true })
+}, (table) => ({
+	publicPublishedIndex: index('news_public_published_idx')
+		.on(table.publishedAt.desc(), table.id)
+		.where(sql`${table.deletedAt} IS NULL AND ${table.status} = 'PUBLISHED'`),
+	creatorIndex: index('news_creator_idx').on(table.createdBy, table.createdAt.desc()),
+	publishedState: check('news_published_state_check', sql`(${table.status} = 'PUBLISHED') = (${table.publishedAt} IS NOT NULL)`)
+}));
 
 export const seriesGalleryImages = pgTable('series_gallery_images', {
 	id: uuid('id').defaultRandom().primaryKey(),

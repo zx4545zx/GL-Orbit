@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+const mocks = vi.hoisted(() => ({ listPublishedNews: vi.fn() }));
+vi.mock('$lib/server/news.js', () => ({ listPublishedNews: mocks.listPublishedNews }));
 import { getWhatsOnData } from './whats-on.js';
 
 const env = {
@@ -13,25 +15,12 @@ const eventWindow = {
 afterEach(() => vi.restoreAllMocks());
 
 describe('getWhatsOnData', () => {
-	it('authenticates requests and maps approved news and external events', async () => {
+	it('maps local published news and authenticates only external events', async () => {
+		mocks.listPublishedNews.mockResolvedValue([{ id: 'news-1', slug: 'approved-story', titleTh: 'ข่าวไทย', titleEn: 'Approved story', contentTh: 'สรุป', contentEn: 'Story summary', coverImageUrl: null, sourceUrl: 'https://x.com/example/status/1', sourceName: 'X', publishedAt: new Date('2026-07-24T00:00:00.000Z'), status: 'PUBLISHED' }]);
 		const calls: Array<{ url: URL; headers: Headers }> = [];
 		const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
 			const url = new URL(input instanceof Request ? input.url : input.toString());
 			calls.push({ url, headers: new Headers(init?.headers) });
-			if (url.pathname.endsWith('/HotNews')) {
-				return Response.json([
-					{
-						news_id: 'news-1',
-						headline: 'Approved story',
-						blurb: 'Story summary',
-						source_url: 'https://x.com/example/status/1',
-						source_name: 'X',
-						published_date: '2026-07-24',
-						status: 'approved'
-					},
-					{ news_id: 'news-2', headline: 'Pending story', published_date: '2026-07-25', status: 'pending' }
-				]);
-			}
 			return Response.json([
 				{
 					event_id: 'event-1',
@@ -48,11 +37,11 @@ describe('getWhatsOnData', () => {
 			]);
 		}) as typeof fetch;
 
-		const result = await getWhatsOnData({ env, eventWindow, fetcher });
+		const result = await getWhatsOnData({ env, eventWindow, fetcher, language: 'en' });
 
 		expect(result.sourceStatus).toEqual({ news: 'live', events: 'live' });
 		expect(result.news).toEqual([
-			expect.objectContaining({ id: 'news-1', sourceUrl: 'https://x.com/example/status/1', status: 'approved' })
+			expect.objectContaining({ id: 'news-1', slug: 'approved-story', headline: 'Approved story', sourceUrl: 'https://x.com/example/status/1', status: 'approved' })
 		]);
 		expect(result.events).toEqual([
 			expect.objectContaining({
@@ -63,7 +52,7 @@ describe('getWhatsOnData', () => {
 				endDateKey: '2026-08-05'
 			})
 		]);
-		expect(calls).toHaveLength(2);
+		expect(calls).toHaveLength(1);
 		for (const call of calls) {
 			expect(call.headers.get('apikey')).toBe('publishable-test-key');
 			expect(call.headers.get('authorization')).toBe('Bearer publishable-test-key');
@@ -75,30 +64,29 @@ describe('getWhatsOnData', () => {
 		]);
 	});
 
-	it('keeps one source live when the other request fails', async () => {
+	it('keeps local news live when the external event request fails', async () => {
+		mocks.listPublishedNews.mockResolvedValue([]);
 		vi.spyOn(console, 'error').mockImplementation(() => undefined);
 		const fetcher = vi.fn(async (input: RequestInfo | URL) => {
-			const url = new URL(input instanceof Request ? input.url : input.toString());
-			return url.pathname.endsWith('/HotNews')
-				? new Response(null, { status: 503 })
-				: Response.json([]);
+			return new Response(null, { status: 503 });
 		}) as typeof fetch;
 
 		const result = await getWhatsOnData({ env, eventWindow, fetcher });
 
 		expect(result.news).toEqual([]);
 		expect(result.events).toEqual([]);
-		expect(result.sourceStatus).toEqual({ news: 'unavailable', events: 'live' });
+		expect(result.sourceStatus).toEqual({ news: 'live', events: 'unavailable' });
 	});
 
 	it('fails closed without exposing requests when configuration is missing', async () => {
+		mocks.listPublishedNews.mockResolvedValue([]);
 		vi.spyOn(console, 'error').mockImplementation(() => undefined);
 		const fetcher = vi.fn<typeof fetch>();
 
 		const result = await getWhatsOnData({ env: {}, eventWindow, fetcher });
 
 		expect(fetcher).not.toHaveBeenCalled();
-		expect(result.sourceStatus).toEqual({ news: 'unavailable', events: 'unavailable' });
+		expect(result.sourceStatus).toEqual({ news: 'live', events: 'unavailable' });
 		expect(result.eventTypes).toHaveLength(8);
 	});
 });

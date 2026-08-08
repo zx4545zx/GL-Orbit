@@ -12,10 +12,11 @@
     "i18n:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/i18n/paraglide --silent",
     "check": "npm run i18n:compile && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "npm run i18n:compile && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
-  },
+		"db:generate": "drizzle-kit generate",
+		"db:push": "drizzle-kit push",
+		"db:studio": "drizzle-kit studio",
+		"news:import": "npx tsx scripts/import-news.ts"
+	},
   "devDependencies": {
     "@sveltejs/adapter-vercel": "^6.3.4",
     "@sveltejs/kit": "^2.20.0",
@@ -29,7 +30,7 @@
     "@types/web-push": "^3.6.4",
     "@vite-pwa/sveltekit": "^1.1.0",
     "autoprefixer": "^10.4.21",
-    "drizzle-kit": "^0.31.0",
+    "drizzle-kit": "1.0.0-rc.4",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.3",
     "svelte": "^5.25.0",
@@ -59,7 +60,7 @@
     "aws4fetch": "^1.0.20",
     "bcryptjs": "^3.0.3",
     "dotenv": "^16.5.0",
-    "drizzle-orm": "^0.43.0",
+    "drizzle-orm": "1.0.0-rc.4",
     "jose": "^6.2.3",
     "postgres": "^3.4.9",
     "sharp": "^0.35.3",
