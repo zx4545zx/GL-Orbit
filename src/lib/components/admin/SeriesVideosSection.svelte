@@ -28,17 +28,17 @@
 	let statusMessage = $state('');
 	const canAdd = $derived(Boolean(titleTh.trim() && titleEn.trim() && youtubeUrl.trim()) && !addPending);
 	const videoErrorMessages: Record<SeriesVideoErrorCode, () => string> = {
-		INVALID_TYPE: () => m.series_videos_error_invalid_type({}, { languageTag: lang }),
-		INVALID_TITLE: () => m.series_videos_error_invalid_title({}, { languageTag: lang }),
-		INVALID_YOUTUBE_URL: () => m.series_videos_error_invalid_youtube_url({}, { languageTag: lang }),
-		DUPLICATE_VIDEO: () => m.series_videos_error_duplicate_video({}, { languageTag: lang }),
-		INVALID_REORDER: () => m.series_videos_error_invalid_reorder({}, { languageTag: lang }),
-		SERIES_NOT_FOUND: () => m.series_videos_error_series_not_found({}, { languageTag: lang }),
-		VIDEO_NOT_FOUND: () => m.series_videos_error_video_not_found({}, { languageTag: lang })
+		INVALID_TYPE: () => m.series_videos_error_invalid_type({}, { locale: lang }),
+		INVALID_TITLE: () => m.series_videos_error_invalid_title({}, { locale: lang }),
+		INVALID_YOUTUBE_URL: () => m.series_videos_error_invalid_youtube_url({}, { locale: lang }),
+		DUPLICATE_VIDEO: () => m.series_videos_error_duplicate_video({}, { locale: lang }),
+		INVALID_REORDER: () => m.series_videos_error_invalid_reorder({}, { locale: lang }),
+		SERIES_NOT_FOUND: () => m.series_videos_error_series_not_found({}, { locale: lang }),
+		VIDEO_NOT_FOUND: () => m.series_videos_error_video_not_found({}, { locale: lang })
 	};
 
 	function localizedError(code?: SeriesVideoErrorCode): string {
-		return (code && videoErrorMessages[code]?.()) ?? m.series_videos_failure({}, { languageTag: lang });
+		return (code && videoErrorMessages[code]?.()) ?? m.series_videos_failure({}, { locale: lang });
 	}
 
 	function group(groupType: SeriesVideoType) {

@@ -15,7 +15,7 @@
 			? (page.data.lang as AvailableLanguageTag)
 			: 'th'
 	);
-	setLanguageTag(() => currentLanguageTag);
+	setLanguageTag(currentLanguageTag);
 
 	const routeChanging = $derived(
 		Boolean(navigating.to && (!navigating.from || navigating.to.url.pathname !== navigating.from.url.pathname))

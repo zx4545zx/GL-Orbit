@@ -133,7 +133,7 @@
 		history = body.conversations ?? history;
 	}
 
-	async function createConversation(title = m.chat_new_title(), options: { resetMessages?: boolean } = {}) {
+	async function createConversation(title: string = m.chat_new_title(), options: { resetMessages?: boolean } = {}) {
 		if (current && messages.length === 0) {
 			await replaceState(`/chat/${current.id}`, page.state);
 			return current;
