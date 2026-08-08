@@ -15,7 +15,15 @@
 			? (page.data.lang as AvailableLanguageTag)
 			: 'th'
 	);
-	setLanguageTag(currentLanguageTag);
+	const syncLanguageTag = () => {
+		setLanguageTag(currentLanguageTag, { reload: false });
+	};
+	syncLanguageTag();
+
+	$effect.pre(() => {
+		syncLanguageTag();
+		document.documentElement.lang = currentLanguageTag;
+	});
 
 	const routeChanging = $derived(
 		Boolean(navigating.to && (!navigating.from || navigating.to.url.pathname !== navigating.from.url.pathname))
