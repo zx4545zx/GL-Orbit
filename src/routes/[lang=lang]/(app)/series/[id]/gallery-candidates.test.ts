@@ -15,20 +15,11 @@ describe('series gallery candidate identity', () => {
 		expect(source).toContain('{#each galleryCandidates as image, index (image.key)}');
 	});
 
-	it('keeps duplicate fallback episode cover URLs using episode identity', () => {
-		const schedule = [
-			{ episode: 1, coverUrl: '/same.jpg' },
-			{ episode: 2, coverUrl: '/same.jpg' }
-		];
-
-		expect(schedule.map((episode) => episode.coverUrl)).toEqual(['/same.jpg', '/same.jpg']);
-		expect(source).toContain('key: `episode:${item.episode}:cover`');
-		expect(source).toContain('{#each galleryCandidates as image, index (image.key)}');
-	});
-
-	it('preserves normal gallery order and the ten-image limit', () => {
-		expect(source).toContain(
-			'(officialGalleryCandidates.length > 0 ? officialGalleryCandidates : episodeCoverCandidates).slice(0, 10)'
-		);
+	it('uses only official gallery rows and hides the carousel when none exist', () => {
+		expect(source).toContain('series.gallery.slice(0, 10).map');
+		expect(source).toContain('const galleryCandidates = $derived(officialGalleryCandidates);');
+		expect(source).toContain('{#if galleryCandidates.length > 0}');
+		expect(source).not.toContain('episodeCoverCandidates');
+		expect(source).not.toContain('key: `episode:${item.episode}:cover`');
 	});
 });

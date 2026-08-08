@@ -8,6 +8,8 @@ export const SERIES_VIDEO_TYPES = [
 	{ key: 'TRAILER', labelTh: 'ตัวอย่าง', labelEn: 'Trailer' },
 	{ key: 'PILOT', labelTh: 'ไพล็อต', labelEn: 'Pilot' },
 	{ key: 'MUSIC', labelTh: 'เพลงประกอบ', labelEn: 'Music' },
+	{ key: 'REACTION', labelTh: 'รีแอ็กชัน', labelEn: 'Reaction' },
+	{ key: 'VLOG', labelTh: 'วล็อก', labelEn: 'Vlog' },
 	{ key: 'EVENT', labelTh: 'กิจกรรม', labelEn: 'Event' },
 	{ key: 'OTHER', labelTh: 'อื่นๆ', labelEn: 'Other' }
 ] as const satisfies readonly SeriesVideoRegistryEntry[];

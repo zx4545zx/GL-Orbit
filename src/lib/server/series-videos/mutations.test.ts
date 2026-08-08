@@ -122,7 +122,7 @@ describe('series video mutations', () => {
 		expect(mocks.deleteCached).toHaveBeenCalledWith(`query:series:${seriesId}`);
 	});
 
-	it.each(['MUSIC', 'EVENT', 'OTHER'] as const)('accepts and persists the %s video type', async (type) => {
+	it.each(['MUSIC', 'REACTION', 'VLOG', 'EVENT', 'OTHER'] as const)('accepts and persists the %s video type', async (type) => {
 		const created = {
 			id: videoId, seriesId, type, youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 			youtubeVideoId: 'dQw4w9WgXcQ', titleTh: 'ชื่อไทย', titleEn: 'English title', sortOrder: 0, createdAt

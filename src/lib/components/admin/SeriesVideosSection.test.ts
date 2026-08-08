@@ -52,6 +52,8 @@ describe('SeriesVideosSection', () => {
 			{ value: 'TRAILER', text: 'Trailer' },
 			{ value: 'PILOT', text: 'Pilot' },
 			{ value: 'MUSIC', text: 'Music' },
+			{ value: 'REACTION', text: 'Reaction' },
+			{ value: 'VLOG', text: 'Vlog' },
 			{ value: 'EVENT', text: 'Event' },
 			{ value: 'OTHER', text: 'Other' }
 		]);
@@ -120,7 +122,7 @@ describe('SeriesVideosSection', () => {
 		const headings = screen.getAllByRole('heading', { level: 3 });
 		expect(headings[0].textContent).toMatch(/Trailer/);
 		expect(headings[1].textContent).toMatch(/Pilot/);
-		expect(headings.slice(2).map((heading) => heading.textContent)).toEqual(['Music (0)', 'Event (0)', 'Other (0)']);
+		expect(headings.slice(2).map((heading) => heading.textContent)).toEqual(['Music (0)', 'Reaction (0)', 'Vlog (0)', 'Event (0)', 'Other (0)']);
 		expect(screen.getByText(/Trailer one/)).toBeTruthy();
 		expect(screen.getByText(/ตัวอย่างหนึ่ง/)).toBeTruthy();
 		expect(screen.getByRole('link', { name: videos[1].youtubeUrl }).getAttribute('href')).toBe(videos[1].youtubeUrl);

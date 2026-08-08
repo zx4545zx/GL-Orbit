@@ -45,15 +45,15 @@ describe('/api/admin/series/[id]/videos', () => {
 		expect(await response.json()).toEqual({ success: false, code: 'SERIES_NOT_FOUND', error: 'ไม่พบซีรีส์' });
 	});
 
-	it('POST forwards only accepted fields plus path series ID and returns 201', async () => {
+	it('POST forwards VLOG plus only accepted fields and the path series ID', async () => {
 		mocks.create.mockResolvedValue({ id: 'created' });
 		const response = await POST(event('POST', JSON.stringify({
-			type: 'TRAILER', titleTh: 'ไทย', titleEn: 'English', youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ',
+			type: 'VLOG', titleTh: 'ไทย', titleEn: 'English', youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ',
 			seriesId: 'attacker', youtubeVideoId: 'attacker', sortOrder: 999, canonicalUrl: 'attacker', createdAt: 'attacker'
 		})));
 		expect(response.status).toBe(201);
 		expect(mocks.create).toHaveBeenCalledWith({ marker: 'db' }, {
-			seriesId: 'series-path', type: 'TRAILER', titleTh: 'ไทย', titleEn: 'English', youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ'
+			seriesId: 'series-path', type: 'VLOG', titleTh: 'ไทย', titleEn: 'English', youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ'
 		});
 	});
 

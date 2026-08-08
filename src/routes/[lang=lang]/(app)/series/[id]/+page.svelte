@@ -68,26 +68,14 @@
 	);
 
 	const officialGalleryCandidates = $derived(
-		series.gallery.map((image, index) => ({
+		series.gallery.slice(0, 10).map((image, index) => ({
 			key: `gallery:${image.id}`,
 			src: image.imageUrl,
 			alt: image.caption ?? `${series.titleEn} gallery ${index + 1}`,
 			caption: image.caption ?? ''
 		}))
 	);
-	const episodeCoverCandidates = $derived(
-		series.schedule
-			.filter((item) => Boolean(item.coverUrl))
-			.map((item) => ({
-				key: `episode:${item.episode}:cover`,
-				src: item.coverUrl as string,
-				alt: m.series_episode_cover_alt({ episode: item.episode }),
-				caption: `EP ${item.episode} · ${item.title}`
-			}))
-	);
-	const galleryCandidates = $derived(
-		(officialGalleryCandidates.length > 0 ? officialGalleryCandidates : episodeCoverCandidates).slice(0, 10)
-	);
+	const galleryCandidates = $derived(officialGalleryCandidates);
 	const infoCells = $derived(
 		[
 			{ label: m.series_detail_studio(), value: series.studio },
@@ -333,6 +321,10 @@
 				<Picture src={series.poster} type="posters" sizes="240px" alt="" width={1920} height={960} loading="eager" fetchpriority="high" class="sd-cover-img sd-cover-fb" />
 					<div class="sd-cover-tint" aria-hidden="true"></div>
 			{/if}
+			<button type="button" onclick={goBack} class="sd-back">
+				<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+				<span>{m.common_back()}</span>
+			</button>
 		</div>
 		<div class="sd-wrap">
 			<div class="sd-hero-inner">
@@ -342,10 +334,6 @@
 					</div>
 				</div>
 				<div class="sd-hero-titles">
-					<button type="button" onclick={goBack} class="sd-back">
-						<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-						<span>{m.common_back()}</span>
-					</button>
 					{#if s}
 						<span class="sd-status-chip" class:sd-status-live={s.live}>{s.text}</span>
 					{/if}
@@ -401,23 +389,33 @@
 					</div>
 				{/each}
 			</div>
-			{#if series.studioOfficialSite || series.studioSocials.length > 0}
+		</section>
+
+		{#if series.studioOfficialSite || series.studioSocials.length > 0}
+			<section aria-labelledby="sd-links-heading">
+				<div class="sd-sec-head">
+					<span class="sd-tag">LINK</span>
+					<h2 id="sd-links-heading">{m.series_detail_official_links()}</h2>
+					<span class="sd-line"></span>
+				</div>
 				<div class="sd-studio-links">
 					{#if series.studioOfficialSite}
 						<a href={series.studioOfficialSite} target="_blank" rel="noopener noreferrer" class="sd-link-chip">
 							<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" /></svg>
 							<span>{m.series_detail_official_site()}</span>
+							<svg class="sd-link-external" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 002 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
 						</a>
 					{/if}
 					{#each series.studioSocials as social (social.url)}
 						<a href={social.url} target="_blank" rel="noopener noreferrer" class="sd-link-chip">
 							{#if social.iconUrl}<img src={social.iconUrl} alt="" width={16} height={16} loading="lazy" decoding="async" class="h-4 w-4" />{/if}
 							<span>{social.platform}</span>
+							<svg class="sd-link-external" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 002 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
 						</a>
 					{/each}
 				</div>
-			{/if}
-		</section>
+			</section>
+		{/if}
 
 		<!-- SYNOPSIS -->
 		{#if description}
@@ -449,7 +447,7 @@
 					<h2 id="sd-gallery-heading">{m.series_detail_gallery()}</h2>
 					<span class="sd-line"></span>
 				</div>
-				<div class="sd-splide splide" bind:this={gallerySplideEl} aria-roledescription="carousel">
+				<div class="sd-splide splide px-4" bind:this={gallerySplideEl} aria-roledescription="carousel">
 					<div class="splide__track">
 						<div class="splide__list">
 							{#each galleryCandidates as image, index (image.key)}
@@ -731,25 +729,29 @@
 		min-width: 0;
 	}
 	.sd-back {
+		position: absolute;
+		top: 12px;
+		left: 16px;
+		z-index: 2;
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
 		min-height: 44px;
 		padding: 4px 12px;
-		margin-bottom: 8px;
 		font-size: 11px;
 		font-weight: var(--orbit-font-label-weight);
 		letter-spacing: var(--orbit-font-letter-spacing);
 		text-transform: uppercase;
-		color: var(--orbit-ink);
-		background: var(--orbit-surface);
-		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
+		color: var(--orbit-surface);
+		background: color-mix(in srgb, var(--orbit-rail) 80%, transparent);
+		backdrop-filter: blur(8px);
+		border: var(--orbit-border-width) var(--orbit-border-style) color-mix(in srgb, var(--orbit-surface) 72%, transparent);
 		border-radius: var(--orbit-radius-control);
-		box-shadow: var(--orbit-shadow-surface);
+		box-shadow: var(--orbit-shadow-overlay);
 		cursor: pointer;
 	}
-	.sd-back:hover { border-color: var(--orbit-border-interactive); }
-	.sd-back:focus-visible { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
+	.sd-back:hover { background: var(--orbit-rail); border-color: var(--orbit-surface); }
+	.sd-back:focus-visible { outline: 3px solid var(--orbit-border-focus); outline-offset: 3px; }
 	.sd-status-chip {
 		display: inline-flex;
 		align-items: center;
@@ -800,37 +802,76 @@
 
 	/* ============ ACTIONS ============ */
 	.sd-actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		align-items: stretch;
+		gap: 8px;
 		padding: 18px 16px 4px;
 	}
+	.sd-actions > :global(div) { min-width: 0; }
 	.sd-actions :global(.sd-btn-like) {
+		width: 100%;
+		min-width: 0;
+		height: 44px;
 		background: var(--orbit-surface);
-		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-interactive);
+		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-default);
 		border-radius: var(--orbit-radius-control);
-		box-shadow: var(--orbit-shadow-interactive);
-		padding: 10px 16px;
+		box-shadow: var(--orbit-shadow-surface);
+		padding: 10px 8px;
 		font-weight: var(--orbit-font-label-weight);
 		letter-spacing: var(--orbit-font-letter-spacing);
 		text-transform: uppercase;
-		color: var(--orbit-ink);
+		color: var(--orbit-muted);
 	}
-	.sd-actions :global(.sd-btn-like:hover) {
+	.sd-actions :global(.sd-btn-like[aria-pressed='true']) {
+		background: var(--orbit-coral);
 		border-color: var(--orbit-coral-dark);
 		box-shadow: var(--orbit-shadow-accent);
+		color: var(--orbit-surface);
+	}
+	.sd-actions :global(.sd-btn-like[aria-pressed='false']) { font-weight: var(--orbit-font-label-weight); }
+	.sd-actions :global(.sd-btn-like > div) {
+		width: 1.25rem;
+		height: 1.25rem;
+		border-radius: var(--orbit-radius-control);
+		background: transparent;
+		color: currentColor;
+		box-shadow: none;
+	}
+	.sd-actions :global(.sd-btn-like[aria-expanded='true'] > div) {
+		background: transparent;
+		color: currentColor;
+	}
+	.sd-actions :global(.sd-btn-like > :last-child) { min-width: 0; }
+	.sd-actions :global(.sd-btn-like:hover) {
+		border-color: var(--orbit-coral-dark);
+		color: var(--orbit-coral-dark);
+		box-shadow: var(--orbit-shadow-accent);
+	}
+	.sd-actions :global(.sd-btn-like[aria-pressed='true']:hover) { color: var(--orbit-surface); }
+	@media (max-width: 389px) {
+		.sd-actions :global(.sd-btn-like > :last-child) { display: none; }
+		.sd-actions :global(.sd-btn-like[aria-haspopup='menu']) {
+			justify-content: center;
+			gap: 0;
+			padding: 0;
+		}
+		.sd-actions :global(.sd-btn-like[aria-haspopup='menu'] > div) {
+			margin: 0;
+			padding: 0;
+		}
 	}
 
 	/* ============ SECTIONS ============ */
 	.sd-page section { margin-top: 28px; }
-	.sd-sec-head {
+	.sd-page :global(.sd-sec-head) {
 		display: flex;
 		align-items: center;
 		gap: 10px;
 		margin-bottom: 12px;
 		padding: 0 16px;
 	}
-	.sd-tag {
+	.sd-page :global(.sd-tag) {
 		font-size: 10px;
 		font-weight: var(--orbit-font-label-weight);
 		letter-spacing: var(--orbit-font-letter-spacing);
@@ -840,13 +881,13 @@
 		padding: 3px 8px;
 		text-transform: uppercase;
 	}
-	.sd-sec-head h2 {
+	.sd-page :global(.sd-sec-head h2) {
 		font-family: var(--orbit-font-display);
 		font-weight: var(--orbit-font-heading-weight);
 		font-size: 17px;
 		text-transform: uppercase;
 	}
-	.sd-line {
+	.sd-page :global(.sd-line) {
 		flex: 1;
 		height: var(--orbit-border-width);
 		background: linear-gradient(90deg, var(--orbit-line-strong), var(--orbit-line), transparent);
@@ -934,6 +975,7 @@
 		align-items: center;
 		gap: 6px;
 		min-height: 44px;
+		min-width: 0;
 		max-width: 100%;
 		padding: 6px 12px;
 		font-size: 11px;
@@ -946,6 +988,7 @@
 	}
 	.sd-link-chip:hover { border-color: var(--orbit-border-interactive); color: var(--orbit-coral-dark); }
 	.sd-link-chip:focus-visible { outline: 2px solid var(--orbit-border-focus); outline-offset: 2px; }
+	.sd-link-external { width: 14px; height: 14px; flex: none; }
 
 	/* ============ SYNOPSIS ============ */
 	.sd-synopsis { padding: 0 16px; }
@@ -1352,8 +1395,11 @@
 	/* ============ DESKTOP ============ */
 	@media (min-width: 760px) {
 		.sd-cover { height: min(calc(100vw / 3), 480px); }
+		.sd-back { top: 20px; left: 28px; }
 		.sd-hero-inner { margin-top: -128px; padding: 0 28px; gap: 28px; }
 		.sd-poster-frame { flex-basis: 230px; }
+		.sd-actions { display: flex; align-items: initial; gap: 10px; }
+		.sd-actions :global(.sd-btn-like) { width: auto; height: auto; padding: 10px 16px; }
 		.sd-actions, .sd-sec-head, .sd-synopsis, .sd-countdown, .sd-info-grid { padding-left: 28px; padding-right: 28px; }
 		.sd-info-grid { grid-template-columns: repeat(3, 1fr); }
 		.sd-cd-cell { padding: 16px 10px 12px; }
@@ -1367,6 +1413,10 @@
 		.sd-cast-splide :global(.splide__arrows) { top: 38px; }
 	}
 	@media (max-width: 759px) {
+		.sd-studio-links {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 		/* Mobile: one full gallery slide with an 18% peek (mirrors Splide padding). */
 		.sd-splide :global(.splide__slide:not(.sd-cast-slide)) { width: 82%; }
 	}
