@@ -612,6 +612,7 @@
 	.sd-page {
 		font-family: var(--orbit-font-body, inherit);
 		color: var(--orbit-ink);
+		border-radius: 0 !important;
 	}
 	.sd-wrap {
 		max-width: 72rem;
@@ -622,6 +623,7 @@
 	.sd-marquee {
 		background: var(--orbit-rail);
 		color: var(--orbit-paper);
+		border-radius: 0 !important;
 		font-size: 12px;
 		font-weight: var(--orbit-font-label-weight);
 		overflow: hidden;
@@ -643,6 +645,7 @@
 	.sd-cover {
 		position: relative;
 		height: max(170px, calc(100vw / 3));
+		border-radius: 0 !important;
 		overflow: hidden;
 	}
 	.sd-cover :global(picture) {
@@ -709,7 +712,6 @@
 		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
 		border-radius: var(--orbit-radius-surface);
 		box-shadow: var(--orbit-shadow-overlay);
-		padding: 6px;
 	}
 	.sd-poster {
 		aspect-ratio: 2 / 3;
@@ -927,6 +929,11 @@
 		text-transform: uppercase;
 		color: var(--orbit-paper);
 		opacity: 0.75;
+	}
+	:global([data-theme='midnight']) .sd-back,
+	:global([data-theme='midnight']) .sd-page :global(.sd-tag),
+	:global([data-theme='midnight']) .sd-cd-cell small {
+		color: var(--orbit-ink);
 	}
 	.sd-cd-sep {
 		align-self: center;
@@ -1338,6 +1345,7 @@
 		padding: 4px 10px;
 		flex-shrink: 0;
 	}
+	:global([data-theme='midnight']) .sd-ep-no { color: var(--orbit-ink); }
 	.sd-ep-open .sd-ep-no { background: var(--orbit-coral); color: #fff; }
 	.sd-ep-meta { min-width: 0; flex: 1; }
 	.sd-ep-t {

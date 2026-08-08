@@ -1,6 +1,8 @@
 import { getHomeData } from '$lib/server/queries/home.js';
+import { getLatestNews } from '$lib/server/queries/whats-on.js';
 import { getMoments } from '$lib/server/moments/queries.js';
 import type { HomeLatestMoment } from '$lib/types/home.js';
+import type { NewsItem } from '$lib/types/whats-on.js';
 import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ params, setHeaders }) => {
@@ -8,9 +10,22 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	setHeaders({
 		'cache-control': 'private, max-age=0, s-maxage=30, stale-while-revalidate=60'
 	});
-	const [home, latestMoment] = await Promise.all([getHomeData(lang), getLatestMoment()]);
-	return { ...home, latestMoment };
+	const [home, latestMoment, latestNews] = await Promise.all([
+		getHomeData(lang),
+		getLatestMoment(),
+		getHomeLatestNews(lang)
+	]);
+	return { ...home, latestMoment, latestNews };
 };
+
+async function getHomeLatestNews(lang: 'th' | 'en'): Promise<NewsItem[]> {
+	try {
+		return await getLatestNews(lang, 5);
+	} catch {
+		// News should never prevent schedules and featured series from loading.
+		return [];
+	}
+}
 
 async function getLatestMoment(): Promise<HomeLatestMoment | null> {
 	try {

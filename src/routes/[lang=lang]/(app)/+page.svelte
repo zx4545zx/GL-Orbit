@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import Picture from '$lib/components/Picture.svelte';
 	import { m, type AvailableLanguageTag } from '$lib/i18n/paraglide.js';
+	import type { NewsItem } from '$lib/types/whats-on.js';
 	import {
 		DEFAULT_OG_IMAGE,
 		OG_IMAGE_HEIGHT,
@@ -21,6 +22,7 @@
 	} from '$lib/seo.js';
 	import type { CountdownItem, FeaturedSeriesItem, UpcomingScheduleItem } from '$lib/types/home.js';
 	import type { PageData } from './$types.js';
+	import NewsCarousel from './whats-on/NewsCarousel.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -29,6 +31,7 @@
 	const featuredSeries = $derived<FeaturedSeriesItem[]>(data.featuredSeries);
 	const upcomingSchedule = $derived<UpcomingScheduleItem[]>(data.upcomingSchedule);
 	const countdownItems = $derived<CountdownItem[]>(data.countdown);
+	const latestNews = $derived<NewsItem[]>(data.latestNews);
 	// data.latestMoment intentionally unused while Orbit Halo is closed.
 
 	const currentLang = $derived((page.data.lang === 'en' ? 'en' : 'th') as AvailableLanguageTag);
@@ -181,6 +184,22 @@
 	</div>
 </section>
 
+<!-- Latest news -->
+<section class="sheet-section" aria-labelledby="home-news-title">
+	<div class="section-head">
+		<h2 id="home-news-title" class="text-base"><span class="zine-tape zine-tape-pink">{m.home_news_title_plain()}{page.data.lang === 'en' ? ' ' : ''}{m.home_news_title_accent()}</span></h2>
+		<a href="/{page.data.lang}/whats-on" class="zine-more touch-target">{m.common_see_all()} →</a>
+	</div>
+
+	{#if latestNews.length > 0}
+		<NewsCarousel news={latestNews} locale={currentLang === 'th' ? 'th-TH' : 'en-US'} />
+	{:else}
+		<div class="orbit-surface px-6 py-12 text-center">
+			<p class="font-semibold">{m.whats_on_no_news()}</p>
+		</div>
+	{/if}
+</section>
+
 <!-- Featured series collage -->
 <section class="sheet-section" aria-labelledby="home-featured-title">
 	<div class="section-head">
@@ -197,7 +216,7 @@
 		<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
 			{#each featuredSeries as series, i (series.id)}
 				<a href="/{page.data.lang}/series/{series.id}" class="zine-polaroid group">
-					<div class="relative aspect-[3/4] overflow-hidden bg-[var(--orbit-ink)]">
+					<div class="zine-polaroid-poster relative aspect-[3/4] overflow-hidden bg-[var(--orbit-ink)]">
 						<Picture src={series.poster} type="posters" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" alt={series.title} width={400} height={533} loading={i < 2 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} class="h-full w-full object-cover transition duration-500 group-hover:opacity-90" />
 						<div class="absolute left-2 top-2">
 							<span class="orbit-badge px-2 py-1 text-[10px] font-bold {statusConfig[series.status].class}">{statusConfig[series.status].text}</span>

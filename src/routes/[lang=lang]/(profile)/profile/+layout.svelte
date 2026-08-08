@@ -75,6 +75,7 @@
 	.profile-cover {
 		height: clamp(8.5rem, 24vw, 17rem);
 		overflow: hidden;
+		border-radius: 0 !important;
 		background:
 			radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--orbit-mint) 70%, transparent), transparent 34%),
 			linear-gradient(125deg, var(--orbit-lavender), var(--orbit-coral-soft));
@@ -83,6 +84,7 @@
 	.profile-cover img {
 		height: 100%;
 		width: 100%;
+		border-radius: 0 !important;
 		object-fit: cover;
 	}
 

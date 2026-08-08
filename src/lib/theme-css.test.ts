@@ -41,7 +41,32 @@ describe('theme CSS contract', () => {
       expect(css).toContain('.orbit-round-data');
       expect(css).toContain('border-radius: 9999px !important');
     });
-     it('keeps a sharp legacy radius across themes until rounded shape overrides it', () => {
+      it('keeps zine text underlines square in rounded mode', () => {
+         expect(css).toMatch(/body \.orbit-nav-item\.shell-navlink \.orbit-nav-indicator\s*\{\s*border-radius:\s*0\s*!important;/);
+         expect(css).toMatch(/\.shell-bottomnav\s*\{[\s\S]*?border-radius:\s*0\s*!important;/);
+       });
+        it('clips the desktop poster without clipping the countdown sticker', () => {
+          expect(css).toMatch(/@media \(min-width:\s*640px\)[\s\S]*\[data-shape='rounded'\]\s+\.zine-countdown\s*\{\s*overflow:\s*visible;/);
+          expect(css).not.toMatch(/\[data-shape='rounded'\]\s+\.zine-countdown\s*\{\s*overflow:\s*hidden;/);
+          expect(css).toMatch(/\[data-shape='rounded'\]\s+\.zine-countdown-poster\s*\{[\s\S]*?border-radius:[^;]*--zine-countdown-card-border[^;]*!important;/);
+          expect(css).toMatch(/\.zine-countdown-poster picture,[\s\S]*\.zine-countdown-img\s*\{\s*border-radius:\s*0\s*!important;/);
+          expect(css).toMatch(/\[data-shape='rounded'\]\[data-theme='y2k'\]\s+\.zine-countdown-poster\s*\{\s*border-top-left-radius:\s*0\s*!important;/);
+        });
+         it('rounds only the top of the Y2K card titlebar', () => {
+           expect(css).toMatch(/\[data-theme='y2k'\] \.zine-card::before\s*\{[\s\S]*border-radius:\s*max\(0px, calc\(var\(--orbit-radius-legacy, 0px\) - 2px\)\) max\(0px, calc\(var\(--orbit-radius-legacy, 0px\) - 2px\)\) 0 0;/);
+         });
+          it('does not decorate the Sakura brand with a pseudo-element', () => {
+            expect(css).not.toMatch(/\[data-theme='sakura'\] \.zine-brand::after\s*\{/);
+          });
+         it('places featured posters flush with the polaroid frame', () => {
+          expect(css).toMatch(/\.zine-polaroid\s*\{\s*padding:\s*0 0 0\.75rem;\s*\}/);
+          expect(css).toMatch(/\.zine-polaroid > p\s*\{\s*padding-inline:\s*0\.625rem;\s*\}/);
+        });
+        it('keeps polaroid poster layers square inside the clipping card', () => {
+          expect(css).toMatch(/\.zine-polaroid\s*\{[\s\S]*?overflow:\s*hidden;/);
+          expect(css).toMatch(/\.zine-polaroid-poster,\s*\.zine-polaroid-poster picture,\s*\.zine-polaroid-poster img\s*\{\s*border-radius:\s*0 !important;/);
+        });
+        it('keeps a sharp legacy radius across themes until rounded shape overrides it', () => {
       for (const theme of themes) {
         expect(themeBlock(theme)).toMatch(/--orbit-radius-legacy:\s*0(px)?/);
       }

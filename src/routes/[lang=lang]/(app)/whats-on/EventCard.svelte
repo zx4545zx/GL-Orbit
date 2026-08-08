@@ -101,7 +101,7 @@
 	.event-meta { display: flex; flex-wrap: wrap; gap: 0.3rem; color: var(--orbit-muted); font-size: 0.72rem; line-height: 1.25; }
 	.event-type { color: var(--event-tone); font-weight: 800; }
 	h3 { margin-top: 0.38rem; color: var(--orbit-ink); font-family: var(--orbit-font-body); font-size: 0.9rem; font-weight: 750; line-height: 1.4; overflow-wrap: anywhere; }
-	.event-details { display: grid; gap: 0.32rem; margin-top: 0.7rem; padding-top: 0.65rem; border-top: 1px var(--orbit-border-style) var(--orbit-line); color: var(--orbit-muted); font-size: 0.72rem; }
+	.event-details { display: grid; gap: 0.32rem; margin-top: 0.7rem; color: var(--orbit-muted); font-size: 0.72rem; }
 	.event-details span { display: flex; min-width: 0; align-items: flex-start; gap: 0.38rem; overflow-wrap: anywhere; }
 	.event-details svg { width: 0.9rem; height: 0.9rem; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; }
 	.event-location a { color: inherit; text-decoration: underline; text-decoration-style: dotted; text-decoration-thickness: 1px; text-underline-offset: 0.16em; }

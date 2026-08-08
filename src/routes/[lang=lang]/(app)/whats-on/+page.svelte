@@ -836,7 +836,6 @@
 		gap: 1rem;
 		align-items: start;
 		padding: 0.85rem 1rem 0.85rem 1.2rem;
-		border-bottom: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
 		transition: background-color var(--orbit-motion-fast), transform var(--orbit-motion-fast) var(--orbit-motion-ease);
 	}
 
@@ -851,10 +850,6 @@
 		inset: 0 auto 0 0;
 		width: 3px;
 		background: var(--event-tone);
-	}
-
-	.all-event-row:last-child {
-		border-bottom: 0;
 	}
 
 	.all-event-row:nth-child(-n + 5) {
@@ -1126,6 +1121,8 @@
 	.week-column {
 		min-width: 0;
 		border-right: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
+		/* Override app.css's global `body *` legacy radius without touching event cards or the board shell. */
+		border-radius: 0 !important;
 	}
 
 	.week-column:last-child {
@@ -1135,6 +1132,7 @@
 	.week-column > header {
 		padding: 0.6rem 0.35rem;
 		border-bottom: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
+		border-radius: 0 !important;
 		text-align: center;
 	}
 
@@ -1177,12 +1175,14 @@
 	.month-main {
 		min-width: 0;
 		border-bottom: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
+		border-radius: 0 !important;
 	}
 
 	.month-weekdays,
 	.month-grid {
 		display: grid;
 		grid-template-columns: repeat(7, minmax(0, 1fr));
+		border-radius: 0 !important;
 	}
 
 	.month-weekdays {
@@ -1195,13 +1195,15 @@
 		font-size: 0.6rem;
 		font-weight: 700;
 		text-align: center;
+		border-radius: 0 !important;
 	}
 
-	.month-grid button {
+	.month-grid > button {
 		min-height: 3.9rem;
 		padding: 0.35rem;
 		border-right: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
 		border-bottom: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-line);
+		border-radius: 0 !important;
 		background: transparent;
 		color: var(--orbit-ink);
 		text-align: left;
@@ -1260,6 +1262,7 @@
 
 	.selected-day-panel {
 		padding: 1rem;
+		border-radius: 0 !important;
 		background: var(--orbit-surface);
 	}
 
@@ -1451,4 +1454,5 @@
 		.load-more-wrap button:hover:not(:disabled),
 		.month-grid button:hover { transform: none; }
 	}
+
 </style>

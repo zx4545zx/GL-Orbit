@@ -39,6 +39,16 @@ describe('home page shared editorial structure', () => {
 		expect(homePage).toContain('nextOnAir');
 	});
 
+	it('shows latest news before featured series', () => {
+		const newsSection = homePage.indexOf('aria-labelledby="home-news-title"');
+		const featuredSection = homePage.indexOf('aria-labelledby="home-featured-title"');
+
+		expect(homePage).toContain('NewsCarousel');
+		expect(homePage).toContain('data.latestNews');
+		expect(newsSection).toBeGreaterThan(-1);
+		expect(featuredSection).toBeGreaterThan(newsSection);
+	});
+
 	it('keeps Orbit Halo hidden while the feature is closed', () => {
 		expect(homePage).not.toContain('{#if latestMoment}');
 		expect(homePage).not.toContain('m.home_halo_title()');

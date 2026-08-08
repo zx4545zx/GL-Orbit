@@ -63,6 +63,7 @@ export async function getHomeData(lang: 'th' | 'en' = 'th'): Promise<HomeApiResp
 				seriesId: series.id,
 				seriesTitleEn: series.titleEn,
 				seriesTitleTh: series.titleTh,
+				posterUrl: series.posterUrl,
 				platformName: platforms.name
 			})
 			.from(episodeSchedules)
@@ -132,6 +133,7 @@ export async function getHomeData(lang: 'th' | 'en' = 'th'): Promise<HomeApiResp
 				time: timeStr,
 				series: s.seriesTitleEn,
 				seriesId: s.seriesId,
+				poster: s.posterUrl ?? '/placeholders/poster.svg',
 				episode: s.episodeTitle ?? `EP.${s.episodeNumber}`,
 				platform: s.platformName,
 				isUncut: s.isUncut

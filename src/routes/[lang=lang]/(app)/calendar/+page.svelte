@@ -322,7 +322,7 @@
 		<div class="cal-card overflow-hidden">
 			{#if contentLoading}
 				<div class="grid-loading-skeleton p-3 sm:p-4">
-					<div class="overflow-x-auto">
+					<div class="cal-gridtable-wrap overflow-x-auto">
 						<table class="cal-gridtable">
 							<thead>
 								<tr>
@@ -358,7 +358,7 @@
 					</div>
 				</div>
 			{:else}
-				<div class="overflow-x-auto">
+				<div class="cal-gridtable-wrap overflow-x-auto">
 					<table class="cal-gridtable">
 						<thead>
 							<tr>
@@ -695,6 +695,7 @@
 		border-radius: var(--orbit-radius-surface);
 		box-shadow: var(--orbit-shadow);
 	}
+	.cal-flush { border-radius: 0 !important; }
 	.cal-chip {
 		display: inline-flex;
 		align-items: center;
@@ -944,7 +945,7 @@
 		color: var(--orbit-surface);
 		padding: 12px 16px;
 		border-bottom: var(--orbit-border-width) solid var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-surface) var(--orbit-radius-surface) 0 0;
+		border-radius: 0 !important;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -987,6 +988,7 @@
 		margin-top: auto;
 		padding: 12px 16px;
 		border-top: var(--orbit-border-width) dashed var(--orbit-line);
+		border-radius: 0 !important;
 		font-size: 13px;
 		color: var(--orbit-muted);
 	}
@@ -1012,6 +1014,7 @@
 		background: var(--orbit-ink);
 		color: var(--orbit-surface);
 		border-bottom: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: 0 !important;
 	}
 	.cal-lday-title {
 		font-family: var(--orbit-font-display);
@@ -1030,6 +1033,7 @@
 		gap: 14px;
 		padding: 12px 16px;
 		border-top: var(--orbit-border-width) solid var(--orbit-line);
+		border-radius: 0 !important;
 		color: var(--orbit-ink);
 		text-decoration: none;
 		transition: background-color var(--orbit-motion-fast, 120ms) var(--orbit-motion-ease, ease);
@@ -1073,14 +1077,17 @@
 	/* ===== grid view ===== */
 	.cal-gridtable {
 		border-collapse: collapse;
+		border-radius: 0 !important;
 		table-layout: fixed;
 		min-width: 720px;
 		width: 100%;
 		font-size: 12px;
 	}
+	.cal-gridtable-wrap { border-radius: 0 !important; }
 	.cal-gridtable th,
 	.cal-gridtable td {
 		border: 1px solid var(--orbit-line);
+		border-radius: 0 !important;
 		padding: 8px;
 		text-align: center;
 		vertical-align: top;
@@ -1236,17 +1243,10 @@
 		.cal-lrow:hover .cal-lrow-arrow { transform: none; }
 	}
 
-	/* Only outer cards stay rounded: app.css `body *` legacy rounding would otherwise
-	   curve these flush children and leave gaps at the card corners. */
-	.cal-lday-head,
-	.cal-lrow,
-	.cal-weekdays,
-	.cal-grid,
-	.cal-cell,
-	.cal-weekdays > div,
-	.cal-gridtable th,
-	.cal-gridtable td,
-	.cal-panel-head,
-	.cal-panel-foot,
-	.cal-flush { border-radius: 0 !important; }
+	/* Scoped selectors outrank app.css's global rounded-mode rule without
+	   flattening the outer card or highlights. */
+	.cal-month-layout .cal-weekdays,
+	.cal-month-layout .cal-weekdays > div,
+	.cal-month-layout .cal-grid,
+	.cal-month-layout .cal-cell { border-radius: 0 !important; }
 </style>

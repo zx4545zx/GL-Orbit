@@ -263,18 +263,6 @@
 		{ key: 'ENDED', label: m.status_ended(), href: `${langPrefix}/explore?view=series&status=ended${statusSearchParam}` }
 	]);
 
-	// Posters for the upcoming rail: reuse countdown/featured posters by series id.
-	const posterBySeriesId = $derived.by(() => {
-		const map = new Map<string, string>();
-		for (const s of data.top10) map.set(s.id, s.poster);
-		for (const h of data.heroes) {
-			if (h.next) map.set(h.next.seriesId, h.next.poster);
-		}
-		return map;
-	});
-	function upcomingPoster(seriesId: string): string {
-		return posterBySeriesId.get(seriesId) ?? '/placeholders/poster.svg';
-	}
 </script>
 
 <svelte:head>
@@ -460,7 +448,7 @@
 					<div class="splide__slide">
 						<a class="xp-card" href="{langPrefix}/series/{item.seriesId}">
 						<div class="xp-poster">
-							<Picture src={upcomingPoster(item.seriesId)} type="posters" sizes="(max-width: 639px) 168px, 232px" alt="" width={464} height={618} class="xp-poster-img" loading="lazy" decoding="async" />
+							<Picture src={item.poster} type="posters" sizes="(max-width: 639px) 168px, 232px" alt="" width={464} height={618} class="xp-poster-img" loading="lazy" decoding="async" />
 							<span class="xp-live"><span class="xp-live-dot orbit-round-data" aria-hidden="true"></span>{item.day} {item.time}</span>
 							{#if item.isUncut}<span class="xp-ep xp-badge-uncut-text">UNCUT</span>{:else}<span class="xp-ep">{item.episode}</span>{/if}
 						</div>
@@ -613,6 +601,14 @@
 		color: var(--orbit-paper);
 		border-top: var(--orbit-border-width) solid var(--orbit-line-strong);
 		border-bottom: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: 0 !important;
+	}
+	.xp-hero-splide,
+	.xp-hero-splide :global(.splide__track),
+	.xp-hero-splide :global(.splide__list),
+	.xp-hero-slide,
+	.xp-hero-frame {
+		border-radius: 0 !important;
 	}
 	.xp-hero-slide {
 		position: relative;
@@ -948,6 +944,7 @@
 		color: var(--orbit-ink);
 		text-decoration: none;
 		border-right: var(--orbit-border-width) solid var(--orbit-line);
+		border-radius: 0 !important;
 		white-space: nowrap;
 	}
 	.xp-tab:last-child { border-right: none; }
@@ -1001,6 +998,7 @@
 		text-decoration: none;
 		color: var(--orbit-ink);
 		border-right: var(--orbit-border-width) solid var(--orbit-line);
+		border-radius: 0 !important;
 		white-space: nowrap;
 	}
 	.xp-chip:last-child { border-right: none; }
@@ -1139,13 +1137,6 @@
 		gap: 6px;
 	}
 	@media (min-width: 1024px) {
-		.xp-hero-splide,
-		.xp-hero-splide :global(.splide__track),
-		.xp-hero-splide :global(.splide__list),
-		.xp-hero-slide,
-		.xp-hero-cover,
-		.xp-hero-cover :global(picture),
-		.xp-hero-cover :global(img) { height: min(calc(100vw / 3), 480px); }
 		/* Keep desktop cards 8px inside the content shell. The outer viewport reserves
 		   14px for intact borders/shadows, but clips before the 18px slide gap ends. */
 		.xp-rail { margin-inline: 8px; }
@@ -1370,6 +1361,7 @@
 		position: relative;
 		overflow: hidden;
 		background: var(--orbit-lavender);
+		border-radius: 0 !important;
 	}
 	.xp-duo-half :global(picture) {
 		position: absolute;

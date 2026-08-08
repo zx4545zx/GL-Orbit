@@ -309,6 +309,7 @@
 		gap: 12px;
 		padding: 10px 14px;
 		border-bottom: 1px solid color-mix(in srgb, var(--orbit-paper) 18%, transparent);
+		border-radius: 0 !important;
 	}
 	.sh-back {
 		display: inline-flex;
@@ -496,11 +497,13 @@
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
 		border-top: 1px solid color-mix(in srgb, var(--orbit-paper) 18%, transparent);
+		border-radius: 0 !important;
 		background: color-mix(in srgb, var(--orbit-rail) 88%, var(--orbit-ink));
 	}
 	.sh-meta-cell {
 		padding: 10px;
 		border-left: 1px solid color-mix(in srgb, var(--orbit-paper) 14%, transparent);
+		border-radius: 0 !important;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
@@ -555,6 +558,7 @@
 		margin-bottom: 12px;
 		padding: 10px 16px 0;
 		border-top: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
+		border-radius: 0 !important;
 	}
 	.sh-sec-k {
 		font-family: var(--orbit-font-display);

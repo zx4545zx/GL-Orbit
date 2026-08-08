@@ -481,6 +481,7 @@
 	.series-card {
 		min-width: 0;
 		overflow: hidden;
+		border-radius: 0 !important;
 		background: var(--orbit-paper-deep);
 		color: white;
 		text-decoration: none;
@@ -491,6 +492,7 @@
 		display: block;
 		aspect-ratio: 3 / 4;
 		overflow: hidden;
+		border-radius: 0 !important;
 		background: var(--orbit-paper-deep);
 	}
 
@@ -505,6 +507,7 @@
 		align-content: end;
 		gap: 0.1rem;
 		padding: clamp(0.35rem, 1.5vw, 0.85rem);
+		border-radius: 0 !important;
 		background: linear-gradient(to top, rgb(0 0 0 / 0.72), transparent 62%);
 		opacity: 0;
 		transition: opacity var(--orbit-motion-fast) var(--orbit-motion-ease);

@@ -2,7 +2,7 @@
 	import { m } from '$lib/i18n/paraglide.js';
 	import { SHAPE_NAMES, setShape, shapeState, type ShapeName } from '$lib/shape.svelte.js';
 
-	let { className = '' }: { className?: string } = $props();
+	let { className = '', compact = false }: { className?: string; compact?: boolean } = $props();
 	let open = $state(false);
 	let root = $state<HTMLDivElement | null>(null);
 	let trigger = $state<HTMLButtonElement | null>(null);
@@ -61,9 +61,9 @@
 <svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
 
 <div bind:this={root} class="relative {className}">
-	<button bind:this={trigger} type="button" aria-haspopup="menu" aria-expanded={open} aria-label={m.shape_trigger()} onclick={toggle} class="orbit-control touch-target flex min-h-11 items-center gap-2 px-3">
+	<button bind:this={trigger} type="button" aria-haspopup="menu" aria-expanded={open} aria-label={m.shape_trigger()} title={compact ? m.shape_trigger() : undefined} onclick={toggle} class="orbit-control touch-target flex min-h-11 items-center gap-2 px-3">
 		<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx={shapeState.shape === 'rounded' ? 2 : 0} /><rect x="13" y="13" width="7" height="7" rx={shapeState.shape === 'rounded' ? 2 : 0} /></svg>
-		<span class="hidden sm:inline">{m.shape_trigger()}</span>
+		{#if !compact}<span class="hidden sm:inline">{m.shape_trigger()}</span>{/if}
 	</button>
 	{#if open}
 		<div role="menu" tabindex="-1" class="orbit-menu absolute right-0 top-full z-50 mt-2 w-44">

@@ -13,6 +13,7 @@ export interface UpcomingScheduleItem {
 	time: string;
 	series: string;
 	seriesId: string;
+	poster: string;
 	isUncut: boolean;
 	episode: string;
 	platform: string;

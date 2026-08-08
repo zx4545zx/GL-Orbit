@@ -68,8 +68,8 @@
 	<!-- Controls: corner cluster on desktop, centered wrap on mobile -->
 	<div class="shell-controls">
 		<LanguageSwitcher variant="icon" />
-		<ThemeMenu />
-		<ShapeMenu />
+		<ThemeMenu compact />
+		<ShapeMenu compact />
 		{#if currentUser}
 			<NotificationDropdown />
 			<div bind:this={profileMenuRoot} class="relative">

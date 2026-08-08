@@ -7,6 +7,8 @@ describe('theme integration', () => {
   const admin = readFileSync('src/routes/[lang=lang]/admin/+layout.svelte', 'utf8');
     expect(nav).toContain("import ThemeMenu from './ThemeMenu.svelte'");
     expect(nav).toContain("import ShapeMenu from './ShapeMenu.svelte'");
+    expect(nav).toContain('<ThemeMenu compact />');
+    expect(nav).toContain('<ShapeMenu compact />');
   expect(nav).not.toContain('ThemeToggle');
   expect(chat).toContain('var(--orbit-paper-deep)');
   expect(admin).toContain('var(--orbit-paper-deep)');

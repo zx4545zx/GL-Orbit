@@ -5,6 +5,24 @@ import { describe, expect, it } from 'vitest';
 const source = readFileSync(fileURLToPath(new URL('./+page.svelte', import.meta.url)), 'utf8');
 
 describe('Explore in-place query navigation', () => {
+	it('keeps full-bleed hero structure square in rounded mode', () => {
+		const squareHeroStart = source.indexOf('.xp-hero-splide,');
+		const squareHeroEnd = source.indexOf('}', squareHeroStart);
+		const squareHeroRule = source.slice(squareHeroStart, squareHeroEnd);
+
+		expect(squareHeroRule).toContain('.xp-hero-splide :global(.splide__track)');
+		expect(squareHeroRule).toContain('.xp-hero-splide :global(.splide__list)');
+		expect(squareHeroRule).toContain('.xp-hero-slide');
+		expect(squareHeroRule).toContain('.xp-hero-frame');
+		expect(squareHeroRule).toContain('border-radius: 0 !important;');
+	});
+
+	it('lets hero content determine its height instead of locking it to viewport width', () => {
+		expect(source).not.toContain('height: min(calc(100vw / 2.8), 500px);');
+		expect(source).toMatch(/\.xp-hero-cover\s*\{[\s\S]*?position: absolute;[\s\S]*?inset: 0;/);
+		expect(source).toMatch(/\.xp-hero-cover :global\(img\)\s*\{[\s\S]*?height: 100%;/);
+	});
+
 	it('autoplays only the hero while preserving accessible and reduced-motion defaults', () => {
 		const heroStart = source.indexOf('heroSplide = new Splide');
 		const heroEnd = source.indexOf('});', heroStart);
@@ -56,6 +74,8 @@ describe('Explore in-place query navigation', () => {
 
 	it('keys upcoming schedule cards by the unique schedule record', () => {
 		expect(source).toContain('{#each data.upcoming as item (item.id)}');
+		expect(source).toContain('src={item.poster}');
+		expect(source).not.toContain('upcomingPoster(');
 	});
 
 	it('normalizes absolute form targets before skipping an unchanged search', () => {

@@ -65,6 +65,11 @@ export async function getWhatsOnData(options: WhatsOnQueryOptions): Promise<What
 	};
 }
 
+export async function getLatestNews(language: 'th' | 'en', limit = 5): Promise<NewsItem[]> {
+	const rows = await listPublishedNews();
+	return mapNews(rows, language).slice(0, limit);
+}
+
 function getConfig(env: Environment) {
 	const rawBaseUrl = env.WHATS_ON_API_URL?.trim();
 	const apiKey = env.WHATS_ON_API_KEY?.trim();

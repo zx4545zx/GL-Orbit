@@ -439,6 +439,7 @@
 		font-size: 13px;
 		line-height: 1.3;
 		color: var(--orbit-ink);
+		border-radius: 0 !important;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;

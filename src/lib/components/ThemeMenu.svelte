@@ -2,7 +2,7 @@
  import { m } from '$lib/i18n/paraglide.js';
  import { THEME_NAMES, setTheme, themeState, type ThemeName } from '$lib/theme.svelte.js';
  import ThemeIcon from './ThemeIcon.svelte';
- let { className = '' }: { className?: string } = $props();
+ let { className = '', compact = false }: { className?: string; compact?: boolean } = $props();
   let open = $state(false);
   let root = $state<HTMLDivElement | null>(null);
  let trigger = $state<HTMLButtonElement | null>(null);
@@ -36,8 +36,8 @@
 <svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
 
 <div bind:this={root} class="relative {className}">
-  <button bind:this={trigger} type="button" aria-haspopup="menu" aria-expanded={open} aria-label={m.theme_trigger()} onclick={toggle} class="orbit-control touch-target flex min-h-11 items-center gap-2 px-3">
-   <ThemeIcon theme={themeState.theme} className="h-5 w-5" /><span class="hidden sm:inline">{m.theme_trigger()}</span>
+  <button bind:this={trigger} type="button" aria-haspopup="menu" aria-expanded={open} aria-label={m.theme_trigger()} title={compact ? m.theme_trigger() : undefined} onclick={toggle} class="orbit-control touch-target flex min-h-11 items-center gap-2 px-3">
+   <ThemeIcon theme={themeState.theme} className="h-5 w-5" />{#if !compact}<span class="hidden sm:inline">{m.theme_trigger()}</span>{/if}
  </button>
  {#if open}
      <div role="menu" tabindex="-1" class="orbit-menu absolute right-0 top-full z-50 mt-2 w-52">

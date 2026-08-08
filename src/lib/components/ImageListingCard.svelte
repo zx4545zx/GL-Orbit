@@ -36,12 +36,12 @@
 	<div class="flex h-full flex-col overflow-hidden border border-[var(--orbit-line)] bg-white transition-[border-color,box-shadow] group-hover:border-coral/60 group-hover:shadow-[var(--orbit-shadow)]">
 		<div class="ilc-poster relative aspect-[3/4] overflow-hidden bg-lavender/10">
 			{#if secondaryImage}
-				<div class="grid h-full w-full grid-cols-2 gap-px bg-[var(--orbit-line-strong)]">
-					<div class="relative overflow-hidden bg-lavender/25">
-						<Picture src={image} type={imageType} sizes="(max-width: 640px) 31vw, (max-width: 1024px) 20.5vw, 15.5vw" {alt} width={250} height={533} class="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
+				<div class="ilc-split grid h-full w-full grid-cols-2 gap-px bg-[var(--orbit-line-strong)]">
+					<div class="ilc-half relative overflow-hidden bg-lavender/25">
+						<Picture src={image} type={imageType} sizes="(max-width: 640px) 31vw, (max-width: 1024px) 20.5vw, 15.5vw" {alt} width={250} height={533} class="ilc-image absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
 					</div>
-					<div class="relative overflow-hidden bg-lavender/25">
-						<Picture src={secondaryImage} type={imageType} sizes="(max-width: 640px) 31vw, (max-width: 1024px) 20.5vw, 15.5vw" alt={secondaryAlt || alt} width={250} height={533} class="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
+					<div class="ilc-half relative overflow-hidden bg-lavender/25">
+						<Picture src={secondaryImage} type={imageType} sizes="(max-width: 640px) 31vw, (max-width: 1024px) 20.5vw, 15.5vw" alt={secondaryAlt || alt} width={250} height={533} class="ilc-image absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
 					</div>
 				</div>
 			{:else}
@@ -52,7 +52,7 @@
 					{alt}
 					width={400}
 					height={533}
-					class="w-full h-full object-cover transition duration-300 group-hover:opacity-90"
+					class="ilc-image w-full h-full object-cover transition duration-300 group-hover:opacity-90"
 					loading="lazy"
 					decoding="async"
 				/>
@@ -81,6 +81,12 @@
 </a>
 
 <style>
-	/* Poster stays square; only the outer card rounds (beats the app.css legacy blanket). */
-	.ilc-poster { border-radius: 0 !important; }
+	/* Poster internals stay square; only the outer card rounds. */
+	.ilc-poster,
+	.ilc-split,
+	.ilc-half,
+	.ilc-poster :global(picture),
+	.ilc-poster :global(.ilc-image) {
+		border-radius: 0 !important;
+	}
 </style>

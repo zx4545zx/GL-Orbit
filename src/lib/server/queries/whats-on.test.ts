@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ listPublishedNews: vi.fn() }));
 vi.mock('$lib/server/news.js', () => ({ listPublishedNews: mocks.listPublishedNews }));
-import { getWhatsOnData } from './whats-on.js';
+import { getLatestNews, getWhatsOnData } from './whats-on.js';
 
 const env = {
 	WHATS_ON_API_URL: 'https://example.supabase.co',
@@ -88,5 +88,19 @@ describe('getWhatsOnData', () => {
 		expect(fetcher).not.toHaveBeenCalled();
 		expect(result.sourceStatus).toEqual({ news: 'live', events: 'unavailable' });
 		expect(result.eventTypes).toHaveLength(8);
+	});
+});
+
+describe('getLatestNews', () => {
+	it('localizes and limits the newest published stories', async () => {
+		mocks.listPublishedNews.mockResolvedValue([
+			{ id: 'news-2', slug: 'new-story', titleTh: 'ข่าวใหม่', titleEn: 'New story', contentTh: 'เนื้อหาใหม่', contentEn: 'New content', coverImageUrl: null, sourceUrl: null, sourceName: null, publishedAt: new Date('2026-08-02T00:00:00.000Z'), status: 'PUBLISHED' },
+			{ id: 'news-1', slug: 'old-story', titleTh: 'ข่าวเก่า', titleEn: 'Old story', contentTh: 'เนื้อหาเก่า', contentEn: 'Old content', coverImageUrl: null, sourceUrl: null, sourceName: null, publishedAt: new Date('2026-08-01T00:00:00.000Z'), status: 'PUBLISHED' }
+		]);
+
+		const result = await getLatestNews('th', 1);
+
+		expect(result).toHaveLength(1);
+		expect(result[0]).toEqual(expect.objectContaining({ id: 'news-2', headline: 'ข่าวใหม่', blurb: 'เนื้อหาใหม่' }));
 	});
 });
