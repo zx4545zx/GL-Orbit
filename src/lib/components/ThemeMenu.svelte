@@ -3,15 +3,21 @@
  import { THEME_NAMES, setTheme, themeState, type ThemeName } from '$lib/theme.svelte.js';
  import ThemeIcon from './ThemeIcon.svelte';
  let { className = '' }: { className?: string } = $props();
- let open = $state(false);
+  let open = $state(false);
+  let root = $state<HTMLDivElement | null>(null);
  let trigger = $state<HTMLButtonElement | null>(null);
  let options = $state<(HTMLButtonElement | null)[]>([]);
  let status = $state('');
  let activeIndex = $state(0);
  const labels: Record<ThemeName, () => string> = { fanzine: m.theme_fanzine, midnight: m.theme_midnight, y2k: m.theme_y2k, sakura: m.theme_sakura, ocean: m.theme_ocean, candy: m.theme_candy, mission: m.theme_mission };
  $effect(() => { if (open) queueMicrotask(() => options[activeIndex]?.focus()); });
- function toggle() { open = !open; if (open) activeIndex = THEME_NAMES.indexOf(themeState.theme); }
- function close() { open = false; trigger?.focus(); }
+  function toggle() { open = !open; if (open) activeIndex = THEME_NAMES.indexOf(themeState.theme); }
+  function close() { open = false; trigger?.focus(); }
+  function dismiss() { open = false; }
+  function handleWindowClick(event: MouseEvent) {
+   if (open && root && event.target instanceof Node && !root.contains(event.target)) dismiss();
+  }
+  function handleWindowKeydown(event: KeyboardEvent) { if (event.key === 'Escape') dismiss(); }
   function select(theme: ThemeName) { setTheme(theme); status = m.theme_selected({ theme: labels[theme]() }); close(); }
   function isCurrentTheme(name: ThemeName) { return Object.is(themeState.theme, name); }
  function keydown(event: KeyboardEvent) {
@@ -27,7 +33,9 @@
  }
 </script>
 
-<div class="relative {className}">
+<svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
+
+<div bind:this={root} class="relative {className}">
   <button bind:this={trigger} type="button" aria-haspopup="menu" aria-expanded={open} aria-label={m.theme_trigger()} onclick={toggle} class="orbit-control touch-target flex min-h-11 items-center gap-2 px-3">
    <ThemeIcon theme={themeState.theme} className="h-5 w-5" /><span class="hidden sm:inline">{m.theme_trigger()}</span>
  </button>

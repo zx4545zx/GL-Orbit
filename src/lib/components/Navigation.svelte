@@ -4,6 +4,7 @@
 	import NotificationDropdown from './NotificationDropdown.svelte';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
 	import ThemeMenu from './ThemeMenu.svelte';
+	import ShapeMenu from './ShapeMenu.svelte';
 	import Picture from './Picture.svelte';
 
 	const currentUser = $derived(page.data.user);
@@ -68,6 +69,7 @@
 	<div class="shell-controls">
 		<LanguageSwitcher variant="icon" />
 		<ThemeMenu />
+		<ShapeMenu />
 		{#if currentUser}
 			<NotificationDropdown />
 			<div bind:this={profileMenuRoot} class="relative">

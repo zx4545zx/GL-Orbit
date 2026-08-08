@@ -41,11 +41,25 @@ describe('theme CSS contract', () => {
       expect(css).toContain('.orbit-round-data');
       expect(css).toContain('border-radius: 9999px !important');
     });
-    it('keeps a sharp legacy radius across all themes for consistent clipping', () => {
+     it('keeps a sharp legacy radius across themes until rounded shape overrides it', () => {
       for (const theme of themes) {
         expect(themeBlock(theme)).toMatch(/--orbit-radius-legacy:\s*0(px)?/);
       }
-    });
+      expect(css).toMatch(/\[data-shape='rounded'\]\s*\{[\s\S]*--orbit-radius-legacy:\s*0\.75rem/);
+      expect(css).toMatch(/\[data-shape='rounded'\]\s*\{[\s\S]*--orbit-radius-surface:\s*1rem/);
+       expect(css).toMatch(/\.orbit-round-data\s*\{[\s\S]*border-radius: 9999px !important/);
+     });
+     it('preserves only explicitly marked semantic circles in rounded mode', () => {
+       const circleInventory = [
+         'src/lib/components/BackToTopButton.svelte',
+         'src/lib/components/chat/ChatApp.svelte',
+         'src/lib/components/Navigation.svelte',
+         'src/lib/components/SeriesDetailPanel.svelte',
+         'src/routes/[lang=lang]/(app)/menus/+page.svelte'
+       ];
+       for (const file of circleInventory) expect(readFileSync(file, 'utf8')).toContain('orbit-round-data');
+       expect(css).not.toMatch(/rounded-full[^\n]*border-radius:\s*9999px/);
+     });
    it('uses only valid registered-property grammars for visual primitives', () => {
     expect(css).not.toMatch(/@property[^}]*syntax:\s*'<shadow>'/);
     expect(css).not.toMatch(/@property[^}]*syntax:\s*'<image>'[^}]*initial-value:\s*none/);

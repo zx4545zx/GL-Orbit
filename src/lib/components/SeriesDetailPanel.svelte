@@ -169,7 +169,7 @@
 					{#each detail.platforms as platform}
 						<span class="rounded-xl border border-white/70 bg-white/60 px-2.5 py-1.5 text-xs font-medium text-plum shadow-sm flex items-center gap-1.5 max-w-full min-w-0">
 							{#if platform.logo}
-								<img src={platform.logo} alt={platform.name} width={16} height={16} loading="lazy" class="w-4 h-4 rounded-full object-cover border border-lavender/30" />
+								<img src={platform.logo} alt={platform.name} width={16} height={16} loading="lazy" class="orbit-round-data w-4 h-4 rounded-full object-cover border border-lavender/30" />
 							{/if}
 							<span class="truncate">{platform.name}</span>
 						</span>
@@ -186,7 +186,7 @@
 					{#each detail.artists as artist}
 						<a href={`/artists/${artist.id}`} class="glass-card relative overflow-hidden rounded-xl p-2.5 transition hover:-translate-y-1 hover:shadow-md hover:shadow-lavender/20">
 							<div class="flex items-center gap-2.5">
-								<Picture src={artist.image} type="profiles" sizes="96px" alt={artist.name} width={44} height={44} loading="lazy" class="h-10 w-10 shrink-0 rounded-xl border border-white/70 object-cover shadow-sm" />
+								<Picture src={artist.image} type="profiles" sizes="96px" alt={artist.name} width={44} height={44} loading="lazy" class="orbit-round-data h-10 w-10 shrink-0 rounded-xl border border-white/70 object-cover shadow-sm" />
 								<div class="min-w-0">
 									<div class="truncate text-sm font-bold text-plum">{artist.name}</div>
 									<div class="truncate text-xs font-medium text-plum-light">{artist.role}</div>
@@ -261,9 +261,9 @@
 											<div class="flex items-center justify-between gap-2 rounded-xl bg-white/50 px-2.5 py-2">
 												<div class="flex items-center gap-2 min-w-0">
 													{#if sch.platformLogo}
-														<img src={sch.platformLogo} alt={sch.platform} width={24} height={24} loading="lazy" class="w-5 h-5 rounded-full object-cover shrink-0 border border-lavender/30" />
+													<img src={sch.platformLogo} alt={sch.platform} width={24} height={24} loading="lazy" class="orbit-round-data w-5 h-5 rounded-full object-cover shrink-0 border border-lavender/30" />
 													{:else}
-														<div class="w-5 h-5 rounded-full bg-lavender/20 flex items-center justify-center shrink-0 border border-lavender/30">
+													<div class="orbit-round-data w-5 h-5 rounded-full bg-lavender/20 flex items-center justify-center shrink-0 border border-lavender/30">
 															<span class="text-[9px] font-bold text-lavender-dark">{sch.platform.charAt(0)}</span>
 														</div>
 													{/if}

@@ -24,7 +24,7 @@
 	<button
 		onclick={scrollTop}
 		aria-label={m.back_to_top_aria()}
-		class="group fixed right-4 sm:right-6 z-[55] floating-action-above-nav {bottomNavHidden ? 'nav-hidden' : ''} flex h-12 w-12 items-center justify-center rounded-full border border-[var(--orbit-line)] bg-white text-plum hover:border-coral/40 hover:text-coral-dark active:scale-95 transition-colors touch-target"
+		class="orbit-round-data group fixed right-4 sm:right-6 z-[55] floating-action-above-nav {bottomNavHidden ? 'nav-hidden' : ''} flex h-12 w-12 items-center justify-center rounded-full border border-[var(--orbit-line)] bg-white text-plum hover:border-coral/40 hover:text-coral-dark active:scale-95 transition-colors touch-target"
 		in:fly={{ y: 20, duration: 250 }}
 		out:fly={{ y: 20, duration: 200 }}
 	>

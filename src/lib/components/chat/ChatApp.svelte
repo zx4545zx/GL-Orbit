@@ -292,9 +292,9 @@
 		{#if currentUser}
 			<div class="flex items-center gap-2 border-b border-black/10 px-4 py-3">
 				{#if currentUser.avatarUrl}
-					<Picture src={currentUser.avatarUrl} type="profiles" sizes="64px" alt="" width={32} height={32} loading="lazy" class="h-8 w-8 rounded-full object-cover" />
+					<Picture src={currentUser.avatarUrl} type="profiles" sizes="64px" alt="" width={32} height={32} loading="lazy" class="orbit-round-data h-8 w-8 rounded-full object-cover" />
 				{:else}
-					<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-coral/10 text-xs font-black text-coral-dark">
+					<div class="orbit-round-data flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-coral/10 text-xs font-black text-coral-dark">
 						{(currentUser.displayName || currentUser.username || 'U').charAt(0).toUpperCase()}
 					</div>
 				{/if}
@@ -304,7 +304,7 @@
 				</div>
 				<button
 					type="button"
-					class="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10 hover:text-plum md:hidden"
+					class="orbit-round-data ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10 hover:text-plum md:hidden"
 					aria-label={m.chat_close_menu_aria()}
 					onclick={() => sidebarOpen = false}
 				>
@@ -360,7 +360,7 @@
 			<div class="flex min-w-0 items-center gap-3">
 				<button
 					type="button"
-					class="flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10 md:hidden"
+					class="orbit-round-data flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10 md:hidden"
 					aria-label={m.chat_open_menu_aria()}
 					onclick={() => sidebarOpen = true}
 				>
@@ -374,7 +374,7 @@
 				</div>
 			</div>
 			{#if hasContextItems(latestContext)}
-				<button type="button" class="relative flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10 {previewOpen ? 'bg-coral/10 text-coral-dark' : ''}" aria-label={previewOpen ? m.chat_hide_preview() : m.chat_show_preview()} aria-pressed={previewOpen} onclick={togglePreviewContext}>
+				<button type="button" class="orbit-round-data relative flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10 {previewOpen ? 'bg-coral/10 text-coral-dark' : ''}" aria-label={previewOpen ? m.chat_hide_preview() : m.chat_show_preview()} aria-pressed={previewOpen} onclick={togglePreviewContext}>
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
 					</svg>

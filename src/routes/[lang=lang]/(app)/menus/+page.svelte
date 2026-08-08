@@ -7,8 +7,11 @@
 	import ThemeMenu from '$lib/components/ThemeMenu.svelte';
 	import ThemeIcon from '$lib/components/ThemeIcon.svelte';
 	import { themeState, type ThemeName } from '$lib/theme.svelte.js';
+	import ShapeMenu from '$lib/components/ShapeMenu.svelte';
+	import { shapeState, type ShapeName } from '$lib/shape.svelte.js';
 
 	const themeLabels: Record<ThemeName, () => string> = { fanzine: m.theme_fanzine, midnight: m.theme_midnight, y2k: m.theme_y2k, sakura: m.theme_sakura, ocean: m.theme_ocean, candy: m.theme_candy, mission: m.theme_mission };
+	const shapeLabels: Record<ShapeName, () => string> = { sharp: m.shape_sharp, rounded: m.shape_rounded };
 
 	const currentUser = $derived(page.data.user);
 	const currentLang = $derived(
@@ -62,7 +65,7 @@
 					href={localizedHref('/profile', page.data.lang)}
 					class="group orbit-surface flex items-center gap-4 rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 touch-target sm:p-5"
 				>
-					<div class="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-coral/10 sm:h-16 sm:w-16">
+					<div class="orbit-round-data relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-coral/10 sm:h-16 sm:w-16">
 						{#if currentUser.avatarUrl}
 							<Picture src={currentUser.avatarUrl} type="profiles" sizes="96px" alt="" loading="eager" class="h-full w-full object-cover" />
 						{:else}
@@ -210,6 +213,19 @@
 						<p class="text-sm leading-5 text-plum-light">{m.theme_selected({ theme: themeLabels[themeState.theme]() })}</p>
 					</div>
 					<ThemeMenu />
+				</div>
+			</section>
+
+			<section class="order-3 orbit-surface p-4 sm:p-5" aria-labelledby="menus-shape-heading">
+				<div class="flex items-center gap-3">
+					<div class="grid h-11 w-11 shrink-0 place-items-center bg-mint/15 text-mint-dark" aria-hidden="true">
+						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx={shapeState.shape === 'rounded' ? 2 : 0} /><rect x="13" y="13" width="7" height="7" rx={shapeState.shape === 'rounded' ? 2 : 0} /></svg>
+					</div>
+					<div class="min-w-0 flex-1">
+						<h2 id="menus-shape-heading" class="font-[family-name:var(--font-display)] text-lg font-black leading-tight text-plum sm:text-xl">{m.menus_shape_title()}</h2>
+						<p class="text-sm leading-5 text-plum-light">{m.shape_selected({ shape: shapeLabels[shapeState.shape]() })}</p>
+					</div>
+					<ShapeMenu />
 				</div>
 			</section>
 		</div>

@@ -1,5 +1,6 @@
 (function () {
 	var theme = 'y2k';
+	var shape = 'sharp';
 	var colors = {
 		fanzine: '#fbf3e4',
 		midnight: '#0d0a14',
@@ -17,7 +18,16 @@
 			localStorage.setItem('theme', 'y2k');
 		}
 	} catch (e) {}
+	try {
+		var storedShape = localStorage.getItem('shape');
+		if (storedShape === 'rounded') {
+			shape = storedShape;
+		} else if (storedShape !== null && storedShape !== 'sharp') {
+			localStorage.setItem('shape', 'sharp');
+		}
+	} catch (e) {}
 	document.documentElement.dataset.theme = theme;
+	document.documentElement.dataset.shape = shape;
 	var meta = document.querySelector('meta[name="theme-color"]');
 	if (meta) meta.setAttribute('content', colors[theme]);
 })();
