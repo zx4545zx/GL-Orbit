@@ -9,5 +9,6 @@
 		conversations={data.conversations}
 		activeConversation={data.activeConversation}
 		initialMessages={data.messages}
+		profiles={data.aiSettings.profiles}
 	/>
 {/key}

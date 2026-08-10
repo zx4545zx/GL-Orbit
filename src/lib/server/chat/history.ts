@@ -22,6 +22,9 @@ export type ChatMessageItem = {
 	id: string;
 	role: 'USER' | 'ASSISTANT';
 	content: string;
+	parts: unknown[];
+	providerType: 'OPENROUTER' | 'GOOGLE' | 'OPENAI_COMPATIBLE' | null;
+	modelId: string | null;
 	context: ChatContextPayload;
 	createdAt: string;
 };
@@ -173,6 +176,9 @@ export async function getChatMessages(userId: string, conversationId: string): P
 			id: chatConversationMessages.id,
 			role: chatConversationMessages.role,
 			content: chatConversationMessages.content,
+			parts: chatConversationMessages.parts,
+			providerType: chatConversationMessages.providerType,
+			modelId: chatConversationMessages.modelId,
 			context: chatConversationMessages.context,
 			createdAt: chatConversationMessages.createdAt
 		})
@@ -184,9 +190,26 @@ export async function getChatMessages(userId: string, conversationId: string): P
 		id: row.id,
 		role: row.role === 'ASSISTANT' ? 'ASSISTANT' : 'USER',
 		content: row.content,
+		parts: Array.isArray(row.parts) ? row.parts : [],
+		providerType: row.providerType,
+		modelId: row.modelId,
 		context: row.role === 'ASSISTANT' ? normalizeChatContext(row.context) : null,
 		createdAt: row.createdAt.toISOString()
 	}));
+}
+
+export async function appendAiChatExchange(userId: string, conversationId: string, userContent: string, userParts: unknown[], assistantContent: string, assistantParts: unknown[], metadata: { providerType: 'OPENROUTER' | 'GOOGLE' | 'OPENAI_COMPATIBLE'; modelId: string }) {
+	const conversation = await getOwnedConversation(userId, conversationId);
+	if (!conversation) return false;
+	const db = await getDb();
+	await db.transaction(async (tx) => {
+		await tx.insert(chatConversationMessages).values([
+			{ conversationId, role: 'USER', content: userContent, context: null, parts: userParts },
+			{ conversationId, role: 'ASSISTANT', content: assistantContent, context: null, parts: assistantParts, providerType: metadata.providerType, modelId: metadata.modelId }
+		]);
+		await tx.update(chatConversations).set({ title: conversation.title === DEFAULT_TITLE ? titleFromInput(userContent) : conversation.title, updatedAt: sql`now()`, expiresAt: nextExpiry() }).where(and(eq(chatConversations.id, conversationId), eq(chatConversations.userId, userId)));
+	});
+	return true;
 }
 
 export async function getRecentChatContext(userId: string, conversationId: string, turns = 6) {

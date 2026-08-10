@@ -4,15 +4,17 @@ import {
 	getOwnedConversation,
 	listChatConversations
 } from '$lib/server/chat/history.js';
+import { listAiSettings } from '$lib/server/ai/profiles.js';
 import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user) throw redirect(303, '/login');
 
-	const [conversations, activeConversation, messages] = await Promise.all([
+	const [conversations, activeConversation, messages, aiSettings] = await Promise.all([
 		listChatConversations(locals.user.id),
 		getOwnedConversation(locals.user.id, params.id),
-		getChatMessages(locals.user.id, params.id)
+		getChatMessages(locals.user.id, params.id),
+		listAiSettings(locals.user.id)
 	]);
 
 	if (!activeConversation || !messages) throw error(404, 'ไม่พบแชตนี้');
@@ -21,5 +23,6 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		conversations,
 		activeConversation,
 		messages
+		, aiSettings
 	};
 };

@@ -1,6 +1,6 @@
 import { defineConfig } from 'drizzle-kit';
 import dotenv from 'dotenv';
-import { resolveMigrationDatabaseUrl } from './src/lib/server/db/config.js';
+import { resolveMigrationDatabaseUrl } from './src/lib/server/db/config';
 
 dotenv.config();
 

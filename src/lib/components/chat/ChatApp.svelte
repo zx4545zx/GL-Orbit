@@ -19,17 +19,22 @@
 		role: 'USER' | 'ASSISTANT';
 		content: string;
 		context: ChatContextPayload;
+		parts?: unknown[];
+		providerType?: string | null;
+		modelId?: string | null;
 		createdAt: string;
 	};
 
 	let {
 		conversations,
 		activeConversation = null,
-		initialMessages = []
+		initialMessages = [],
+		profiles = []
 	}: {
 		conversations: Conversation[];
 		activeConversation?: Conversation | null;
 		initialMessages?: Message[];
+		profiles?: { id: string; name: string; modelId: string; isDefault: boolean }[];
 	} = $props();
 
 	let sidebarOpen = $state(false);
@@ -48,6 +53,8 @@
 	let renamingId = $state<string | null>(null);
 	let renameTitle = $state('');
 	let messagesContainer = $state<HTMLDivElement | null>(null);
+	let selectedProfileId = $state('');
+	let activeRequest = $state<AbortController | null>(null);
 
 	$effect(() => {
 		history = conversations;
@@ -66,6 +73,8 @@
 		return () => cancelAnimationFrame(raf);
 	});
 	const currentUser = $derived(page.data.user);
+	const activeProfile = $derived(profiles.find((profile) => profile.id === selectedProfileId) ?? profiles.find((profile) => profile.isDefault) ?? null);
+	$effect(() => { if (!selectedProfileId && activeProfile) selectedProfileId = activeProfile.id; });
 	const latestContext = $derived.by(() => {
 		for (let i = messages.length - 1; i >= 0; i -= 1) {
 			if (messages[i].role === 'ASSISTANT' && hasContextItems(messages[i].context)) return messages[i].context;
@@ -181,46 +190,61 @@
 		try {
 			const conversation = current ?? await createConversation(text, { resetMessages: false });
 			if (!conversation) throw new Error('missing conversation');
+			activeRequest = new AbortController();
 			const res = await fetch(`/api/chat/conversations/${conversation.id}/messages`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message: text })
+				body: JSON.stringify({ message: text, profileId: selectedProfileId }), signal: activeRequest.signal
 			});
-			const body = await res.json();
 			if (!res.ok) {
+				const body = await res.json();
 				error = body.error ?? m.chat_error_default();
 				messages = messages.filter((message) => message.id !== optimisticUser.id);
 				input = text;
 				return;
 			}
 
-			const responseContext: ChatContextPayload = hasContextItems(body.context ?? null) ? body.context : null;
-			messages = [
-				...messages,
-				{
-					id: crypto.randomUUID(),
-					role: 'ASSISTANT',
-					content: body.reply,
-					context: responseContext,
-					createdAt: new Date().toISOString()
+			if (!res.body) throw new Error('missing stream');
+			const assistantId = crypto.randomUUID();
+			let assistantText = '';
+			const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = '';
+			while (true) {
+				const { done, value } = await reader.read(); if (done) break;
+				buffer += decoder.decode(value, { stream: true });
+				const lines = buffer.split('\n'); buffer = lines.pop() ?? '';
+				for (const line of lines) {
+					if (!line.startsWith('data:')) continue;
+					const raw = line.slice(5).trim(); let delta = '';
+					if (raw.startsWith('0:')) { try { delta = JSON.parse(raw.slice(2)); } catch { delta = ''; } }
+					else if (raw.startsWith('3:')) { try { throw new Error(JSON.parse(raw.slice(2))); } catch (error) { if (error instanceof Error) throw error; throw new Error(m.chat_error_default()); } }
+					else { try { const event = JSON.parse(raw) as { type?: string; delta?: string }; if (event.type === 'text-delta') delta = event.delta ?? ''; } catch { /* ignore protocol metadata */ } }
+					if (!delta) continue;
+					assistantText += delta;
+					messages = [...messages.filter((item) => item.id !== assistantId), { id: assistantId, role: 'ASSISTANT', content: assistantText, parts: [{ type: 'text', text: assistantText }], context: null, createdAt: new Date().toISOString() }];
 				}
-			];
-			panelContext = responseContext;
+			}
+			panelContext = null;
 			previewHidden = true;
-			followupSuggestions = Array.isArray(body.suggestions)
-				? body.suggestions.filter((suggestion: unknown): suggestion is string => typeof suggestion === 'string' && suggestion.trim().length > 0).slice(0, 4)
-				: [];
 			await refreshHistory();
-		} catch {
-			error = m.chat_error_connect();
-			messages = messages.filter((message) => message.id !== optimisticUser.id);
+		} catch (caught) {
+			error = caught instanceof Error && caught.name === 'AbortError' ? m.chat_error_default() : m.chat_error_connect();
+			const canonical = current ? await fetch(`/api/chat/conversations/${current.id}/messages`).then(async (response) => response.ok ? await response.json() : null).catch(() => null) : null;
+			if (canonical?.messages) messages = canonical.messages;
+			else messages = messages.filter((message) => message.id !== optimisticUser.id);
 			input = text;
 			panelContext = null;
 			previewHidden = true;
 		} finally {
+			activeRequest = null;
 			loading = false;
 			stopLoadingStatus();
 		}
+	}
+
+	function stopStreaming() { activeRequest?.abort(); }
+
+	function textFromParts(parts: unknown[]) {
+		return parts.filter((part): part is { type: 'text'; text: string } => Boolean(part) && typeof part === 'object' && (part as { type?: unknown }).type === 'text' && typeof (part as { text?: unknown }).text === 'string').map((part) => part.text).join('');
 	}
 
 	const SUGGESTIONS = [
@@ -372,6 +396,7 @@
 					<h1 class="truncate text-base font-bold text-plum">{current?.title ?? m.chat_new_title()}</h1>
 					<p class="text-xs text-plum-light">{m.chat_header_subtitle()}</p>
 				</div>
+				{#if profiles.length > 0}<select aria-label="Chat model" bind:value={selectedProfileId} disabled={loading} class="max-w-40 rounded-lg border border-lavender/30 bg-white px-2 py-1 text-xs text-plum">{#each profiles as profile (profile.id)}<option value={profile.id}>{profile.name}</option>{/each}</select>{/if}
 			</div>
 			{#if hasContextItems(latestContext)}
 				<button type="button" class="orbit-round-data relative flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/30 text-plum transition hover:bg-lavender/10 {previewOpen ? 'bg-coral/10 text-coral-dark' : ''}" aria-label={previewOpen ? m.chat_hide_preview() : m.chat_show_preview()} aria-pressed={previewOpen} onclick={togglePreviewContext}>
@@ -479,14 +504,15 @@
 							maxlength="500"
 							placeholder={m.chat_placeholder()}
 							class="max-h-36 min-h-11 flex-1 resize-none bg-transparent px-2 py-2.5 text-base leading-6 text-plum placeholder:text-plum-light/70 outline-none sm:px-3"
-							disabled={loading}
+								disabled={loading || !activeProfile}
 						></textarea>
-						<button type="button" onclick={sendMessage} disabled={loading || !input.trim()} class="group flex h-11 shrink-0 items-center gap-2 rounded-2xl bg-plum px-4 text-sm font-black text-white shadow-lg shadow-coral/20 transition hover:-translate-y-0.5 hover:shadow-coral/35 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-45 sm:px-5">
+						<button type="button" onclick={sendMessage} disabled={loading || !input.trim() || !activeProfile} class="group flex h-11 shrink-0 items-center gap-2 rounded-2xl bg-plum px-4 text-sm font-black text-white shadow-lg shadow-coral/20 transition hover:-translate-y-0.5 hover:shadow-coral/35 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-45 sm:px-5">
 							<span class="hidden sm:inline">{m.chat_send()}</span>
 							<svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.4">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m0 0-5-5m5 5-5 5" />
 							</svg>
 						</button>
+						{#if loading}<button type="button" class="text-xs text-plum-light" onclick={stopStreaming}>Stop</button>{/if}
 					</div>
 				</div>
 			</div>

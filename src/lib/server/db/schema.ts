@@ -34,6 +34,7 @@ export const subscriptionStatusEnum = pgEnum('subscription_status', ['ACTIVE', '
 export const subscriptionBillingUnitEnum = pgEnum('subscription_billing_unit', ['DAY', 'MONTH', 'YEAR']);
 export const subscriptionPaymentKindEnum = pgEnum('subscription_payment_kind', ['INITIAL', 'RENEWAL', 'MANUAL']);
 export const newsStatusEnum = pgEnum('news_status', ['DRAFT', 'PUBLISHED', 'ARCHIVED']);
+export const aiProviderTypeEnum = pgEnum('ai_provider_type', ['OPENROUTER', 'GOOGLE', 'OPENAI_COMPATIBLE']);
 
 export const users = pgTable('users', {
 	id: uuid('id').defaultRandom().primaryKey(),
@@ -514,6 +515,35 @@ export const chatConversations = pgTable('chat_conversations', {
 	expiresAt: timestamp('expires_at', { withTimezone: true }).notNull()
 });
 
+export const aiProviderConfigs = pgTable('ai_provider_configs', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	type: aiProviderTypeEnum('type').notNull(),
+	name: varchar('name', { length: 120 }).notNull(),
+	baseUrl: text('base_url'),
+	credential: text('credential').notNull(),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({
+	userIndex: index('ai_provider_configs_user_idx').on(table.userId, table.updatedAt.desc()),
+	providerOwnership: unique('ai_provider_configs_user_id_id_unique').on(table.userId, table.id)
+}));
+
+export const aiModelProfiles = pgTable('ai_model_profiles', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	providerConfigId: uuid('provider_config_id').notNull(),
+	name: varchar('name', { length: 120 }).notNull(),
+	modelId: varchar('model_id', { length: 255 }).notNull(),
+	isDefault: boolean('is_default').notNull().default(false),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+}, (table) => ({
+	providerOwnership: foreignKey({ columns: [table.userId, table.providerConfigId], foreignColumns: [aiProviderConfigs.userId, aiProviderConfigs.id], name: 'ai_model_profiles_user_provider_fk' }).onDelete('cascade'),
+	userIndex: index('ai_model_profiles_user_idx').on(table.userId, table.updatedAt.desc()),
+	oneDefaultPerUser: uniqueIndex('ai_model_profiles_one_default_per_user').on(table.userId).where(sql`${table.isDefault} = true`)
+}));
+
 export const chatMessages = pgTable('chat_messages', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
@@ -528,6 +558,9 @@ export const chatConversationMessages = pgTable('chat_conversation_messages', {
 	conversationId: uuid('conversation_id').notNull().references(() => chatConversations.id, { onDelete: 'cascade' }),
 	role: varchar('role', { length: 20 }).notNull(),
 	content: text('content').notNull(),
+	parts: jsonb('parts').$type<unknown[]>().notNull().default([]),
+	providerType: aiProviderTypeEnum('provider_type'),
+	modelId: varchar('model_id', { length: 255 }),
 	context: jsonb('context'),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });
