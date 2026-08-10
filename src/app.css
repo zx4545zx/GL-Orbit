@@ -225,6 +225,11 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Keep vertical page scrolling native while Splide handles horizontal drags. */
+.splide__track {
+  touch-action: pan-y pinch-zoom;
+}
+
 /* iOS standalone PWA: paint a coral status bar and push content below it.
    Android keeps using manifest/theme-color, so this does not change its app bar.
    --pwa-safe-top defaults to 0 so every non-iOS context stays unaffected; fixed
