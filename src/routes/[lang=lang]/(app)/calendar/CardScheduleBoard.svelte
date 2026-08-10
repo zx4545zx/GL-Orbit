@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import Picture from '$lib/components/Picture.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import type { ScheduleDay, CalendarEvent } from '$lib/types/calendar.js';
@@ -237,7 +238,8 @@
 								<span class="board-wevent-name" title={event.series}>{event.series}</span>
 								<span class="board-wevent-ep">{event.episode}</span>
 								<span class="board-wevent-more">
-									{m.calendar_card_detail_link()} →
+									{m.calendar_card_detail_link()}
+									<OrbitIcon name="arrow-right" className="h-4 w-4" />
 								</span>
 							</div>
 						</a>
@@ -448,6 +450,9 @@
 	}
 	.board-wevent-ep { font-size: 12px; color: var(--orbit-muted); }
 	.board-wevent-more {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
 		font-size: 12px;
 		font-weight: 600;
 		color: var(--orbit-link);

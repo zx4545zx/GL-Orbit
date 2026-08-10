@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
 	import Picture from '$lib/components/Picture.svelte';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import SeriesResults from './series/+page.svelte';
 	import ArtistResults from './artists/+page.svelte';
 	import ShipResults from './ships/+page.svelte';
@@ -296,13 +297,13 @@
 				class="xp-rail-arrow"
 				aria-label={m.explore_rail_prev()}
 				onclick={() => railGo(index, '<')}
-			>←</button>
+			><OrbitIcon name="arrow-left" className="h-4 w-4" /></button>
 			<button
 				type="button"
 				class="xp-rail-arrow"
 				aria-label={m.explore_rail_next()}
 				onclick={() => railGo(index, '>')}
-			>→</button>
+			><OrbitIcon name="arrow-right" className="h-4 w-4" /></button>
 		</span>
 	{/if}
 {/snippet}
@@ -352,7 +353,7 @@
 								</p>
 							{/if}
 							<div class="xp-hero-actions">
-								<a class="xp-btn xp-btn--primary" href="{langPrefix}/series/{detail.id}" tabindex={i === activeSlide ? undefined : -1}>▶&nbsp; {m.explore_hero_cta()}</a>
+								<a class="xp-btn xp-btn--primary" href="{langPrefix}/series/{detail.id}" tabindex={i === activeSlide ? undefined : -1}><OrbitIcon name="play" className="h-4 w-4" /> {m.explore_hero_cta()}</a>
 								<a class="xp-btn xp-btn--ghost" href="{langPrefix}/calendar" tabindex={i === activeSlide ? undefined : -1}>{m.nav_calendar()}</a>
 							</div>
 						</div>
@@ -438,7 +439,7 @@
 				<h2 class="xp-rail-title">{m.explore_rail_upcoming()}</h2>
 				<div class="xp-rail-tools">
 					{@render railArrows(0, data.upcoming.length, 3, 4)}
-					<a class="xp-rail-more" href="{langPrefix}/calendar">{m.explore_view_all()} →</a>
+					<a class="xp-rail-more" href="{langPrefix}/calendar">{m.explore_view_all()} <OrbitIcon name="arrow-right" className="h-3.5 w-3.5" /></a>
 				</div>
 			</div>
 			<div class="xp-rail-scroll splide" bind:this={railSplideEls[0]}>
@@ -473,7 +474,7 @@
 				<h2 class="xp-rail-title">{m.explore_rail_top10()}</h2>
 				<div class="xp-rail-tools">
 					{@render railArrows(1, data.top10.length, 3, 4)}
-					<a class="xp-rail-more" href="{langPrefix}/explore?view=series" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=series`)}>{m.explore_view_all()} →</a>
+					<a class="xp-rail-more" href="{langPrefix}/explore?view=series" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=series`)}>{m.explore_view_all()} <OrbitIcon name="arrow-right" className="h-3.5 w-3.5" /></a>
 				</div>
 			</div>
 			<div class="xp-rail-scroll xp-rail-scroll--top10 splide" bind:this={railSplideEls[1]}>
@@ -510,7 +511,7 @@
 				<h2 class="xp-rail-title">{m.explore_rail_artists()}</h2>
 				<div class="xp-rail-tools">
 					{@render railArrows(2, data.artists.length, 4, 6)}
-					<a class="xp-rail-more" href="{langPrefix}/explore?view=artists" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=artists`)}>{m.explore_view_all()} →</a>
+					<a class="xp-rail-more" href="{langPrefix}/explore?view=artists" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=artists`)}>{m.explore_view_all()} <OrbitIcon name="arrow-right" className="h-3.5 w-3.5" /></a>
 				</div>
 			</div>
 			<div class="xp-rail-scroll xp-rail-scroll--avatars splide" bind:this={railSplideEls[2]}>
@@ -541,7 +542,7 @@
 				<h2 class="xp-rail-title">{m.explore_rail_ships()}</h2>
 				<div class="xp-rail-tools">
 					{@render railArrows(3, data.ships.length, 3, 4)}
-					<a class="xp-rail-more" href="{langPrefix}/explore?view=ships" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=ships`)}>{m.explore_view_all()} →</a>
+					<a class="xp-rail-more" href="{langPrefix}/explore?view=ships" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=ships`)}>{m.explore_view_all()} <OrbitIcon name="arrow-right" className="h-3.5 w-3.5" /></a>
 				</div>
 			</div>
 			<div class="xp-rail-scroll splide" bind:this={railSplideEls[3]}>
@@ -1050,6 +1051,7 @@
 		min-height: 44px;
 		display: inline-flex;
 		align-items: center;
+		gap: 4px;
 		white-space: nowrap;
 	}
 	.xp-rail-more:hover { text-decoration: underline; }

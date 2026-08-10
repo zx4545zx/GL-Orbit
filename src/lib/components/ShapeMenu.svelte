@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
 	import { SHAPE_NAMES, setShape, shapeState, type ShapeName } from '$lib/shape.svelte.js';
+	import OrbitIcon from './OrbitIcon.svelte';
 
 	let { className = '', compact = false }: { className?: string; compact?: boolean } = $props();
 	let open = $state(false);
@@ -70,7 +71,7 @@
 			{#each SHAPE_NAMES as name, index}
 				<button bind:this={options[index]} type="button" role="menuitemradio" aria-checked={shapeState.shape === name} tabindex={activeIndex === index ? 0 : -1} onclick={() => select(name)} onkeydown={keydown} class="orbit-menu-item">
 					<svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx={name === 'rounded' ? 4 : 0} /></svg>
-					<span>{labels[name]()}</span>{#if shapeState.shape === name}<span class="ml-auto font-bold" aria-label={m.shape_current()}>✓</span>{/if}
+					<span>{labels[name]()}</span>{#if shapeState.shape === name}<span class="ml-auto" aria-label={m.shape_current()}><OrbitIcon name="check" className="h-4 w-4" /></span>{/if}
 				</button>
 			{/each}
 		</div>

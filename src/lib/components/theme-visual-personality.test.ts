@@ -88,7 +88,7 @@ describe('theme visual personality contracts', () => {
 		expect(confirmDialog).toMatch(/aria-(?:label|describedby)|role="alert"|text-(?:coral|error)/i);
 
 		// Success state: boundary exposes status/live feedback or an explicit success marker.
-		expect(themeMenu).toMatch(/role="status"|aria-live|[✓✔]|text-(?:mint|success)/i);
+		expect(themeMenu).toContain('<OrbitIcon name="check"');
 
 		// Badge boundary: count remains available to assistive technology.
 		expect(notificationBadge).toMatch(/orbit-badge/);

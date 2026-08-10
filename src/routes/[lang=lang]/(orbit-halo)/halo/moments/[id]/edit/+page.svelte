@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import HaloIcon from '$lib/components/moments/HaloIcon.svelte';
 	import type { PageData } from './$types.js';
 
 	type EntityKind = 'series' | 'artist' | 'ship';
@@ -173,7 +174,7 @@
 </script>
 
 <header class="sticky top-[var(--pwa-safe-top)] z-30 flex items-center gap-5 border-b border-[#eee9ef] bg-white/95 px-3 py-2 backdrop-blur-md">
-	<a href={`/${page.data.lang}/halo/moments/${moment.id}`} class="halo-focus-ring grid h-9 w-9 place-items-center rounded-full hover:bg-plum/[.05]" aria-label={thai ? 'กลับ' : 'Back'}>←</a>
+	<a href={`/${page.data.lang}/halo/moments/${moment.id}`} class="halo-focus-ring grid h-9 w-9 place-items-center rounded-full hover:bg-plum/[.05]" aria-label={thai ? 'กลับ' : 'Back'}><HaloIcon name="arrow-left" /></a>
 	<h1 class="font-display text-lg font-extrabold">{thai ? 'แก้ไข Moment' : 'Edit Moment'}</h1>
 </header>
 
@@ -193,9 +194,9 @@
 						<span class="absolute left-2 top-2 rounded-full bg-mint px-2 py-1 text-[10px] font-bold text-plum">{thai ? 'รูปใหม่' : 'New'}</span>
 					{/if}
 					<div class="absolute inset-x-1 bottom-1 flex justify-between gap-1">
-						<button type="button" onclick={() => moveMedia(index, -1)} disabled={index === 0} class="rounded bg-white/90 px-2 disabled:opacity-40">←</button>
-						<button type="button" onclick={() => removeMedia(mediaKey(media))} class="rounded bg-white/90 px-2 font-bold text-coral-dark" aria-label={thai ? 'ลบรูป' : 'Remove image'}>×</button>
-						<button type="button" onclick={() => moveMedia(index, 1)} disabled={index === mediaItems.length - 1} class="rounded bg-white/90 px-2 disabled:opacity-40">→</button>
+						<button type="button" onclick={() => moveMedia(index, -1)} disabled={index === 0} class="grid h-8 w-8 place-items-center rounded bg-white/90 disabled:opacity-40" aria-label={thai ? 'เลื่อนรูปไปทางซ้าย' : 'Move image left'}><HaloIcon name="chevron-left" size={16} /></button>
+						<button type="button" onclick={() => removeMedia(mediaKey(media))} class="grid h-8 w-8 place-items-center rounded bg-white/90 text-coral-dark" aria-label={thai ? 'ลบรูป' : 'Remove image'}><HaloIcon name="x" size={16} /></button>
+						<button type="button" onclick={() => moveMedia(index, 1)} disabled={index === mediaItems.length - 1} class="grid h-8 w-8 place-items-center rounded bg-white/90 disabled:opacity-40" aria-label={thai ? 'เลื่อนรูปไปทางขวา' : 'Move image right'}><HaloIcon name="chevron-right" size={16} /></button>
 					</div>
 				</div>
 			{/each}
@@ -203,7 +204,7 @@
 		<input bind:this={imageInput} class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" onchange={selectMedia} />
 		<div class="mt-3 flex items-center justify-between gap-3">
 			<button type="button" onclick={() => imageInput?.click()} disabled={mediaCount >= 4} class="halo-focus-ring inline-flex h-11 items-center gap-2 rounded-full border border-mint/35 bg-mint/10 px-4 text-sm font-bold text-mint-dark transition hover:bg-mint/20 disabled:cursor-not-allowed disabled:opacity-45">
-				<span aria-hidden="true">▧</span>{thai ? 'เพิ่มรูปภาพ' : 'Add images'}
+				<HaloIcon name="image" size={18} />{thai ? 'เพิ่มรูปภาพ' : 'Add images'}
 			</button>
 			<p class="text-xs text-plum-light">{mediaCount}/4</p>
 		</div>
@@ -214,7 +215,7 @@
 			<label class="block text-xs font-bold text-plum" for="seriesSearch">{thai ? 'ซีรีส์' : 'Series'}</label>
 			<div class="mt-2 flex flex-wrap gap-2">
 				{#each selectedSeries as item (item.id)}
-					<button type="button" onclick={() => removeEntity('series', item.id)} class="rounded-full bg-coral/10 px-3 py-1 text-xs font-bold text-plum">{item.label} ×</button>
+					<button type="button" onclick={() => removeEntity('series', item.id)} class="inline-flex items-center gap-1 rounded-full bg-coral/10 px-3 py-1 text-xs font-bold text-plum">{item.label}<HaloIcon name="x" size={13} /></button>
 				{/each}
 			</div>
 			<div class="mt-2 flex gap-2">
@@ -235,7 +236,7 @@
 			<label class="block text-xs font-bold text-plum" for="artistSearch">{thai ? 'ศิลปิน' : 'Artists'}</label>
 			<div class="mt-2 flex flex-wrap gap-2">
 				{#each selectedArtists as item (item.id)}
-					<button type="button" onclick={() => removeEntity('artist', item.id)} class="rounded-full bg-lavender/20 px-3 py-1 text-xs font-bold text-plum">{item.label} ×</button>
+					<button type="button" onclick={() => removeEntity('artist', item.id)} class="inline-flex items-center gap-1 rounded-full bg-lavender/20 px-3 py-1 text-xs font-bold text-plum">{item.label}<HaloIcon name="x" size={13} /></button>
 				{/each}
 			</div>
 			<div class="mt-2 flex gap-2">
@@ -256,7 +257,7 @@
 			<label class="block text-xs font-bold text-plum" for="shipSearch">Ships</label>
 			<div class="mt-2 flex flex-wrap gap-2">
 				{#each selectedShips as item (item.id)}
-					<button type="button" onclick={() => removeEntity('ship', item.id)} class="rounded-full bg-mint/25 px-3 py-1 text-xs font-bold text-plum">{item.label} ×</button>
+					<button type="button" onclick={() => removeEntity('ship', item.id)} class="inline-flex items-center gap-1 rounded-full bg-mint/25 px-3 py-1 text-xs font-bold text-plum">{item.label}<HaloIcon name="x" size={13} /></button>
 				{/each}
 			</div>
 			<div class="mt-2 flex gap-2">

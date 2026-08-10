@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import HaloIcon from '$lib/components/moments/HaloIcon.svelte';
 	import MomentComposer from '$lib/components/moments/MomentComposer.svelte';
 	import type { PageData } from './$types.js';
 
@@ -11,7 +12,7 @@
 <svelte:head><title>{thai ? 'สร้าง Moment · Orbit Halo' : 'Create Moment · Orbit Halo'}</title></svelte:head>
 
 <header class="sticky top-[var(--pwa-safe-top)] z-30 flex items-center gap-4 border-b border-[#eee9ef] bg-white/95 px-4 py-3 backdrop-blur-md">
-	<a href={feedHref} class="halo-focus-ring grid h-10 w-10 place-items-center rounded-full hover:bg-plum/[.05]" aria-label={thai ? 'ยกเลิก' : 'Cancel'}>×</a>
+	<a href={feedHref} class="halo-focus-ring grid h-10 w-10 place-items-center rounded-full hover:bg-plum/[.05]" aria-label={thai ? 'ยกเลิก' : 'Cancel'}><HaloIcon name="x" /></a>
 	<h1 class="font-display text-lg font-extrabold">{thai ? 'สร้าง Moment' : 'Create Moment'}</h1>
 </header>
 

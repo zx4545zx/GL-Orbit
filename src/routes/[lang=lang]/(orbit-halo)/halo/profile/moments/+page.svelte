@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { tick } from 'svelte';
+	import HaloIcon from '$lib/components/moments/HaloIcon.svelte';
 	import MomentFeed from '$lib/components/moments/MomentFeed.svelte';
 	import { toProfileMoment } from '$lib/components/moments/types.js';
 	import type { PageData } from './$types.js';
 	let { data }: { data: PageData } = $props();
 	const isThai = $derived(page.data.lang === 'th');
 	const displayName = $derived(data.profile.displayName || data.profile.username);
-	const initial = $derived(displayName.trim().charAt(0).toUpperCase() || '✦');
+	const initial = $derived(displayName.trim().charAt(0).toUpperCase());
 	const profileMoments = $derived(data.moments.map((moment) => toProfileMoment(moment, page.data.lang)));
 	const nextLang = $derived(page.data.lang === 'th' ? 'en' : 'th');
 	const alternateProfileHref = $derived(`${page.url.pathname.replace(/^\/(th|en)(?=\/|$)/, `/${nextLang}`)}${page.url.search}${page.url.hash}`);
@@ -70,7 +71,7 @@
 		</div>
 	</div>
 	<div class="px-4 pb-4 sm:px-5">
-		<div class="-mt-10 flex items-end">{#if data.profile.avatarUrl}<img src={data.profile.avatarUrl} alt="" class="relative z-10 h-20 w-20 rounded-full border-4 border-white object-cover" />{:else}<div class="relative z-10 grid h-20 w-20 place-items-center rounded-full border-4 border-white bg-coral/20 text-xl font-bold text-coral-dark">{initial}</div>{/if}</div>
+		<div class="-mt-10 flex items-end">{#if data.profile.avatarUrl}<img src={data.profile.avatarUrl} alt="" class="relative z-10 h-20 w-20 rounded-full border-4 border-white object-cover" />{:else}<div class="relative z-10 grid h-20 w-20 place-items-center rounded-full border-4 border-white bg-coral/20 text-xl font-bold text-coral-dark">{#if initial}{initial}{:else}<HaloIcon name="user" size={24} />{/if}</div>{/if}</div>
 		<h1 class="mt-3 font-display text-xl font-extrabold">{displayName}</h1><p class="text-sm text-plum-light">@{data.profile.username}</p>
 	</div>
 	<div class="grid grid-cols-3 border-t border-[#eee9ef] text-center text-sm font-bold">

@@ -4,6 +4,7 @@
 	import { onDestroy } from 'svelte';
 	import CalendarMonthHeader from '$lib/components/calendar/CalendarMonthHeader.svelte';
 	import CalendarWeekHeader from '$lib/components/calendar/CalendarWeekHeader.svelte';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import { m } from '$lib/i18n/paraglide.js';
 	import { buildCanonicalUrl, buildWebPageJsonLd, jsonLdScript, localizedPath, safeJsonLd } from '$lib/seo.js';
@@ -248,7 +249,7 @@
 				<span class="whats-on-live-dot orbit-round-data" aria-hidden="true"></span>
 				{m.whats_on_eyebrow()}
 			</p>
-			<h1 class="whats-on-title">{m.whats_on_title()} <span class="whats-on-title-accent" aria-hidden="true">✦</span></h1>
+			<h1 class="whats-on-title">{m.whats_on_title()} <span class="whats-on-title-accent"><OrbitIcon name="spark" className="h-6 w-6" /></span></h1>
 			<p class="page-intro">{m.whats_on_intro()}</p>
 		</div>
 

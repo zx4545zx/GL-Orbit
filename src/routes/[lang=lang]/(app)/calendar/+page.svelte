@@ -11,6 +11,7 @@
 	import CalendarViewToggle from '$lib/components/calendar/CalendarViewToggle.svelte';
 	import CalendarWeekHeader from '$lib/components/calendar/CalendarWeekHeader.svelte';
 	import CardScheduleBoard from './CardScheduleBoard.svelte';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import Picture from '$lib/components/Picture.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 
@@ -272,7 +273,8 @@
 				Today / This Week
 			</span>
 			<h1 class="cal-title">
-				{m.calendar_title_plain()} <span class="cal-title-accent">GL</span> ✦
+				{m.calendar_title_plain()} <span class="cal-title-accent">GL</span>
+				<OrbitIcon name="spark" className="inline-block h-[0.8em] w-[0.8em] align-[-0.05em] text-coral" />
 			</h1>
 			<p class="cal-sub">{m.calendar_subtitle()}</p>
 			<div class="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -534,13 +536,17 @@
 										{/each}
 									</div>
 									<a class="cal-event-more" href="/{page.data.lang}/series/{event.seriesId}">
-										{m.calendar_detail_link()} →
+										{m.calendar_detail_link()}
+										<OrbitIcon name="arrow-right" className="h-4 w-4" />
 									</a>
 								</div>
 							</article>
 						{/each}
 					</div>
-					<div class="cal-panel-foot">✦ {m.calendar_selected_hint().replace('\n', ' ')}</div>
+					<div class="cal-panel-foot">
+						<OrbitIcon name="spark" className="h-4 w-4" />
+						{m.calendar_selected_hint().replace('\n', ' ')}
+					</div>
 				{:else}
 					<div class="px-4 py-8 text-center sm:py-10">
 						<div class="cal-empty-icon mx-auto mb-3">
@@ -628,7 +634,7 @@
 											{/each}
 										</span>
 									</span>
-									<span class="cal-lrow-arrow" aria-hidden="true">→</span>
+									<span class="cal-lrow-arrow"><OrbitIcon name="arrow-right" className="h-5 w-5" /></span>
 								</a>
 							{/each}
 						{:else}
@@ -674,7 +680,7 @@
 			<h2 class="cal-banner-title">{m.calendar_countdown_cta_title()}</h2>
 			<p class="cal-banner-desc">{m.calendar_countdown_cta_desc()}</p>
 		</span>
-		<span class="cal-banner-go" aria-hidden="true">→</span>
+		<span class="cal-banner-go"><OrbitIcon name="arrow-right" className="h-6 w-6" /></span>
 	</a>
 
 	<!-- ============ 7. NOTES ============ -->
@@ -978,6 +984,9 @@
 	.cal-event-name { font-weight: 700; font-size: 15px; color: var(--orbit-ink); }
 	.cal-event-ep { font-size: 13px; color: var(--orbit-muted); }
 	.cal-event-more {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
 		font-size: 13px;
 		font-weight: 600;
 		color: var(--orbit-link);
@@ -985,6 +994,9 @@
 	}
 	.cal-event-more:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
 	.cal-panel-foot {
+		display: flex;
+		align-items: center;
+		gap: 6px;
 		margin-top: auto;
 		padding: 12px 16px;
 		border-top: var(--orbit-border-width) dashed var(--orbit-line);
@@ -1159,17 +1171,6 @@
 		text-decoration: none;
 	}
 	.cal-banner:hover { text-decoration: none; }
-	.cal-banner::after {
-		content: '✦ ✧ ★ ✧ ✦';
-		position: absolute;
-		right: 16px;
-		top: 8px;
-		color: var(--orbit-lavender);
-		font-size: 14px;
-		letter-spacing: 6px;
-		opacity: 0.7;
-		pointer-events: none;
-	}
 	.cal-banner-icon { flex: none; color: var(--orbit-mint); display: inline-flex; }
 	.cal-banner-title {
 		font-family: var(--orbit-font-display);

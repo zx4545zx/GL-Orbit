@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import MemberPageHeader from '$lib/components/profile/MemberPageHeader.svelte';
 	import SubscriptionForm from '$lib/components/subscriptions/SubscriptionForm.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
@@ -20,10 +21,11 @@
 
 <main class="w-full pb-24 pt-5 sm:pt-8 md:pb-12">
 	<a
-		class="touch-target inline-flex min-h-11 items-center font-semibold text-plum underline-offset-4 hover:underline"
+		class="touch-target inline-flex min-h-11 items-center gap-2 font-semibold text-plum underline-offset-4 hover:underline"
 		href={localizedHref('/subscriptions', data.lang)}
 	>
-		← {m.subscriptions_cancel()}
+		<OrbitIcon name="arrow-left" className="h-4 w-4" />
+		{m.subscriptions_cancel()}
 	</a>
 	<div class="mt-4">
 		<MemberPageHeader title={m.subscriptions_add()} />

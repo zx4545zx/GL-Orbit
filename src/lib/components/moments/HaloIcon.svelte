@@ -18,6 +18,10 @@
 		| 'lock'
 		| 'image'
 		| 'smile'
+		| 'play'
+		| 'music'
+		| 'chevron-left'
+		| 'chevron-right'
 		| 'x';
 
 	let { name, size = 20, strokeWidth = 1.8 }: { name: IconName | string; size?: number; strokeWidth?: number } = $props();
@@ -33,6 +37,7 @@
 	stroke-linecap="round"
 	stroke-linejoin="round"
 	aria-hidden="true"
+	focusable="false"
 >
 	{#if name === 'home'}
 		<path d="m3.5 10.8 8.5-7 8.5 7v8.7a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z" />
@@ -70,6 +75,14 @@
 		<rect x="3.5" y="4" width="17" height="16" rx="2" /><circle cx="8.5" cy="9" r="1.4" /><path d="m4 17 4.8-4.8a1.5 1.5 0 0 1 2.1 0l2.2 2.2 1.7-1.7a1.5 1.5 0 0 1 2.1 0l3.1 3.1" />
 	{:else if name === 'smile'}
 		<circle cx="12" cy="12" r="8.5" /><path d="M8.5 14.5c.8 1.2 2 1.8 3.5 1.8s2.7-.6 3.5-1.8M8.8 9.5h.1m6.2 0h.1" />
+	{:else if name === 'play'}
+		<path d="m9 6 9 6-9 6z" fill="currentColor" stroke="none" />
+	{:else if name === 'music'}
+		<path d="M9 18V6l10-2v12" /><circle cx="6.5" cy="18" r="2.5" /><circle cx="16.5" cy="16" r="2.5" />
+	{:else if name === 'chevron-left'}
+		<path d="m15 18-6-6 6-6" />
+	{:else if name === 'chevron-right'}
+		<path d="m9 18 6-6-6-6" />
 	{:else if name === 'x'}
 		<path d="m6 6 12 12M18 6 6 18" />
 	{/if}

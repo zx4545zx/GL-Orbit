@@ -2,6 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import MemberPageHeader from '$lib/components/profile/MemberPageHeader.svelte';
 	import PaymentHistory from '$lib/components/subscriptions/PaymentHistory.svelte';
 	import RenewalDialog from '$lib/components/subscriptions/RenewalDialog.svelte';
@@ -108,10 +109,11 @@
 
 <main class="grid w-full gap-6 pb-24 pt-5 sm:gap-8 sm:pt-8 md:pb-12">
 	<a
-		class="touch-target inline-flex w-fit items-center border border-[var(--orbit-line)] bg-white px-4 text-sm text-plum"
+		class="touch-target inline-flex w-fit items-center gap-2 border border-[var(--orbit-line)] bg-white px-4 text-sm text-plum"
 		href={href('/subscriptions')}
 	>
-		← {m.subscriptions_back()}
+		<OrbitIcon name="arrow-left" className="h-4 w-4" />
+		{m.subscriptions_back()}
 	</a>
 
 	<section class="border border-[var(--orbit-line)] bg-white">

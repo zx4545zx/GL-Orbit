@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import SeriesPosterCard from '$lib/components/SeriesPosterCard.svelte';
 	import SeriesDetailPanel from '$lib/components/SeriesDetailPanel.svelte';
 	import ArtistDetailPanel from '$lib/components/ArtistDetailPanel.svelte';
@@ -119,7 +120,9 @@
 			</div>
 		{/if}
 		{#if onClose}
-			<button type="button" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10" aria-label={m.chat_context_close_aria()} onclick={onClose}>×</button>
+			<button type="button" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-plum-light transition hover:bg-lavender/10" aria-label={m.chat_context_close_aria()} onclick={onClose}>
+				<OrbitIcon name="x" className="h-5 w-5" />
+			</button>
 		{/if}
 	</header>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import MemberPageHeader from '$lib/components/profile/MemberPageHeader.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import { localizedHref } from '$lib/i18n/link.js';
@@ -70,7 +71,9 @@
 					<strong>{item.title}</strong>
 					<small>{item.description}</small>
 				</span>
-				<span class="member-menu-arrow" aria-hidden="true">→</span>
+				<span class="member-menu-arrow" aria-hidden="true">
+					<OrbitIcon name="arrow-right" className="h-5 w-5" />
+				</span>
 			</a>
 		{/each}
 	</nav>

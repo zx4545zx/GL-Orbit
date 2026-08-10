@@ -1,4 +1,6 @@
 <script lang="ts">
+	import HaloIcon from './HaloIcon.svelte';
+
 	let { videoId, source, title, poster = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` }: { videoId: string; source: string; title: string; poster?: string } = $props();
 	let playing = $state(false);
 	let warmedUp = $state(false);
@@ -24,9 +26,9 @@
 	{:else}
 		<button type="button" onclick={() => { warmup(); playing = true; }} onmouseenter={warmup} onfocus={warmup} ontouchstart={warmup} class="halo-focus-ring group relative block h-full w-full bg-black" aria-label={`เล่นวิดีโอ ${title}`}>
 			<img src={poster} alt="" loading="lazy" decoding="async" class="h-full w-full object-contain" />
-			<span class="absolute left-1/2 top-1/2 grid h-12 w-[68px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-xl bg-[#ff0000] text-2xl text-white transition group-hover:scale-110">▶</span>
+			<span class="absolute left-1/2 top-1/2 grid h-12 w-[68px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-xl bg-[#ff0000] text-white transition group-hover:scale-110"><HaloIcon name="play" size={24} /></span>
 		</button>
 	{/if}
 	</div>
-	<a href={source} target="_blank" rel="noreferrer" class="halo-focus-ring flex items-center justify-between border-t border-white/10 bg-white px-4 py-3 text-xs"><span class="font-medium text-plum">เปิดดูที่ต้นฉบับ</span><span class="text-coral-dark">YouTube ↗</span></a>
+	<a href={source} target="_blank" rel="noreferrer" class="halo-focus-ring flex items-center justify-between border-t border-white/10 bg-white px-4 py-3 text-xs"><span class="font-medium text-plum">เปิดดูที่ต้นฉบับ</span><span class="inline-flex items-center gap-1 text-coral-dark">YouTube <HaloIcon name="external" size={14} /></span></a>
 </div>

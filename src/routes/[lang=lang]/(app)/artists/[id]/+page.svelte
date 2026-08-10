@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import Picture from '$lib/components/Picture.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import {
@@ -298,7 +299,7 @@
 									</span>
 								{/if}
 								{#if ship.isFeatured}
-									<span class="ad-ship-feat">{m.artist_ship_featured()}</span>
+									<span class="ad-ship-feat"><OrbitIcon name="star" className="h-3.5 w-3.5" />{m.artist_ship_featured()}</span>
 								{/if}
 							</span>
 						</a>
@@ -859,7 +860,9 @@
 		padding: 2px 8px;
 	}
 	.ad-ship-feat {
-		display: inline-block;
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
 		margin-top: 10px;
 		font-family: var(--orbit-font-display);
 		font-size: 9px;

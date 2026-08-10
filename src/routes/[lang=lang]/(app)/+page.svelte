@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import Picture from '$lib/components/Picture.svelte';
 	import { m, type AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import type { NewsItem } from '$lib/types/whats-on.js';
@@ -159,7 +160,9 @@
 		<div>
 			<div class="section-head">
 				<h2 id="home-schedule-title" class="text-base"><span class="zine-tape">{m.home_schedule_title_plain()}{page.data.lang === 'en' ? ' ' : ''}{m.home_schedule_title_accent()}</span></h2>
-				<a href="/{page.data.lang}/calendar" class="zine-more touch-target">{m.common_see_all()} →</a>
+				<a href="/{page.data.lang}/calendar" class="zine-more touch-target">
+					{m.common_see_all()} <OrbitIcon name="arrow-right" className="h-4 w-4" />
+				</a>
 			</div>
 			{#if upcomingSchedule.length === 0}
 				<div class="orbit-surface px-6 py-12 text-center">
@@ -188,7 +191,9 @@
 <section class="sheet-section" aria-labelledby="home-news-title">
 	<div class="section-head">
 		<h2 id="home-news-title" class="text-base"><span class="zine-tape zine-tape-pink">{m.home_news_title_plain()}{page.data.lang === 'en' ? ' ' : ''}{m.home_news_title_accent()}</span></h2>
-		<a href="/{page.data.lang}/whats-on" class="zine-more touch-target">{m.common_see_all()} →</a>
+		<a href="/{page.data.lang}/whats-on" class="zine-more touch-target">
+			{m.common_see_all()} <OrbitIcon name="arrow-right" className="h-4 w-4" />
+		</a>
 	</div>
 
 	{#if latestNews.length > 0}
@@ -204,7 +209,9 @@
 <section class="sheet-section" aria-labelledby="home-featured-title">
 	<div class="section-head">
 		<h2 id="home-featured-title" class="text-base"><span class="zine-tape zine-tape-pink">{m.home_featured_title_plain()}{page.data.lang === 'en' ? ' ' : ''}{m.home_featured_title_accent()}</span></h2>
-		<a href="/{page.data.lang}/series" class="zine-more touch-target">{m.home_featured_see_all()} →</a>
+		<a href="/{page.data.lang}/series" class="zine-more touch-target">
+			{m.home_featured_see_all()} <OrbitIcon name="arrow-right" className="h-4 w-4" />
+		</a>
 	</div>
 
 	{#if featuredSeries.length === 0}

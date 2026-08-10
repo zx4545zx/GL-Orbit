@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import Picture from '$lib/components/Picture.svelte';
 	import { m } from '$lib/i18n/paraglide.js';
 	import { buildCanonicalUrl } from '$lib/seo.js';
@@ -15,7 +16,10 @@
 
 <main class="mx-auto grid w-full max-w-4xl gap-8 py-8 md:grid-cols-[minmax(0,1fr)_15rem] md:py-14">
 	<article class="min-w-0">
-		<a href={`/${lang}/whats-on`} class="text-sm font-semibold text-[var(--orbit-link)]">← {m.news_back_to_whats_on()}</a>
+		<a href={`/${lang}/whats-on`} class="inline-flex items-center gap-2 text-sm font-semibold text-[var(--orbit-link)]">
+			<OrbitIcon name="arrow-left" className="h-4 w-4" />
+			{m.news_back_to_whats_on()}
+		</a>
 		<p class="mt-6 text-sm text-[var(--orbit-muted)]">{published}</p>
 		<h1 class="mt-2 font-[var(--orbit-font-display)] text-4xl font-bold leading-tight md:text-5xl">{data.localized.title}</h1>
 		<div class="mt-8 whitespace-pre-wrap text-base leading-8 text-[var(--orbit-ink)]">{data.localized.content}</div>

@@ -3,6 +3,7 @@
 	import '@splidejs/splide/css/core';
 	import { m } from '$lib/i18n/paraglide.js';
 	import Picture from '$lib/components/Picture.svelte';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import type { NewsItem } from '$lib/types/whats-on.js';
 
 	let { news, locale }: { news: NewsItem[]; locale: string } = $props();
@@ -81,11 +82,11 @@
 	<div class="news-carousel-controls">
 		<div class="splide__arrows">
 			<button class="splide__arrow splide__arrow--prev" type="button">
-				<span aria-hidden="true">←</span>
+				<OrbitIcon name="arrow-left" className="h-4 w-4" />
 				<span class="sr-only">{m.whats_on_news_carousel_previous()}</span>
 			</button>
 			<button class="splide__arrow splide__arrow--next" type="button">
-				<span aria-hidden="true">→</span>
+				<OrbitIcon name="arrow-right" className="h-4 w-4" />
 				<span class="sr-only">{m.whats_on_news_carousel_next()}</span>
 			</button>
 		</div>

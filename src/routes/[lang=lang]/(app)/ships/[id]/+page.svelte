@@ -5,6 +5,7 @@
 	import type { AvailableLanguageTag } from '$lib/i18n/paraglide.js';
 	import Picture from '$lib/components/Picture.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import {
 		buildBreadcrumbJsonLd,
 		buildCanonicalUrl,
@@ -24,7 +25,7 @@
 	const canonicalPath = $derived(`/ships/${ship.slug}`);
 	const canonicalUrl = $derived(buildCanonicalUrl(page.url.origin, currentLang, canonicalPath));
 
-	const shareTitle = $derived(currentLang === 'th' ? `ฝากรู้จัก 「${ship.name}」 บน GL-Orbit 💕` : `Meet 「${ship.name}」 on GL-Orbit 💕`);
+	const shareTitle = $derived(currentLang === 'th' ? `ฝากรู้จัก 「${ship.name}」 บน GL-Orbit` : `Meet 「${ship.name}」 on GL-Orbit`);
 	const shareText = $derived(currentLang === 'th' ? `มาทำความรู้จักคู่จิ้น「${ship.name}」บน GL-Orbit` : `Meet ship 「${ship.name}」 on GL-Orbit`);
 	const shareAriaLabel = $derived(currentLang === 'th' ? 'แชร์คู่จิ้นนี้' : 'Share this ship');
 
@@ -151,7 +152,7 @@
 						</div>
 					{/if}
 					{#if ship.isFeatured}
-						<span class="sh-feat">{m.artist_ship_featured()}</span>
+						<span class="sh-feat"><OrbitIcon name="star" className="h-3.5 w-3.5" />{m.artist_ship_featured()}</span>
 					{/if}
 				</div>
 			</div>
@@ -479,6 +480,9 @@
 	}
 	.sh-feat {
 		align-self: flex-start;
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
 		font-family: var(--orbit-font-display);
 		font-size: 9px;
 		font-weight: var(--orbit-font-label-weight);

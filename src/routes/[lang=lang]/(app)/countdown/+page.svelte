@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/i18n/paraglide.js';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import Picture from '$lib/components/Picture.svelte';
 
 	import { page } from '$app/state';
@@ -130,11 +131,15 @@
 			{m.home_countdown_badge()}
 		</span>
 		<h1 class="cd-title animate-slide-up stagger-1">
-			{m.countdown_title_plain()} <span class="cd-title-accent">{m.countdown_title_accent()}</span> ✦
+			{m.countdown_title_plain()} <span class="cd-title-accent">{m.countdown_title_accent()}</span>
+			<OrbitIcon name="spark" className="inline-block h-[0.8em] w-[0.8em] align-[-0.05em] text-coral" />
 		</h1>
 		<p class="cd-sub animate-slide-up stagger-2">{m.countdown_subtitle()}</p>
 		<div class="cd-hero-actions animate-slide-up stagger-3">
-			<a href={calendarPath} class="cd-btn">← {m.countdown_view_calendar()}</a>
+			<a href={calendarPath} class="cd-btn">
+				<OrbitIcon name="arrow-left" className="h-4 w-4" />
+				{m.countdown_view_calendar()}
+			</a>
 		</div>
 	</div>
 
@@ -159,7 +164,7 @@
 {:else}
 	<!-- Next-up spotlight -->
 	{#if nextUp}
-		<h2 class="cd-section-title"><span class="cd-spark" aria-hidden="true">✦</span> {m.countdown_next_up()}</h2>
+		<h2 class="cd-section-title"><span class="cd-spark"><OrbitIcon name="spark" className="h-5 w-5" /></span> {m.countdown_next_up()}</h2>
 		<section class="cd-spotlight" aria-label={m.countdown_next_up()}>
 			<a href="/{page.data.lang}/series/{nextUp.seriesId}" class="cd-spotlight-poster" tabindex="-1" aria-hidden="true">
 				<Picture
@@ -175,7 +180,11 @@
 				/>
 			</a>
 			<div class="cd-spotlight-body">
-				<span class="cd-spotlight-tag">{m.countdown_spotlight_tag()} ★ {nextUp.episode}</span>
+				<span class="cd-spotlight-tag">
+					{m.countdown_spotlight_tag()}
+					<OrbitIcon name="star" className="h-3 w-3" />
+					{nextUp.episode}
+				</span>
 				<h3 class="cd-spotlight-name">
 					<a href="/{page.data.lang}/series/{nextUp.seriesId}" class="cd-spotlight-link">{nextUp.title}</a>
 				</h3>
@@ -199,7 +208,7 @@
 
 	<!-- All remaining countdowns -->
 	{#if restCountdowns.length > 0}
-		<h2 class="cd-section-title"><span class="cd-spark" aria-hidden="true">✧</span> {m.countdown_all_title()}</h2>
+		<h2 class="cd-section-title"><span class="cd-spark"><OrbitIcon name="spark" className="h-5 w-5" /></span> {m.countdown_all_title()}</h2>
 		<section class="cd-grid" aria-label={m.countdown_all_title()}>
 			{#each restCountdowns as c, i (c.id)}
 				<a
@@ -241,7 +250,7 @@
 					</div>
 					<div class="cd-card-foot">
 						<span>{c.airLabel}</span>
-						<span class="cd-card-go" aria-hidden="true">→</span>
+						<span class="cd-card-go"><OrbitIcon name="arrow-right" className="h-4 w-4" /></span>
 					</div>
 				</a>
 			{/each}
@@ -467,18 +476,6 @@
 		overflow: hidden;
 		position: relative;
 	}
-	.cd-spotlight::after {
-		content: "✦ ★ ✦";
-		position: absolute;
-		right: 16px;
-		top: 10px;
-		color: var(--orbit-lavender);
-		font-family: var(--orbit-font-display);
-		font-size: 12px;
-		letter-spacing: 4px;
-		opacity: 0.7;
-		pointer-events: none;
-	}
 	.cd-spotlight-poster {
 		display: block;
 		border-right: var(--orbit-border-width) solid var(--orbit-line-strong);
@@ -497,6 +494,9 @@
 		justify-items: start;
 	}
 	.cd-spotlight-tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
 		font-family: var(--orbit-font-display);
 		font-size: 11px;
 		letter-spacing: 0.1em;
@@ -600,7 +600,7 @@
 		font-size: 13px;
 		color: var(--orbit-muted);
 	}
-	.cd-card-go { font-family: var(--orbit-font-display); color: var(--orbit-link); }
+	.cd-card-go { display: inline-flex; color: var(--orbit-link); }
 
 	/* ===== empty state ===== */
 	.cd-empty {

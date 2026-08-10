@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import Picture from '$lib/components/Picture.svelte';
 	import LibraryShareCard from '$lib/components/profile/LibraryShareCard.svelte';
 	import {
@@ -155,7 +156,7 @@
 		<h2>{title}</h2>
 		<p>{description}</p>
 		<a href={localizedHref('/explore?view=series', page.data.lang)} class="orbit-action">
-			{m.profile_view_all_series()} <span aria-hidden="true">→</span>
+			{m.profile_view_all_series()} <OrbitIcon name="arrow-right" className="h-4 w-4" />
 		</a>
 	</div>
 {/snippet}

@@ -883,18 +883,6 @@ body {
   box-shadow: var(--orbit-shadow, 3px 3px 0 rgba(59, 42, 32, 0.12));
 }
 
-/* Decorative heart doodle; never interactive, never announced. */
-.zine-note::after {
-  content: '♡';
-  position: absolute;
-  right: 0.75rem;
-  top: 0.5rem;
-  color: var(--orbit-coral, #e4572e);
-  font-size: 1.25rem;
-  transform: rotate(12deg);
-  pointer-events: none;
-}
-
 .zine-polaroid {
   display: block;
   background: var(--orbit-surface, #ffffff);
@@ -2031,8 +2019,6 @@ body .orbit-nav-item.shell-navlink .orbit-nav-indicator {
   transform: none;
 }
 
-[data-theme='y2k'] .zine-note::after { content: '♥'; color: var(--orbit-coral); }
-
 [data-theme='y2k'] .zine-more {
   font-family: var(--orbit-font-body);
   color: var(--orbit-link);
@@ -2126,7 +2112,6 @@ body .orbit-nav-item.shell-navlink .orbit-nav-indicator {
 }
 
 [data-theme='sakura'] .zine-note { transform: none; }
-[data-theme='sakura'] .zine-note::after { content: '❀'; }
 
 [data-theme='sakura'] .zine-more { border-bottom: 0; }
 [data-theme='sakura'] .zine-more:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -2265,21 +2250,6 @@ body .orbit-nav-item.shell-navlink .orbit-nav-indicator {
   box-shadow: 8px 8px 0 var(--orbit-coral);
 }
 
-[data-theme='candy'] .zine-card::before {
-  content: '★';
-  top: -18px;
-  right: 22px;
-  left: auto;
-  width: auto;
-  height: auto;
-  transform: rotate(12deg);
-  background: transparent;
-  opacity: 1;
-  box-shadow: none;
-  font-size: 26px;
-  color: var(--orbit-coral);
-}
-
 [data-theme='candy'] .zine-sticker {
   border: 2px solid var(--orbit-ink);
   background: var(--orbit-mint);
@@ -2307,18 +2277,14 @@ body .orbit-nav-item.shell-navlink .orbit-nav-indicator {
   transform: none;
 }
 
-[data-theme='candy'] .zine-note::after { content: '★'; transform: rotate(12deg); }
-
 [data-theme='candy'] .zine-more { border-bottom: 2px solid var(--orbit-coral); }
 [data-theme='candy'] .shell-bottomnav { background: var(--orbit-surface); border-top: 3px solid var(--orbit-ink); }
 [data-theme='candy'] .shell-bottomnav .orbit-nav-active .orbit-nav-indicator { display: block; background: var(--orbit-coral); height: 3px; }
 
-/* Mission Control: telemetry labels, condensed caps, ▮ markers */
+/* Mission Control: telemetry labels and condensed caps. */
 [data-theme='mission'] .shell-topbar { border-bottom: 2px solid var(--orbit-ink); }
 [data-theme='mission'] .zine-brand { letter-spacing: 0.08em; text-transform: uppercase; }
 [data-theme='mission'] .zine-brand::after { content: none; }
-
-[data-theme='mission'] .shell-tagline::before { content: '▮ '; color: var(--orbit-focus); }
 
 [data-theme='mission'] .shell-navrow { border-bottom: 2px solid var(--orbit-ink); }
 
@@ -2495,7 +2461,7 @@ body .orbit-nav-item.shell-navlink .orbit-nav-indicator {
 
 /* Y2K: OS titlebar strip, window chrome on schedule/card, pixel accents */
 [data-theme='y2k'] .minimal-shell .noise-overlay::before {
-  content: '♥ gl-orbit.exe — เชื่อมต่อสำเร็จ!';
+  content: 'gl-orbit.exe — เชื่อมต่อสำเร็จ!';
   display: flex;
   align-items: center;
   background: linear-gradient(90deg, var(--orbit-coral), var(--orbit-link));
@@ -2599,13 +2565,11 @@ body .orbit-nav-item.shell-navlink .orbit-nav-indicator {
   transform: none;
 }
 
-/* Ocean: sandy note with anchor, white pill badge */
+/* Ocean: sandy note with white pill badge. */
 [data-theme='ocean'] .zine-note {
   background: #fdf3e2;
   border-color: #f0dfc0;
 }
-
-[data-theme='ocean'] .zine-note::after { content: '⚓'; transform: none; }
 
 [data-theme='ocean'] .zine-polaroid .orbit-badge {
   background: var(--orbit-surface);

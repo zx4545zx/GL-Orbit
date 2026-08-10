@@ -213,7 +213,11 @@
 			{#if page.data.user?.avatarUrl}
 				<img src={page.data.user.avatarUrl} alt="" class="h-full w-full object-cover" />
 			{:else}
-				{page.data.user?.username?.[0]?.toUpperCase() ?? '✦'}
+				{#if page.data.user?.username?.[0]}
+					{page.data.user.username[0].toUpperCase()}
+				{:else}
+					<HaloIcon name="user" size={18} />
+				{/if}
 			{/if}
 		</div>
 		<div class="min-w-0 flex-1">
@@ -232,7 +236,7 @@
 					{#if selectedSeries.length}
 						<div class="mt-2 flex flex-wrap gap-2">
 							{#each selectedSeries as option}
-								<button type="button" onclick={() => removeSeries(option.id)} class="halo-focus-ring inline-flex items-center gap-1 rounded-full bg-lavender/20 px-3 py-1.5 text-xs font-semibold text-lavender-dark" disabled={composerState === 'publishing'}>{option.label} <span aria-hidden="true">×</span></button>
+								<button type="button" onclick={() => removeSeries(option.id)} class="halo-focus-ring inline-flex items-center gap-1 rounded-full bg-lavender/20 px-3 py-1.5 text-xs font-semibold text-lavender-dark" disabled={composerState === 'publishing'}>{option.label} <HaloIcon name="x" size={13} /></button>
 							{/each}
 						</div>
 					{/if}

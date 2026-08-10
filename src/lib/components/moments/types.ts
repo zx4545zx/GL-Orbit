@@ -81,7 +81,7 @@ export function toProfileMoment(moment: MomentApiItem, lang = 'th'): ProfileMome
 		authorId: moment.authorId,
 		author,
 		handle: moment.author.username,
-		initial: author.trim().charAt(0).toUpperCase() || '✦',
+		initial: author.trim().charAt(0).toUpperCase() || '',
 		avatarUrl: moment.author.avatarUrl,
 		time: formatMomentTime(moment.createdAt, lang),
 		body: moment.body ?? '',

@@ -87,7 +87,7 @@
 		].filter((cell) => cell.value !== null && cell.value !== '')
 	);
 	const marqueeText = $derived(
-		`✦ ${series.titleEn}${series.titleTh ? ` ✦ ${series.titleTh}` : ''} ✦ ${s ? (series.status === 'ONGOING' ? m.series_detail_now_airing() : s.text) : ''} ✦ ${series.studio} ✦ `
+		`— ${series.titleEn}${series.titleTh ? ` — ${series.titleTh}` : ''} — ${s ? (series.status === 'ONGOING' ? m.series_detail_now_airing() : s.text) : ''} — ${series.studio} — `
 	);
 
 	let expandedEpisodes = $state(new Set<number>());

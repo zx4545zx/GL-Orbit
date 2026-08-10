@@ -1,6 +1,7 @@
 <script lang="ts">
  import { m } from '$lib/i18n/paraglide.js';
  import { THEME_NAMES, setTheme, themeState, type ThemeName } from '$lib/theme.svelte.js';
+ import OrbitIcon from './OrbitIcon.svelte';
  import ThemeIcon from './ThemeIcon.svelte';
  let { className = '', compact = false }: { className?: string; compact?: boolean } = $props();
   let open = $state(false);
@@ -43,7 +44,7 @@
      <div role="menu" tabindex="-1" class="orbit-menu absolute right-0 top-full z-50 mt-2 w-52">
    {#each THEME_NAMES as name, index}
         <button bind:this={options[index]} type="button" role="menuitemradio" aria-checked={isCurrentTheme(name)} tabindex={activeIndex === index ? 0 : -1} onclick={() => select(name)} onkeydown={keydown} class="orbit-menu-item">
-       <ThemeIcon theme={name} className="h-5 w-5 shrink-0" /><span>{labels[name]()}</span>{#if isCurrentTheme(name)}<span class="ml-auto font-bold" aria-label={m.theme_current()}>✓</span>{/if}
+        <ThemeIcon theme={name} className="h-5 w-5 shrink-0" /><span>{labels[name]()}</span>{#if isCurrentTheme(name)}<span class="ml-auto" aria-label={m.theme_current()}><OrbitIcon name="check" className="h-4 w-4" /></span>{/if}
     </button>
    {/each}
   </div>
