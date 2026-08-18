@@ -10,4 +10,9 @@ describe('series listing query scheduling', () => {
 		expect(source).toContain('await Promise.all([countQuery, rowsQuery])');
 		expect(source).not.toMatch(/const \[countResult\] = await db/);
 	});
+
+	it('sorts upcoming series by their nearest future episode schedule', () => {
+		expect(source).toContain("filters.status === 'UPCOMING'");
+		expect(source).toMatch(/MIN\(\$\{episodeSchedules\.airDate\}\) FILTER \(WHERE \$\{episodeSchedules\.airDate\} >= NOW\(\)\) ASC NULLS LAST/);
+	});
 });

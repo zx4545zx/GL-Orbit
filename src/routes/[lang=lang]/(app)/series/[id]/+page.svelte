@@ -644,7 +644,7 @@
 	.sd-hero { position: relative; }
 	.sd-cover {
 		position: relative;
-		height: max(170px, calc(100vw / 3));
+		height: min(72vh, 540px);
 		border-radius: 0 !important;
 		overflow: hidden;
 	}
@@ -659,7 +659,6 @@
 		object-fit: cover;
 		object-position: center top;
 		display: block;
-		filter: saturate(1.12) contrast(1.04) brightness(1.01);
 	}
 	.sd-cover-tint {
 		position: absolute;
@@ -689,9 +688,7 @@
 		inset: 0;
 		z-index: 1;
 		pointer-events: none;
-		background:
-			linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--orbit-paper) 88%, transparent) 96%, var(--orbit-paper) 100%),
-			repeating-linear-gradient(0deg, color-mix(in srgb, var(--orbit-paper) 6%, transparent) 0 2px, transparent 2px 5px);
+		background: repeating-linear-gradient(0deg, color-mix(in srgb, var(--orbit-paper) 6%, transparent) 0 2px, transparent 2px 5px);
 	}
 	.sd-cover :global(.sd-cover-fb) {
 		filter: blur(26px) saturate(1.25) brightness(1.03);
@@ -710,14 +707,14 @@
 		flex: 0 0 148px;
 		background: var(--orbit-surface);
 		border: var(--orbit-border-width) var(--orbit-border-style) var(--orbit-border-strong);
-		border-radius: var(--orbit-radius-surface);
+		border-radius: 0 !important;
 		box-shadow: var(--orbit-shadow-overlay);
 	}
 	.sd-poster {
 		aspect-ratio: 2 / 3;
 		width: 100%;
 		overflow: hidden;
-		border-radius: calc(var(--orbit-radius-surface) / 2);
+		border-radius: 0 !important;
 		background: var(--orbit-paper-deep);
 	}
 	.sd-poster :global(.sd-poster-img) {
@@ -1402,9 +1399,8 @@
 
 	/* ============ DESKTOP ============ */
 	@media (min-width: 760px) {
-		.sd-cover { height: min(calc(100vw / 3), 480px); }
 		.sd-back { top: 20px; left: 28px; }
-		.sd-hero-inner { margin-top: -128px; padding: 0 28px; gap: 28px; }
+		.sd-hero-inner { margin-top: -216px; padding: 0 28px; gap: 28px; }
 		.sd-poster-frame { flex-basis: 230px; }
 		.sd-actions { display: flex; align-items: initial; gap: 10px; }
 		.sd-actions :global(.sd-btn-like) { width: auto; height: auto; padding: 10px 16px; }
@@ -1420,7 +1416,20 @@
 		.sd-cast-avatar { width: 104px; height: 104px; }
 		.sd-cast-splide :global(.splide__arrows) { top: 38px; }
 	}
+	@media (max-width: 639px) {
+		.sd-cover { height: 440px; }
+	}
+
 	@media (max-width: 759px) {
+		.sd-hero-inner {
+			display: grid;
+			grid-template-columns: 1fr;
+			align-items: start;
+			justify-items: center;
+		}
+		.sd-poster-frame { width: 148px; }
+		.sd-hero-titles { text-align: center; }
+		.sd-status-chip { margin-left: 0; }
 		.sd-studio-links {
 			display: grid;
 			grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -12,16 +12,12 @@
 		page.url.pathname === `/${page.data.lang}` || page.url.pathname === `/${page.data.lang}/`
 	);
 
-	const navLinks = $derived.by(() => {
-		const links = [
-			{ href: `/${page.data.lang}/`, label: m.nav_home() },
-			{ href: `/${page.data.lang}/whats-on`, label: m.nav_whats_on() },
-			{ href: `/${page.data.lang}/calendar`, label: m.nav_calendar() },
-			{ href: `/${page.data.lang}/explore`, label: m.nav_explore() }
-			// Orbit Halo hidden while the feature is closed — restore the /halo entry here.
-		];
-		return links;
-	});
+	const navLinks = $derived([
+		{ href: `/${page.data.lang}/`, label: m.nav_home() },
+		{ href: `/${page.data.lang}/calendar`, label: m.nav_calendar() },
+		{ href: `/${page.data.lang}/explore`, label: m.nav_explore() },
+		{ href: `/${page.data.lang}/whats-on`, label: m.nav_whats_on() }
+	]);
 
 	function isActive(href: string) {
 		const p = page.url.pathname;

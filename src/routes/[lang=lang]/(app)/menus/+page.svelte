@@ -203,7 +203,7 @@
 				</div>
 			</section>
 
-			<section class="order-4 orbit-surface p-4 sm:p-5" aria-labelledby="menus-theme-heading">
+			<section class="order-3 orbit-surface p-4 sm:p-5" aria-labelledby="menus-theme-heading">
 				<div class="flex items-center gap-3">
 					<div class="grid h-11 w-11 shrink-0 place-items-center bg-lavender/15 text-lavender-dark" aria-hidden="true">
 						<ThemeIcon theme={themeState.theme} />
@@ -218,7 +218,7 @@
 				</div>
 			</section>
 
-			<section class="order-3 orbit-surface p-4 sm:p-5" aria-labelledby="menus-shape-heading">
+			<section class="order-4 orbit-surface p-4 sm:p-5" aria-labelledby="menus-shape-heading">
 				<div class="flex items-center gap-3">
 					<div class="grid h-11 w-11 shrink-0 place-items-center bg-mint/15 text-mint-dark" aria-hidden="true">
 						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx={shapeState.shape === 'rounded' ? 2 : 0} /><rect x="13" y="13" width="7" height="7" rx={shapeState.shape === 'rounded' ? 2 : 0} /></svg>

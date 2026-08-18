@@ -18,14 +18,21 @@ describe('shared responsive navigation boundary', () => {
 		expect(bottomNav).toContain("aria-current={active ? 'page' : undefined}");
 	});
 
-	it('uses the home/calendar/explore/menus item set (halo hidden)', () => {
-		expect(bottomNav).toContain('m.nav_home()');
-		expect(bottomNav).toContain('m.nav_calendar()');
-		expect(bottomNav).toContain('m.nav_explore()');
-		expect(bottomNav).toContain('m.nav_menus()');
-		expect(bottomNav).not.toContain('m.nav_notifications()');
-		expect(bottomNav).not.toContain('NotificationBadge');
-		expect(bottomNav).not.toContain('m.nav_halo()');
+	it('uses the same home/calendar/explore/news order in both nav bars', () => {
+		for (const source of [bottomNav, navigation]) {
+			const positions = [
+				source.indexOf('m.nav_home()'),
+				source.indexOf('m.nav_calendar()'),
+				source.indexOf('m.nav_explore()'),
+				source.indexOf('m.nav_whats_on()')
+			];
+			expect(positions.every((position) => position >= 0)).toBe(true);
+			expect(positions).toEqual([...positions].sort((a, b) => a - b));
+			expect(source).not.toContain('m.nav_chat()');
+			expect(source).not.toContain('m.nav_halo()');
+		}
+		expect(bottomNav.indexOf('m.nav_menus()')).toBeGreaterThan(bottomNav.indexOf('m.nav_whats_on()'));
+		expect(navigation).not.toContain('m.nav_menus()');
 	});
 
 	it('keeps the desktop nav row in the shell header', () => {

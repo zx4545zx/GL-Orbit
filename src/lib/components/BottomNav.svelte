@@ -16,15 +16,6 @@ import { navigating, page } from '$app/state';
 
 	const secondaryItems = $derived([
 		{
-			href: `/${page.data.lang}/whats-on`,
-			label: m.nav_whats_on(),
-			icon: (active: boolean) => `
-				<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-[var(--orbit-coral)]' : 'opacity-70'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.5h16.5v15H3.75v-15Zm3 3h4.5v4.5h-4.5V7.5Zm7.5 0h3m-3 3h3m-10.5 4.5h10.5m-10.5 3h7.5" />
-				</svg>
-			`
-		},
-		{
 			href: `/${page.data.lang}/calendar`,
 			label: m.nav_calendar(),
 			icon: (active: boolean) => `
@@ -42,7 +33,15 @@ import { navigating, page } from '$app/state';
 					</svg>
 				`
 			},
-			// Orbit Halo hidden while the feature is closed — restore the /halo item here.
+			{
+				href: `/${page.data.lang}/whats-on`,
+				label: m.nav_whats_on(),
+				icon: (active: boolean) => `
+					<svg class="w-6 h-6 transition-all duration-300 ${active ? 'text-[var(--orbit-coral)]' : 'opacity-70'}" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="${active ? '0' : '1.5'}">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.5h16.5v15H3.75v-15Zm3 3h4.5v4.5h-4.5V7.5Zm7.5 0h3m-3 3h3m-10.5 4.5h10.5m-10.5 3h7.5" />
+					</svg>
+				`
+			}
 		]);
 
 	const menuItem = $derived({
@@ -55,11 +54,7 @@ import { navigating, page } from '$app/state';
 		`
 	});
 
-	const navItems = $derived.by(() => {
-		const items = [homeItem, ...secondaryItems];
-		items.push(menuItem);
-		return items;
-	});
+	const navItems = $derived([homeItem, ...secondaryItems, menuItem]);
 
 	const activePathname = $derived(navigating.to?.url.pathname ?? page.url.pathname);
 

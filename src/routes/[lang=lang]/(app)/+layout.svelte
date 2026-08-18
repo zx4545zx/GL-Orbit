@@ -21,6 +21,7 @@
 
 	const langPrefix = $derived(`/${page.data.lang}`);
 	const currentUser = $derived(page.data.user);
+	const isSeriesDetail = $derived(page.url.pathname.startsWith(`${langPrefix}/series/`));
 
 	// Show the floating back-to-top button on long list pages, but NOT on detail pages.
 	const showBackToTop = $derived(
@@ -98,7 +99,9 @@
 
 <div class="minimal-shell">
 	<div class="noise-overlay flex min-h-dvh flex-col">
-		<Navigation />
+		{#if !isSeriesDetail}
+			<Navigation />
+		{/if}
 		<div class="flex-1 mobile-bottom-safe-space px-4">
 			{@render children()}
 		</div>

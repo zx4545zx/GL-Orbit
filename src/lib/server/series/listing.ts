@@ -139,8 +139,7 @@ export async function getSeriesList(filters: SeriesFilters, page: number = 1): P
 			titleTh: series.titleTh,
 			posterUrl: series.posterUrl,
 			status: series.status,
-			studioName: studios.name,
-			firstAirDate: sql<Date | null>`MIN(${episodeSchedules.airDate})`
+			studioName: studios.name
 		})
 		.from(series)
 		.leftJoin(studios, and(eq(series.studioId, studios.id), isNull(studios.deletedAt)))
@@ -155,7 +154,9 @@ export async function getSeriesList(filters: SeriesFilters, page: number = 1): P
 				WHEN ${series.status} = 'UPCOMING' THEN 3
 				ELSE 4
 			END`,
-			desc(sql`MIN(${episodeSchedules.airDate})`),
+			filters.status === 'UPCOMING'
+				? sql`MIN(${episodeSchedules.airDate}) FILTER (WHERE ${episodeSchedules.airDate} >= NOW()) ASC NULLS LAST`
+				: desc(sql`MIN(${episodeSchedules.airDate})`),
 			asc(series.titleEn)
 		)
 		.limit(SERIES_PAGE_LIMIT)
