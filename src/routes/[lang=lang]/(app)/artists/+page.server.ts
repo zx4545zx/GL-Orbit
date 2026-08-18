@@ -1,4 +1,4 @@
-import { getCached, setCached } from '$lib/server/cache.js';
+import { getCached, setCached, setPublicPageCache } from '$lib/server/cache.js';
 import {
 	buildArtistSeoMeta,
 	getArtistList,
@@ -13,7 +13,7 @@ function buildArtistCacheKey(search: string, page: number): string {
 	return `page:artists:search:${search}:page:${page}`;
 }
 
-export const load: PageServerLoad = async ({ url, setHeaders }) => {
+export const load: PageServerLoad = async ({ url, setHeaders, locals }) => {
 	const filters = parseArtistFilters(url.searchParams);
 	const page = parseArtistPage(url.searchParams);
 	const cacheKey = buildArtistCacheKey(filters.search, page);
@@ -22,9 +22,7 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
 
 	if (!cached) setCached(cacheKey, artists, CACHE_TTL);
 
-	setHeaders({
-		'cache-control': 'private, no-store'
-	});
+	setPublicPageCache(setHeaders, Boolean(locals.user));
 
 	return {
 		artists,

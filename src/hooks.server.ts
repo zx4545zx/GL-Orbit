@@ -31,7 +31,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 	});
 
 	event.locals.lang = locale;
-	event.cookies.set('locale', locale, { path: '/', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' });
 
 	// Redirect non-localized public routes to the detected locale.
 	// Static assets, API routes, and special top-level routes are skipped.
@@ -40,6 +39,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const lastSegment = event.url.pathname.split('/').pop() ?? '';
 	const hasFileExtension = lastSegment.includes('.');
 	const nonLocalizedRoutes = new Set(['api', 'og-image']);
+	const localeCookieOptions = { path: '/', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' as const };
+
+	if (event.url.pathname === '/') {
+		event.cookies.set('locale', locale, localeCookieOptions);
+	}
 
 	if (
 		!isLocalized &&
@@ -47,6 +51,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		!hasFileExtension &&
 		!nonLocalizedRoutes.has(firstSegment)
 	) {
+		event.cookies.set('locale', locale, localeCookieOptions);
 		throw redirect(302, `/${locale}${event.url.pathname}${event.url.search}`);
 	}
 

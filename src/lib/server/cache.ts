@@ -5,6 +5,18 @@ type CacheEntry<T> = {
 
 const cache = new Map<string, CacheEntry<unknown>>();
 
+export const PUBLIC_CACHE_CONTROL = 'public, max-age=0, s-maxage=1800, stale-while-revalidate=86400';
+
+export function setPublicPageCache(
+	setHeaders: (headers: Record<string, string>) => void,
+	authenticated: boolean
+): void {
+	setHeaders({
+		'cache-control': authenticated ? 'private, no-store' : PUBLIC_CACHE_CONTROL,
+		vary: 'Cookie'
+	});
+}
+
 export function getCached<T>(key: string, ttlMs: number = 30000): T | undefined {
 	const entry = cache.get(key);
 	if (!entry) return undefined;

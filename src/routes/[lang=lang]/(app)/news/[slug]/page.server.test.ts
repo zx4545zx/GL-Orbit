@@ -9,13 +9,16 @@ describe('public news detail load', () => {
 	it('returns only the localized published article', async () => {
 		mocks.getPublishedNewsBySlug.mockResolvedValue({ slug: 'hello-world', titleTh: 'สวัสดี', titleEn: 'Hello', contentTh: 'ไทย', contentEn: 'English' });
 		const setHeaders = vi.fn();
-		const result = await load({ params: { slug: 'hello-world', lang: 'th' }, setHeaders } as never);
+		const result = await load({ params: { slug: 'hello-world', lang: 'th' }, setHeaders, locals: { user: null } } as never);
 		expect(mocks.getPublishedNewsBySlug).toHaveBeenCalledWith('hello-world');
 		expect(result).toMatchObject({ localized: { title: 'สวัสดี', content: 'ไทย' } });
-		expect(setHeaders).toHaveBeenCalledWith({ 'cache-control': 'public, max-age=60, s-maxage=300' });
+		expect(setHeaders).toHaveBeenCalledWith({
+			'cache-control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=86400',
+			vary: 'Cookie'
+		});
 	});
 	it('returns 404 when the article is draft, archived, deleted, or missing', async () => {
 		mocks.getPublishedNewsBySlug.mockResolvedValue(null);
-		await expect(load({ params: { slug: 'private', lang: 'en' }, setHeaders: vi.fn() } as never)).rejects.toMatchObject({ status: 404 });
+		await expect(load({ params: { slug: 'private', lang: 'en' }, setHeaders: vi.fn(), locals: { user: null } } as never)).rejects.toMatchObject({ status: 404 });
 	});
 });

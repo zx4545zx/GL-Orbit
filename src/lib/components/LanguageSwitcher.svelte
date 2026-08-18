@@ -25,6 +25,8 @@
 
 		if (newPath === currentPath) return;
 
+		document.cookie = `locale=${lang}; Path=/; Max-Age=31536000; SameSite=Lax`;
+
 		// Persist preference if logged in
 		if (page.data.user) {
 			await fetch('/api/user/language', {

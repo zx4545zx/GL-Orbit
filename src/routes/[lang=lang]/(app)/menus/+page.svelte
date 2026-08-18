@@ -26,6 +26,8 @@
 		const currentPath = page.url.pathname + page.url.search + page.url.hash;
 		if (newPath === currentPath) return;
 
+		document.cookie = `locale=${lang}; Path=/; Max-Age=31536000; SameSite=Lax`;
+
 		if (currentUser) {
 			await fetch('/api/user/language', {
 				method: 'POST',

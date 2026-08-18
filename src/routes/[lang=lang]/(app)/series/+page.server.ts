@@ -1,4 +1,4 @@
-import { getCached, setCached } from '$lib/server/cache.js';
+import { getCached, setCached, setPublicPageCache } from '$lib/server/cache.js';
 import {
 	buildSeriesCacheKey,
 	buildSeriesSeoMeta,
@@ -10,7 +10,7 @@ import type { PageServerLoad } from './$types.js';
 
 const CACHE_TTL = 30_000;
 
-export const load: PageServerLoad = async ({ url, setHeaders }) => {
+export const load: PageServerLoad = async ({ url, setHeaders, locals }) => {
 	const filters = parseSeriesFilters(url.searchParams);
 	const page = parseSeriesPage(url.searchParams);
 	const cacheKey = buildSeriesCacheKey(filters, page);
@@ -19,9 +19,7 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
 
 	if (!cached) setCached(cacheKey, series, CACHE_TTL);
 
-	setHeaders({
-		'cache-control': 'private, max-age=0, s-maxage=30, stale-while-revalidate=60'
-	});
+	setPublicPageCache(setHeaders, Boolean(locals.user));
 
 	return {
 		series,
