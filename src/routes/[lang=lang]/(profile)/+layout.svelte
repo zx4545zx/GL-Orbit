@@ -177,20 +177,18 @@
 		<div class="shell-bottomnav safe-area-bottom">
 			<div class="flex items-stretch px-0">
 				<a
-					class="orbit-nav-item group relative flex min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 px-1 py-2 touch-target {isProfilePath ? 'orbit-nav-active' : ''}"
-					href={profileHref}
+					class="orbit-nav-item group relative flex min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 px-1 py-2 touch-target"
+					href={homeHref}
 					data-sveltekit-preload-data="hover"
-					aria-current={isProfilePath ? 'page' : undefined}
 				>
 					<div class="relative flex items-center justify-center">
-						<div class="relative {isProfilePath ? 'zine-tilt' : ''}">
-							<svg class="h-6 w-6 transition-all duration-300 {isProfilePath ? 'text-[var(--orbit-coral)]' : 'opacity-70'}" viewBox="0 0 24 24" fill={isProfilePath ? 'currentColor' : 'none'} stroke="currentColor" stroke-width={isProfilePath ? '0' : '1.5'} aria-hidden="true">
-								<circle cx="12" cy="8" r="4" />
-								<path d="M4.5 21a7.5 7.5 0 0 1 15 0" />
+						<div class="relative">
+							<svg class="h-6 w-6 opacity-70 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
 							</svg>
 						</div>
 					</div>
-					<span class="zine-nav-label block max-w-full truncate text-center text-[10px] font-medium leading-none {isProfilePath ? 'font-semibold' : 'opacity-70'}">{m.profile_sidebar_profile()}</span>
+					<span class="zine-nav-label block max-w-full truncate text-center text-[10px] font-medium leading-none opacity-70">{m.nav_home()}</span>
 					<div class="orbit-nav-indicator mt-0.5 h-px w-5" aria-hidden="true"></div>
 				</a>
 
@@ -230,18 +228,20 @@
 				</a>
 
 				<a
-					class="orbit-nav-item group relative flex min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 px-1 py-2 touch-target"
-					href={homeHref}
+					class="orbit-nav-item group relative flex min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 px-1 py-2 touch-target {isProfilePath ? 'orbit-nav-active' : ''}"
+					href={profileHref}
 					data-sveltekit-preload-data="hover"
+					aria-current={isProfilePath ? 'page' : undefined}
 				>
 					<div class="relative flex items-center justify-center">
-						<div class="relative">
-							<svg class="h-6 w-6 opacity-70 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-								<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+						<div class="relative {isProfilePath ? 'zine-tilt' : ''}">
+							<svg class="h-6 w-6 transition-all duration-300 {isProfilePath ? 'text-[var(--orbit-coral)]' : 'opacity-70'}" viewBox="0 0 24 24" fill={isProfilePath ? 'currentColor' : 'none'} stroke="currentColor" stroke-width={isProfilePath ? '0' : '1.5'} aria-hidden="true">
+								<circle cx="12" cy="8" r="4" />
+								<path d="M4.5 21a7.5 7.5 0 0 1 15 0" />
 							</svg>
 						</div>
 					</div>
-					<span class="zine-nav-label block max-w-full truncate text-center text-[10px] font-medium leading-none opacity-70">{m.nav_home()}</span>
+					<span class="zine-nav-label block max-w-full truncate text-center text-[10px] font-medium leading-none {isProfilePath ? 'font-semibold' : 'opacity-70'}">{m.profile_sidebar_profile()}</span>
 					<div class="orbit-nav-indicator mt-0.5 h-px w-5" aria-hidden="true"></div>
 				</a>
 			</div>

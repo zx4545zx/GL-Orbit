@@ -3,7 +3,6 @@
 	import { onMount } from 'svelte';
 	import OrbitIcon from '$lib/components/OrbitIcon.svelte';
 	import Picture from '$lib/components/Picture.svelte';
-	import LibraryShareCard from '$lib/components/profile/LibraryShareCard.svelte';
 	import {
 		getExistingSubscription,
 		isPushSupported,
@@ -233,18 +232,6 @@
 				{/if}
 			</div>
 
-			{#if data.favoriteSeries.length || data.watchedSeries.length}
-				<div class="profile-share">
-					<LibraryShareCard
-						lang={page.data.lang}
-						displayName={profileUser.displayName}
-						avatarUrl={profileUser.avatarUrl}
-						favoriteCount={data.favoriteSeries.length}
-						watchedCount={data.watchedSeries.length}
-						favorites={data.favoriteSeries}
-					/>
-				</div>
-			{/if}
 		</section>
 	{:else}
 		<section aria-labelledby="account-heading">
@@ -587,12 +574,6 @@
 		text-decoration: none;
 	}
 
-	.profile-share {
-		margin-top: clamp(2rem, 5vw, 4rem);
-		padding-top: clamp(1.5rem, 3vw, 2.5rem);
-		border-top: 1px solid var(--orbit-line);
-	}
-
 	.account-layout {
 		display: grid;
 		gap: 1.25rem;
@@ -752,11 +733,6 @@
 		border: 0;
 		border-radius: var(--orbit-radius-surface);
 		background: var(--orbit-paper-deep);
-	}
-
-	.profile-share {
-		padding-top: 0;
-		border-top: 0;
 	}
 
 	.account-layout {

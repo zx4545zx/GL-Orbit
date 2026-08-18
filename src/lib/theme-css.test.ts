@@ -151,6 +151,17 @@ describe('theme CSS contract', () => {
    expect(reducedMotion).toContain('--orbit-motion-standard: 0.01ms');
    expect(reducedMotion).toContain('--orbit-motion-theme: 0.01ms');
   });
+  it('uses the active display font for every page element', () => {
+       expect(css).toMatch(/body\s*\{[\s\S]*?font-family: var\(--orbit-font-display\) !important;/);
+       expect(css).toMatch(/body \*\s*\{[\s\S]*?font-family: var\(--orbit-font-display\) !important;/);
+      });
+      it('uses the Y2K Prompt fallback for Thai in Sakura, Midnight, and Mission', () => {
+   for (const theme of ['y2k', 'sakura', 'midnight', 'mission'] as const) {
+    expect(themeBlock(theme)).toMatch(/--orbit-font-display:[^;]*'Prompt'/);
+    expect(themeBlock(theme)).toMatch(/--orbit-font-body:'Prompt'/);
+   }
+   expect(css).not.toMatch(/font-family:\s*'(?:Chivo Mono|IBM Plex Mono)',\s*monospace/);
+  });
   it('marks midnight as the only dark color-scheme theme', () => {
    expect(themeBlock('midnight')).toContain('color-scheme: dark');
    for (const theme of ['y2k', 'sakura', 'ocean', 'candy', 'mission'] as const) {

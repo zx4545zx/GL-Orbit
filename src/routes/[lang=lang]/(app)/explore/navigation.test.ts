@@ -5,6 +5,10 @@ import { describe, expect, it } from 'vitest';
 const source = readFileSync(fileURLToPath(new URL('./+page.svelte', import.meta.url)), 'utf8');
 
 describe('Explore in-place query navigation', () => {
+	it('uses the navigation display font throughout Explore', () => {
+		expect(source).toMatch(/\.xp\s*\{[\s\S]*?font-family: var\(--orbit-font-display\);/);
+	});
+
 	it('keeps full-bleed hero structure square in rounded mode', () => {
 		const squareHeroStart = source.indexOf('.xp-hero-splide,');
 		const squareHeroEnd = source.indexOf('}', squareHeroStart);
@@ -38,6 +42,13 @@ describe('Explore in-place query navigation', () => {
 		expect(heroOptions).not.toContain('pauseOnFocus: false');
 		expect(heroOptions).not.toContain('reducedMotion:');
 		expect(railOptions).not.toContain('autoplay:');
+		expect(railOptions).toContain("type: i < 2 && canLoop(railCounts[i], railMaxPerPage[i]) ? 'loop' : 'slide'");
+		expect(railOptions).toContain("padding: '5rem'");
+		expect(source.match(/padding: '3rem'/g)).toHaveLength(3);
+		expect(source.match(/639: \{ perPage: [12], padding: '2rem' \}/g)).toHaveLength(3);
+		expect(source).toContain('width: 100vw;');
+		expect(source).toContain('margin-inline: calc(50% - 50vw);');
+		expect(heroOptions).not.toContain('padding:');
 	});
 
 	it('renders a standalone localized overview control before exactly three connected tabs', () => {
@@ -70,6 +81,15 @@ describe('Explore in-place query navigation', () => {
 			expect(source).toContain(`href="{langPrefix}/explore?view=${view}"`);
 		}
 		expect(source.match(/class="xp-rail-more" href="\{langPrefix\}\/explore\?view=(series|artists|ships)" onclick=\{\(event\) => navigateQuery\(event, `\$\{langPrefix\}\/explore\?view=\1`\)\}/g)).toHaveLength(3);
+	});
+
+	it('ends the finite artist and ship rails with view-all slides', () => {
+		expect(source.match(/class="xp-astar xp-view-all-control"/g)).toHaveLength(1);
+		expect(source).toContain('class="xp-view-all-card"');
+		expect(source).toContain('.xp-view-all-control { color: var(--orbit-ink); }');
+		expect(source).toMatch(/\.xp-view-all-card\s*\{[\s\S]*?background: var\(--orbit-lavender\);/);
+		expect(source).toContain('railArrows(2, data.artists.length + 1, 4, 6)');
+		expect(source).toContain('railArrows(3, data.ships.length + 1, 3, 4)');
 	});
 
 	it('keys upcoming schedule cards by the unique schedule record', () => {

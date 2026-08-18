@@ -9,4 +9,14 @@ describe('carousel touch CSS contract', () => {
 
 		expect(trackRule).toContain('touch-action: pan-y pinch-zoom');
 	});
+
+	it('removes composited theme textures from coarse-pointer touch paths', () => {
+		const coarsePointerRule = css.match(/@media \(hover: none\) and \(pointer: coarse\) \{([\s\S]*?)\n\}/)?.[1] ?? '';
+
+		for (const theme of ['sakura', 'midnight', 'y2k']) {
+			expect(coarsePointerRule).toContain(`[data-theme='${theme}']`);
+		}
+		expect(coarsePointerRule).toContain('noise-overlay::after');
+		expect(coarsePointerRule).toContain('display: none');
+	});
 });

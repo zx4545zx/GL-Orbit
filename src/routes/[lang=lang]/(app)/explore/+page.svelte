@@ -159,15 +159,15 @@
 	// (No perMove: arrows compute the target page explicitly in railGo.)
 	const CARD_PAGES = {
 		perPage: 4,
-		breakpoints: { 1023: { perPage: 3 }, 639: { perPage: 2 } }
+		breakpoints: { 1023: { perPage: 3, padding: '3rem' }, 639: { perPage: 2, padding: '2rem' } }
 	};
 	const TOP10_PAGES = {
 		perPage: 4,
-		breakpoints: { 1023: { perPage: 3 }, 639: { perPage: 1 } }
+		breakpoints: { 1023: { perPage: 3, padding: '3rem' }, 639: { perPage: 1, padding: '2rem' } }
 	};
 	const AVATAR_PAGES = {
 		perPage: 6,
-		breakpoints: { 1023: { perPage: 4 }, 639: { perPage: 2 } }
+		breakpoints: { 1023: { perPage: 4, padding: '3rem' }, 639: { perPage: 2, padding: '2rem' } }
 	};
 
 	onMount(() => {
@@ -207,10 +207,11 @@
 			railSplideEls.forEach((el, i) => {
 				if (!el) return;
 				const splide = new Splide(el, {
-					type: canLoop(railCounts[i], railMaxPerPage[i]) ? 'loop' : 'slide',
+					type: i < 2 && canLoop(railCounts[i], railMaxPerPage[i]) ? 'loop' : 'slide',
 					rewind: true,
 					drag: 'free',
 					snap: true,
+					padding: '5rem',
 					gap: '18px',
 					arrows: false,
 					// Keep the other rails arrow/swipe-only; TOP 10 also exposes Splide's
@@ -510,7 +511,7 @@
 			<div class="xp-rail-head">
 				<h2 class="xp-rail-title">{m.explore_rail_artists()}</h2>
 				<div class="xp-rail-tools">
-					{@render railArrows(2, data.artists.length, 4, 6)}
+					{@render railArrows(2, data.artists.length + 1, 4, 6)}
 					<a class="xp-rail-more" href="{langPrefix}/explore?view=artists" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=artists`)}>{m.explore_view_all()} <OrbitIcon name="arrow-right" className="h-3.5 w-3.5" /></a>
 				</div>
 			</div>
@@ -528,6 +529,12 @@
 						</a>
 					</div>
 				{/each}
+					<div class="splide__slide">
+						<a class="xp-astar xp-view-all-control" href="{langPrefix}/explore?view=artists" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=artists`)}>
+							<span class="xp-face orbit-round-data"><OrbitIcon name="arrow-right" className="h-6 w-6" /></span>
+							<span class="xp-astar-name">{m.explore_view_all()}</span>
+						</a>
+					</div>
 					</div>
 				</div>
 			</div>
@@ -541,7 +548,7 @@
 			<div class="xp-rail-head">
 				<h2 class="xp-rail-title">{m.explore_rail_ships()}</h2>
 				<div class="xp-rail-tools">
-					{@render railArrows(3, data.ships.length, 3, 4)}
+					{@render railArrows(3, data.ships.length + 1, 3, 4)}
 					<a class="xp-rail-more" href="{langPrefix}/explore?view=ships" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=ships`)}>{m.explore_view_all()} <OrbitIcon name="arrow-right" className="h-3.5 w-3.5" /></a>
 				</div>
 			</div>
@@ -567,6 +574,12 @@
 						</a>
 					</div>
 				{/each}
+					<div class="splide__slide">
+						<a class="xp-view-all-card" href="{langPrefix}/explore?view=ships" onclick={(event) => navigateQuery(event, `${langPrefix}/explore?view=ships`)}>
+							<span>{m.explore_view_all()}</span>
+							<OrbitIcon name="arrow-right" className="h-6 w-6" />
+						</a>
+					</div>
 					</div>
 				</div>
 			</div>
@@ -574,21 +587,13 @@
 		</section>
 	{/if}
 
-	<!-- ===== platform strip ===== -->
-	{#if data.platforms.length > 0}
-		<div class="xp-platforms" aria-label={m.explore_platforms_label()}>
-			<span class="xp-platforms-lbl">{m.explore_platforms_label()}</span>
-			{#each data.platforms as p (p.name)}
-				<span class="xp-pf">{p.name}</span>
-			{/each}
-		</div>
-	{/if}
 	</div>
 </div>
 
 <style>
 	.xp {
 		max-width: 72rem;
+		font-family: var(--orbit-font-display);
 		margin: 0 auto;
 		padding: 0 0 64px;
 	}
@@ -1066,7 +1071,7 @@
 	.xp-rail-scroll :global(.splide__track) {
 		/* The track is the viewport. A 4px internal shadow reserve keeps card
 		   decoration intact while overflow clipping rejects adjacent slides/clones. */
-		padding: 14px 4px 24px !important;
+		padding: 14px 4px 24px;
 		margin: -14px 12px -24px;
 		overflow-x: hidden;
 	}
@@ -1144,7 +1149,7 @@
 		.xp-rail { margin-inline: 8px; }
 		.xp-rail-scroll { margin-inline: -14px; }
 		.xp-rail-scroll :global(.splide__track) {
-			padding-inline: 4px !important;
+			padding-inline: 4px;
 			margin-inline: 10px;
 		}
 		.xp-rail-arrows--desktop { display: inline-flex; }
@@ -1155,7 +1160,7 @@
 		.xp-rail { margin-inline: 8px; }
 		.xp-rail-scroll { margin-inline: -24px; }
 		.xp-rail-scroll :global(.splide__track) {
-			padding-inline: 4px !important;
+			padding-inline: 4px;
 			margin-inline: 20px;
 		}
 		.xp-rail-arrows--tablet { display: inline-flex; }
@@ -1324,6 +1329,27 @@
 		color: var(--orbit-ink);
 	}
 	.xp-astar:hover { text-decoration: none; }
+	.xp-view-all-control { color: var(--orbit-ink); }
+	.xp-view-all-control .xp-face { color: var(--orbit-link); }
+	.xp-view-all-card {
+		display: grid;
+		place-content: center;
+		justify-items: center;
+		gap: 10px;
+		height: 100%;
+		min-height: 180px;
+		padding: 20px;
+		font-family: var(--orbit-font-display);
+		font-weight: 700;
+		text-align: center;
+		text-decoration: none;
+		color: var(--orbit-link);
+		background: var(--orbit-lavender);
+		border: var(--orbit-border-width) solid var(--orbit-line-strong);
+		border-radius: var(--orbit-radius-surface);
+		box-shadow: var(--orbit-shadow);
+	}
+	.xp-view-all-card:hover { color: var(--orbit-coral-dark); }
 	.xp-face {
 		width: 132px;
 		aspect-ratio: 1;
@@ -1386,46 +1412,17 @@
 		transform: translateX(-50%);
 	}
 
-	/* platform strip */
-	.xp-platforms {
-		margin-top: 40px;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
-		align-items: center;
-		border: var(--orbit-border-width) solid var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-surface);
-		background: var(--orbit-surface);
-		box-shadow: var(--orbit-shadow);
-		padding: 14px 16px;
-	}
-	.xp-platforms-lbl {
-		font-family: var(--orbit-font-display);
-		font-size: 11px;
-		color: var(--orbit-muted);
-		margin-right: 6px;
-	}
-	.xp-pf {
-		font-family: var(--orbit-font-display);
-		font-size: 10px;
-		padding: 6px 12px;
-		min-height: 36px;
-		display: inline-flex;
-		align-items: center;
-		background: var(--orbit-mint);
-		color: var(--orbit-ink);
-		border: var(--orbit-border-width) solid var(--orbit-line-strong);
-		border-radius: var(--orbit-radius-badge);
-		box-shadow: var(--orbit-shadow);
-	}
 
 	/* ===== responsive ===== */
 	@media (max-width: 639px) {
-		/* Keep cards on the 16px mobile edge with the same clipped shadow reserve. */
-		.xp-rail-scroll { margin-inline: -16px; }
+		/* Rails escape the shell's px-4 gutter so slides can reach both viewport edges. */
+		.xp-rail-scroll {
+			width: 100vw;
+			margin-inline: calc(50% - 50vw);
+		}
 		.xp-rail-scroll :global(.splide__track) {
-			padding-inline: 4px !important;
-			margin-inline: 12px;
+			padding-inline: 0;
+			margin-inline: 0;
 			overflow-x: hidden;
 		}
 		.xp-hero-slide { min-height: 440px; }

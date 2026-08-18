@@ -1,33 +1,9 @@
-import { asc, isNull } from 'drizzle-orm';
-import { getDb } from '$lib/server/db/index.js';
-import { platforms } from '$lib/server/db/schema.js';
-import { getCached, setCached } from '$lib/server/cache.js';
 import { getHomeData } from '$lib/server/queries/home.js';
 import { getSeriesDetail } from '$lib/server/queries/series-detail.js';
 import { getSeriesList, parseSeriesFilters, parseSeriesPage } from '$lib/server/series/listing.js';
 import { getArtistList, parseArtistFilters, parseArtistPage } from '$lib/server/queries/artist-list.js';
 import { getShipList, parseShipFilters, parseShipPage } from '$lib/server/ships/listing.js';
 import type { PageServerLoad } from './$types.js';
-
-const CACHE_TTL = 30_000;
-
-export type ExplorePlatform = { name: string };
-
-async function getPlatformNames(): Promise<ExplorePlatform[]> {
-	const CACHE_KEY = 'query:explore:platforms';
-	const cached = getCached<ExplorePlatform[]>(CACHE_KEY, CACHE_TTL);
-	if (cached) return cached;
-
-	const db = await getDb();
-	const rows = await db
-		.select({ name: platforms.name })
-		.from(platforms)
-		.where(isNull(platforms.deletedAt))
-		.orderBy(asc(platforms.name));
-
-	setCached(CACHE_KEY, rows, CACHE_TTL);
-	return rows;
-}
 
 export type ExploreMode = 'overview' | 'series' | 'artists' | 'ships';
 
@@ -44,12 +20,11 @@ export const load: PageServerLoad = async ({ params, url, setHeaders }) => {
 	const artistFilters = parseArtistFilters(url.searchParams);
 	const shipFilters = parseShipFilters(url.searchParams);
 
-	const [home, seriesList, artistList, shipList, platformNames] = await Promise.all([
+	const [home, seriesList, artistList, shipList] = await Promise.all([
 		getHomeData(lang),
 		getSeriesList({ search: '', status: 'ALL' }, 1),
 		getArtistList({ search: '' }, 1),
-		getShipList({ search: '' }, 1),
-		getPlatformNames()
+		getShipList({ search: '' }, 1)
 	]);
 	const [seriesResults, artistResults, shipResults] = await Promise.all([
 		mode === 'series' ? getSeriesList(seriesFilters, parseSeriesPage(url.searchParams)) : null,
@@ -99,7 +74,6 @@ export const load: PageServerLoad = async ({ params, url, setHeaders }) => {
 			series: seriesList.total,
 			artists: artistList.total,
 			ships: shipList.total
-		},
-		platforms: platformNames
+		}
 	};
 };

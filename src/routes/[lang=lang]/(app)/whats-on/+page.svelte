@@ -499,6 +499,7 @@
 <style>
 	.whats-on-page {
 		color: var(--orbit-ink);
+		font-family: var(--orbit-font-display);
 	}
 
 	.page-reveal,

@@ -7,12 +7,6 @@
 
 	const menuItems = $derived([
 		{
-			href: localizedHref('/settings/ai', page.data.lang),
-			title: m.ai_settings_title(),
-			description: m.ai_settings_description(),
-			icon: 'ai'
-		},
-		{
 			href: localizedHref('/subscriptions', page.data.lang),
 			title: m.subscriptions_nav(),
 			description: m.subscriptions_subtitle(),
@@ -61,9 +55,7 @@
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m4 20 4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20Z" /><path d="m14 7 3 3" /></svg>
 					{:else if item.icon === 'password'}
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 11V8a5 5 0 0 1 10 0v3" /><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M12 15v2" /></svg>
-			{:else if item.icon === 'ai'}
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="16" height="16" rx="3" /><path d="M9 9h.01M15 9h.01M9 15h6" /></svg>
-			{:else}
+					{:else}
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="13" rx="2" /><path d="M8 21h8M12 17v4" /></svg>
 					{/if}
 				</span>
