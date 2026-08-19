@@ -167,6 +167,7 @@
 	};
 	const AVATAR_PAGES = {
 		perPage: 6,
+		gap: 0,
 		breakpoints: { 1023: { perPage: 4, padding: '3rem' }, 639: { perPage: 2, padding: '2rem' } }
 	};
 
@@ -1077,7 +1078,7 @@
 	}
 	/* Responsive pre-init widths mirror Splide to limit hydration movement. */
 	.xp-rail-scroll :global(.splide__slide) { flex: 0 0 auto; width: calc((100% - 54px) / 4); }
-	.xp-rail-scroll--avatars :global(.splide__slide) { width: calc((100% - 90px) / 6); }
+	.xp-rail-scroll--avatars :global(.splide__slide) { width: calc(100% / 6); }
 	/* TOP 10 keeps Splide's default semantic pagination markup, styled as a
 	   compact in-flow navigator so mobile pages never overlap the cards. */
 	.xp-rail-scroll--top10 :global(.splide__pagination) {
@@ -1165,7 +1166,7 @@
 		}
 		.xp-rail-arrows--tablet { display: inline-flex; }
 		.xp-rail-scroll :global(.splide__slide) { width: calc((100% - 36px) / 3); }
-		.xp-rail-scroll--avatars :global(.splide__slide) { width: calc((100% - 54px) / 4); }
+		.xp-rail-scroll--avatars :global(.splide__slide) { width: 25%; }
 	}
 	.xp-rail-arrow {
 		display: inline-flex;
@@ -1437,7 +1438,7 @@
 		.xp-rail-scroll--top10 :global(.splide__slide) { width: 100%; }
 		.xp-rail-scroll--top10 :global(.splide__pagination) { margin-top: 16px; gap: 2px; }
 		.xp-rail-scroll--top10 :global(.splide__pagination__page) { width: 26px; height: 26px; }
-		.xp-rail-scroll--avatars :global(.splide__slide) { width: calc((100% - 18px) / 2); }
+		.xp-rail-scroll--avatars :global(.splide__slide) { width: 50%; }
 		.xp-face { width: 108px; }
 		.xp-rank { font-size: clamp(88px, 30vw, 108px); min-width: 64px; margin-right: -8px; }
 	}
