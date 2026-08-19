@@ -8,6 +8,7 @@
 	<span>{m.footer_tagline()}</span>
 	<span class="shell-colophon-links">
 		<a href="/{page.data.lang}/about" class="touch-target">{m.footer_about()}</a>
+		<a href="/{page.data.lang}/privacy" class="touch-target">{m.footer_privacy()}</a>
 		<a href="/{page.data.lang}/explore?view=series" class="touch-target">{m.footer_all_series()}</a>
 		<a href="/{page.data.lang}/explore?view=artists" class="touch-target">{m.nav_artists()}</a>
 		<a href="/{page.data.lang}/explore?view=ships" class="touch-target">{m.nav_ships()}</a>

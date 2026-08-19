@@ -64,6 +64,8 @@ describe('GET /sitemap.xml', () => {
 		expect(response.headers.get('content-type')).toContain('application/xml');
 		expect(body).toContain('<loc>https://gl-orbit.com/th</loc>');
 		expect(body).toContain('<loc>https://gl-orbit.com/en</loc>');
+		expect(body).toContain('<loc>https://gl-orbit.com/th/privacy</loc>');
+		expect(body).toContain('<loc>https://gl-orbit.com/en/privacy</loc>');
 		expect(body).toContain('<loc>https://gl-orbit.com/th/series</loc>');
 		expect(body).toContain('<loc>https://gl-orbit.com/en/series</loc>');
 		expect(body).toContain('<loc>https://gl-orbit.com/th/artists</loc>');

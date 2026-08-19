@@ -47,6 +47,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	const urls = [
 		...localizedUrlEntries(origin, '', 'daily', '1.0'),
 		...localizedUrlEntries(origin, '/about', 'monthly', '0.8'),
+		...localizedUrlEntries(origin, '/privacy', 'monthly', '0.3'),
 		...localizedUrlEntries(origin, '/series', 'daily', '0.9'),
 		...localizedUrlEntries(origin, '/artists', 'weekly', '0.7'),
 		...localizedUrlEntries(origin, '/calendar', 'hourly', '0.9'),
