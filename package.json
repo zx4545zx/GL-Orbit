@@ -63,6 +63,7 @@
     "@inlang/plugin-message-format": "^4.4.1",
     "@openrouter/ai-sdk-provider": "^2.10.0",
     "@splidejs/splide": "^4.1.4",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "ai": "^6.0.246",
     "aws4fetch": "^1.0.20",
