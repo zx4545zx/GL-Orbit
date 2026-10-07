@@ -209,3 +209,15 @@ Do not claim success from intent; report command result and distinguish pre-exis
 - Preserve user-owned data boundaries in subscriptions, chat and Halo.
 - Do not commit generated screenshots or local debug artifacts unless explicitly requested.
 - Update README.md, AGENTS.md and CLAUDE.md when architecture, commands, env requirements or major feature status changes.
+
+## Cursor Cloud specific instructions
+
+Cloud Agent VMs do not run systemd. The environment install command runs `npm ci` and installs PostgreSQL 16 when `psql` is missing. On boot, the start command starts PostgreSQL with `pg_ctlcluster`, prepares a local database, and launches the Vite dev server.
+
+- Node is 22 or newer. Install dependencies with `npm ci`.
+- On boot, start creates the `glorbit` role and database, switches local TCP auth to trust, and writes a gitignored `.env` only when that file is absent. `DB_PROVIDER=neon` uses `postgres://glorbit@127.0.0.1:5432/glorbit` for the app URL, the read-only URL, and `DATABASE_MIGRATION_URL`. Do not print `.env`.
+- `npx drizzle-kit push --force` runs only when the public schema has no tables. After a schema change, run `npm run db:push` against this local database.
+- The dev server is tmux session `gl-orbit-dev`: `npm run dev -- --host 0.0.0.0 --port 5173 --strictPort`. `/` redirects to `/th` or `/en`.
+- `scripts/seed-data.ts` deletes seeded application data. Run it only against this local database, and only with explicit approval.
+- News & Events, AI Chat, R2 uploads, and Web Push stay inactive until their server secrets are configured. Catalog, auth, and member flows use the local database.
+- Validation commands: `npm test`, `npm run check`, `npm run build`.
